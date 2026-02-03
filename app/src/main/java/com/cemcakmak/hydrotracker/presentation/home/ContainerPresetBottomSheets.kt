@@ -2,6 +2,7 @@ package com.cemcakmak.hydrotracker.presentation.home
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -12,8 +13,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.data.models.ContainerPreset
+import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.utils.ContainerIconMapper
 
 /**
@@ -59,8 +62,7 @@ fun EditContainerPresetBottomSheet(
             ) {
                 Text(
                     text = "Edit Container",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.SemiBold
+                    style = MaterialTheme.typography.titleLargeEmphasized
                 )
 
                 // Icon preview
@@ -109,6 +111,7 @@ fun EditContainerPresetBottomSheet(
                     { Text("Name is required") }
                 } else null,
                 singleLine = true,
+                shape = RoundedCornerShape(20.dp),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -123,6 +126,7 @@ fun EditContainerPresetBottomSheet(
                 placeholder = { Text("e.g., 250") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 isError = volumeError,
+                shape = RoundedCornerShape(20.dp),
                 supportingText = if (volumeError) {
                     { Text("Enter a valid volume (1-5000 ml)") }
                 } else {
@@ -355,5 +359,18 @@ fun AddContainerPresetBottomSheet(
                 Text("Add Container")
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun EditContainerPresetBottomSheetPreview() {
+    HydroTrackerTheme {
+        EditContainerPresetBottomSheet(
+            preset = ContainerPreset.getDefaultPresets().first(),
+            onDismiss = {},
+            onSave = { _, _ -> },
+            onDelete = {}
+        )
     }
 }
