@@ -24,6 +24,10 @@
   <img src="https://img.shields.io/badge/Compose-BOM%202025.07.00-purple.svg" alt="Compose Version">
 </p>
 
+<p align="center">
+  https://img.shields.io/badge/Android-API%2026+-green.svg
+</p>
+
 ---
 
 ## Features
