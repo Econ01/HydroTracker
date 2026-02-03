@@ -25,7 +25,8 @@
 </p>
 
 <p align="center">
-  https://img.shields.io/badge/Android-API%2026+-green.svg
+  ![Downloads](https://img.shields.io/github/downloads/Econ01/HydroTracker/total)
+
 </p>
 
 ---
