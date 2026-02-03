@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
+import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
 
 object DatabaseInitializer {
@@ -133,6 +134,40 @@ object DatabaseInitializer {
         }
     }
 
+    // Migration from version 5 to version 6 (adding container_presets table)
+    private val MIGRATION_5_6 = object : Migration(5, 6) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            try {
+                println("DatabaseInitializer: Starting migration from version 5 to 6")
+
+                // Create the container_presets table
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS container_presets (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        name TEXT NOT NULL,
+                        volume REAL NOT NULL,
+                        icon_type TEXT NOT NULL,
+                        icon_name TEXT NOT NULL,
+                        is_default INTEGER NOT NULL DEFAULT 0,
+                        display_order INTEGER NOT NULL DEFAULT 0
+                    )
+                """)
+
+                // Create index on display_order for efficient sorting
+                db.execSQL("""
+                    CREATE INDEX IF NOT EXISTS index_container_presets_display_order
+                    ON container_presets (display_order)
+                """)
+
+                println("DatabaseInitializer: Migration 5→6 completed. Created container_presets table.")
+
+            } catch (e: Exception) {
+                println("DatabaseInitializer: Error during migration 5→6: ${e.message}")
+                throw e
+            }
+        }
+    }
+
     fun getDatabase(context: Context): HydroTrackerDatabase {
         return database ?: synchronized(this) {
             val instance = Room.databaseBuilder(
@@ -140,7 +175,7 @@ object DatabaseInitializer {
                 HydroTrackerDatabase::class.java,
                 HydroTrackerDatabase.DATABASE_NAME
             )
-                .addMigrations(MIGRATION_1_2, MIGRATION_1_3, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+                .addMigrations(MIGRATION_1_2, MIGRATION_1_3, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
                 // Add fallback strategy for Room 2.8.1 compatibility issues
                 .fallbackToDestructiveMigrationOnDowngrade(true)
                 .build()
@@ -158,6 +193,13 @@ object DatabaseInitializer {
             dailySummaryDao = db.dailySummaryDao(),
             userRepository = userRepository,
             context = context.applicationContext // Use application context to prevent leaks
+        )
+    }
+
+    fun getContainerPresetRepository(context: Context): ContainerPresetRepository {
+        val db = getDatabase(context)
+        return ContainerPresetRepository(
+            containerPresetDao = db.containerPresetDao()
         )
     }
 
