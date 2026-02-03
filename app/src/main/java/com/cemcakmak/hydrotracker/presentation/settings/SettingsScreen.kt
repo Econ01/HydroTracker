@@ -31,7 +31,9 @@ import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.models.HydrationStandard
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
+import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
 import com.cemcakmak.hydrotracker.presentation.common.HydroSnackbarHost
+import com.cemcakmak.hydrotracker.presentation.common.showSuccessSnackbar
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.clickable
@@ -56,6 +58,7 @@ fun SettingsScreen(
     userProfile: UserProfile? = null,
     userRepository: UserRepository? = null,
     waterIntakeRepository: WaterIntakeRepository? = null,
+    containerPresetRepository: ContainerPresetRepository? = null,
     onDarkModeChange: (DarkModePreference) -> Unit = {},
     onColorSourceChange: (ColorSource) -> Unit = {},
     onPureBlackChange: (Boolean) -> Unit = {},
@@ -183,6 +186,29 @@ fun SettingsScreen(
             HorizontalDivider(
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
             )
+
+            // Container Presets Section
+            if (containerPresetRepository != null) {
+                AnimatedVisibility(
+                    visible = isVisible,
+                    enter = slideInVertically(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessMedium
+                        ),
+                        initialOffsetY = { it / 2 }
+                    ) + fadeIn(animationSpec = tween(600, delayMillis = 260))
+                ) {
+                    ContainerPresetsSection(
+                        containerPresetRepository = containerPresetRepository,
+                        snackbarHostState = snackbarHostState
+                    )
+                }
+
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                )
+            }
 
             // Health Connect Section - only show if supported on this Android version
             if (HealthConnectManager.isVersionSupported()) {
@@ -1783,6 +1809,129 @@ private fun HydrationSection(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ContainerPresetsSection(
+    containerPresetRepository: ContainerPresetRepository,
+    snackbarHostState: SnackbarHostState
+) {
+    val coroutineScope = rememberCoroutineScope()
+    var showResetConfirmation by remember { mutableStateOf(false) }
+    val presetCount by containerPresetRepository.getAllPresets().collectAsState(initial = emptyList())
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(5.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocalDrink,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Container Presets",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
+            Text(
+                text = "Customize the quick select containers on the home screen. Long-press any container to edit or delete it.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            // Current preset count
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                ),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Current containers:",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = "${presetCount.size}",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
+            // Reset to defaults button
+            OutlinedButton(
+                onClick = { showResetConfirmation = true },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.RestartAlt,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Reset to Defaults")
+            }
+        }
+    }
+
+    // Reset confirmation dialog
+    if (showResetConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showResetConfirmation = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.RestartAlt,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            title = { Text("Reset Container Presets?") },
+            text = {
+                Text("This will remove all custom containers and restore the 7 default presets. This action cannot be undone.")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showResetConfirmation = false
+                        coroutineScope.launch {
+                            containerPresetRepository.resetToDefaults()
+                            snackbarHostState.showSuccessSnackbar(
+                                message = "Container presets reset to defaults"
+                            )
+                        }
+                    }
+                ) {
+                    Text("Reset")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetConfirmation = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 

@@ -21,7 +21,11 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(timeout:*)",
       "WebFetch(domain:www.sinasamaki.com)",
-      "Bash(cmd.exe:*)"
+      "Bash(cmd.exe:*)",
+      "Bash(.gradlew.bat clean)",
+      "WebFetch(domain:codepen.io)",
+      "WebFetch(domain:img.buymeacoffee.com)",
+      "Bash(gradlew.bat assembleDebug:*)"
     ],
     "deny": [],
     "additionalDirectories": [
