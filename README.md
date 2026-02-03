@@ -25,9 +25,9 @@
 </p>
 
 <p align="center">
-  ![Downloads](https://img.shields.io/github/downloads/Econ01/HydroTracker/total)
-
+  <img src="https://img.shields.io/github/downloads/Econ01/HydroTracker/total?color=blue&label=Downloads" alt="Downloads"/>
 </p>
+
 
 ---
 
