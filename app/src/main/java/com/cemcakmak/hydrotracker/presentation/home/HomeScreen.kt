@@ -40,6 +40,7 @@ import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.models.ContainerPreset
 import com.cemcakmak.hydrotracker.data.models.BeverageType
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
+import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
 import com.cemcakmak.hydrotracker.health.HealthConnectManager
 import com.cemcakmak.hydrotracker.health.HealthConnectSyncManager
 import com.cemcakmak.hydrotracker.data.database.repository.WaterProgress
@@ -49,12 +50,15 @@ import com.cemcakmak.hydrotracker.utils.WaterCalculator
 import com.cemcakmak.hydrotracker.presentation.common.HydroSnackbarHost
 import com.cemcakmak.hydrotracker.presentation.common.showSuccessSnackbar
 import com.cemcakmak.hydrotracker.presentation.common.showErrorSnackbar
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
     userProfile: UserProfile,
     waterIntakeRepository: WaterIntakeRepository,
+    containerPresetRepository: ContainerPresetRepository,
     onNavigateToHistory: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {}
@@ -107,6 +111,12 @@ fun HomeScreen(
 
     // Beverage selection state
     var selectedBeverageType by remember { mutableStateOf(BeverageType.WATER) }
+
+    // Container preset management state
+    val presets by containerPresetRepository.getAllPresets().collectAsState(initial = emptyList())
+    var showAddPresetSheet by remember { mutableStateOf(false) }
+    var showEditPresetSheet by remember { mutableStateOf(false) }
+    var presetToEdit by remember { mutableStateOf<ContainerPreset?>(null) }
 
     // Pull-to-refresh state
     var isRefreshing by remember { mutableStateOf(false) }
@@ -482,8 +492,9 @@ fun HomeScreen(
                         initialOffsetY = { it / 2 }
                     ) + fadeIn(animationSpec = tween(600, delayMillis = 400))
                 ) {
-                    val presets = remember { ContainerPreset.getDefaultPresets() }
-                    val carouselState = rememberCarouselState { presets.size }
+                    // +1 for the "Add" button at the end
+                    val carouselItemCount = presets.size + 1
+                    val carouselState = rememberCarouselState { carouselItemCount }
 
                     Column(
                         modifier = Modifier
@@ -506,15 +517,35 @@ fun HomeScreen(
                             preferredItemWidth = 130.dp,
                             itemSpacing = 8.dp,
                         ) { index ->
-                            val preset = presets[index]
-                            CarouselWaterCard(
-                                preset = preset,
-                                onClick = { addWaterIntake(preset.volume, preset.name)
-                                    haptics.performHapticFeedback(HapticFeedbackType.Confirm)},
-                                modifier = Modifier
-                                    .height(130.dp)
-                                    .maskClip(MaterialTheme.shapes.extraLarge)
-                            )
+                            if (index < presets.size) {
+                                val preset = presets[index]
+                                CarouselWaterCard(
+                                    preset = preset,
+                                    onClick = {
+                                        addWaterIntake(preset.volume, preset.name)
+                                        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                                    },
+                                    onLongPress = {
+                                        presetToEdit = preset
+                                        showEditPresetSheet = true
+                                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    },
+                                    modifier = Modifier
+                                        .height(130.dp)
+                                        .maskClip(MaterialTheme.shapes.extraLarge)
+                                )
+                            } else {
+                                // Add button at the end
+                                AddContainerCard(
+                                    onClick = {
+                                        showAddPresetSheet = true
+                                        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                                    },
+                                    modifier = Modifier
+                                        .height(130.dp)
+                                        .maskClip(MaterialTheme.shapes.extraLarge)
+                                )
+                            }
                         }
 
                         // Beverage Selection Section
@@ -603,7 +634,7 @@ fun HomeScreen(
     if (showEditDialog && entryToEdit != null) {
         EditWaterDialog(
             entry = entryToEdit!!,
-            onDismiss = { 
+            onDismiss = {
                 showEditDialog = false
                 entryToEdit = null
             },
@@ -614,19 +645,72 @@ fun HomeScreen(
             }
         )
     }
+
+    // Add Container Preset Bottom Sheet
+    if (showAddPresetSheet) {
+        AddContainerPresetBottomSheet(
+            onDismiss = { showAddPresetSheet = false },
+            onAdd = { name, volume ->
+                coroutineScope.launch {
+                    containerPresetRepository.addPreset(name, volume)
+                    showAddPresetSheet = false
+                    snackbarHostState.showSuccessSnackbar(
+                        message = "Added \"$name\" container"
+                    )
+                }
+            }
+        )
+    }
+
+    // Edit Container Preset Bottom Sheet
+    if (showEditPresetSheet && presetToEdit != null) {
+        EditContainerPresetBottomSheet(
+            preset = presetToEdit!!,
+            onDismiss = {
+                showEditPresetSheet = false
+                presetToEdit = null
+            },
+            onSave = { name, volume ->
+                coroutineScope.launch {
+                    containerPresetRepository.updatePreset(presetToEdit!!.id, name, volume)
+                    showEditPresetSheet = false
+                    presetToEdit = null
+                    snackbarHostState.showSuccessSnackbar(
+                        message = "Updated \"$name\" container"
+                    )
+                }
+            },
+            onDelete = {
+                coroutineScope.launch {
+                    val deletedName = presetToEdit!!.name
+                    containerPresetRepository.deletePreset(presetToEdit!!.id)
+                    showEditPresetSheet = false
+                    presetToEdit = null
+                    snackbarHostState.showSuccessSnackbar(
+                        message = "Deleted \"$deletedName\" container"
+                    )
+                }
+            }
+        )
+    }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CarouselWaterCard(
     preset: ContainerPreset,
     onClick: () -> Unit,
+    onLongPress: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
             .clip(MaterialTheme.shapes.extraLarge)
             .background(MaterialTheme.colorScheme.primaryContainer)
-            .clickable { onClick() },
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongPress
+            ),
         contentAlignment = Alignment.Center,
     ) {
         Column(
@@ -675,6 +759,44 @@ fun CarouselWaterCard(
                 text = preset.getFormattedVolume(),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        }
+    }
+}
+
+@Composable
+fun AddContainerCard(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .clip(MaterialTheme.shapes.extraLarge)
+            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add container",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(32.dp)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Add",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
             )
         }
     }

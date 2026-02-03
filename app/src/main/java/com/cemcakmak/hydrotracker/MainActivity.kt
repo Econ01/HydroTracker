@@ -27,6 +27,7 @@ import com.cemcakmak.hydrotracker.data.database.DatabaseMigrationHelper
 import kotlinx.coroutines.launch
 import androidx.lifecycle.lifecycleScope
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
+import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
 import com.cemcakmak.hydrotracker.presentation.common.*
 import com.cemcakmak.hydrotracker.presentation.home.HomeScreen
 import com.cemcakmak.hydrotracker.presentation.history.HistoryScreen
@@ -42,6 +43,7 @@ import com.cemcakmak.hydrotracker.health.HealthConnectManager
 class MainActivity : ComponentActivity() {
     private lateinit var userRepository: UserRepository
     private lateinit var waterIntakeRepository: WaterIntakeRepository
+    private lateinit var containerPresetRepository: ContainerPresetRepository
 
     // Modern permission launcher
     private val notificationPermissionLauncher = registerForActivityResult(
@@ -112,6 +114,15 @@ class MainActivity : ComponentActivity() {
             applicationContext, userRepository
         )
 
+        containerPresetRepository = DatabaseInitializer.getContainerPresetRepository(
+            applicationContext
+        )
+
+        // Seed default container presets if needed
+        lifecycleScope.launch {
+            containerPresetRepository.seedDefaultsIfNeeded()
+        }
+
         // Create Health Connect permission launcher using the proper method from the manager
         healthConnectPermissionLauncher = HealthConnectManager.createPermissionRequestLauncher(this) { grantedPermissions ->
             // This callback will be called when user responds to permission request
@@ -122,6 +133,7 @@ class MainActivity : ComponentActivity() {
             HydroTrackerApp(
                 userRepository,
                 waterIntakeRepository,
+                containerPresetRepository,
                 notificationPermissionLauncher,
                 healthConnectPermissionLauncher
             )
@@ -134,6 +146,7 @@ class MainActivity : ComponentActivity() {
 fun HydroTrackerApp(
     userRepository: UserRepository,
     waterIntakeRepository: WaterIntakeRepository,
+    containerPresetRepository: ContainerPresetRepository,
     notificationPermissionLauncher: ActivityResultLauncher<String>,
     healthConnectPermissionLauncher: ActivityResultLauncher<Set<String>>
 ) {
@@ -218,6 +231,7 @@ fun HydroTrackerApp(
                             HomeScreen(
                                 userProfile = it,
                                 waterIntakeRepository = waterIntakeRepository,
+                                containerPresetRepository = containerPresetRepository,
                                 onNavigateToHistory = { navController.navigate(NavigationRoutes.HISTORY) },
                                 onNavigateToSettings = { navController.navigate(NavigationRoutes.SETTINGS) },
                                 onNavigateToProfile = { navController.navigate(NavigationRoutes.PROFILE) }
@@ -251,6 +265,7 @@ fun HydroTrackerApp(
                             userProfile = userProfile,
                             userRepository = userRepository,
                             waterIntakeRepository = waterIntakeRepository,
+                            containerPresetRepository = containerPresetRepository,
                             onColorSourceChange = themeViewModel::setColorSource,
                             onDarkModeChange = themeViewModel::updateDarkModePreference,
                             onPureBlackChange = themeViewModel::updatePureBlackPreference,
