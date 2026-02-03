@@ -1,0 +1,73 @@
+name: Bug Report
+description: File a bug report to help us fix the app
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+      placeholder: When I click the "Add Water" button, the app crashes...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: How can we make this happen on our devices?
+      placeholder: |
+        1. Open the app
+        2. Go to 'Settings'
+        3. Click on 'Theme'
+        4. See crash
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Device Model
+      description: What device are you using?
+      placeholder: e.g. Pixel 10, Samsung S25 Ultra
+    validations:
+      required: true
+
+  - type: dropdown
+    id: android_version
+    attributes:
+      label: Android Version
+      options:
+        - Android 16
+        - Android 16
+        - Android 14
+        - Android 13
+        - Android 12
+        - Android 11
+        - Android 10
+        - Android 9
+        - Android 8
+    validations:
+      required: true
+
+  - type: input
+    id: app_version
+    attributes:
+      label: App Version
+      description: Which version of HydroTracker are you using? (You can learn this at he very bottom of the settings menu)
+      placeholder: e.g. v1.0.2
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Stack Trace / Logs
+      description: If the app crashed, please paste the stack trace here.
+      render: shell
