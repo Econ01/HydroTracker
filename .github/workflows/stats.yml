@@ -1,6 +1,10 @@
 name: Update Stats Graph
 
 on:
+  push:
+    branches:
+      - 'feature/HT-0'
+
   schedule:
     # Run every day at midnight UTC
     - cron: '0 0 * * *'
