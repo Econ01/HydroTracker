@@ -1,6 +1,6 @@
 # GNU General Public License v3.0
 
-**Copyright (C) 2025 Ali Cem Çakmak**
+**Copyright (C) 2026 Ali Cem Çakmak**
 
 ## Preamble
 
@@ -73,20 +73,20 @@ This is a summary of the key terms. The complete GNU General Public License v3.0
 
 ## What This License Means
 
-### ✅ You Can:
+### You Can:
 - Use this app's source code for any purpose
 - Study how the app works
 - Share the app with others
 - Make changes and improvements
 - Distribute your modified versions
 
-### 📋 You Must:
+### You Must:
 - Keep this license notice
 - Share your source code when you distribute the app
 - Use the same GPL v3 license for your modifications
 - Document the changes you made
 
-### ❌ You Cannot:
+### You Cannot:
 - Remove copyright notices
 - Use a different license for derivative works
 - Hold the original author liable for damages
