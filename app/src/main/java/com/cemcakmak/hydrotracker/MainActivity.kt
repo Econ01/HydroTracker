@@ -34,6 +34,7 @@ import com.cemcakmak.hydrotracker.presentation.history.HistoryScreen
 import com.cemcakmak.hydrotracker.presentation.profile.ProfileScreen
 import com.cemcakmak.hydrotracker.presentation.settings.SettingsScreen
 import com.cemcakmak.hydrotracker.presentation.settings.HealthConnectDataScreen
+import com.cemcakmak.hydrotracker.presentation.settings.BeverageTypesScreen
 import com.cemcakmak.hydrotracker.presentation.onboarding.*
 import com.cemcakmak.hydrotracker.notifications.*
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
@@ -155,6 +156,8 @@ fun HydroTrackerApp(
     val themePreferences by themeViewModel.themePreferences.collectAsState()
     val userProfile by userRepository.userProfile.collectAsState()
     val isOnboardingCompleted by userRepository.isOnboardingCompleted.collectAsState()
+    val beveragePreferences by userRepository.beveragePreferences.collectAsState()
+    val activeBeverageTypes = remember(beveragePreferences) { beveragePreferences.toDisplayList() }
     var isLoading by remember { mutableStateOf(true) }
     val context = LocalContext.current
 
@@ -232,6 +235,7 @@ fun HydroTrackerApp(
                                 userProfile = it,
                                 waterIntakeRepository = waterIntakeRepository,
                                 containerPresetRepository = containerPresetRepository,
+                                activeBeverageTypes = activeBeverageTypes,
                                 onNavigateToHistory = { navController.navigate(NavigationRoutes.HISTORY) },
                                 onNavigateToSettings = { navController.navigate(NavigationRoutes.SETTINGS) },
                                 onNavigateToProfile = { navController.navigate(NavigationRoutes.PROFILE) }
@@ -301,6 +305,9 @@ fun HydroTrackerApp(
                                     popUpTo(NavigationRoutes.HOME) { inclusive = true }
                                 }
                             },
+                            onNavigateToBeverageTypes = {
+                                navController.navigate(NavigationRoutes.BEVERAGE_TYPES)
+                            },
                             onNavigateToHealthConnectData = {
                                 navController.navigate(NavigationRoutes.HEALTH_CONNECT_DATA)
                             }
@@ -310,6 +317,13 @@ fun HydroTrackerApp(
                     composable(NavigationRoutes.HEALTH_CONNECT_DATA) {
                         HealthConnectDataScreen(
                             waterIntakeRepository = waterIntakeRepository,
+                            onNavigateBack = { navController.popBackStack() }
+                        )
+                    }
+
+                    composable(NavigationRoutes.BEVERAGE_TYPES) {
+                        BeverageTypesScreen(
+                            userRepository = userRepository,
                             onNavigateBack = { navController.popBackStack() }
                         )
                     }

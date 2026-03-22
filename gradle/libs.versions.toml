@@ -1,5 +1,5 @@
 [versions]
-agp = "9.0.0"
+agp = "9.1.0"
 kotlin = "2.2.20"
 ksp = "2.3.2"
 coreKtx = "1.17.0"
@@ -13,6 +13,7 @@ navigationCompose = "2.9.5"
 lifecycleViewmodel = "2.9.4"
 room = "2.8.1"
 healthConnect = "1.1.0-rc03"
+reorderable = "2.4.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -46,6 +47,9 @@ androidx-room-compiler = { group = "androidx.room", name = "room-compiler", vers
 
 # Health Connect
 androidx-health-connect = { group = "androidx.health.connect", name = "connect-client", version.ref = "healthConnect" }
+
+# Reorderable (drag-and-drop for LazyColumn)
+reorderable = { group = "sh.calvin.reorderable", name = "reorderable", version.ref = "reorderable" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

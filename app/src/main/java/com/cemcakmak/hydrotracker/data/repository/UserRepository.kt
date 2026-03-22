@@ -23,6 +23,9 @@ class UserRepository(context: Context) {
     private val _isOnboardingCompleted = MutableStateFlow(false)
     val isOnboardingCompleted: StateFlow<Boolean> = _isOnboardingCompleted.asStateFlow()
 
+    private val _beveragePreferences = MutableStateFlow(loadBeveragePreferences())
+    val beveragePreferences: StateFlow<BeveragePreferences> = _beveragePreferences.asStateFlow()
+
     init {
         // Add debug logging
         println("UserRepository: Initializing...")
@@ -225,5 +228,23 @@ class UserRepository(context: Context) {
      */
     fun loadDeveloperOptionsEnabled(): Boolean {
         return prefs.getBoolean("developer_options_enabled", false)
+    }
+
+    private fun loadBeveragePreferences(): BeveragePreferences {
+        val orderStr = prefs.getString("beverage_order", null)
+        val hiddenStr = prefs.getString("beverage_hidden", null)
+        if (orderStr == null && hiddenStr == null) return BeveragePreferences.default()
+        val ordered = orderStr?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
+        val hidden = hiddenStr?.split(",")?.filter { it.isNotBlank() }?.toSet() ?: emptySet()
+        return BeveragePreferences(orderedVisible = ordered, hidden = hidden)
+    }
+
+    fun saveBeveragePreferences(beveragePreferences: BeveragePreferences) {
+        prefs.edit().apply {
+            putString("beverage_order", beveragePreferences.orderedVisible.joinToString(","))
+            putString("beverage_hidden", beveragePreferences.hidden.joinToString(","))
+            apply()
+        }
+        _beveragePreferences.value = beveragePreferences
     }
 }
