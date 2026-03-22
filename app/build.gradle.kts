@@ -13,8 +13,8 @@ android {
         applicationId = "com.cemcakmak.hydrotracker"
         minSdk = 26
         targetSdk = 36
-        versionCode = 25
-        versionName = "1.0.4"
+        versionCode = 26
+        versionName = "1.0.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -101,6 +101,9 @@ dependencies {
 
     // Health Connect
     implementation(libs.androidx.health.connect)
+
+    // Reorderable (drag-and-drop)
+    implementation(libs.reorderable)
 
     // Debug tools
     debugImplementation(libs.androidx.ui.tooling)

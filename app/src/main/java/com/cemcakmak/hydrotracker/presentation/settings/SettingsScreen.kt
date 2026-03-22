@@ -68,6 +68,7 @@ fun SettingsScreen(
     healthConnectPermissionLauncher: ActivityResultLauncher<Set<String>>? = null,
     onNavigateBack: () -> Unit = {},
     onNavigateToOnboarding: () -> Unit = {},
+    onNavigateToBeverageTypes: () -> Unit = {},
     onNavigateToHealthConnectData: () -> Unit = {},
     isDynamicColorAvailable: Boolean = true
 ) {
@@ -203,6 +204,87 @@ fun SettingsScreen(
                         containerPresetRepository = containerPresetRepository,
                         snackbarHostState = snackbarHostState
                     )
+                }
+
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                )
+            }
+
+            // Beverage Types nav card
+            if (userRepository != null) {
+                AnimatedVisibility(
+                    visible = isVisible,
+                    enter = slideInVertically(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessMedium
+                        ),
+                        initialOffsetY = { it / 2 }
+                    ) + fadeIn(animationSpec = tween(600, delayMillis = 265))
+                ) {
+                    Column(
+                        modifier = Modifier.padding(5.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.EmojiFoodBeverage,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = "Baverage Types",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onNavigateToBeverageTypes() },
+                            shape = MaterialTheme.shapes.extraLarge,
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer
+                            )
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.EmojiFoodBeverage,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "Beverage Types",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                    Text(
+                                        text = "Reorder and hide beverages",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                }
+                                Icon(
+                                    imageVector = Icons.Default.ChevronRight,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
+                        }
+                    }
                 }
 
                 HorizontalDivider(
@@ -1819,7 +1901,6 @@ private fun ContainerPresetsSection(
 ) {
     val coroutineScope = rememberCoroutineScope()
     var showResetConfirmation by remember { mutableStateOf(false) }
-    val presetCount by containerPresetRepository.getAllPresets().collectAsState(initial = emptyList())
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -1848,37 +1929,10 @@ private fun ContainerPresetsSection(
             }
 
             Text(
-                text = "Customize the quick select containers on the home screen. Long-press any container to edit or delete it.",
+                text = "Customize the quick select containers on the home screen. Long-press any container to edit or delete it. Use the button to restore to the default state",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-
-            // Current preset count
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-                ),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Current containers:",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = "${presetCount.size}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
 
             // Reset to defaults button
             OutlinedButton(
