@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
 
     steps:
       - name: Checkout repository
@@ -34,32 +33,17 @@ jobs:
         run: |
           python stats/graph.py
 
-      - name: Commit, Push, Create PR, and Auto-Merge
-        env:
-          GH_TOKEN: ${{ secrets.STATS_PAT }}
+      - name: Commit and Push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          BRANCH_NAME="bot/update-stats-$(date +%Y%m%d-%H%M%S)"
-          git checkout -b "$BRANCH_NAME"
-
           git add stats/overview.png stats/download_history.json
 
-          # Only proceed if there are changes
+          # Only commit if there are changes
           if git diff --cached --quiet; then
             echo "No changes to commit"
             exit 0
           fi
 
           git commit -m "Update stats graph"
-          git push origin "$BRANCH_NAME"
-
-          PR_URL=$(gh pr create \
-            --title "Update stats graph" \
-            --body "Automated daily stats update." \
-            --base master \
-            --head "$BRANCH_NAME")
-
-          # Auto-merge immediately using admin bypass
-          gh pr merge --squash --admin --delete-branch "$PR_URL"
+          git push
