@@ -1,6 +1,18 @@
 # Changelog
 
-All notable changes to HydroTracker will be documented in this file.
+## [1.0.6]
+### Added
+- Widgets and notifications now respect the system time configuration
+
+## [1.0.5]
+### Added
+- Now you can remove and re-order beverages
+
+## [1.0.4]
+### Added
+- Ability to add custom containers
+- Ability to edit preset containers
+- Ability to reset default containers
 
 ## [1.0.3] - 2025.10.17
 ### Added

@@ -2,6 +2,8 @@ package com.cemcakmak.hydrotracker.data.models
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 
 /**
  * Represents a single water intake entry
@@ -18,14 +20,20 @@ data class WaterIntake(
      * Formats the timestamp for display
      */
     fun getFormattedTime(): String {
-        return timestamp.format(DateTimeFormatter.ofPattern("HH:mm"))
+        return timestamp.format(
+            DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
+                .withLocale(Locale.getDefault())
+        )
     }
 
     /**
      * Formats the timestamp for display with date
      */
     fun getFormattedDateTime(): String {
-        return timestamp.format(DateTimeFormatter.ofPattern("MMM dd, HH:mm"))
+        return timestamp.format(
+            DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.SHORT)
+                .withLocale(Locale.getDefault())
+        )
     }
 
     /**
