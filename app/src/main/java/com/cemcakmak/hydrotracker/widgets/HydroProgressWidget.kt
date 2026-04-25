@@ -16,7 +16,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.first
-import java.text.SimpleDateFormat
 import java.util.*
 
 /**
@@ -79,7 +78,7 @@ class HydroProgressWidget : AppWidgetProvider() {
                 views.setTextViewText(R.id.widget_progress_percent, "$progressPercent%")
 
                 // Update last updated time
-                val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+                val timeFormat = android.text.format.DateFormat.getTimeFormat(context)
                 val lastUpdated = "Updated ${timeFormat.format(Date())}"
                 views.setTextViewText(R.id.widget_last_updated, lastUpdated)
 

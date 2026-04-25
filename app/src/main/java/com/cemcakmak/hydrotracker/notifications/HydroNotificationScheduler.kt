@@ -13,6 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -351,10 +352,10 @@ object HydroNotificationScheduler {
 
         if (validationResult.isValid) {
             Log.d(TAG, "Using valid scheduled time: ${Date(scheduledTime)}")
-            val formatter = DateTimeFormatter.ofPattern("MMM dd, HH:mm")
-            val calendar = Calendar.getInstance().apply { timeInMillis = scheduledTime }
-            val localDateTime = LocalDateTime.ofInstant(calendar.toInstant(), calendar.timeZone.toZoneId())
-            return localDateTime.format(formatter)
+            val is24Hour = android.text.format.DateFormat.is24HourFormat(context)
+            val pattern = if (is24Hour) "MMM dd, HH:mm" else "MMM dd, h:mm a"
+            val formatter = SimpleDateFormat(pattern, Locale.getDefault())
+            return formatter.format(Date(scheduledTime))
         } else {
             // Clear invalid cached data
             Log.w(TAG, "Invalid scheduled time detected: ${validationResult.reason}. Clearing cache.")
@@ -364,8 +365,10 @@ object HydroNotificationScheduler {
             Log.d(TAG, "Calculating fresh next reminder time")
             val nextTime = calculateNextReminderTime(userProfile)
             return nextTime?.let {
-                val formatter = DateTimeFormatter.ofPattern("MMM dd, HH:mm")
-                LocalDateTime.ofInstant(it.toInstant(), it.timeZone.toZoneId()).format(formatter)
+                val is24Hour = android.text.format.DateFormat.is24HourFormat(context)
+                val pattern = if (is24Hour) "MMM dd, HH:mm" else "MMM dd, h:mm a"
+                val formatter = SimpleDateFormat(pattern, Locale.getDefault())
+                formatter.format(it.time)
             }
         }
     }
