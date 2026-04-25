@@ -34,7 +34,7 @@ jobs:
         run: |
           python stats/graph.py
 
-      - name: Commit, Push, and Create Pull Request
+      - name: Commit, Push, Create PR, and Auto-Merge
         env:
           GH_TOKEN: ${{ secrets.STATS_PAT }}
         run: |
@@ -55,8 +55,11 @@ jobs:
           git commit -m "Update stats graph"
           git push origin "$BRANCH_NAME"
 
-          gh pr create \
+          PR_URL=$(gh pr create \
             --title "Update stats graph" \
             --body "Automated daily stats update." \
             --base master \
-            --head "$BRANCH_NAME"
+            --head "$BRANCH_NAME")
+
+          # Auto-merge immediately using admin bypass
+          gh pr merge --squash --admin --delete-branch "$PR_URL"
