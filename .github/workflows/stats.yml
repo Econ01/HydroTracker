@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.STATS_PAT }}
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -37,5 +39,5 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add stats/overview.png stats/download_history.json
           # Only commit if there are changes
-          git commit -m "Update stats graph [skip ci]" || exit 0
+          git commit -m "Update stats graph" || exit 0
           git push
