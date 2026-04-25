@@ -163,7 +163,7 @@ object HealthConnectManager {
             // Create unique ID for tracking this record
             val uniqueId = "hydrotracker_${entry.id}_${System.currentTimeMillis()}"
 
-            // Create HydrationRecord with proper metadata including custom ID
+            // Create HydrationRecord
             val hydrationRecord = HydrationRecord(
                 startTime = startTime,
                 startZoneOffset = ZoneOffset.systemDefault().rules.getOffset(startTime),
@@ -243,6 +243,7 @@ object HealthConnectManager {
 
     /**
      * Read hydration records from Health Connect since a specific time
+     * Handles pagination to retrieve all records across multiple pages
      */
     suspend fun readHydrationRecords(context: Context, since: Instant): Result<List<HydrationRecord>> {
         return try {
@@ -255,23 +256,35 @@ object HealthConnectManager {
 
             Log.d(TAG, "Permissions verified, creating read request...")
 
-            val request = ReadRecordsRequest(
-                recordType = HydrationRecord::class,
-                timeRangeFilter = TimeRangeFilter.after(since)
-            )
-
-            Log.d(TAG, "Executing Health Connect read request...")
             val healthConnectClient = HealthConnectClient.getOrCreate(context)
-            val response = healthConnectClient.readRecords(request)
+            val allRecords = mutableListOf<HydrationRecord>()
+            var pageToken: String? = null
+            var pageCount = 0
 
-            Log.i(TAG, "✅ Successfully read ${response.records.size} hydration records since $since")
+            do {
+                val request = ReadRecordsRequest(
+                    recordType = HydrationRecord::class,
+                    timeRangeFilter = TimeRangeFilter.after(since),
+                    pageToken = pageToken
+                )
+
+                Log.d(TAG, "Executing Health Connect read request (page ${pageCount + 1})...")
+                val response = healthConnectClient.readRecords(request)
+                allRecords.addAll(response.records)
+                pageToken = response.pageToken
+                pageCount++
+
+                Log.d(TAG, "📄 Page $pageCount: read ${response.records.size} records, hasMorePages=${pageToken != null}")
+            } while (pageToken != null)
+
+            Log.i(TAG, "✅ Successfully read ${allRecords.size} hydration records across $pageCount page(s) since $since")
 
             // Log details of each record for debugging
-            response.records.forEach { record ->
-                Log.d(TAG, "📥 External record: ${record.volume.inMilliliters}ml at ${record.startTime} (source: ${record.metadata.dataOrigin})")
+            allRecords.forEach { record ->
+                Log.d(TAG, "📥 Record: ${record.volume.inMilliliters}ml at ${record.startTime} (source: ${record.metadata.dataOrigin})")
             }
 
-            Result.success(response.records)
+            Result.success(allRecords)
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error reading hydration records from Health Connect", e)
             Result.failure(e)
@@ -330,22 +343,28 @@ object HealthConnectManager {
      */
     fun hydrationRecordToWaterIntakeEntry(
         record: HydrationRecord,
-        sourceName: String?
+        sourceName: String?,
+        wakeUpTime: String = "07:00",
+        healthConnectRecordId: String? = null
     ): WaterIntakeEntry {
         val volumeInML = record.volume.inMilliliters
         val timestamp = record.startTime.toEpochMilli()
-        val date = Instant.ofEpochMilli(timestamp)
-            .atZone(ZoneOffset.systemDefault())
-            .toLocalDate()
-            .toString()
+        val date = com.cemcakmak.hydrotracker.utils.UserDayCalculator.getUserDayStringForTimestamp(
+            timestamp,
+            wakeUpTime
+        )
 
         // Extract a user-friendly source name from the dataOrigin
         val friendlySourceName = extractFriendlySourceName(sourceName)
+
+        // Use provided ID or fallback to Health Connect's UUID
+        val recordId = healthConnectRecordId ?: record.metadata.id
 
         Log.d(TAG, "📱 Converting Health Connect record from: $sourceName → $friendlySourceName")
         Log.d(TAG, "🆔 Health Connect Record ID: ${record.metadata.id}")
         Log.d(TAG, "🏷️ Client Record ID: ${record.metadata.clientRecordId}")
         Log.d(TAG, "📦 Package: ${record.metadata.dataOrigin.packageName}")
+        Log.d(TAG, "💾 Using record ID for local storage: $recordId")
 
         return WaterIntakeEntry(
             amount = volumeInML,
@@ -354,7 +373,7 @@ object HealthConnectManager {
             containerType = friendlySourceName, // Use the actual source app name
             containerVolume = volumeInML, // Use same as amount for external data
             note = "Imported from $friendlySourceName",
-            healthConnectRecordId = record.metadata.id // Store the Health Connect record ID for deletion
+            healthConnectRecordId = recordId // Store the Health Connect record ID for deletion
         )
     }
 
@@ -444,6 +463,47 @@ object HealthConnectManager {
 
         Log.d(TAG, "🏷️ Mapped '$packageName' → '$cleanName'")
         return cleanName
+    }
+
+    /**
+     * Read only HydroTracker hydration records from Health Connect
+     * Used to restore local data after reinstall
+     */
+    suspend fun readHydroTrackerRecords(context: Context, since: Instant): Result<List<HydrationRecord>> {
+        return try {
+            val allRecords = readHydrationRecords(context, since)
+            if (allRecords.isFailure) {
+                return allRecords
+            }
+
+            val totalRecords = allRecords.getOrNull()?.size ?: 0
+            Log.d(TAG, "📥 Found $totalRecords total hydration records since $since")
+
+            // Keep only records that originated from HydroTracker
+            val hydroTrackerRecords = allRecords.getOrNull()?.filter { record ->
+                val recordId = record.metadata.id
+                val clientRecordId = record.metadata.clientRecordId
+                val packageName = record.metadata.dataOrigin.packageName
+
+                val isFromHydroTrackerByClientId = clientRecordId?.startsWith("hydrotracker_") == true
+                val isFromHydroTrackerById = recordId.startsWith("hydrotracker_")
+                val isFromHydroTrackerByPackage = packageName == "com.cemcakmak.hydrotracker"
+
+                val isFromHydroTracker = isFromHydroTrackerByClientId || isFromHydroTrackerById || isFromHydroTrackerByPackage
+
+                if (isFromHydroTracker) {
+                    Log.d(TAG, "✅ Including HydroTracker record: clientID=$clientRecordId, ID=$recordId, package=$packageName, amount=${record.volume.inMilliliters}ml")
+                }
+
+                isFromHydroTracker
+            } ?: emptyList()
+
+            Log.i(TAG, "📥 Found ${hydroTrackerRecords.size} HydroTracker records (filtered from $totalRecords total)")
+            Result.success(hydroTrackerRecords)
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Error filtering HydroTracker records", e)
+            Result.failure(e)
+        }
     }
 
     /**

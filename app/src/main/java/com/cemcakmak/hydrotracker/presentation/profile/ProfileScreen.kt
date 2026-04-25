@@ -395,6 +395,7 @@ fun ProfileScreenPreview() {
             override suspend fun getEntryCountForDate(date: String): Int = 0
             override suspend fun getEntryCount(): Int = 0
             override fun getLast30DaysEntries(): kotlinx.coroutines.flow.Flow<List<com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry>> = kotlinx.coroutines.flow.flowOf(emptyList())
+            override fun getAllEntries(): kotlinx.coroutines.flow.Flow<List<com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry>> = kotlinx.coroutines.flow.flowOf(emptyList())
             override suspend fun updateEntry(entry: com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry) {}
             override suspend fun deleteEntry(entry: com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry) {}
             override suspend fun deleteEntryById(entryId: Long) {}
@@ -410,6 +411,7 @@ fun ProfileScreenPreview() {
             override fun getSummaryForDate(date: String): kotlinx.coroutines.flow.Flow<com.cemcakmak.hydrotracker.data.database.entities.DailySummary?> = kotlinx.coroutines.flow.flowOf(null)
             override fun getSummariesForRange(startDate: String, endDate: String): kotlinx.coroutines.flow.Flow<List<com.cemcakmak.hydrotracker.data.database.entities.DailySummary>> = kotlinx.coroutines.flow.flowOf(emptyList())
             override fun getLast30DaysSummaries(): kotlinx.coroutines.flow.Flow<List<com.cemcakmak.hydrotracker.data.database.entities.DailySummary>> = kotlinx.coroutines.flow.flowOf(emptyList())
+            override fun getAllSummaries(): kotlinx.coroutines.flow.Flow<List<com.cemcakmak.hydrotracker.data.database.entities.DailySummary>> = kotlinx.coroutines.flow.flowOf(emptyList())
             override suspend fun updateSummary(summary: com.cemcakmak.hydrotracker.data.database.entities.DailySummary) {}
             override suspend fun deleteSummaryForDate(date: String) {}
             override suspend fun deleteAllSummaries() {}

@@ -25,6 +25,9 @@ interface DailySummaryDao {
     @Query("SELECT * FROM daily_summaries WHERE date >= date('now', '-30 days') ORDER BY date DESC")
     fun getLast30DaysSummaries(): Flow<List<DailySummary>>
 
+    @Query("SELECT * FROM daily_summaries ORDER BY date DESC")
+    fun getAllSummaries(): Flow<List<DailySummary>>
+
     @Update
     suspend fun updateSummary(summary: DailySummary)
 
