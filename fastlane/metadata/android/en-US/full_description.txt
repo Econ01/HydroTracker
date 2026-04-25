@@ -1,0 +1,51 @@
+HydroTracker - Modern Water Intake Tracker
+
+Stay properly hydrated with HydroTracker, a beautifully designed water tracking app that helps you monitor your daily water intake and build healthy hydration habits.
+
+Key Features
+
+Smart Tracking
+- Log water intake with pre-defined containers or custom amounts
+- Personalized daily hydration goals based on your profile
+- Comprehensive analytics with daily and historical statistics
+- Track patterns and insights to improve your hydration habits
+
+Intelligent Reminders
+- Context-aware notifications that respect your sleep schedule
+- Customizable reminder intervals and active hours
+- Precise timing for consistent hydration throughout the day
+
+Beautiful Design
+- Modern Material 3 design with dynamic theming
+- Dark mode support for comfortable viewing
+- Guided onboarding to get you started quickly
+- Home screen widgets for quick progress updates
+
+Privacy Focused
+- All data stored locally on your device
+- No cloud sync or data collection
+- No usage tracking or analytics
+- Works completely offline
+
+Customization Options
+- Flexible container presets for instant logging
+- Activity-based goal recommendations
+- Comprehensive user settings and preferences
+- Optional profile photo support
+
+Why Choose HydroTracker?
+
+No Ads
+No Subscription
+
+Just a beautiful free and open source water tracking app.
+
+Perfect for:
+- Anyone looking to improve their daily hydration
+- Health-conscious individuals tracking wellness goals
+- Users who value privacy and local data storage
+- People seeking a clean, ad-free experience
+
+Download HydroTracker today and start building better hydration habits with an app that respects your privacy and puts your health first.
+
+Open Source: HydroTracker is open source software licensed under GPL v3.0. You can examine the code, contribute improvements, or build it yourself.
