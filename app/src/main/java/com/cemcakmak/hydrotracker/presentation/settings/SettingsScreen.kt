@@ -307,6 +307,9 @@ fun SettingsScreen(
                     HealthConnectSection(
                         healthConnectPermissionLauncher = healthConnectPermissionLauncher,
                         userProfile = userProfile,
+                        userRepository = userRepository,
+                        waterIntakeRepository = waterIntakeRepository,
+                        snackbarHostState = snackbarHostState,
                         onHealthConnectSyncChange = { enabled ->
                             userProfile?.let { profile ->
                                 val updatedProfile = profile.copy(healthConnectSyncEnabled = enabled)
@@ -1993,6 +1996,9 @@ private fun ContainerPresetsSection(
 private fun HealthConnectSection(
     healthConnectPermissionLauncher: ActivityResultLauncher<Set<String>>? = null,
     userProfile: UserProfile? = null,
+    userRepository: UserRepository? = null,
+    waterIntakeRepository: WaterIntakeRepository? = null,
+    snackbarHostState: SnackbarHostState? = null,
     onHealthConnectSyncChange: (Boolean) -> Unit = {},
     onNavigateToHealthConnectData: () -> Unit = {}
 ) {
@@ -2005,6 +2011,10 @@ private fun HealthConnectSection(
     var refreshTrigger by remember { mutableIntStateOf(0) }
 
     val manager = HealthConnectManager
+
+    var showRestoreDialog by remember { mutableStateOf(false) }
+    var restoreTimeRange by remember { mutableStateOf("all") }
+    var isRestoring by remember { mutableStateOf(false) }
 
     // Check Health Connect status on component mount and when refresh is triggered
     LaunchedEffect(refreshTrigger) {
@@ -2153,6 +2163,62 @@ private fun HealthConnectSection(
                         )
                     }
                 }
+
+                // Restore from Health Connect button
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            if (!isRestoring) {
+                                showRestoreDialog = true
+                            }
+                        },
+                    shape = MaterialTheme.shapes.extraLarge,
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CloudDownload,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Restore from Health Connect",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Text(
+                                text = "Import your past HydroTracker entries",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+
+                        if (isRestoring) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Restore,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                    }
+                }
             }
 
             // Request permissions button (when not ready)
@@ -2186,6 +2252,103 @@ private fun HealthConnectSection(
                 }
             }
         }
+    }
+
+    // Restore confirmation dialog
+    if (showRestoreDialog) {
+        AlertDialog(
+            onDismissRequest = { if (!isRestoring) showRestoreDialog = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.CloudDownload,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            title = { Text("Restore from Health Connect") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Import your past HydroTracker entries from Health Connect. Choose a time range:")
+
+                    Column {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            RadioButton(
+                                selected = restoreTimeRange == "all",
+                                onClick = { restoreTimeRange = "all" },
+                                enabled = !isRestoring
+                            )
+                            Text(
+                                text = "All history",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            RadioButton(
+                                selected = restoreTimeRange == "90days",
+                                onClick = { restoreTimeRange = "90days" },
+                                enabled = !isRestoring
+                            )
+                            Text(
+                                text = "Last 90 days",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        isRestoring = true
+                        val since = if (restoreTimeRange == "all") {
+                            java.time.Instant.EPOCH
+                        } else {
+                            java.time.Instant.now().minus(90, java.time.temporal.ChronoUnit.DAYS)
+                        }
+
+                        com.cemcakmak.hydrotracker.health.HealthConnectSyncManager.restoreHydroTrackerHistory(
+                            context,
+                            userRepository!!,
+                            waterIntakeRepository!!,
+                            since
+                        ) { imported, skipped ->
+                            coroutineScope.launch {
+                                isRestoring = false
+                                showRestoreDialog = false
+                                snackbarHostState?.showSnackbar(
+                                    "Restored $imported entries, skipped $skipped duplicates"
+                                )
+                            }
+                        }
+                    },
+                    enabled = !isRestoring && userRepository != null && waterIntakeRepository != null
+                ) {
+                    if (isRestoring) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else {
+                        Text("Restore")
+                    }
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { if (!isRestoring) showRestoreDialog = false },
+                    enabled = !isRestoring
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 

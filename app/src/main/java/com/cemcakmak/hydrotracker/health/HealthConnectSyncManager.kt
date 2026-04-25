@@ -143,11 +143,13 @@ object HealthConnectSyncManager {
                 var errorCount = 0
 
                 // Process each external record with conflict resolution
+                val wakeUpTime = userRepository.userProfile.value?.wakeUpTime ?: "07:00"
                 externalRecords.forEach { record ->
                     try {
                         val waterIntakeEntry = HealthConnectManager.hydrationRecordToWaterIntakeEntry(
                             record,
-                            record.metadata.dataOrigin.toString()
+                            record.metadata.dataOrigin.toString(),
+                            wakeUpTime
                         )
 
                         // Check for potential duplicates using timestamp and amount
@@ -229,6 +231,117 @@ object HealthConnectSyncManager {
 
             } catch (e: Exception) {
                 Log.e(TAG, "❌ Error during app launch sync", e)
+            }
+        }
+    }
+
+    /**
+     * Restore HydroTracker history from Health Connect
+     * Imports HydroTracker-tagged records back into the local database
+     * Used after reinstall when local data is empty but Health Connect still holds records
+     */
+    fun restoreHydroTrackerHistory(
+        context: Context,
+        userRepository: UserRepository,
+        waterIntakeRepository: WaterIntakeRepository,
+        since: java.time.Instant,
+        onComplete: (imported: Int, skipped: Int) -> Unit = { _, _ -> }
+    ) {
+        Log.d(TAG, "🔄 Restore request received for HydroTracker history since: $since")
+
+        CoroutineScope(Dispatchers.IO).launch {
+            _isSyncing.value = true
+            Log.d(TAG, "🔄 Setting isSyncing = true for restore sync")
+            try {
+                // Check if user has sync enabled
+                val userProfile = userRepository.userProfile.value
+                if (userProfile?.healthConnectSyncEnabled != true) {
+                    Log.d(TAG, "⏭️ Restore skipped: Health Connect sync disabled")
+                    _isSyncing.value = false
+                    onComplete(0, 0)
+                    return@launch
+                }
+
+                if (!HealthConnectManager.isAvailable(context) || !HealthConnectManager.hasPermissions(context)) {
+                    Log.w(TAG, "⚠️ Restore skipped: Health Connect not ready")
+                    _isSyncing.value = false
+                    onComplete(0, 0)
+                    return@launch
+                }
+
+                Log.i(TAG, "🚀 Starting HydroTracker history restore from Health Connect")
+
+                // Read HydroTracker records only
+                val result = HealthConnectManager.readHydroTrackerRecords(context, since)
+
+                if (result.isFailure) {
+                    Log.e(TAG, "❌ Failed to read HydroTracker records: ${result.exceptionOrNull()?.message}")
+                    _isSyncing.value = false
+                    onComplete(0, 0)
+                    return@launch
+                }
+
+                val hydroTrackerRecords = result.getOrNull() ?: emptyList()
+                Log.i(TAG, "📥 Found ${hydroTrackerRecords.size} HydroTracker records to restore")
+
+                if (hydroTrackerRecords.isEmpty()) {
+                    Log.d(TAG, "✅ No HydroTracker records found to restore")
+                    _isSyncing.value = false
+                    onComplete(0, 0)
+                    return@launch
+                }
+
+                var importedCount = 0
+                var skippedCount = 0
+
+                val wakeUpTime = userRepository.userProfile.value?.wakeUpTime ?: "07:00"
+                hydroTrackerRecords.forEach { record ->
+                    try {
+                        // For HydroTracker records, prefer our clientRecordId so it matches
+                        // what we store locally after sync (hydrotracker_${entry.id}_${timestamp})
+                        val recordIdForLocalStorage = record.metadata.clientRecordId ?: record.metadata.id
+
+                        val waterIntakeEntry = HealthConnectManager.hydrationRecordToWaterIntakeEntry(
+                            record,
+                            record.metadata.dataOrigin.toString(),
+                            wakeUpTime,
+                            healthConnectRecordId = recordIdForLocalStorage
+                        )
+
+                        // Check for duplicates using existing logic
+                        val isDuplicate = checkForDuplicate(waterIntakeRepository, waterIntakeEntry)
+
+                        if (isDuplicate) {
+                            Log.d(TAG, "⚠️ Duplicate detected, skipping: ${waterIntakeEntry.amount}ml at ${waterIntakeEntry.timestamp}")
+                            skippedCount++
+                        } else {
+                            val addResult = addImportedWaterEntry(waterIntakeRepository, waterIntakeEntry)
+                            if (addResult.isSuccess) {
+                                importedCount++
+                                Log.d(TAG, "📥 Restored: ${waterIntakeEntry.amount}ml at ${waterIntakeEntry.timestamp}")
+                            } else {
+                                Log.e(TAG, "❌ Failed to restore entry: ${addResult.exceptionOrNull()?.message}")
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "❌ Error processing HydroTracker record: ${e.message}")
+                    }
+                }
+
+                Log.i(TAG, "📊 Restore completed: $importedCount entries imported, $skippedCount duplicates skipped")
+                onComplete(importedCount, skippedCount)
+
+                if (importedCount > 0) {
+                    _lastSyncTime.value = System.currentTimeMillis()
+                }
+
+            } catch (e: Exception) {
+                Log.e(TAG, "💥 Unexpected error during HydroTracker history restore", e)
+                onComplete(0, 0)
+            } finally {
+                kotlinx.coroutines.delay(800)
+                _isSyncing.value = false
+                Log.d(TAG, "🔄 Setting isSyncing = false for restore sync")
             }
         }
     }
@@ -377,32 +490,53 @@ object HealthConnectSyncManager {
     /**
      * Check if an entry is a potential duplicate based on timestamp and amount
      * Uses a tolerance window to account for slight time differences
+     *
+     * ARCHITECTURAL NOTE: This function uses the stored [date] field (user-day) as the
+     * single source of truth for date-based queries. It does NOT recompute the date from
+     * the timestamp to avoid inconsistencies with UserDayCalculator logic. Time display
+     * formatting is a UI concern and must remain separate from deduplication logic.
      */
     private suspend fun checkForDuplicate(repository: WaterIntakeRepository, newEntry: WaterIntakeEntry): Boolean {
         return try {
+            // Use the entry's pre-computed date field (user-day) as the single source of truth.
+            // Recomputing from timestamp via toLocalDate() would produce a different result
+            // for entries before wake-up time, causing us to query the wrong date.
+            val entryDate = newEntry.date
 
-            // Get the date for the entry
-            val entryDate = java.time.Instant.ofEpochMilli(newEntry.timestamp)
-                .atZone(java.time.ZoneOffset.systemDefault())
-                .toLocalDate()
-                .toString()
-
-            // Get all entries for the same date (including hidden ones to prevent re-import)
+            // Get all entries for the same user-day (including hidden ones to prevent re-import)
             val existingEntries = repository.getAllEntriesForDate(entryDate)
 
-            // Check for duplicates within a 5-minute window with similar amounts (±10ml tolerance)
+            Log.d(TAG, "🔍 Duplicate check for ${newEntry.amount}ml at ${newEntry.timestamp} (date=$entryDate): found ${existingEntries.size} existing entries on same user-day")
+
+            // Fast-path: exact healthConnectRecordId match
+            if (newEntry.healthConnectRecordId != null) {
+                val idMatch = existingEntries.find { it.healthConnectRecordId == newEntry.healthConnectRecordId }
+                if (idMatch != null) {
+                    Log.i(TAG, "⚠️ Exact duplicate by Health Connect record ID: ${newEntry.healthConnectRecordId}")
+                    return true
+                }
+            }
+
+            // Check for duplicates within a 5-minute window with similar effective hydration amounts
             val timeWindow = 5 * 60 * 1000L // 5 minutes in milliseconds
             val amountTolerance = 10.0 // ±10ml
 
             val isDuplicate = existingEntries.any { existing ->
+                // Compare effective hydration amounts, not raw amounts.
+                // When writing to Health Connect we store the effective amount (raw * multiplier).
+                // When restoring, newEntry.amount IS the effective amount from Health Connect.
+                // existing.amount is the raw amount stored locally, so we must convert it.
+                val existingEffectiveAmount = existing.getEffectiveHydrationAmount()
                 val timeDiff = kotlin.math.abs(existing.timestamp - newEntry.timestamp)
-                val amountDiff = kotlin.math.abs(existing.amount - newEntry.amount)
+                val amountDiff = kotlin.math.abs(existingEffectiveAmount - newEntry.amount)
 
                 val isTimeMatch = timeDiff <= timeWindow
                 val isAmountMatch = amountDiff <= amountTolerance
 
+                Log.d(TAG, "   vs existing ${existing.amount}ml (effective=${existingEffectiveAmount}) at ${existing.timestamp}: timeDiff=${timeDiff}ms, amountDiff=${amountDiff}ml, timeMatch=$isTimeMatch, amountMatch=$isAmountMatch")
+
                 if (isTimeMatch && isAmountMatch) {
-                    Log.d(TAG, "🔍 Potential duplicate found: existing ${existing.amount}ml at ${existing.timestamp}, new ${newEntry.amount}ml at ${newEntry.timestamp}")
+                    Log.d(TAG, "🔍 Potential duplicate found: existing ${existing.amount}ml (effective=${existingEffectiveAmount}) at ${existing.timestamp}, new ${newEntry.amount}ml at ${newEntry.timestamp}")
                     true
                 } else {
                     false
@@ -410,9 +544,9 @@ object HealthConnectSyncManager {
             }
 
             if (isDuplicate) {
-                Log.i(TAG, "⚠️ Duplicate entry detected and skipped: ${newEntry.amount}ml at ${newEntry.timestamp}")
+                Log.i(TAG, "⚠️ Duplicate entry detected and skipped: ${newEntry.amount}ml at ${newEntry.timestamp} (date=$entryDate)")
             } else {
-                Log.d(TAG, "✅ No duplicate found for ${newEntry.amount}ml at ${newEntry.timestamp}")
+                Log.d(TAG, "✅ No duplicate found for ${newEntry.amount}ml at ${newEntry.timestamp} (date=$entryDate)")
             }
 
             isDuplicate

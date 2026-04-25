@@ -3,6 +3,18 @@
 ## [1.0.6]
 ### Added
 - Widgets and notifications now respect the system time configuration
+- Add manual restore button to the HealthConnect page. Now you can retrieve your old entries if you delete and re-install the app
+
+### Fixed
+- Fix Health Connect read pagination — now reads all pages instead of only the first page
+- Fix restored entry date assignment to use user-day (wake-up time) instead of calendar day
+- Fix duplicate detection during import/restore:
+  - Now queries the stored `date` field directly instead of recomputing from timestamp
+  - Compares effective hydration amounts instead of raw amounts
+  - Added fast-path exact match via `healthConnectRecordId`
+- Fix `healthConnectRecordId` storage mismatch between write and restore paths
+- Fix History screen only showing last 30 days — now displays all historical data
+- Fix Health Connect Data screen only showing last 30 days — now displays all entries
 
 ## [1.0.5]
 ### Added

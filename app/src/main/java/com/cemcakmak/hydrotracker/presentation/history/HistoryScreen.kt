@@ -56,8 +56,8 @@ fun HistoryScreen(
     var currentMonthOffset by remember { mutableIntStateOf(0) } // 0 = current month, -1 = previous month, etc.
     var currentYearOffset by remember { mutableIntStateOf(0) } // 0 = current year, -1 = previous year, etc.
 
-    // Collect data from repository
-    val last30DaysSummaries by waterIntakeRepository.getLast30DaysSummaries().collectAsState(
+    // Collect ALL historical data from repository (not just last 30 days)
+    val allSummaries by waterIntakeRepository.getAllSummaries().collectAsState(
         initial = emptyList()
     )
 
@@ -145,13 +145,13 @@ fun HistoryScreen(
                             WeeklyChartSection(
                                 selectedPeriod = selectedPeriod,
                                 weekOffset = currentWeekOffset,
-                                summaries = last30DaysSummaries,
+                                summaries = allSummaries,
                                 weekStartDay = themePreferences.weekStartDay
                             )
                         }
                         TimePeriod.MONTHLY -> {
                             MonthlyChartSection(
-                                summaries = last30DaysSummaries,
+                                summaries = allSummaries,
                                 selectedPeriod = selectedPeriod,
                                 monthOffset = currentMonthOffset,
                                 weekStartDay = themePreferences.weekStartDay
@@ -159,7 +159,7 @@ fun HistoryScreen(
                         }
                         TimePeriod.YEARLY -> {
                             YearlyChartSection(
-                                summaries = last30DaysSummaries,
+                                summaries = allSummaries,
                                 selectedPeriod = selectedPeriod,
                                 yearOffset = currentYearOffset
                             )
@@ -181,7 +181,7 @@ fun HistoryScreen(
                     ) + fadeIn(animationSpec = tween(600, delayMillis = 300))
                 ) {
                     StatisticsGrid(
-                        summaries = last30DaysSummaries
+                        summaries = allSummaries
                     )
                 }
             }
@@ -203,7 +203,7 @@ fun HistoryScreen(
                     ) + fadeIn(animationSpec = tween(600, delayMillis = 400))
                 ) {
                     GoalAchievementSection(
-                        summaries = last30DaysSummaries,
+                        summaries = allSummaries,
                         selectedPeriod = selectedPeriod,
                         weekOffset = currentWeekOffset,
                         monthOffset = currentMonthOffset,
