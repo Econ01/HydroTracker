@@ -59,6 +59,7 @@ fun HomeScreen(
     userProfile: UserProfile,
     waterIntakeRepository: WaterIntakeRepository,
     containerPresetRepository: ContainerPresetRepository,
+    activeBeverageTypes: List<BeverageType> = BeverageType.getAllSorted(),
     onNavigateToHistory: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {}
@@ -555,6 +556,7 @@ fun HomeScreen(
                                 selectedBeverageType = beverageType
                                 haptics.performHapticFeedback(HapticFeedbackType.Confirm)
                             },
+                            beverageTypes = activeBeverageTypes,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -626,7 +628,8 @@ fun HomeScreen(
             selectedBeverageType = selectedBeverageType,
             onBeverageTypeChange = { newType ->
                 selectedBeverageType = newType
-            }
+            },
+            beverageTypes = activeBeverageTypes
         )
     }
 
@@ -642,7 +645,8 @@ fun HomeScreen(
                 updateWaterIntake(entryToEdit!!, updatedEntry)
                 showEditDialog = false
                 entryToEdit = null
-            }
+            },
+            beverageTypes = activeBeverageTypes
         )
     }
 
@@ -808,7 +812,8 @@ private fun CustomWaterDialog(
     onDismiss: () -> Unit,
     onConfirm: (Double) -> Unit,
     selectedBeverageType: BeverageType,
-    onBeverageTypeChange: (BeverageType) -> Unit
+    onBeverageTypeChange: (BeverageType) -> Unit,
+    beverageTypes: List<BeverageType> = BeverageType.getAllSorted()
 ) {
     var amountText by remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(false) }
@@ -832,7 +837,6 @@ private fun CustomWaterDialog(
                 )
 
                 // Beverage Type Selection Dropdown
-                val beverageTypes = BeverageType.getAllSorted()
                 var beverageExpanded by remember { mutableStateOf(false) }
 
                 ExposedDropdownMenuBox(
@@ -978,11 +982,16 @@ private fun CustomWaterDialog(
 private fun EditWaterDialog(
     entry: WaterIntakeEntry,
     onDismiss: () -> Unit,
-    onConfirm: (WaterIntakeEntry) -> Unit
+    onConfirm: (WaterIntakeEntry) -> Unit,
+    beverageTypes: List<BeverageType> = BeverageType.getAllSorted()
 ) {
     var amountText by remember { mutableStateOf(entry.amount.toString()) }
     var containerType by remember { mutableStateOf(entry.containerType) }
-    var selectedBeverageType by remember { mutableStateOf(entry.getBeverageType()) }
+    var selectedBeverageType by remember {
+        mutableStateOf(
+            entry.getBeverageType().let { t -> if (t in beverageTypes) t else BeverageType.WATER }
+        )
+    }
     var isError by remember { mutableStateOf(false) }
 
     // Time picker state
@@ -1108,7 +1117,6 @@ private fun EditWaterDialog(
 
                 // Beverage Type Selection Dropdown (disabled for external entries)
                 if (!isExternalEntry) {
-                    val beverageTypes = BeverageType.getAllSorted()
                     var beverageExpanded by remember { mutableStateOf(false) }
 
                     ExposedDropdownMenuBox(
@@ -1763,9 +1771,15 @@ private fun HealthConnectSyncIcon(
 private fun BeverageSelectionSection(
     selectedBeverageType: BeverageType,
     onBeverageTypeChange: (BeverageType) -> Unit,
+    beverageTypes: List<BeverageType> = BeverageType.getAllSorted(),
     modifier: Modifier = Modifier
 ) {
     val haptics = LocalHapticFeedback.current
+
+    val safeSelected = if (selectedBeverageType in beverageTypes) selectedBeverageType else beverageTypes.first()
+    LaunchedEffect(beverageTypes) {
+        if (selectedBeverageType !in beverageTypes) onBeverageTypeChange(BeverageType.WATER)
+    }
 
     Column(
         modifier = modifier.padding(horizontal = 5.dp, vertical = 5.dp),
@@ -1773,15 +1787,13 @@ private fun BeverageSelectionSection(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Horizontally scrollable chips
-        val beverageTypes = BeverageType.getAllSorted()
-
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(horizontal = 4.dp)
         ) {
             items(beverageTypes) { beverageType ->
-                val isSelected = selectedBeverageType == beverageType
+                val isSelected = safeSelected == beverageType
 
                 FilterChip(
                     shape = if (isSelected){
@@ -1831,7 +1843,7 @@ private fun BeverageSelectionSection(
 
         // Show selected beverage info with animation
         AnimatedVisibility(
-            visible = selectedBeverageType != BeverageType.WATER,
+            visible = safeSelected != BeverageType.WATER,
             enter = expandVertically(
                 animationSpec = spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
@@ -1886,7 +1898,7 @@ private fun BeverageSelectionSection(
                             style = MaterialTheme.typography.titleSmall,
                         )
                         AnimatedContent(
-                            targetState = (selectedBeverageType.hydrationMultiplier * 100).toInt(),
+                            targetState = (safeSelected.hydrationMultiplier * 100).toInt(),
                             transitionSpec = {
                                 slideInVertically { height -> height } + fadeIn() togetherWith
                                 slideOutVertically { height -> -height } + fadeOut()

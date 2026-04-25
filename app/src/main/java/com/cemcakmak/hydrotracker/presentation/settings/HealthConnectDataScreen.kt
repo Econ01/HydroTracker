@@ -34,7 +34,7 @@ fun HealthConnectDataScreen(
                 isLoading = true
 
                 // Collect both flows and combine them
-                val visibleFlow = waterIntakeRepository.getLast30DaysEntries()
+                val visibleFlow = waterIntakeRepository.getAllEntries()
                 val hiddenFlow = waterIntakeRepository.getHiddenEntries()
 
                 // Use combine to merge both flows
@@ -211,9 +211,17 @@ private fun HealthConnectDataItem(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Date and time
+            // Date and time (fixed ISO 24-hour format for Health Connect consistency)
+            val isoFormatter = remember {
+                java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+            }
+            val isoDateTime = remember(entry.timestamp) {
+                java.time.Instant.ofEpochMilli(entry.timestamp)
+                    .atZone(java.time.ZoneId.systemDefault())
+                    .format(isoFormatter)
+            }
             Text(
-                text = entry.getFormattedDateTime(),
+                text = isoDateTime,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

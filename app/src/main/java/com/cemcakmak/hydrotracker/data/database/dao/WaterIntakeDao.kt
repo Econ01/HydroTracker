@@ -37,6 +37,9 @@ interface WaterIntakeDao {
     @Query("SELECT * FROM water_intake_entries WHERE date >= date('now', '-30 days') AND is_hidden = 0 ORDER BY timestamp DESC")
     fun getLast30DaysEntries(): Flow<List<WaterIntakeEntry>>
 
+    @Query("SELECT * FROM water_intake_entries WHERE is_hidden = 0 ORDER BY timestamp DESC")
+    fun getAllEntries(): Flow<List<WaterIntakeEntry>>
+
     @Update
     suspend fun updateEntry(entry: WaterIntakeEntry)
 

@@ -1,20 +1,19 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
 }
 
 android {
     namespace = "com.cemcakmak.hydrotracker"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.cemcakmak.hydrotracker"
         minSdk = 26
         targetSdk = 36
-        versionCode = 25
-        versionName = "1.0.4"
+        versionCode = 27
+        versionName = "1.0.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -48,17 +47,17 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
-            freeCompilerArgs.addAll(listOf(
-                "-opt-in=androidx.compose.material3.ExperimentalMaterial3ExpressiveApi"
-            ))
-        }
-    }
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+}
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll(listOf(
+            "-opt-in=androidx.compose.material3.ExperimentalMaterial3ExpressiveApi"
+        ))
     }
 }
 
@@ -101,6 +100,9 @@ dependencies {
 
     // Health Connect
     implementation(libs.androidx.health.connect)
+
+    // Reorderable (drag-and-drop)
+    implementation(libs.reorderable)
 
     // Debug tools
     debugImplementation(libs.androidx.ui.tooling)

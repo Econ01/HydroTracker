@@ -68,6 +68,7 @@ fun SettingsScreen(
     healthConnectPermissionLauncher: ActivityResultLauncher<Set<String>>? = null,
     onNavigateBack: () -> Unit = {},
     onNavigateToOnboarding: () -> Unit = {},
+    onNavigateToBeverageTypes: () -> Unit = {},
     onNavigateToHealthConnectData: () -> Unit = {},
     isDynamicColorAvailable: Boolean = true
 ) {
@@ -210,6 +211,87 @@ fun SettingsScreen(
                 )
             }
 
+            // Beverage Types nav card
+            if (userRepository != null) {
+                AnimatedVisibility(
+                    visible = isVisible,
+                    enter = slideInVertically(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessMedium
+                        ),
+                        initialOffsetY = { it / 2 }
+                    ) + fadeIn(animationSpec = tween(600, delayMillis = 265))
+                ) {
+                    Column(
+                        modifier = Modifier.padding(5.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.EmojiFoodBeverage,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = "Baverage Types",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onNavigateToBeverageTypes() },
+                            shape = MaterialTheme.shapes.extraLarge,
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer
+                            )
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.EmojiFoodBeverage,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "Beverage Types",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                    Text(
+                                        text = "Reorder and hide beverages",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                }
+                                Icon(
+                                    imageVector = Icons.Default.ChevronRight,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
+                        }
+                    }
+                }
+
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                )
+            }
+
             // Health Connect Section - only show if supported on this Android version
             if (HealthConnectManager.isVersionSupported()) {
                 AnimatedVisibility(
@@ -225,6 +307,9 @@ fun SettingsScreen(
                     HealthConnectSection(
                         healthConnectPermissionLauncher = healthConnectPermissionLauncher,
                         userProfile = userProfile,
+                        userRepository = userRepository,
+                        waterIntakeRepository = waterIntakeRepository,
+                        snackbarHostState = snackbarHostState,
                         onHealthConnectSyncChange = { enabled ->
                             userProfile?.let { profile ->
                                 val updatedProfile = profile.copy(healthConnectSyncEnabled = enabled)
@@ -1819,7 +1904,6 @@ private fun ContainerPresetsSection(
 ) {
     val coroutineScope = rememberCoroutineScope()
     var showResetConfirmation by remember { mutableStateOf(false) }
-    val presetCount by containerPresetRepository.getAllPresets().collectAsState(initial = emptyList())
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -1848,37 +1932,10 @@ private fun ContainerPresetsSection(
             }
 
             Text(
-                text = "Customize the quick select containers on the home screen. Long-press any container to edit or delete it.",
+                text = "Customize the quick select containers on the home screen. Long-press any container to edit or delete it. Use the button to restore to the default state",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-
-            // Current preset count
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-                ),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Current containers:",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = "${presetCount.size}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
 
             // Reset to defaults button
             OutlinedButton(
@@ -1939,6 +1996,9 @@ private fun ContainerPresetsSection(
 private fun HealthConnectSection(
     healthConnectPermissionLauncher: ActivityResultLauncher<Set<String>>? = null,
     userProfile: UserProfile? = null,
+    userRepository: UserRepository? = null,
+    waterIntakeRepository: WaterIntakeRepository? = null,
+    snackbarHostState: SnackbarHostState? = null,
     onHealthConnectSyncChange: (Boolean) -> Unit = {},
     onNavigateToHealthConnectData: () -> Unit = {}
 ) {
@@ -1951,6 +2011,10 @@ private fun HealthConnectSection(
     var refreshTrigger by remember { mutableIntStateOf(0) }
 
     val manager = HealthConnectManager
+
+    var showRestoreDialog by remember { mutableStateOf(false) }
+    var restoreTimeRange by remember { mutableStateOf("all") }
+    var isRestoring by remember { mutableStateOf(false) }
 
     // Check Health Connect status on component mount and when refresh is triggered
     LaunchedEffect(refreshTrigger) {
@@ -2099,6 +2163,62 @@ private fun HealthConnectSection(
                         )
                     }
                 }
+
+                // Restore from Health Connect button
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            if (!isRestoring) {
+                                showRestoreDialog = true
+                            }
+                        },
+                    shape = MaterialTheme.shapes.extraLarge,
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CloudDownload,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Restore from Health Connect",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Text(
+                                text = "Import your past HydroTracker entries",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+
+                        if (isRestoring) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Restore,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                    }
+                }
             }
 
             // Request permissions button (when not ready)
@@ -2132,6 +2252,103 @@ private fun HealthConnectSection(
                 }
             }
         }
+    }
+
+    // Restore confirmation dialog
+    if (showRestoreDialog) {
+        AlertDialog(
+            onDismissRequest = { if (!isRestoring) showRestoreDialog = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.CloudDownload,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            title = { Text("Restore from Health Connect") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Import your past HydroTracker entries from Health Connect. Choose a time range:")
+
+                    Column {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            RadioButton(
+                                selected = restoreTimeRange == "all",
+                                onClick = { restoreTimeRange = "all" },
+                                enabled = !isRestoring
+                            )
+                            Text(
+                                text = "All history",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            RadioButton(
+                                selected = restoreTimeRange == "90days",
+                                onClick = { restoreTimeRange = "90days" },
+                                enabled = !isRestoring
+                            )
+                            Text(
+                                text = "Last 90 days",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        isRestoring = true
+                        val since = if (restoreTimeRange == "all") {
+                            java.time.Instant.EPOCH
+                        } else {
+                            java.time.Instant.now().minus(90, java.time.temporal.ChronoUnit.DAYS)
+                        }
+
+                        com.cemcakmak.hydrotracker.health.HealthConnectSyncManager.restoreHydroTrackerHistory(
+                            context,
+                            userRepository!!,
+                            waterIntakeRepository!!,
+                            since
+                        ) { imported, skipped ->
+                            coroutineScope.launch {
+                                isRestoring = false
+                                showRestoreDialog = false
+                                snackbarHostState?.showSnackbar(
+                                    "Restored $imported entries, skipped $skipped duplicates"
+                                )
+                            }
+                        }
+                    },
+                    enabled = !isRestoring && userRepository != null && waterIntakeRepository != null
+                ) {
+                    if (isRestoring) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else {
+                        Text("Restore")
+                    }
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { if (!isRestoring) showRestoreDialog = false },
+                    enabled = !isRestoring
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 

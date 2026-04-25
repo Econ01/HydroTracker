@@ -239,6 +239,10 @@ class WaterIntakeRepository(
         return waterIntakeDao.getLast30DaysEntries()
     }
 
+    fun getAllEntries(): Flow<List<WaterIntakeEntry>> {
+        return waterIntakeDao.getAllEntries()
+    }
+
     suspend fun getAllEntriesForDate(date: String): List<WaterIntakeEntry> = withContext(Dispatchers.IO) {
         waterIntakeDao.getAllEntriesForDateSync(date)
     }
@@ -302,6 +306,10 @@ class WaterIntakeRepository(
 
     fun getLast30DaysSummaries(): Flow<List<DailySummary>> {
         return dailySummaryDao.getLast30DaysSummaries()
+    }
+
+    fun getAllSummaries(): Flow<List<DailySummary>> {
+        return dailySummaryDao.getAllSummaries()
     }
 
     private suspend fun updateDailySummaryForDate(date: String) = withContext(Dispatchers.IO) {
