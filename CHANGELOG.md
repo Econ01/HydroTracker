@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.0.6.1]
+- Small preparations for F-Droid release
+
 ## [1.0.6]
 ### Added
 - Widgets and notifications now respect the system time configuration
