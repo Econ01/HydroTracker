@@ -139,6 +139,9 @@ class HydroLargeWidget : AppWidgetProvider() {
                 WidgetTheme.applyTheme(
                     context = context,
                     views = views,
+                    containerId = R.id.widget_container,
+                    progressBarId = R.id.widget_progress_bar,
+                    titleTextViewIds = listOf(R.id.widget_title),
                     textViewIds = listOf(R.id.widget_progress_text),
                     accentTextViewIds = listOf(R.id.widget_progress_percent),
                     variantTextViewIds = listOf(R.id.widget_last_updated),
@@ -228,6 +231,24 @@ class HydroLargeWidget : AppWidgetProvider() {
         views.setOnClickPendingIntent(R.id.widget_container, pendingIntent)
 
         setupQuickAddButtons(context, views)
+
+        // Apply Material 3 theme
+        WidgetTheme.applyTheme(
+            context = context,
+            views = views,
+            containerId = R.id.widget_container,
+            progressBarId = R.id.widget_progress_bar,
+            titleTextViewIds = listOf(R.id.widget_title),
+            textViewIds = listOf(R.id.widget_progress_text),
+            accentTextViewIds = listOf(R.id.widget_progress_percent),
+            variantTextViewIds = listOf(R.id.widget_last_updated),
+            buttonTextViewIds = listOf(
+                R.id.widget_btn_250_text,
+                R.id.widget_btn_300_text,
+                R.id.widget_btn_500_text,
+                R.id.widget_btn_1l_text
+            )
+        )
 
         appWidgetManager.updateAppWidget(appWidgetId, views)
     }

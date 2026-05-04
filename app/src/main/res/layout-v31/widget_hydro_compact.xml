@@ -4,8 +4,9 @@
     android:id="@+id/widget_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@android:style/Theme.DeviceDefault.DayNight"
-    android:background="@drawable/widget_background_m3"
+    android:theme="@style/Theme.Material3.DynamicColors.DayNight"
+    android:background="@drawable/widget_background_shape"
+    android:backgroundTint="?attr/colorSurface"
     android:padding="@dimen/widget_padding_compact">
 
     <!-- Circular Progress Indicator with Percentage -->
@@ -20,7 +21,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:progressDrawable="@drawable/widget_circular_progress_small"
-            android:background="@drawable/widget_circular_progress_background_small"
+            android:progressTint="?attr/colorPrimary"
+            android:progressBackgroundTint="?attr/colorSurfaceVariant"
             android:max="100"
             android:progress="0"
             android:rotation="-90" />
@@ -32,6 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="0%"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="12sp"
             android:textStyle="bold"
             android:fontFamily="sans-serif-medium"
@@ -46,6 +49,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
         android:text="0L / 2.7L"
+        android:textColor="?attr/colorOnSurface"
         android:textSize="@dimen/widget_text_caption"
         android:fontFamily="sans-serif"
         android:textAlignment="center"
@@ -59,6 +63,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Tap to open"
+        android:textColor="?attr/colorOnSurfaceVariant"
         android:textSize="@dimen/widget_text_caption"
         android:fontFamily="sans-serif"
         android:textAlignment="center"

@@ -4,8 +4,9 @@
     android:id="@+id/widget_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@android:style/Theme.DeviceDefault.DayNight"
-    android:background="@drawable/widget_background_m3"
+    android:theme="@style/Theme.Material3Expressive.DynamicColors.DayNight"
+    android:background="@drawable/widget_background_shape"
+    android:backgroundTint="?attr/colorSurface"
     android:padding="16dp">
 
     <LinearLayout
@@ -29,6 +30,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="HydroTracker"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="18sp"
                 android:fontFamily="sans-serif-medium"
                 android:maxLines="1"
@@ -40,6 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0%"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="26sp"
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-medium" />
@@ -67,6 +70,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="0ml / 2,700ml"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="17sp"
                     android:fontFamily="sans-serif" />
 
@@ -76,6 +80,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Updated 15:35"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="14sp"
                     android:fontFamily="sans-serif"
                     android:alpha="0.7"
@@ -90,7 +95,8 @@
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="12dp"
-                android:progressDrawable="@drawable/widget_progress_m3"
+                android:progressTint="?attr/colorPrimary"
+                android:progressBackgroundTint="?attr/colorSurfaceVariant"
                 android:max="100"
                 android:progress="0" />
 
@@ -114,7 +120,8 @@
                 android:gravity="center"
                 android:minHeight="56dp"
                 android:padding="12dp"
-                android:background="@drawable/widget_button_background"
+                android:background="@drawable/widget_button_shape"
+                android:backgroundTint="?attr/colorSecondaryContainer"
                 android:layout_marginEnd="5dp">
 
                 <TextView
@@ -122,6 +129,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="250ml"
+                    android:textColor="?attr/colorOnSecondaryContainer"
                     android:textSize="15sp"
                     android:fontFamily="sans-serif-medium" />
 
@@ -137,7 +145,8 @@
                 android:gravity="center"
                 android:minHeight="56dp"
                 android:padding="12dp"
-                android:background="@drawable/widget_button_background"
+                android:background="@drawable/widget_button_shape"
+                android:backgroundTint="?attr/colorSecondaryContainer"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp">
 
@@ -146,6 +155,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="300ml"
+                    android:textColor="?attr/colorOnSecondaryContainer"
                     android:textSize="15sp"
                     android:fontFamily="sans-serif-medium" />
 
@@ -161,7 +171,8 @@
                 android:gravity="center"
                 android:minHeight="56dp"
                 android:padding="12dp"
-                android:background="@drawable/widget_button_background"
+                android:background="@drawable/widget_button_shape"
+                android:backgroundTint="?attr/colorSecondaryContainer"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp">
 
@@ -170,6 +181,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="500ml"
+                    android:textColor="?attr/colorOnSecondaryContainer"
                     android:textSize="15sp"
                     android:fontFamily="sans-serif-medium" />
 
@@ -185,7 +197,8 @@
                 android:gravity="center"
                 android:minHeight="56dp"
                 android:padding="12dp"
-                android:background="@drawable/widget_button_background"
+                android:background="@drawable/widget_button_shape"
+                android:backgroundTint="?attr/colorSecondaryContainer"
                 android:layout_marginStart="5dp">
 
                 <TextView
@@ -193,6 +206,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="1L"
+                    android:textColor="?attr/colorOnSecondaryContainer"
                     android:textSize="15sp"
                     android:fontFamily="sans-serif-medium" />
 

@@ -7,7 +7,7 @@
     <corners android:radius="@dimen/widget_corner_radius" />
 
     <!-- Surface container color (dark) -->
-    <solid android:color="@color/widget_surface_container_dark" />
+    <solid android:color="@color/widget_surface_dark" />
 
     <!-- Subtle outline -->
     <stroke

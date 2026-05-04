@@ -2,20 +2,20 @@
 <!-- Progress bar drawable for Android 12-13 with dynamic colors -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Track (background) - SecondaryContainer equivalent -->
+    <!-- Track (background) -->
     <item android:id="@android:id/background">
         <shape android:shape="rectangle">
             <corners android:radius="@dimen/widget_progress_bar_corner" />
-            <solid android:color="@android:color/system_accent2_100" />
+            <solid android:color="?android:attr/colorButtonNormal" />
         </shape>
     </item>
 
-    <!-- Progress (foreground) - Primary equivalent -->
+    <!-- Progress (foreground) -->
     <item android:id="@android:id/progress">
         <clip>
             <shape android:shape="rectangle">
                 <corners android:radius="@dimen/widget_progress_bar_corner" />
-                <solid android:color="@android:color/system_accent1_600" />
+                <solid android:color="?android:attr/colorAccent" />
             </shape>
         </clip>
     </item>

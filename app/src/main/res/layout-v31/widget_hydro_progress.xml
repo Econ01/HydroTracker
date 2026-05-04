@@ -4,8 +4,9 @@
     android:id="@+id/widget_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@android:style/Theme.DeviceDefault.DayNight"
-    android:background="@drawable/widget_background_m3"
+    android:theme="@style/Theme.Material3.DynamicColors.DayNight"
+    android:background="@drawable/widget_background_shape"
+    android:backgroundTint="?attr/colorSurface"
     android:padding="16dp">
 
     <LinearLayout
@@ -29,6 +30,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="HydroTracker"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="16sp"
                 android:fontFamily="sans-serif-medium"
                 android:maxLines="1"
@@ -40,6 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0%"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="22sp"
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-medium" />
@@ -60,6 +63,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="0ml / 2,700ml"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="14sp"
                 android:fontFamily="sans-serif" />
 
@@ -69,6 +73,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Updated 15:35"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="12sp"
                 android:fontFamily="sans-serif"
                 android:alpha="0.7"
@@ -83,7 +88,8 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="8dp"
-            android:progressDrawable="@drawable/widget_progress_m3"
+            android:progressTint="?attr/colorPrimary"
+            android:progressBackgroundTint="?attr/colorSurfaceVariant"
             android:max="100"
             android:progress="0" />
 

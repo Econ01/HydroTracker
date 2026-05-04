@@ -91,8 +91,11 @@ class HydroCompactWidget : AppWidgetProvider() {
                 WidgetTheme.applyTheme(
                     context = context,
                     views = views,
-                    textViewIds = listOf(R.id.widget_progress_text, R.id.widget_last_updated),
-                    accentTextViewIds = listOf(R.id.widget_progress_percent)
+                    containerId = R.id.widget_container,
+                    progressBarId = R.id.widget_progress_circle,
+                    textViewIds = listOf(R.id.widget_progress_text),
+                    accentTextViewIds = listOf(R.id.widget_progress_percent),
+                    variantTextViewIds = listOf(R.id.widget_last_updated)
                 )
 
                 appWidgetManager.updateAppWidget(appWidgetId, views)
@@ -121,6 +124,17 @@ class HydroCompactWidget : AppWidgetProvider() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         views.setOnClickPendingIntent(R.id.widget_container, pendingIntent)
+
+        // Apply Material 3 theme
+        WidgetTheme.applyTheme(
+            context = context,
+            views = views,
+            containerId = R.id.widget_container,
+            progressBarId = R.id.widget_progress_circle,
+            textViewIds = listOf(R.id.widget_progress_text),
+            accentTextViewIds = listOf(R.id.widget_progress_percent),
+            variantTextViewIds = listOf(R.id.widget_last_updated)
+        )
         
         appWidgetManager.updateAppWidget(appWidgetId, views)
     }
