@@ -193,6 +193,7 @@ class UserRepository(context: Context) {
             putString("color_source", themePreferences.colorSource.name)
             putString("week_start_day", themePreferences.weekStartDay.name)
             putBoolean("use_pure_black", themePreferences.usePureBlack)
+            putString("app_font", themePreferences.appFont.name)
             apply()
         }
     }
@@ -212,7 +213,10 @@ class UserRepository(context: Context) {
             weekStartDay = WeekStartDay.valueOf(
                 prefs.getString("week_start_day", WeekStartDay.MONDAY.name) ?: WeekStartDay.MONDAY.name
             ),
-            usePureBlack = prefs.getBoolean("use_pure_black", false)
+            usePureBlack = prefs.getBoolean("use_pure_black", false),
+            appFont = AppFont.valueOf(
+                prefs.getString("app_font", AppFont.ROBOTO.name) ?: AppFont.ROBOTO.name
+            )
         )
     }
     

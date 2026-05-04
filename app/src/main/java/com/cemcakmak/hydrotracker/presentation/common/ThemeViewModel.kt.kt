@@ -10,6 +10,7 @@ import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.DarkModePreference
 import com.cemcakmak.hydrotracker.data.models.ColorSource
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
+import com.cemcakmak.hydrotracker.data.models.AppFont
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
 
 /**
@@ -23,6 +24,17 @@ class ThemeViewModel(private val userRepository: UserRepository) : ViewModel() {
         userRepository.loadThemePreferences()
     )
     val themePreferences: StateFlow<ThemePreferences> = _themePreferences.asStateFlow()
+
+    /**
+     * Update application font
+     */
+    fun updateAppFont(font: AppFont) {
+        viewModelScope.launch {
+            val newPreferences = _themePreferences.value.copy(appFont = font)
+            _themePreferences.value = newPreferences
+            userRepository.updateThemePreferences(newPreferences)
+        }
+    }
 
     /**
      * Toggle dynamic color on/off

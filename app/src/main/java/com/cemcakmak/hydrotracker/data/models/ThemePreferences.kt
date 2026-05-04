@@ -11,8 +11,17 @@ data class ThemePreferences(
     val darkMode: DarkModePreference = DarkModePreference.SYSTEM,
     val colorSource: ColorSource = ColorSource.DYNAMIC_COLOR,
     val weekStartDay: WeekStartDay = WeekStartDay.MONDAY,
-    val usePureBlack: Boolean = false // Pure black backgrounds in dark mode
+    val usePureBlack: Boolean = false, // Pure black backgrounds in dark mode
+    val appFont: AppFont = AppFont.ROBOTO // Default to Roboto
 )
+
+enum class AppFont(val displayName: String) {
+    ROBOTO("Roboto Flex"),
+    DMSANS("DM Sans"),
+    JETBRAINS_MONO("JetBrains Mono"),
+    GOOGLE_SANS("Google Sans"),
+    OUTFIT("Outfit")
+}
 
 enum class DarkModePreference {
     SYSTEM,     // Follow system setting

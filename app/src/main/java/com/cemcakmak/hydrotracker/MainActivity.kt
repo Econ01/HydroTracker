@@ -286,6 +286,7 @@ fun HydroTrackerApp(
                             onDarkModeChange = themeViewModel::updateDarkModePreference,
                             onPureBlackChange = themeViewModel::updatePureBlackPreference,
                             onWeekStartDayChange = themeViewModel::updateWeekStartDay,
+                            onAppFontChange = themeViewModel::updateAppFont,
                             onHydrationStandardChange = { newStandard ->
                                 userProfile?.let { profile ->
                                     // Recalculate daily water goal with new standard

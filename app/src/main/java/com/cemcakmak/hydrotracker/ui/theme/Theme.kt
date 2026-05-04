@@ -130,7 +130,7 @@ fun HydroTrackerTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = HydroTypography,
+        typography = getTypography(themePreferences.appFont),
         content = content
     )
 }

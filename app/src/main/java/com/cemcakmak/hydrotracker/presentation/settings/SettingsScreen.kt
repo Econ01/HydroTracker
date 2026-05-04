@@ -27,6 +27,7 @@ import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.DarkModePreference
 import com.cemcakmak.hydrotracker.data.models.ColorSource
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
+import com.cemcakmak.hydrotracker.data.models.AppFont
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.models.HydrationStandard
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
@@ -50,6 +51,9 @@ import com.cemcakmak.hydrotracker.health.HealthConnectManager
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import android.util.Log
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -63,6 +67,7 @@ fun SettingsScreen(
     onColorSourceChange: (ColorSource) -> Unit = {},
     onPureBlackChange: (Boolean) -> Unit = {},
     onWeekStartDayChange: (WeekStartDay) -> Unit = {},
+    onAppFontChange: (AppFont) -> Unit = {},
     onHydrationStandardChange: (HydrationStandard) -> Unit = {},
     onRequestNotificationPermission: () -> Unit = {},
     healthConnectPermissionLauncher: ActivityResultLauncher<Set<String>>? = null,
@@ -142,6 +147,24 @@ fun SettingsScreen(
                 )
             }
 
+
+            // Font Section
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = slideInVertically(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    ),
+                    initialOffsetY = { it / 2 }
+                ) + fadeIn(animationSpec = tween(600, delayMillis = 225))
+            ) {
+                FontSection(
+                    themePreferences = themePreferences,
+                    onAppFontChange = onAppFontChange
+                )
+            }
+
             HorizontalDivider(
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
             )
@@ -166,6 +189,9 @@ fun SettingsScreen(
             HorizontalDivider(
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
             )
+
+
+
 
             // Hydration Calculation Section
             AnimatedVisibility(
@@ -583,6 +609,65 @@ private fun ThemeSection(
     }
 }
 
+
+@Composable
+private fun FontSection(
+    themePreferences: ThemePreferences,
+    onAppFontChange: (AppFont) -> Unit
+) {
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(6.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.FontDownload,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Application Font",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
+            // Grid or Column of font choices
+            val haptics = LocalHapticFeedback.current
+            Row (
+                modifier = Modifier.fillMaxWidth()
+                    .animateContentSize()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                AppFont.entries.forEach { font ->
+                    val isSelected = themePreferences.appFont == font
+                    ToggleButton(
+                        modifier = Modifier.animateContentSize(),
+                        checked = isSelected,
+                        onCheckedChange = {
+                            onAppFontChange(font)
+                            haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
+                        }
+                    ) {
+                        Text(
+                            text = font.displayName,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                        )
+                    }
+
+                }
+            }
+        }
+
+}
 
 @Composable
 private fun DisplaySection(
