@@ -1,57 +1,172 @@
 package com.cemcakmak.hydrotracker.presentation.home
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.TargetedFlingBehavior
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.material3.*
-import androidx.compose.material3.carousel.rememberCarouselState
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.WaterDrop
+import androidx.compose.material.icons.outlined.Cloud
+import androidx.compose.material.icons.rounded.AddCircle
+import androidx.compose.material.icons.rounded.Cloud
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonGroup
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularWavyProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.ToggleButton
+import androidx.compose.material3.ToggleButtonDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.carousel.CarouselDefaults
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
+import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
+import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
-import androidx.compose.runtime.*
+import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import kotlinx.coroutines.launch
-import com.cemcakmak.hydrotracker.data.models.UserProfile
-import com.cemcakmak.hydrotracker.data.models.ContainerPreset
-import com.cemcakmak.hydrotracker.data.models.BeverageType
-import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
+import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
 import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
+import com.cemcakmak.hydrotracker.data.database.repository.TodayStatistics
+import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
+import com.cemcakmak.hydrotracker.data.database.repository.WaterProgress
+import com.cemcakmak.hydrotracker.data.models.BeverageType
+import com.cemcakmak.hydrotracker.data.models.ContainerPreset
+import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.health.HealthConnectManager
 import com.cemcakmak.hydrotracker.health.HealthConnectSyncManager
-import com.cemcakmak.hydrotracker.data.database.repository.WaterProgress
-import com.cemcakmak.hydrotracker.data.database.repository.TodayStatistics
-import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
-import com.cemcakmak.hydrotracker.utils.WaterCalculator
 import com.cemcakmak.hydrotracker.presentation.common.HydroSnackbarHost
-import com.cemcakmak.hydrotracker.presentation.common.showSuccessSnackbar
+import com.cemcakmak.hydrotracker.presentation.common.SnackbarQueue
 import com.cemcakmak.hydrotracker.presentation.common.showErrorSnackbar
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
+import com.cemcakmak.hydrotracker.presentation.common.showSuccessSnackbar
+import com.cemcakmak.hydrotracker.utils.WaterCalculator
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+import java.util.Calendar
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -95,6 +210,8 @@ fun HomeScreen(
         )
     )
 
+   // val todayCompletionPercentage = todayStatistics.entryCount / todayStatistics.
+
     // Vibration and haptics
     val haptics = LocalHapticFeedback.current
     val context = LocalContext.current
@@ -115,6 +232,7 @@ fun HomeScreen(
 
     // Container preset management state
     val presets by containerPresetRepository.getAllPresets().collectAsState(initial = emptyList())
+
     var showAddPresetSheet by remember { mutableStateOf(false) }
     var showEditPresetSheet by remember { mutableStateOf(false) }
     var presetToEdit by remember { mutableStateOf<ContainerPreset?>(null) }
@@ -137,11 +255,13 @@ fun HomeScreen(
             )
 
             result.onSuccess {
+                SnackbarQueue.clearAll()
                 val beverageInfo = if (selectedBeverageType != BeverageType.WATER) {
                     " ${selectedBeverageType.displayName}"
                 } else {
                     ""
                 }
+
                 snackbarHostState.showSuccessSnackbar(
                     message = "Added ${WaterCalculator.formatWaterAmount(amount)}$beverageInfo!"
                 )
@@ -194,12 +314,12 @@ fun HomeScreen(
                 isRefreshing = true
                 try {
                     // Import external hydration data from the last 30 days
-                    val since = java.time.Instant.now().minus(30, java.time.temporal.ChronoUnit.DAYS)
+                    val since = Instant.now().minus(30, ChronoUnit.DAYS)
 
                     waterIntakeRepository.getSyncManager().importExternalHydrationData(context, waterIntakeRepository.getUserRepository(), waterIntakeRepository, since) { imported, errors ->
                         coroutineScope.launch {
                             // Always show loading for at least 1.5 seconds for better UX
-                            kotlinx.coroutines.delay(1500)
+                            delay(1500)
 
                             when {
                                 imported > 0 -> {
@@ -223,7 +343,7 @@ fun HomeScreen(
                     }
                 } catch (e: Exception) {
                     // Show loading for at least 1.5 seconds even on error
-                    kotlinx.coroutines.delay(1500)
+                    delay(1500)
                     snackbarHostState.showErrorSnackbar(
                         message = "Sync failed: ${e.message}"
                     )
@@ -231,7 +351,7 @@ fun HomeScreen(
                 }
             } else {
                 // Show loading animation even when disabled for consistency
-                kotlinx.coroutines.delay(1500)
+                delay(1500)
                 snackbarHostState.showSnackbar(
                     message = "Health Connect sync is disabled",
                     actionLabel = "Enable"
@@ -294,6 +414,19 @@ fun HomeScreen(
                 shadowElevation = animatedElevation
             ) {
                 TopAppBar(
+                    navigationIcon = {
+                        Image(
+                            modifier = Modifier.size(42.dp),
+                            painter = painterResource(
+
+                                id = com.cemcakmak.hydrotracker.R.drawable.ic_launcher_foreground,
+                            ),
+                            colorFilter = ColorFilter.tint(
+                                color = MaterialTheme.colorScheme.primary
+                            ),
+                            contentDescription = ""
+                        )
+                    },
                     scrollBehavior = scrollBehavior,
                     title = {
                         Row(
@@ -302,8 +435,7 @@ fun HomeScreen(
                         ) {
                             Text(
                                 text = "HydroTracker",
-                                style = MaterialTheme.typography.headlineLargeEmphasized,
-                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.SemiBold
                             )
 
                             // Health Connect Sync Status Icon
@@ -401,85 +533,160 @@ fun HomeScreen(
                     initialOffsetY = { it / 3 }
                 ) + fadeIn(animationSpec = tween(600, delayMillis = 200))
             ) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    ),
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(
-                        modifier = Modifier.padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(20.dp)
-                    ) {
-                        Text(
-                            text = "Daily Progress",
-                            style = MaterialTheme.typography.headlineLargeEmphasized,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                   Column(
+                       horizontalAlignment = Alignment.Start,
+                      modifier =  Modifier.weight(1f)
+                   ) {
+                       Text(
+                           text = "Today",
+                           style = MaterialTheme.typography.labelMedium.copy(
+                               fontWeight = FontWeight.Light
+                           )
+                       )
 
-                        // Progress amount display
-                        Text(
-                            text = "${todayProgress.getFormattedCurrent()} / ${todayProgress.getFormattedGoal()}",
-                            style = MaterialTheme.typography.headlineMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                       Text(
+                           text = "${todayProgress.currentIntake .toInt()} ml",
+                           style = MaterialTheme.typography.headlineMedium.copy(
+                               color = MaterialTheme.colorScheme.primary
+                           )
+                       )
+                       Text(
+                           text = "Goal ${todayProgress.dailyGoal.toInt()} ml",
+                           style = MaterialTheme.typography.titleLarge.copy(
+                               color = MaterialTheme.colorScheme.onSurface
+                           )
+                       )
 
-                        // Wavy Progress Indicator
-                        LinearWavyProgressIndicator(
-                            progress = { animatedProgress },
-                            modifier = Modifier.fillMaxWidth(),
-                            color = MaterialTheme.colorScheme.primary,
-                            trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-                            stroke = WavyProgressIndicatorDefaults.linearIndicatorStroke,
-                            trackStroke = WavyProgressIndicatorDefaults.linearTrackStroke,
-                            amplitude = WavyProgressIndicatorDefaults.indicatorAmplitude,
-                            wavelength = WavyProgressIndicatorDefaults.LinearDeterminateWavelength,
-                            waveSpeed = WavyProgressIndicatorDefaults.LinearDeterminateWavelength
-                        )
+                       if (todayStatistics.entryCount > 0){
+                           Spacer(modifier = Modifier.height(8.dp))
+                           Text(
+                               text = buildAnnotatedString {
+                                   withStyle(
+                                       style = SpanStyle(
+                                           fontWeight = FontWeight.Medium,
+                                           fontSize = MaterialTheme.typography.labelLarge.fontSize
+                                       )
+                                   ) { append("${todayStatistics.entryCount}") }
 
-                        // Motivational message
-                        Text(
-                            text = getMotivationalMessage(todayProgress.progress, userProfile, todayProgress.isGoalAchieved),
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                                   withStyle(
+                                       style = SpanStyle(
+                                           fontWeight = FontWeight.Thin,
+                                           color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                                           fontSize = MaterialTheme.typography.labelSmall.fontSize
+                                       )
+                                   ) {
+                                       append(" Entries")
+                                   }
+                               }
+                           )
+                           Text(
+                               text = buildAnnotatedString {
+                                   withStyle(
+                                       style = SpanStyle(
+                                           fontWeight = FontWeight.Medium,
+                                           fontSize = MaterialTheme.typography.labelLarge.fontSize
+                                       )
+                                   ) { append(todayStatistics.firstIntakeTime!!) }
 
-                        // Additional stats row
-                        if (todayStatistics.entryCount > 0) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly
-                            ) {
-                                StatChip(
-                                    label = "Entries",
-                                    value = "${todayStatistics.entryCount}"
-                                )
-                                if (todayStatistics.firstIntakeTime != null) {
-                                    StatChip(
-                                        label = "First",
-                                        value = todayStatistics.firstIntakeTime!!
-                                    )
-                                }
-                                if (todayStatistics.lastIntakeTime != null && todayStatistics.entryCount > 1) {
-                                    StatChip(
-                                        label = "Latest",
-                                        value = todayStatistics.lastIntakeTime!!
-                                    )
-                                }
-                            }
-                        }
-                    }
+                                   withStyle(
+                                       style = SpanStyle(
+                                           fontWeight = FontWeight.Thin,
+                                           color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                                           fontSize = MaterialTheme.typography.labelSmall.fontSize
+                                       )
+                                   ) {
+                                       append(" First Intake")
+                                   }
+                               },
+                           )
+
+                           Text(
+                               text = buildAnnotatedString {
+                                   withStyle(
+                                       style = SpanStyle(
+                                           fontWeight = FontWeight.Medium,
+                                           fontSize = MaterialTheme.typography.labelLarge.fontSize
+                                       )
+                                   ) { append(todayStatistics.lastIntakeTime!!) }
+
+                                   withStyle(
+                                       style = SpanStyle(
+                                           fontWeight = FontWeight.Thin,
+                                           color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                                           fontSize = MaterialTheme.typography.labelSmall.fontSize
+                                       )
+                                   ) {
+                                       append(" Last Intake")
+                                   }
+                               },
+                           )
+
+
+                       }
+                   }
+                    Box(
+                      contentAlignment = Alignment.Center
+                   ){
+                       Text(
+                           textAlign = TextAlign.Center,
+                           text = buildAnnotatedString {
+                               withStyle(style = SpanStyle(
+                                   fontWeight = FontWeight.Bold,
+                                   fontSize =  MaterialTheme.typography.headlineMedium  .fontSize,
+                                   fontStyle = MaterialTheme.typography.titleLarge.fontStyle
+                               )){
+                                   append("${(todayStatistics.goalProgress * 100).toInt()}%")
+                               }
+                               withStyle(style = SpanStyle(
+                                   fontWeight = FontWeight.Normal,
+                                   fontSize =  MaterialTheme.typography.labelSmall  .fontSize,
+                                   fontStyle = MaterialTheme.typography.labelSmall.fontStyle,
+                                   color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                               )){
+                                   append("\nCompleted")
+                               }
+
+
+                           }
+                       )
+                        // representaion of the progress of water
+                       CircularWavyProgressIndicator(
+                           amplitude = { 16f },
+                           wavelength = 50.dp,
+                           stroke = Stroke(
+                               cap = StrokeCap.Round,
+                               join = StrokeJoin.Round,
+                               width = 38f
+                           ),
+                           trackStroke = Stroke(
+                               width = 38f,
+                               cap = StrokeCap.Round,
+                               join = StrokeJoin.Round
+                           ),
+                           modifier = Modifier
+                               .size(200.dp)
+                               .align(Alignment.CenterEnd),
+                           progress = { animatedProgress }
+                       )
+                   }
                 }
+
             }
+
 
             Card (
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    containerColor = MaterialTheme.colorScheme.surface
                 ),
                 shape = MaterialTheme.shapes.extraLargeIncreased
             ){
@@ -501,7 +708,7 @@ fun HomeScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 16.dp, bottom = 12.dp)
-                            .padding(horizontal = 20.dp),
+                            .padding(horizontal = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
@@ -510,46 +717,132 @@ fun HomeScreen(
                             color = MaterialTheme.colorScheme.onSurface,
                         )
 
-                        HorizontalMultiBrowseCarousel(
-                            state = carouselState,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(135.dp),
-                            preferredItemWidth = 130.dp,
-                            itemSpacing = 8.dp,
-                        ) { index ->
-                            if (index < presets.size) {
-                                val preset = presets[index]
-                                CarouselWaterCard(
-                                    preset = preset,
-                                    onClick = {
-                                        addWaterIntake(preset.volume, preset.name)
-                                        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
-                                    },
-                                    onLongPress = {
-                                        presetToEdit = preset
-                                        showEditPresetSheet = true
-                                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    },
-                                    modifier = Modifier
-                                        .height(130.dp)
-                                        .maskClip(MaterialTheme.shapes.extraLarge)
-                                )
-                            } else {
-                                // Add button at the end
-                                AddContainerCard(
-                                    onClick = {
-                                        showAddPresetSheet = true
-                                        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
-                                    },
-                                    modifier = Modifier
-                                        .height(130.dp)
-                                        .maskClip(MaterialTheme.shapes.extraLarge)
-                                )
+
+                        // this is the ui here u can select the amount of the hydration to add
+                        val scrollState = rememberLazyListState()
+                        LazyRow (
+                            state = scrollState,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                           itemsIndexed(presets) { index, currentPreset ->
+                                if (index + 1 < presets.size) {
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier
+                                            .fillParentMaxWidth(0.3f)
+                                            .clip(
+                                                RoundedCornerShape(16.dp)
+                                            )
+                                            .background(
+                                                color = MaterialTheme.colorScheme.secondaryContainer,
+                                                shape = RoundedCornerShape(16.dp)
+                                            )
+                                            .combinedClickable(
+                                                onLongClick = {
+                                                    presetToEdit = currentPreset
+                                                    showEditPresetSheet = true
+                                                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                },
+                                                onClick = {
+                                                    addWaterIntake(
+                                                        currentPreset.volume,
+                                                        currentPreset.name
+                                                    )
+                                                    haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                                                }
+                                            )
+                                            .padding(16.dp)
+                                    ) {
+                                        Column(
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                                        ) {
+                                            when {
+                                                currentPreset.iconRes != null -> {
+                                                    Icon(
+                                                        painter = painterResource(currentPreset.iconRes),
+                                                        contentDescription = currentPreset.name,
+                                                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                                        modifier = Modifier.size(32.dp)
+                                                    )
+                                                }
+
+                                                currentPreset.icon != null -> {
+                                                    Icon(
+                                                        imageVector = currentPreset.icon,
+                                                        contentDescription = currentPreset.name,
+                                                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                                        modifier = Modifier.size(32.dp)
+                                                    )
+                                                }
+
+                                                else -> {
+                                                    Icon(
+                                                        imageVector = Icons.Default.WaterDrop,
+                                                        contentDescription = currentPreset.name,
+                                                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                                        modifier = Modifier.size(32.dp)
+                                                    )
+                                                }
+                                            }
+                                            Text(
+                                                text = "${currentPreset.volume.toInt()} ml"
+                                            )
+                                        }
+                                    }
+                                }else{
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                       modifier =  Modifier
+                                           .fillParentMaxWidth(0.4f)
+                                           .clip(
+                                               RoundedCornerShape(16.dp)
+                                           )
+                                           .background(
+                                               color = MaterialTheme.colorScheme.surface,
+                                               shape = RoundedCornerShape(16.dp)
+                                           )
+                                           .border(
+                                               shape = RoundedCornerShape(16.dp),
+                                               width = 2.dp,
+                                               color = MaterialTheme.colorScheme.primary
+                                           ).clickable(
+                                               onClick = {
+                                                   showAddPresetSheet = true
+                                                   haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                                               })
+                                           .padding(16.dp)
+                                    ){
+                                        Column(
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Add,
+                                                contentDescription = "Add container",
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                modifier = Modifier.size(32.dp)
+                                            )
+
+
+                                            Text(
+                                                text = "Add",
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                textAlign = TextAlign.Center
+                                            )
+                                        }
+                                    }
+                                }
                             }
                         }
 
-                        // Beverage Selection Section
+
+
+
+
+
+
+                        // this the ui where u can select what type of hydration (it's s toggle button material expressive one) like water coffe energy drink ok
                         BeverageSelectionSection(
                             selectedBeverageType = selectedBeverageType,
                             onBeverageTypeChange = { beverageType ->
@@ -562,7 +855,7 @@ fun HomeScreen(
                     }
                 }
 
-                // Recent Entries Section
+                 //Recent Entries Section
                 if (todayEntries.isNotEmpty()) {
                     AnimatedVisibility(
                         visible = isVisible,
@@ -575,22 +868,26 @@ fun HomeScreen(
                         ) + fadeIn(animationSpec = tween(600, delayMillis = 500))
                     ) {
                         Card(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceContainer
                             )
                         ) {
+                            Text(
+                                modifier = Modifier.padding(start = 16.dp, top = 16.dp),
+                                text = "Recent Entries",
+                                style = MaterialTheme.typography.titleLargeEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
                             Column(
-                                modifier = Modifier.padding(20.dp),
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                                modifier = Modifier.padding(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Text(
-                                    text = "Recent Entries",
-                                    style = MaterialTheme.typography.titleLargeEmphasized,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                )
 
-                                todayEntries.forEach { entry ->
+
+                                todayEntries.forEachIndexed { index, entry ->
                                     key(entry.id) {
                                         RecentEntryItem(
                                             entry = entry,
@@ -602,7 +899,9 @@ fun HomeScreen(
                                                 deleteWaterIntake(entryToDelete)
                                             }
                                         )
-                                        HorizontalDivider()
+                                        if (index +1 != todayEntries.size){
+                                            HorizontalDivider()
+                                        }
                                     }
                                 }
                             }
@@ -709,8 +1008,7 @@ fun CarouselWaterCard(
 ) {
     Box(
         modifier = modifier
-            .clip(MaterialTheme.shapes.extraLarge)
-            .background(MaterialTheme.colorScheme.primaryContainer)
+            .background(MaterialTheme.colorScheme.surface)
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongPress
@@ -751,19 +1049,19 @@ fun CarouselWaterCard(
                 }
             }
 
-            Text(
-                text = preset.name,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                textAlign = TextAlign.Center,
-                maxLines = 2
-            )
-
-            Text(
-                text = preset.getFormattedVolume(),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
+           Row(
+               modifier = Modifier.fillMaxHeight()
+           ) {
+               VerticalDivider(color = Color.Red, modifier = Modifier.fillMaxHeight())
+               Text(
+                  // modifier = Modifier.weight(1f),
+                   text = preset.volume.toString(),
+                   style = MaterialTheme.typography.titleLarge,
+                   color = MaterialTheme.colorScheme.primary
+               )
+               VerticalDivider()
+           }
+            Text("ml",color = MaterialTheme.colorScheme.onSurface)
         }
     }
 }
@@ -997,12 +1295,12 @@ private fun EditWaterDialog(
     // Time picker state
     var showTimePicker by remember { mutableStateOf(false) }
     val calendar = remember {
-        java.util.Calendar.getInstance().apply {
+        Calendar.getInstance().apply {
             timeInMillis = entry.timestamp
         }
     }
-    var selectedHour by remember { mutableIntStateOf(calendar.get(java.util.Calendar.HOUR_OF_DAY)) }
-    var selectedMinute by remember { mutableIntStateOf(calendar.get(java.util.Calendar.MINUTE)) }
+    var selectedHour by remember { mutableIntStateOf(calendar.get(Calendar.HOUR_OF_DAY)) }
+    var selectedMinute by remember { mutableIntStateOf(calendar.get(Calendar.MINUTE)) }
 
     val timePickerState = rememberTimePickerState(
         initialHour = selectedHour,
@@ -1187,7 +1485,7 @@ private fun EditWaterDialog(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     OutlinedTextField(
-                        value = String.format(java.util.Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute),
+                        value = String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute),
                         onValueChange = { },
                         readOnly = true,
                         enabled = !isExternalEntry,
@@ -1247,12 +1545,12 @@ private fun EditWaterDialog(
                                 val amount = amountText.toDoubleOrNull()
                                 if (amount != null && amount > 0 && amount <= 5000) {
                                     // Calculate new timestamp with selected time
-                                    val newCalendar = java.util.Calendar.getInstance().apply {
+                                    val newCalendar = Calendar.getInstance().apply {
                                         timeInMillis = entry.timestamp
-                                        set(java.util.Calendar.HOUR_OF_DAY, selectedHour)
-                                        set(java.util.Calendar.MINUTE, selectedMinute)
-                                        set(java.util.Calendar.SECOND, 0)
-                                        set(java.util.Calendar.MILLISECOND, 0)
+                                        set(Calendar.HOUR_OF_DAY, selectedHour)
+                                        set(Calendar.MINUTE, selectedMinute)
+                                        set(Calendar.SECOND, 0)
+                                        set(Calendar.MILLISECOND, 0)
                                     }
 
                                     val updatedEntry = entry.copy(
@@ -1331,31 +1629,34 @@ private fun EditWaterDialog(
 @Composable
 private fun StatChip(
     label: String,
-    value: String
+    value: String,
+    alignment: Alignment.Horizontal = Alignment.Start
 ) {
     Surface(
         color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
         shape = MaterialTheme.shapes.small,
-        modifier = Modifier.padding(horizontal = 4.dp)
+
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.padding( vertical = 4.dp),
+            horizontalAlignment = alignment
         ) {
             Text(
                 text = value,
                 style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = label,
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.ExtraLight),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
         }
     }
 }
+
+
 
 @Composable
 private fun RecentEntryItem(
@@ -1385,7 +1686,7 @@ private fun RecentEntryItem(
                 hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onEdit(entry)
                 // Reset to center after action
-                kotlinx.coroutines.delay(100)
+                delay(100)
                 dismissState.snapTo(SwipeToDismissBoxValue.Settled)
             }
             SwipeToDismissBoxValue.EndToStart -> {
@@ -1393,7 +1694,7 @@ private fun RecentEntryItem(
                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                 showDeleteDialog = true
                 // Reset to center after showing dialog
-                kotlinx.coroutines.delay(100)
+                delay(100)
                 dismissState.snapTo(SwipeToDismissBoxValue.Settled)
             }
             SwipeToDismissBoxValue.Settled -> {
@@ -1419,12 +1720,12 @@ private fun RecentEntryItem(
                     .background(
                         color = when (direction) {
                             SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primaryContainer
-                            SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.errorContainer
+                            SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.error
                             SwipeToDismissBoxValue.Settled -> MaterialTheme.colorScheme.surface
                         },
-                        shape = MaterialTheme.shapes.extraLargeIncreased
+                        shape = RoundedCornerShape(16.dp)
                     )
-                    .padding(horizontal = 20.dp),
+                    .padding(horizontal = 12.dp),
                 contentAlignment = alignment
             ) {
                 when (direction) {
@@ -1457,13 +1758,13 @@ private fun RecentEntryItem(
                             Text(
                                 text = "Delete",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onErrorContainer,
+                                color = MaterialTheme.colorScheme.onError,
                                 fontWeight = FontWeight.Medium
                             )
                             Icon(
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = "Delete entry",
-                                tint = MaterialTheme.colorScheme.onErrorContainer,
+                                tint = MaterialTheme.colorScheme.onError,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
@@ -1478,22 +1779,22 @@ private fun RecentEntryItem(
         // Main list item content
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.extraLargeIncreased,
+            shape = RoundedCornerShape(16.dp),
             color = MaterialTheme.colorScheme.surfaceContainer
         ) {
             ListItem(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 4.dp),
+                    .padding(vertical = 0.dp),
                 colors = ListItemDefaults.colors(
                     MaterialTheme.colorScheme.surfaceContainer
                 ),
                 leadingContent = {
                     Surface(
-                        shape = MaterialTheme.shapes.large,
-                        color = MaterialTheme.colorScheme.primaryContainer,
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.secondaryContainer,
                         tonalElevation = 2.dp,
-                        modifier = Modifier.size(56.dp)
+                        modifier = Modifier.size(48.dp)
                     ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
@@ -1504,7 +1805,7 @@ private fun RecentEntryItem(
                                     Icon(
                                         painter = painterResource(preset.iconRes),
                                         contentDescription = preset.name,
-                                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
                                         modifier = Modifier.size(24.dp)
                                     )
                                 }
@@ -1512,7 +1813,7 @@ private fun RecentEntryItem(
                                     Icon(
                                         imageVector = preset.icon,
                                         contentDescription = preset.name,
-                                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
                                         modifier = Modifier.size(24.dp)
                                     )
                                 }
@@ -1520,7 +1821,7 @@ private fun RecentEntryItem(
                                     Icon(
                                         imageVector = Icons.Default.WaterDrop,
                                         contentDescription = entry.containerType,
-                                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
                                         modifier = Modifier.size(24.dp)
                                     )
                                 }
@@ -1532,7 +1833,7 @@ private fun RecentEntryItem(
                     Text(
                         text = entry.containerType,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 },
@@ -1574,6 +1875,7 @@ private fun RecentEntryItem(
                 }
             )
         }
+
     }
 
     // Delete confirmation dialog
@@ -1766,6 +2068,10 @@ private fun HealthConnectSyncIcon(
     }
 }
 
+
+/**
+ * Selction of what kinda drink like water ui
+ */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun BeverageSelectionSection(
@@ -1781,63 +2087,108 @@ private fun BeverageSelectionSection(
         if (selectedBeverageType !in beverageTypes) onBeverageTypeChange(BeverageType.WATER)
     }
 
+    val rowScrollState = rememberLazyListState()
+    val scope = rememberCoroutineScope ()
+
     Column(
-        modifier = modifier.padding(horizontal = 5.dp, vertical = 5.dp),
-        verticalArrangement = Arrangement.spacedBy(5.dp),
+        modifier = modifier.padding( vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Horizontally scrollable chips
-        LazyRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(horizontal = 4.dp)
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer
+            ),
+            shape = MaterialTheme.shapes.medium
         ) {
-            items(beverageTypes) { beverageType ->
-                val isSelected = safeSelected == beverageType
+            LazyRow(
+                state = rowScrollState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(horizontal = 4.dp)
+            ) {
+                itemsIndexed(beverageTypes) {index,  beverageType ->
+                    val isSelected = safeSelected == beverageType
 
-                FilterChip(
-                    shape = if (isSelected){
-                        MaterialTheme.shapes.medium
-                    } else {
-                        MaterialTheme.shapes.extraLarge
-                    },
-                    onClick = {
-                        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
-                        onBeverageTypeChange(beverageType)
-                    },
-                    label = {
-                        if (isSelected){
+                    ToggleButton(
+                        checked = isSelected,
+                        onCheckedChange = {
+                            scope.launch {
+                                rowScrollState.animateScrollToItem(index,)
+                            }
+                            haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                            onBeverageTypeChange(beverageType)
+                        }
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                            //modifier = Modifier.padding(8.dp),
+                        ) {
+                            if (isSelected){
+                                Icon(
+                                    painter = painterResource(beverageType.iconResFilled),
+                                    contentDescription = null,
+                                )}else{
+                                Icon(
+                                    painter = painterResource(beverageType.iconRes),
+                                    contentDescription = null,)
+                            }
+
                             Text(
                                 text = beverageType.displayName,
-                                style = MaterialTheme.typography.labelMediumEmphasized,
-                                textAlign = TextAlign.Center
-                            )
-                        } else {
-                            Text(
-                                text = beverageType.displayName,
-                                style = MaterialTheme.typography.labelMedium,
                                 textAlign = TextAlign.Center
                             )
                         }
-                    },
-                    leadingIcon = {
-                        if (isSelected){
-                            Icon(
-                                painter = painterResource(beverageType.iconResFilled),
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        } else {
-                            Icon(
-                                painter = painterResource(beverageType.iconRes),
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-                    },
-                    selected = isSelected,
-                    modifier = Modifier.animateItem()
-                )
+                    }
+
+//                FilterChip(
+//                    shape = if (isSelected){
+//                        MaterialTheme.shapes.medium
+//                    } else {
+//                        MaterialTheme.shapes.extraLarge
+//                    },
+//                    onClick = {
+//                        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+//                        onBeverageTypeChange(beverageType)
+//                    },
+//                    label = {
+//                        if (isSelected){
+//                            Text(
+//                                text = beverageType.displayName,
+//                                style = MaterialTheme.typography.titleMedium,
+//                                textAlign = TextAlign.Center
+//                            )
+//                        } else {
+//                            Text(
+//                                text = beverageType.displayName,
+//                                style = MaterialTheme.typography.titleMedium,
+//                                textAlign = TextAlign.Center
+//                            )
+//                        }
+//                    },
+//                    leadingIcon = {
+//                        if (isSelected){
+//                            Icon(
+//                                painter = painterResource(beverageType.iconResFilled),
+//                                contentDescription = null,
+//                                modifier = Modifier.size(34.dp)
+//                            )
+//                        } else {
+//                            Icon(
+//                                painter = painterResource(beverageType.iconRes),
+//                                contentDescription = null,
+//                                modifier = Modifier.size(34.dp)
+//                            )
+//                        }
+//                    },
+//                    selected = isSelected,
+//                    modifier = Modifier.animateItem()
+//                )
+                }
             }
         }
 

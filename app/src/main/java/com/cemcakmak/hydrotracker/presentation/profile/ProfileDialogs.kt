@@ -1,6 +1,7 @@
 package com.cemcakmak.hydrotracker.presentation.profile
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -147,6 +148,7 @@ fun GoalEditBottomSheet(
                     )
                     
                     OutlinedTextField(
+                        shape = RoundedCornerShape(12.dp),
                         value = goalText,
                         onValueChange = { newText ->
                             goalText = newText
@@ -180,7 +182,9 @@ fun GoalEditBottomSheet(
                             onDismiss },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Cancel")
+                        Text(
+                            modifier = Modifier.padding(vertical = 8.dp), text = "Cancel"
+                        )
                     }
 
                     Button(
@@ -188,7 +192,7 @@ fun GoalEditBottomSheet(
                         onClick = {
                             haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
                             val goalLiters = sliderValue.toDouble()
-                            if (goalLiters >= 0.5 && goalLiters <= 10.0) {
+                            if (goalLiters in 0.5..10.0) {
                                 onConfirm(goalLiters * 1000) // Convert to ml
                             } else {
                                 isError = true
@@ -196,7 +200,9 @@ fun GoalEditBottomSheet(
                         },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Save")
+                        Text(
+                            modifier = Modifier.padding(vertical = 8.dp), text = "Save"
+                        )
                     }
                 }
                 
@@ -708,7 +714,7 @@ fun WeightEditBottomSheet(
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
                     .padding(bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
                     text = "Enter Weight",
@@ -724,6 +730,7 @@ fun WeightEditBottomSheet(
                 )
                 
                 OutlinedTextField(
+                    shape = RoundedCornerShape(12.dp),
                     value = weightText,
                     onValueChange = {
                         weightText = it
@@ -751,7 +758,9 @@ fun WeightEditBottomSheet(
                             onDismiss },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Cancel")
+                        Text(
+                            modifier = Modifier.padding(vertical = 8.dp), text = "Cancel"
+                        )
                     }
 
                     Button(
@@ -764,7 +773,7 @@ fun WeightEditBottomSheet(
                                 weightText.toDoubleOrNull()
                             }
 
-                            if (weight != null && (weight < 30 || weight > 300)) {
+                            if (weight != null && (weight !in 30.0..300.0)) {
                                 isWeightError = true
                             } else {
                                 onConfirm(weight)
@@ -772,7 +781,9 @@ fun WeightEditBottomSheet(
                         },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Save")
+                        Text(
+                            modifier = Modifier.padding(vertical = 8.dp), text = "Save"
+                        )
                     }
                 }
                 

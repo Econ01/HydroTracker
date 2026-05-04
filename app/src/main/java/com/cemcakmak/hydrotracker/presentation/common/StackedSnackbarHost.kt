@@ -224,7 +224,7 @@ object SnackbarQueue {
     val snackbars: StateFlow<List<HydroSnackbar>> = _snackbars.asStateFlow()
     
     fun addSnackbar(snackbar: HydroSnackbar) {
-        _snackbars.value = _snackbars.value + snackbar
+        _snackbars.value += snackbar
     }
     
     fun removeSnackbar(id: String) {

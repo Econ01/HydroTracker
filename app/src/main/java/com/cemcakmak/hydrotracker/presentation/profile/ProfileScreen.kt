@@ -114,7 +114,6 @@ fun ProfileScreen(
                 title = {
                     Text(
                         text = "Profile",
-                        fontWeight = FontWeight.Bold
                     )
                 },
                 navigationIcon = {
@@ -134,9 +133,9 @@ fun ProfileScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(5.dp)
+                .padding(horizontal = 6.dp)
                 .padding(bottom = 80.dp), // Add bottom padding for navigation bar
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
 
             // Profile Header Section

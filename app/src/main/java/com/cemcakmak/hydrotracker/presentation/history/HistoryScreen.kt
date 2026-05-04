@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -26,9 +28,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
 import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
@@ -76,7 +84,6 @@ fun HistoryScreen(
                 title = {
                     Text(
                         text = "History & Statistics",
-                        fontWeight = FontWeight.Bold
                     )
                 },
                 navigationIcon = {
@@ -130,17 +137,20 @@ fun HistoryScreen(
 
             // Main Chart Section
             item {
-                AnimatedVisibility(
-                    visible = isVisible,
-                    enter = slideInVertically(
-                        initialOffsetY = { it / 3 },
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessLow
-                        )
-                    ) + fadeIn(animationSpec = tween(700, delayMillis = 200))
+                AnimatedContent(
+                    targetState = selectedPeriod,
+                    transitionSpec = {
+                        val direction = if (targetState.ordinal > initialState.ordinal) 1 else -1
+                        slideInHorizontally(
+                            initialOffsetX = { it * direction }
+                        ) + fadeIn() togetherWith
+                                slideOutHorizontally(
+                                    targetOffsetX = { -it * direction }
+                                ) + fadeOut()
+                    },
+                    label = "ChartTransition"
                 ) {
-                    when (selectedPeriod) {
+                    when (it) {
                         TimePeriod.WEEKLY -> {
                             WeeklyChartSection(
                                 selectedPeriod = selectedPeriod,
@@ -358,10 +368,7 @@ private fun WeeklyChartSection(
             modifier = Modifier.padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = getCurrentPeriodText(selectedPeriod, weekOffset, 0, 0, weekStartDay),
-                style = MaterialTheme.typography.titleLargeEmphasized
-            )
+//
 
             // Filter summaries for the selected week and convert to DailyTotal format
             val filteredSummaries = filterSummariesByPeriod(summaries, selectedPeriod, weekOffset, 0, 0, weekStartDay)
@@ -395,6 +402,7 @@ private fun WeeklyChartSection(
                 
                 // Inline detail panel with animation
                 AnimatedVisibility(
+                    modifier = Modifier.animateContentSize(),
                     visible = selectedDayData != null,
                     enter = slideInVertically(
                         initialOffsetY = { -it / 2 },
@@ -508,7 +516,7 @@ private fun WeeklyBarChart(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(height)
-                            .clip(MaterialTheme.shapes.small)
+                            .clip(CircleShape)
                             .clickable { onBarClick(dayTotal) }
                             .background(
                                 color = MaterialTheme.colorScheme.primary
@@ -586,10 +594,7 @@ private fun YearlyChartSection(
             modifier = Modifier.padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = getPeriodTitle(selectedPeriod),
-                style = MaterialTheme.typography.titleLargeEmphasized
-            )
+
 
             val filteredSummaries = filterSummariesByPeriod(summaries, selectedPeriod, weekOffset = 0, monthOffset = 0, yearOffset = yearOffset)
             
@@ -687,17 +692,29 @@ private fun YearlyHeatmap(
                     modifier = Modifier
                         .size(12.dp)
                         .clip(MaterialTheme.shapes.small)
-                        .clickable(enabled = summary != null) { 
+                        .clickable(enabled = summary != null) {
                             summary?.let { onCellClick(it) }
                         }
                         .background(
                             when {
                                 summary == null -> MaterialTheme.colorScheme.surfaceVariant
                                 summary.goalAchieved -> MaterialTheme.colorScheme.primary
-                                summary.goalPercentage >= 0.8f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                                summary.goalPercentage >= 0.6f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                                summary.goalPercentage >= 0.4f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
-                                summary.goalPercentage >= 0.2f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
+                                summary.goalPercentage >= 0.8f -> MaterialTheme.colorScheme.primary.copy(
+                                    alpha = 0.8f
+                                )
+
+                                summary.goalPercentage >= 0.6f -> MaterialTheme.colorScheme.primary.copy(
+                                    alpha = 0.6f
+                                )
+
+                                summary.goalPercentage >= 0.4f -> MaterialTheme.colorScheme.primary.copy(
+                                    alpha = 0.4f
+                                )
+
+                                summary.goalPercentage >= 0.2f -> MaterialTheme.colorScheme.primary.copy(
+                                    alpha = 0.25f
+                                )
+
                                 else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                             }
                         )
@@ -758,10 +775,7 @@ private fun MonthlyChartSection(
             modifier = Modifier.padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = getPeriodTitle(selectedPeriod),
-                style = MaterialTheme.typography.titleLargeEmphasized
-            )
+
 
             val filteredSummaries = filterSummariesByPeriod(summaries, selectedPeriod, weekOffset = 0, monthOffset, 0)
             
@@ -984,18 +998,33 @@ private fun MonthlyCalendarGrid(
                             modifier = Modifier
                                 .size(28.dp)
                                 .clip(MaterialTheme.shapes.small)
-                                .clickable(enabled = summary != null && isCurrentMonth) { 
+                                .clickable(enabled = summary != null && isCurrentMonth) {
                                     summary?.let { onCellClick(it) }
                                 }
                                 .background(
                                     when {
                                         !isCurrentMonth -> Color.Transparent
-                                        summary == null -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                                        summary == null -> MaterialTheme.colorScheme.surfaceVariant.copy(
+                                            alpha = 0.3f
+                                        )
+
                                         summary.goalAchieved -> MaterialTheme.colorScheme.primary
-                                        summary.goalPercentage >= 0.8f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                                        summary.goalPercentage >= 0.6f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                                        summary.goalPercentage >= 0.4f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
-                                        summary.goalPercentage >= 0.2f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
+                                        summary.goalPercentage >= 0.8f -> MaterialTheme.colorScheme.primary.copy(
+                                            alpha = 0.8f
+                                        )
+
+                                        summary.goalPercentage >= 0.6f -> MaterialTheme.colorScheme.primary.copy(
+                                            alpha = 0.6f
+                                        )
+
+                                        summary.goalPercentage >= 0.4f -> MaterialTheme.colorScheme.primary.copy(
+                                            alpha = 0.4f
+                                        )
+
+                                        summary.goalPercentage >= 0.2f -> MaterialTheme.colorScheme.primary.copy(
+                                            alpha = 0.25f
+                                        )
+
                                         else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                                     }
                                 ),
@@ -1040,47 +1069,80 @@ private fun StatisticsGrid(
         
         // Calculate daily average from all data
         val dailyAverage = if (totalDays > 0) totalIntake / totalDays else 0.0
-        
-        
-        // Grid of stat cards - consistent across all periods
+
         Column(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                StatCard(
-                    modifier = Modifier.weight(1f),
-                    icon = Icons.Default.LocalFireDepartment,
-                    title = "Current Streak",
-                    value = currentStreak.toString(),
-                    subtitle = "days",
-                    color = MaterialTheme.colorScheme.error,
-                )
 
-                StatCard(
-                    modifier = Modifier.weight(1f),
-                    icon = Icons.Default.Stars,
-                    title = "Daily Average",
-                    value = WaterCalculator.formatWaterAmount(dailyAverage).split(" ")[0],
-                    subtitle = WaterCalculator.formatWaterAmount(dailyAverage).split(" ")[1],
-                    color = MaterialTheme.colorScheme.secondary
-                )
+            StatRow(
+                title = "Total Water",
+                value = "${(totalIntake / 1000)}",
+                subtitle = "L"
+            )
 
-                StatCard(
-                    modifier = Modifier.weight(1f),
-                    icon = Icons.Default.WaterDrop,
-                    title = "Total Intake",
-                    value = "${(totalIntake / 1000).toInt()}",
-                    subtitle = "liters",
-                    color = MaterialTheme.colorScheme.tertiary,
-                )
-            }
+            StatRow(
+                title = "Streak",
+                value = "$currentStreak",
+                subtitle = "days"
+            )
+
+            StatRow(
+                title = "Daily Average",
+                value = WaterCalculator.formatWaterAmount(dailyAverage).split(" ")[0],
+                subtitle = WaterCalculator.formatWaterAmount(dailyAverage).split(" ")[1]
+            )
+
         }
     }
 }
 
+@Composable
+fun StatRow(
+    title: String,
+    value: String,
+    subtitle: String
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Bottom
+    ) {
+
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Text(
+            text = buildAnnotatedString {
+
+                withStyle(
+                    SpanStyle(
+                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                ) {
+                    append(value)
+                }
+
+                append(" ")
+
+
+                withStyle(
+                    SpanStyle(
+                        fontSize = MaterialTheme.typography.titleSmall.fontSize,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        //baselineShift = BaselineShift(-0.2f)
+                    )
+                ) {
+                    append(subtitle)
+                }
+            }
+        )
+    }
+}
 @Composable
 private fun StatCard(
     modifier: Modifier = Modifier,
@@ -1091,56 +1153,41 @@ private fun StatCard(
     color: Color,
 ) {
     Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
+        modifier = modifier.fillMaxHeight(),
+        shape = RoundedCornerShape(16.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        )
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(14.dp)
                 .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = color,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = value,
-                    style = MaterialTheme.typography.headlineMediumEmphasized,
-                    color = color
-                )
 
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
+            Text(
+                text = "$value $subtitle",
+                style = MaterialTheme.typography.headlineMedium,
+                color = color
+            )
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.labelMediumEmphasized,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center
-                )
-            }
+
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = color.copy(alpha = 0.7f),
+                modifier = Modifier.size(16.dp)
+            )
         }
     }
 }
@@ -1154,67 +1201,93 @@ private fun GoalAchievementSection(
     yearOffset: Int,
     weekStartDay: WeekStartDay = WeekStartDay.MONDAY
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
-    ) {
+    val filteredSummaries = filterSummariesByPeriod(
+        summaries,
+        selectedPeriod,
+        weekOffset,
+        monthOffset,
+        yearOffset,
+        weekStartDay
+    )
+
+
         Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
                 text = "Goal Achievement",
-                style = MaterialTheme.typography.titleLargeEmphasized,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
 
-            val filteredSummaries = filterSummariesByPeriod(summaries, selectedPeriod, weekOffset, monthOffset, yearOffset, weekStartDay)
-            
             if (filteredSummaries.isNotEmpty()) {
-                val achievementRate = filteredSummaries.count { it.goalAchieved }.toFloat() / filteredSummaries.size
+                val achievementRate =
+                    filteredSummaries.count { it.goalAchieved }.toFloat() /
+                            filteredSummaries.size
 
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                val percentage = (achievementRate * 100).toInt()
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Bottom
                 ) {
-                    // Large achievement percentage
                     Text(
-                        text = "${(achievementRate * 100).toInt()}%",
-                        style = MaterialTheme.typography.displayMedium,
-                        fontWeight = FontWeight.ExtraBold,
+                        text = "$percentage%",
+                        style = MaterialTheme.typography.displaySmall,
+                        fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )
 
                     Text(
-                        text = "of days you met your goal",
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
+                        text = "days met goal",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                LinearWavyProgressIndicator(
+                    progress = { achievementRate.coerceIn(0f, 1f) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(10.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    stroke = WavyProgressIndicatorDefaults.linearIndicatorStroke,
+                    trackStroke = WavyProgressIndicatorDefaults.linearTrackStroke,
+                    amplitude = WavyProgressIndicatorDefaults.indicatorAmplitude,
+                    wavelength = WavyProgressIndicatorDefaults.LinearDeterminateWavelength,
+                    waveSpeed = WavyProgressIndicatorDefaults.LinearDeterminateWavelength
+                )
+            } else {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.WaterDrop,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(28.dp)
+                    )
+
+                    Text(
+                        text = "No data yet",
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
 
-                    // Achievement progress bar
-                    LinearWavyProgressIndicator(
-                        progress = { achievementRate },
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.primary,
-                        trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-                        stroke = WavyProgressIndicatorDefaults.linearIndicatorStroke,
-                        trackStroke = WavyProgressIndicatorDefaults.linearTrackStroke,
-                        amplitude = WavyProgressIndicatorDefaults.indicatorAmplitude,
-                        wavelength = WavyProgressIndicatorDefaults.LinearDeterminateWavelength,
-                        waveSpeed = WavyProgressIndicatorDefaults.LinearDeterminateWavelength
+                    Text(
+                        text = "Start tracking to see your goal progress",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
                     )
                 }
-            } else {
-                Text(
-                    text = "Start tracking your water intake to see your goal achievement rate!",
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
             }
-        }
+
     }
 }
 
@@ -1249,110 +1322,121 @@ private fun InlineDetailPanel(
     data: ChartDetailData,
     onDismiss: () -> Unit,
 ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    val haptics = LocalHapticFeedback.current
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Header with close button
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                Text(
+                    text = formatDisplayDate(data.date),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                FilledIconButton(
+                    onClick = {
+                        haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                        onDismiss()
+                    },
+                    modifier = Modifier.size(32.dp)
                 ) {
-                    Text(
-                        text = formatDisplayDate(data.date),
-                        style = MaterialTheme.typography.titleMediumEmphasized,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
                     )
-                    val haptics = LocalHapticFeedback.current
-                    FilledIconButton(
-                        onClick = {
-                            haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                            onDismiss()
-                        },
-                        colors = IconButtonDefaults.filledIconButtonColors(),
-                        shapes = IconButtonDefaults.shapes(),
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Close",
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
                 }
-                
-                // Content in a more compact layout
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // Water amount - prominent display
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+            }
+
+
+            Text(
+                text = WaterCalculator.formatWaterAmount(data.amount),
+                style = MaterialTheme.typography.displaySmall,
+                color = MaterialTheme.colorScheme.primary,
+                lineHeight = 8.sp
+            )
+
+            Text(
+                text = "Water Intake",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+
+            data.goal?.let { goal ->
+                data.goalPercentage?.let { percentage ->
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            text = "Water Intake",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                        Text(
-                            text = WaterCalculator.formatWaterAmount(data.amount),
-                            style = MaterialTheme.typography.titleLargeEmphasized,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    
-                    // Goal information (if available)
-                    data.goal?.let { goal ->
-                        data.goalPercentage?.let { percentage ->
-                            // Compact progress display
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column {
-                                    Text(
-                                        text = "Goal: ${WaterCalculator.formatWaterAmount(goal)}",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                                    )
-                                    Text(
-                                        text = "Progress: ${(percentage * 100).toInt()}%",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                                    )
-                                }
-                            }
-                            
-                            // Compact progress bar
-                            LinearProgressIndicator(
-                                progress = { percentage.coerceAtMost(1.0f) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(6.dp)
-                                    .clip(MaterialTheme.shapes.small),
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                trackColor = MaterialTheme.colorScheme.surfaceVariant
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Goal",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+
+                            Text(
+                                text = WaterCalculator.formatWaterAmount(goal),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Progress",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+
+                            Text(
+                                text = "${(percentage * 100).toInt()}%",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        // Progress bar
+                        LinearProgressIndicator(
+                            progress = { percentage.coerceIn(0f, 1f) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(8.dp),
+                            color = MaterialTheme.colorScheme.primary,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
                     }
                 }
             }
         }
     }
-
+}
 private fun formatDisplayDate(dateString: String): String {
     return try {
         val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())

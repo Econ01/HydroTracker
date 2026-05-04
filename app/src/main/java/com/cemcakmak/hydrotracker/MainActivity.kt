@@ -188,29 +188,41 @@ fun HydroTrackerApp(
                 currentRoute = route, 
                 userProfileImagePath = userProfile?.profileImagePath
             ) { padding ->
+                val motion = MaterialTheme.motionScheme
+
                 NavHost(
-                    navController = navController, 
+                    navController = navController,
                     startDestination = startDestination,
-                    // Predictive back gesture animations
-                    popExitTransition = {
-                        scaleOut(
-                            targetScale = 0.7f,
-                            transformOrigin = TransformOrigin(
-                                pivotFractionX = 1f,
-                                pivotFractionY = 0.5f
-                            )
-                        ) + fadeOut()
+
+                    enterTransition = {
+                        slideInHorizontally(
+                            initialOffsetX = { it / 3 },
+                            animationSpec = motion.defaultSpatialSpec()
+                        )
                     },
+
+                    exitTransition = {
+                        slideOutHorizontally(
+                            targetOffsetX = { -it / 3 },
+                            animationSpec = motion.fastSpatialSpec()
+                        )
+                    },
+
                     popEnterTransition = {
-                        scaleIn(
-                            initialScale = 1.1f,
-                            transformOrigin = TransformOrigin(
-                                pivotFractionX = 0.4f,
-                                pivotFractionY = 0.5f
-                            )
+                        slideInHorizontally(
+                            initialOffsetX = { -it / 3 },
+                            animationSpec = motion.defaultSpatialSpec()
+                        )
+                    },
+
+                    popExitTransition = {
+                        slideOutHorizontally(
+                            targetOffsetX = { it / 3 },
+                            animationSpec = motion.fastSpatialSpec()
                         )
                     }
                 ) {
+
 
                     composable(NavigationRoutes.ONBOARDING) {
                         val context = LocalContext.current

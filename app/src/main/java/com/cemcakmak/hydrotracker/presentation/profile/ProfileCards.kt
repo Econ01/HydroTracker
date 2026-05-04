@@ -1,8 +1,13 @@
 package com.cemcakmak.hydrotracker.presentation.profile
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -16,8 +21,12 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.utils.ImageUtils
 import java.io.File
@@ -37,105 +46,236 @@ fun ProfileHeaderCard(
     onEditProfilePicture: () -> Unit = {},
     onEditUsername: () -> Unit = {}
 ) {
+    val haptics = LocalHapticFeedback.current
+
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
         )
     ) {
-        Column(
-            modifier = Modifier.padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Profile Avatar
-            ProfileAvatar(
-                profileImagePath = userProfile.profileImagePath,
-                name = userProfile.name,
-                size = 120.dp,
-                onClick = onEditProfilePicture
-            )
+        Column {
 
-            // Personalized Greeting
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text(
-                    text = getTimeBasedGreeting(),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                    modifier = Modifier.alignByBaseline()
-                )
-                Text(
-                    text = userProfile.name,
-                    style = MaterialTheme.typography.headlineMediumEmphasized,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.alignByBaseline()
-                )
 
-                val haptics = LocalHapticFeedback.current
-                IconButton(
-                    onClick = {haptics.performHapticFeedback(HapticFeedbackType.Confirm)
-                        onEditUsername()},
-                    modifier = Modifier
-                        .size(20.dp)
-                        .alignByBaseline()
-                        .offset(y = (10).dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit Name",
-                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                        modifier = Modifier.size(16.dp)
+                    ProfileAvatar(
+                        profileImagePath = userProfile.profileImagePath,
+                        name = userProfile.name,
+                        size = 56.dp,
+                        onClick = onEditProfilePicture
+                    )
+
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = getTimeBasedGreeting(),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = userProfile.name,
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+
+                            IconButton(
+                                onClick = {
+                                    haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                                    onEditUsername()
+                                },
+                                modifier = Modifier.size(28.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+
+
+                ProfileStatCard(
+                    value = "${(todayStatistics.goalProgress * 100).toInt()}%",
+                    label = "Today's Goal",
+                    isHighlight = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedCard {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Min),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    ProfileStatSegment(
+                        value = "${todayStatistics.entryCount}",
+                        label = "Entries",
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    VerticalDivider()
+
+                    ProfileStatSegment(
+                        value = "$totalDaysTracked",
+                        label = "Days",
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    VerticalDivider()
+
+                    ProfileStatSegment(
+                        value = "${(todayStatistics.goalProgress * 100).toInt()}%",
+                        label = "Goal",
+                        modifier = Modifier.weight(1f),
+                        isHighlight = true
                     )
                 }
             }
-
-            // Quick Stats Row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                QuickStatItem(
-                    value = "${todayStatistics.entryCount}",
-                    label = "Today's Entries"
-                )
-                QuickStatItem(
-                    value = "$totalDaysTracked",
-                    label = "Days Tracked"
-                )
-                QuickStatItem(
-                    value = "${(todayStatistics.goalProgress * 100).toInt()}%",
-                    label = "Today's Goal"
-                )
             }
 
-            Spacer(
-                modifier = Modifier.height(12.dp)
-            )
-            HorizontalDivider()
+
+
         }
     }
 }
+@Composable
+fun ProfileStatSegment(
+    value: String,
+    label: String,
+    modifier: Modifier = Modifier,
+    isHighlight: Boolean = false
+) {
+    Column(
+        modifier = modifier.padding(vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Text(
+            text = value,
+            style = if (isHighlight)
+                MaterialTheme.typography.titleLarge
+            else
+                MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = if (isHighlight)
+                MaterialTheme.colorScheme.primary
+            else
+                MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
+@Composable
+fun ProfileStatCard(
+    value: String,
+    label: String,
+    modifier: Modifier = Modifier,
+    isHighlight: Boolean = false
+) {
+    Text(
+        modifier = modifier,
+        text = buildAnnotatedString {
+
+
+            withStyle(
+                SpanStyle(
+                    fontSize = if (isHighlight)
+                        MaterialTheme.typography.headlineSmall.fontSize
+                    else
+                        MaterialTheme.typography.titleMedium.fontSize,
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (isHighlight)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.onSurface
+                )
+            ) {
+                append(value)
+            }
+
+            append(" ")
+
+
+            withStyle(
+                SpanStyle(
+                    fontSize = MaterialTheme.typography.labelSmall.fontSize,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            ) {
+                append(label)
+            }
+        }
+    )
+}
+@Composable
+fun ProfileStat(
+    value: String,
+    label: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
 @Composable
 private fun QuickStatItem(
     value: String,
     label: String
 ) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         Text(
             text = value,
-            style = MaterialTheme.typography.headlineMediumEmphasized,
-            color = MaterialTheme.colorScheme.primary
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface
         )
+
         Text(
             text = label,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f),
-            textAlign = TextAlign.Center
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
@@ -165,6 +305,7 @@ fun ProfileAvatar(
     
     Surface(
         modifier = modifier
+            .clip(CircleShape)
             .size(size)
             .let { mod -> 
                 onClick?.let { mod.clickable { it() } } ?: mod 
@@ -248,7 +389,7 @@ fun ProfileDetailsCard(
     ) {
         Column(
             modifier = Modifier.padding(10.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -257,19 +398,25 @@ fun ProfileDetailsCard(
             ) {
                 Text(
                     text = "Profile Details",
-                    style = MaterialTheme.typography.titleLargeEmphasized
+                    style = MaterialTheme.typography.titleMedium
                 )
             }
 
             val haptics = LocalHapticFeedback.current
             Column(
-                verticalArrangement = Arrangement.spacedBy(14.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 // Gender
                 EditableInfoRow(
                     icon = Icons.Default.Person,
                     label = "Gender",
                     value = userProfile.gender.getDisplayName(),
+                    shape = RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 16.dp,
+                        bottomStart = 4.dp,
+                        bottomEnd = 4.dp
+                    ),
                     onClick = {haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
                         onEditGender() }
                 )
@@ -278,6 +425,7 @@ fun ProfileDetailsCard(
                 EditableInfoRow(
                     icon = Icons.Default.Cake,
                     label = "Age Group",
+                    shape = RoundedCornerShape(4.dp),
                     value = userProfile.ageGroup.getDisplayName(),
                     onClick = {haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
                         onEditAgeGroup() }
@@ -287,15 +435,19 @@ fun ProfileDetailsCard(
                 EditableInfoRow(
                     icon = Icons.Default.MonitorWeight,
                     label = "Weight",
+                    shape =  RoundedCornerShape(
+                        topStart = 4.dp,
+                        topEnd = 4.dp,
+                        bottomStart = 16.dp,
+                        bottomEnd = 16.dp
+                    ),
                     value = if (userProfile.weight != null) "${userProfile.weight.toInt()} kg" else "Not set",
                     onClick = {haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
                         onEditWeight() }
                 )
 
-                Spacer(
-                    modifier = Modifier.height(12.dp)
-                )
-                HorizontalDivider()
+
+
             }
         }
     }
@@ -318,7 +470,7 @@ fun DailyGoalsCard(
     ) {
         Column(
             modifier = Modifier.padding(10.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -327,19 +479,24 @@ fun DailyGoalsCard(
             ) {
                 Text(
                     text = "Daily Goals",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.titleMedium
                 )
             }
 
             val haptics = LocalHapticFeedback.current
             Column(
-                verticalArrangement = Arrangement.spacedBy(14.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 // Daily Goal
                 EditableInfoRow(
                     icon = Icons.Default.WaterDrop,
                     label = "Daily Water Goal",
+                    shape = RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 16.dp,
+                        bottomStart = 4.dp,
+                        bottomEnd = 4.dp
+                    ),
                     value = WaterCalculator.formatWaterAmount(userProfile.dailyWaterGoal),
                     onClick = {haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
                         onEditGoal() }
@@ -350,14 +507,17 @@ fun DailyGoalsCard(
                     icon = Icons.Default.FitnessCenter,
                     label = "Activity Level",
                     value = userProfile.activityLevel.getDisplayName(),
+                    shape =  RoundedCornerShape(
+                        topStart = 4.dp,
+                        topEnd = 4.dp,
+                        bottomStart = 16.dp,
+                        bottomEnd = 16.dp
+                    ),
                     onClick = {haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
                         onEditActivity() }
                 )
 
-                Spacer(
-                    modifier = Modifier.height(12.dp)
-                )
-                HorizontalDivider()
+
             }
         }
     }
@@ -379,7 +539,7 @@ fun ActiveScheduleCard(
     ) {
         Column(
             modifier = Modifier.padding(10.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -388,8 +548,7 @@ fun ActiveScheduleCard(
             ) {
                 Text(
                     text = "Active Schedule",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.titleMedium
                 )
             }
 
@@ -401,6 +560,9 @@ fun ActiveScheduleCard(
                 EditableInfoRow(
                     icon = Icons.Default.AccessTime,
                     label = "Active Hours",
+                    shape =  RoundedCornerShape(
+                        16.dp
+                    ),
                     value = "${userProfile.wakeUpTime} - ${userProfile.sleepTime}",
                     onClick = {haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
                         onEditSchedule() }

@@ -1,10 +1,16 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
 }
-
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+        freeCompilerArgs.addAll(listOf(
+            "-opt-in=androidx.compose.material3.ExperimentalMaterial3ExpressiveApi"
+        ))
+    }
+}
 android {
     namespace = "com.cemcakmak.hydrotracker"
     compileSdk = 36
@@ -19,26 +25,15 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    signingConfigs {
-        create("release") {
-            storeFile = file("../signing_keys/upload-keystore")
-            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: project.findProperty("KEYSTORE_PASSWORD") as String? ?: ""
-            keyAlias = System.getenv("KEY_ALIAS") ?: project.findProperty("KEY_ALIAS") as String? ?: ""
-            keyPassword = System.getenv("KEY_PASSWORD") ?: project.findProperty("KEY_PASSWORD") as String? ?: ""
-        }
-    }
+
 
     buildTypes {
-        debug {
-            signingConfig = signingConfigs.getByName("release")
-        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
             ndk {
                 debugSymbolLevel = "FULL"
             }
@@ -48,14 +43,8 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
-            freeCompilerArgs.addAll(listOf(
-                "-opt-in=androidx.compose.material3.ExperimentalMaterial3ExpressiveApi"
-            ))
-        }
-    }
+
+
     buildFeatures {
         compose = true
         buildConfig = true

@@ -117,7 +117,7 @@ fun EditContainerPresetBottomSheet(
                     { Text("Name is required") }
                 } else null,
                 singleLine = true,
-                shape = RoundedCornerShape(50.dp),
+                shape = RoundedCornerShape(12.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .defaultMinSize(minHeight = 60.dp)
@@ -134,7 +134,7 @@ fun EditContainerPresetBottomSheet(
                 placeholder = { Text("e.g., 250") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 isError = volumeError,
-                shape = RoundedCornerShape(50.dp),
+                shape = RoundedCornerShape(12.dp),
                 supportingText = if (volumeError) {
                     { Text("Enter a valid volume (1-5000 ml)") }
                 } else {
@@ -167,8 +167,10 @@ fun EditContainerPresetBottomSheet(
                 label = "saveCornerRadius"
             )
 
-            ButtonGroup(
+            Row(
                 modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 FilledTonalButton(
                     onClick = {
@@ -179,19 +181,19 @@ fun EditContainerPresetBottomSheet(
                         containerColor = MaterialTheme.colorScheme.errorContainer,
                         contentColor = MaterialTheme.colorScheme.onErrorContainer
                     ),
-                    shape = RoundedCornerShape(deleteCornerRadius),
+                   shapes = ButtonDefaults.shapes(),
                     interactionSource = deleteInteractionSource,
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp)
-                        .animateWidth(interactionSource = deleteInteractionSource)
+
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(24.dp).padding(end = 8.dp)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+
                     Text("Delete")
                 }
 
@@ -208,19 +210,19 @@ fun EditContainerPresetBottomSheet(
                             onSave(trimmedName, volume)
                         }
                     },
-                    shape = RoundedCornerShape(saveCornerRadius),
+                    shapes = ButtonDefaults.shapes(),
                     interactionSource = saveInteractionSource,
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp)
-                        .animateWidth(interactionSource = saveInteractionSource)
+
                 ) {
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(24.dp).padding(end = 8.dp)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+
                     Text("Save")
                 }
             }
@@ -260,19 +262,21 @@ fun EditContainerPresetBottomSheet(
                 Text("Are you sure you want to delete \"${preset.name}\"? This action cannot be undone.")
             },
             confirmButton = {
-                ButtonGroup(
-                    modifier = Modifier.fillMaxWidth()
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     FilledTonalButton(
                         onClick = {
                             dialogHaptics.performHapticFeedback(HapticFeedbackType.Confirm)
                             showDeleteConfirmation = false
                         },
-                        shape = RoundedCornerShape(cancelCornerRadius),
+                        shapes = ButtonDefaults.shapes(),
                         interactionSource = cancelInteractionSource,
                         modifier = Modifier
                             .weight(1f)
-                            .animateWidth(interactionSource = cancelInteractionSource)
+
                     ) {
                         Text("Cancel")
                     }
@@ -286,11 +290,11 @@ fun EditContainerPresetBottomSheet(
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.error
                         ),
-                        shape = RoundedCornerShape(confirmDeleteCornerRadius),
+                        shapes = ButtonDefaults.shapes(),
                         interactionSource = confirmDeleteInteractionSource,
                         modifier = Modifier
                             .weight(1f)
-                            .animateWidth(interactionSource = confirmDeleteInteractionSource)
+
                     ) {
                         Text("Delete")
                     }
@@ -385,7 +389,7 @@ fun AddContainerPresetBottomSheet(
                 label = { Text("Container Name") },
                 placeholder = { Text("e.g., Coffee Mug") },
                 isError = nameError,
-                shape = RoundedCornerShape(50.dp),
+                shape = RoundedCornerShape(12.dp),
                 supportingText = if (nameError) {
                     { Text("Name is required") }
                 } else null,
@@ -404,7 +408,7 @@ fun AddContainerPresetBottomSheet(
                 placeholder = { Text("e.g., 250") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 isError = volumeError,
-                shape = RoundedCornerShape(50.dp),
+                shape = RoundedCornerShape(12.dp),
                 supportingText = if (volumeError) {
                     { Text("Enter a valid volume (1-5000 ml)") }
                 } else {
@@ -426,44 +430,85 @@ fun AddContainerPresetBottomSheet(
                 label = "addCornerRadius"
             )
 
+
+            Button(
+                shapes = ButtonDefaults.shapes(),
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                onClick = {
+                    haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                    val trimmedName = name.trim()
+                    val volume = volumeText.toDoubleOrNull()
+
+                    nameError = trimmedName.isEmpty()
+                    volumeError = volume == null || volume <= 0 || volume > 5000
+
+                    if (!nameError && !volumeError && volume != null) {
+                        onAdd(trimmedName, volume)
+                    }
+                }
+            ) {
+                Row(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .padding(end = 8.dp)
+                    )
+                    Text("Add Container")
+                }
+            }
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                ButtonGroup {
-                    Button(
-                        onClick = {
-                            haptics.performHapticFeedback(HapticFeedbackType.Confirm)
-                            val trimmedName = name.trim()
-                            val volume = volumeText.toDoubleOrNull()
 
-                            nameError = trimmedName.isEmpty()
-                            volumeError = volume == null || volume <= 0 || volume > 5000
 
-                            if (!nameError && !volumeError && volume != null) {
-                                onAdd(trimmedName, volume)
-                            }
-                        },
-                        colors = ButtonDefaults.filledTonalButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                        ),
-                        shape = RoundedCornerShape(addCornerRadius),
-                        interactionSource = addInteractionSource,
-                        modifier = Modifier
-                            .fillMaxWidth(0.5f)
-                            .height(56.dp)
-                            .animateWidth(interactionSource = addInteractionSource)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Add Container")
-                    }
-                }
+//                ButtonGroup(
+//                    overflowIndicator = {}
+//                ) {
+//
+//                    clickableItem(
+//                        onClick = {
+//                            haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+//                            val trimmedName = name.trim()
+//                            val volume = volumeText.toDoubleOrNull()
+//
+//                            nameError = trimmedName.isEmpty()
+//                            volumeError = volume == null || volume <= 0 || volume > 5000
+//
+//                            if (!nameError && !volumeError && volume != null) {
+//                                onAdd(trimmedName, volume)
+//                            }
+//                        },
+//                        label = "Add Container",
+//                        icon = {
+//
+//                        }
+//                    )
+////                    Button(
+////                        onClick = {
+////
+////                        },
+////                        colors = ButtonDefaults.filledTonalButtonColors(
+////                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+////                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+////                        ),
+////                        shape = RoundedCornerShape(addCornerRadius),
+////                        interactionSource = addInteractionSource,
+////                        modifier = Modifier
+////                            .fillMaxWidth(0.5f)
+////                            .height(56.dp)
+////                            .animateWidth(interactionSource = addInteractionSource)
+////                    ) {
+////
+////                        Spacer(modifier = Modifier.width(8.dp))
+////                        Text("Add Container")
+////                    }
+//                }
             }
         }
     }
