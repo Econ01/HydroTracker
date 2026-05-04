@@ -569,11 +569,36 @@ fun ActiveScheduleCard(
                 )
 
                 // Reminder Frequency (Read-only)
-                InfoRow(
-                    icon = Icons.Default.Notifications,
-                    label = "Reminder Interval",
-                    value = "Every ${userProfile.reminderInterval} minutes"
+
+                ListItem(
+                    leadingContent = {
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    shape = MaterialTheme.shapes.extraLargeIncreased
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Notifications,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    },
+                    overlineContent = {
+                        Text("Reminder Interval",)
+                    },
+                    headlineContent = {
+                        Text("Every ${userProfile.reminderInterval} minutes")
+                    }
                 )
+
+
+
             }
         }
     }
