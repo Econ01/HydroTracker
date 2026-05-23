@@ -41,7 +41,7 @@
         android:enableOnBackInvokedCallback="true"
         tools:targetApi="33" >
         <activity
-            android:name=".MainActivity"
+            android:name="com.dev.hydrotracker.MainActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -59,7 +59,7 @@
         <activity-alias
             android:name="ViewPermissionUsageActivity"
             android:exported="true"
-            android:targetActivity=".MainActivity"
+            android:targetActivity="com.dev.hydrotracker.MainActivity"
             android:permission="android.permission.START_VIEW_PERMISSION_USAGE">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
@@ -69,18 +69,18 @@
 
         <!-- Notification receivers -->
         <receiver
-            android:name=".notifications.HydroNotificationReceiver"
+            android:name="com.dev.hydrotracker.notifications.HydroNotificationReceiver"
             android:enabled="true"
             android:exported="false" />
         
         <receiver
-            android:name=".notifications.QuickAddWaterReceiver"
+            android:name="com.dev.hydrotracker.notifications.QuickAddWaterReceiver"
             android:enabled="true"
             android:exported="false" />
         
         <!-- Boot receiver to reschedule notifications after device restart -->
         <receiver
-            android:name=".notifications.BootReceiver"
+            android:name="com.dev.hydrotracker.notifications.BootReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter android:priority="1000">
@@ -93,7 +93,7 @@
 
         <!-- HydroTracker Compact Widget (1x1) -->
         <receiver
-            android:name=".widgets.HydroCompactWidget"
+            android:name="com.dev.hydrotracker.widgets.HydroCompactWidget"
             android:enabled="true"
             android:exported="true"
             android:label="HydroTracker Compact">
@@ -107,7 +107,7 @@
 
         <!-- HydroTracker Progress Widget (4x1) -->
         <receiver
-            android:name=".widgets.HydroProgressWidget"
+            android:name="com.dev.hydrotracker.widgets.HydroProgressWidget"
             android:enabled="true"
             android:exported="true"
             android:label="HydroTracker Progress">
@@ -121,13 +121,13 @@
 
         <!-- HydroTracker Large Widget (4x4) -->
         <receiver
-            android:name=".widgets.HydroLargeWidget"
+            android:name="com.dev.hydrotracker.widgets.HydroLargeWidget"
             android:enabled="true"
             android:exported="true"
             android:label="HydroTracker Large">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.cemcakmak.hydrotracker.QUICK_ADD" />
+                <action android:name="com.dev.hydrotracker.QUICK_ADD" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -136,7 +136,7 @@
 
         <!-- Widget Update Service -->
         <service
-            android:name=".widgets.WidgetUpdateService"
+            android:name="com.dev.hydrotracker.widgets.WidgetUpdateService"
             android:enabled="true"
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE" />

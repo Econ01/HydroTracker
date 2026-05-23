@@ -12,11 +12,11 @@ kotlin {
     }
 }
 android {
-    namespace = "com.cemcakmak.hydrotracker"
+    namespace = "com.dev.hydrotracker"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.cemcakmak.hydrotracker"
+        applicationId = "com.dev.hydrotracker"
         minSdk = 26
         targetSdk = 36
         versionCode = 26
@@ -56,6 +56,8 @@ ksp{
 }
 
 dependencies {
+    implementation(libs.korner)
+
     // Core Android dependencies
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
