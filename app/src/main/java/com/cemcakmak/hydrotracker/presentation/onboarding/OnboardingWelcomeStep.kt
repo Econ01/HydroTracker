@@ -15,7 +15,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cemcakmak.hydrotracker.ui.theme.HydroTypography
 
 @Composable
 fun WelcomeStep(
@@ -79,7 +78,7 @@ fun WelcomeStep(
             ) {
                 Text(
                     text = "Welcome to HydroTracker",
-                    style = HydroTypography.displayLargeEmphasized,
+                    style = MaterialTheme.typography.displayLargeEmphasized,
                     fontSize = 32.sp,
                     lineHeight = 40.sp,
                     color = MaterialTheme.colorScheme.onSurface,
