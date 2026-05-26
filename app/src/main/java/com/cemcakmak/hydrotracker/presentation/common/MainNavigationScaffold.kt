@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -51,7 +52,7 @@ fun MainNavigationScaffold(
     content: @Composable (PaddingValues) -> Unit
 ) {
     val shouldShowBottomBar = when (currentRoute) {
-        NavigationRoutes.HOME, NavigationRoutes.HISTORY, NavigationRoutes.PROFILE -> true
+        NavigationRoutes.HOME, NavigationRoutes.HISTORY, NavigationRoutes.PROFILE, NavigationRoutes.SETTINGS -> true
         else -> false
     }
 
@@ -148,6 +149,12 @@ enum class NavigationItem(
         label = "Profile",
         icon = Icons.Filled.Person,
         selectedIcon = Icons.Filled.Person
+    ),
+    SETTINGS(
+        route = NavigationRoutes.SETTINGS,
+        label = "Settings",
+        icon = Icons.Filled.Settings,
+        selectedIcon = Icons.Filled.Settings
     )
 }
 

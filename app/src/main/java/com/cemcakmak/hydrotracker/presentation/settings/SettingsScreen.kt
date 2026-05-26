@@ -75,15 +75,6 @@ fun SettingsScreen(
     // Animation states
     var isVisible by remember { mutableStateOf(false) }
 
-    // Developer options state
-    var developerOptionsEnabled by remember {
-        mutableStateOf(
-            userRepository?.loadDeveloperOptionsEnabled() ?: false
-        )
-    }
-    var tapCount by remember { mutableIntStateOf(0) }
-    var lastTapTime by remember { mutableLongStateOf(0L) }
-
     // Snackbar state for Material 3 Expressive feedback
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -336,8 +327,8 @@ fun SettingsScreen(
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
             )
 
-            // Developer Options Section (only show if enabled and repositories available)
-            if (developerOptionsEnabled && userRepository != null && waterIntakeRepository != null) {
+            // Developer Options Section (only show in debug builds)
+            if (BuildConfig.DEBUG && userRepository != null && waterIntakeRepository != null) {
                 AnimatedVisibility(
                     visible = isVisible,
                     enter = slideInVertically(
@@ -353,10 +344,6 @@ fun SettingsScreen(
                         waterIntakeRepository = waterIntakeRepository,
                         snackbarHostState = snackbarHostState,
                         onNavigateToOnboarding = onNavigateToOnboarding,
-                        onDisableDeveloperOptions = {
-                            developerOptionsEnabled = false
-                            userRepository.saveDeveloperOptionsEnabled(false)
-                        },
                         userProfile = userProfile
                     )
                 }
@@ -378,33 +365,6 @@ fun SettingsScreen(
 
             // Footer with app info
             FooterSection(
-                onVersionTap = {
-                    val currentTime = System.currentTimeMillis()
-
-                    // Reset counter if more than 3 seconds have passed
-                    if (currentTime - lastTapTime > 3000) {
-                        tapCount = 1
-                    } else {
-                        tapCount++
-                    }
-
-                    lastTapTime = currentTime
-
-                    // Activate developer options after 10 taps
-                    if (tapCount >= 10 && !developerOptionsEnabled) {
-                        developerOptionsEnabled = true
-                        userRepository?.saveDeveloperOptionsEnabled(true)
-
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = "Developer options activated",
-                                duration = SnackbarDuration.Short
-                            )
-                        }
-
-                        tapCount = 0
-                    }
-                },
                 isVisible = isVisible
             )
         }
@@ -885,7 +845,6 @@ private fun SupportSection(
 
 @Composable
 private fun FooterSection(
-    onVersionTap: () -> Unit,
     isVisible: Boolean
 ) {
     AnimatedVisibility(
@@ -923,8 +882,7 @@ private fun FooterSection(
                     text = "Version ${BuildConfig.VERSION_NAME}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.clickable { onVersionTap() }
+                    textAlign = TextAlign.Center
                 )
                 
                 Text(
@@ -945,7 +903,6 @@ private fun DeveloperOptionsSection(
     waterIntakeRepository: WaterIntakeRepository,
     snackbarHostState: SnackbarHostState,
     onNavigateToOnboarding: () -> Unit,
-    onDisableDeveloperOptions: () -> Unit,
     userProfile: UserProfile?
 ) {
     Card(
@@ -980,41 +937,6 @@ private fun DeveloperOptionsSection(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f)
             )
-            
-            // Disable Developer Options Toggle
-            Card(
-                onClick = onDisableDeveloperOptions,
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.VisibilityOff,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "Disable Developer Options",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = "Hide developer options from settings",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
             
             HorizontalDivider(
                 color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.3f)

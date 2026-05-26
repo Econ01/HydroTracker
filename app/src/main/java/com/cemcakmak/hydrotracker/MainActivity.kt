@@ -33,6 +33,8 @@ import com.cemcakmak.hydrotracker.presentation.home.HomeScreen
 import com.cemcakmak.hydrotracker.presentation.history.HistoryScreen
 import com.cemcakmak.hydrotracker.presentation.profile.ProfileScreen
 import com.cemcakmak.hydrotracker.presentation.settings.SettingsScreen
+import com.cemcakmak.hydrotracker.presentation.settings.SettingsHubScreen
+import com.cemcakmak.hydrotracker.presentation.settings.PlaceholderScreen
 import com.cemcakmak.hydrotracker.presentation.settings.HealthConnectDataScreen
 import com.cemcakmak.hydrotracker.presentation.settings.BeverageTypesScreen
 import com.cemcakmak.hydrotracker.presentation.onboarding.*
@@ -237,7 +239,7 @@ fun HydroTrackerApp(
                                 containerPresetRepository = containerPresetRepository,
                                 activeBeverageTypes = activeBeverageTypes,
                                 onNavigateToHistory = { navController.navigate(NavigationRoutes.HISTORY) },
-                                onNavigateToSettings = { navController.navigate(NavigationRoutes.SETTINGS) },
+                                onNavigateToSettings = { navController.navigate(NavigationRoutes.SETTINGS_OLD) },
                                 onNavigateToProfile = { navController.navigate(NavigationRoutes.PROFILE) }
                             )
                         } ?: LoadingScreen()
@@ -263,7 +265,7 @@ fun HydroTrackerApp(
                         } ?: LoadingScreen()
                     }
 
-                    composable(NavigationRoutes.SETTINGS) {
+                    composable(NavigationRoutes.SETTINGS_OLD) {
                         SettingsScreen(
                             themePreferences = themePreferences,
                             userProfile = userProfile,
@@ -312,6 +314,38 @@ fun HydroTrackerApp(
                                 navController.navigate(NavigationRoutes.HEALTH_CONNECT_DATA)
                             }
                         )
+                    }
+
+                    composable(NavigationRoutes.SETTINGS) {
+                        SettingsHubScreen(
+                            developerOptionsEnabled = BuildConfig.DEBUG,
+                            onNavigateTo = { route -> navController.navigate(route) }
+                        )
+                    }
+
+                    composable(NavigationRoutes.SETTINGS_APPEARANCE) {
+                        PlaceholderScreen(title = "Appearance", onNavigateBack = { navController.popBackStack() })
+                    }
+                    composable(NavigationRoutes.SETTINGS_DISPLAY) {
+                        PlaceholderScreen(title = "Display & Locale", onNavigateBack = { navController.popBackStack() })
+                    }
+                    composable(NavigationRoutes.SETTINGS_HYDRATION) {
+                        PlaceholderScreen(title = "Hydration & Health", onNavigateBack = { navController.popBackStack() })
+                    }
+                    composable(NavigationRoutes.SETTINGS_CONTAINERS) {
+                        PlaceholderScreen(title = "Quick Add Customization", onNavigateBack = { navController.popBackStack() })
+                    }
+                    composable(NavigationRoutes.SETTINGS_NOTIFICATIONS) {
+                        PlaceholderScreen(title = "Notifications", onNavigateBack = { navController.popBackStack() })
+                    }
+                    composable(NavigationRoutes.SETTINGS_SUPPORT) {
+                        PlaceholderScreen(title = "Support Development", onNavigateBack = { navController.popBackStack() })
+                    }
+                    composable(NavigationRoutes.SETTINGS_ABOUT) {
+                        PlaceholderScreen(title = "About", onNavigateBack = { navController.popBackStack() })
+                    }
+                    composable(NavigationRoutes.SETTINGS_DEVELOPER) {
+                        PlaceholderScreen(title = "Developer Options", onNavigateBack = { navController.popBackStack() })
                     }
 
                     composable(NavigationRoutes.HEALTH_CONNECT_DATA) {
