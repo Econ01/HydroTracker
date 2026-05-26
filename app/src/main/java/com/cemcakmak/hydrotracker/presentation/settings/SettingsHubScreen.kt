@@ -188,15 +188,15 @@ private fun SettingsCategoryCard(
     val shape = getShapeForIndex(
         index = index,
         size = totalSize,
-        outerRadius = 16.dp,
-        innerRadius = 4.dp
+        outerRadius = 24.dp,
+        innerRadius = 6.dp
     )
 
     Surface(
         shape = shape,
         tonalElevation = 2.dp,
         modifier = Modifier
-            .padding(bottom = 2.dp)
+            .padding(bottom = 4.dp)
             .graphicsLayer {
                 translationY = offsetY.value
                 this.alpha = alpha.value
@@ -249,5 +249,37 @@ fun SettingsHubScreenPreview() {
         SettingsHubScreen(
             developerOptionsEnabled = true
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SettingsHubInteractivePreview() {
+    HydroTrackerTheme {
+        var selectedRoute by remember { mutableStateOf<String?>(null) }
+
+        val title = when (selectedRoute) {
+            NavigationRoutes.SETTINGS_APPEARANCE -> "Appearance"
+            NavigationRoutes.SETTINGS_DISPLAY -> "Display & Locale"
+            NavigationRoutes.SETTINGS_HYDRATION -> "Hydration & Health"
+            NavigationRoutes.SETTINGS_CONTAINERS -> "Quick Add Customization"
+            NavigationRoutes.SETTINGS_NOTIFICATIONS -> "Notifications"
+            NavigationRoutes.SETTINGS_SUPPORT -> "Support Development"
+            NavigationRoutes.SETTINGS_ABOUT -> "About"
+            NavigationRoutes.SETTINGS_DEVELOPER -> "Developer Options"
+            else -> ""
+        }
+
+        if (selectedRoute == null) {
+            SettingsHubScreen(
+                developerOptionsEnabled = true,
+                onNavigateTo = { route -> selectedRoute = route }
+            )
+        } else {
+            PlaceholderScreen(
+                title = title,
+                onNavigateBack = { selectedRoute = null }
+            )
+        }
     }
 }
