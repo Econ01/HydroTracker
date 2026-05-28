@@ -3,26 +3,30 @@
 
 package com.cemcakmak.hydrotracker.presentation.common
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Analytics
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.ShortNavigationBar
+import androidx.compose.material3.ShortNavigationBarItem
+import androidx.compose.material3.ShortNavigationBarItemDefaults
+import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,13 +38,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
+import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.utils.ImageUtils
 import java.io.File
 
@@ -59,51 +67,72 @@ fun MainNavigationScaffold(
         NavigationRoutes.Settings
     )
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Box(modifier = Modifier.weight(1f)) {
-            content(PaddingValues(0.dp))
-        }
-        if (shouldShowBottomBar) {
-            HydroNavigationBar(
-                currentKey = currentKey,
-                userProfileImagePath = userProfileImagePath,
-                onTabSelected = { key ->
-                    backStack.apply {
-                        clear()
-                        add(key)
+    Scaffold(
+        bottomBar = {
+            if (shouldShowBottomBar) {
+                HydroNavigationBar(
+                    currentKey = currentKey,
+                    userProfileImagePath = userProfileImagePath,
+                    onTabSelected = { key ->
+                        backStack.apply {
+                            clear()
+                            add(key)
+                        }
                     }
-                }
-            )
+                )
+            }
         }
+    ) { paddingValues ->
+        // Intentionally not applying paddingValues here — inner screens have their own
+        // Scaffold/TopAppBar and handle insets themselves. Passing paddingValues through
+        // satisfies the Compose inspection without causing double insets.
+        content(paddingValues)
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HydroNavigationBar(
     currentKey: NavigationRoutes,
     userProfileImagePath: String? = null,
     onTabSelected: (NavigationRoutes) -> Unit = {}
 ) {
-    NavigationBar(
+    ShortNavigationBar(
         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
     ) {
         NavigationItem.entries.forEach { item ->
             val isSelected = currentKey == item.key
+            val tooltipState = rememberTooltipState()
+            val haptics = LocalHapticFeedback.current
 
-            NavigationBarItem(
+            LaunchedEffect(tooltipState.isVisible) {
+                if (tooltipState.isVisible) {
+                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                }
+            }
+
+            ShortNavigationBarItem(
                 icon = {
-                    if (item == NavigationItem.PROFILE) {
-                        ProfileIcon(
-                            profileImagePath = userProfileImagePath,
-                            isSelected = isSelected,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    } else {
-                        Icon(
-                            imageVector = if (isSelected) item.selectedIcon else item.icon,
-                            contentDescription = item.label,
-                            modifier = Modifier.size(24.dp)
-                        )
+                    TooltipBox(
+                        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
+                        tooltip = { PlainTooltip { Text(item.label) } },
+                        state = tooltipState
+                    ) {
+                        if (item == NavigationItem.PROFILE) {
+                            ProfileIcon(
+                                profileImagePath = userProfileImagePath,
+                                isSelected = isSelected,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        } else {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(
+                                    if (isSelected) item.selectedIconRes else item.iconRes
+                                ),
+                                contentDescription = item.label,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                     }
                 },
                 label = {
@@ -118,10 +147,10 @@ private fun HydroNavigationBar(
                         onTabSelected(item.key)
                     }
                 },
-                colors = NavigationBarItemDefaults.colors(
+                colors = ShortNavigationBarItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                    indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                    selectedIndicatorColor = MaterialTheme.colorScheme.primaryContainer,
                     unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -133,32 +162,32 @@ private fun HydroNavigationBar(
 enum class NavigationItem(
     val key: NavigationRoutes,
     val label: String,
-    val icon: ImageVector,
-    val selectedIcon: ImageVector
+    @get:DrawableRes val iconRes: Int,
+    @get:DrawableRes val selectedIconRes: Int
 ) {
     HOME(
         key = NavigationRoutes.Home,
         label = "Home",
-        icon = Icons.Filled.Home,
-        selectedIcon = Icons.Filled.Home
+        iconRes = R.drawable.home,
+        selectedIconRes = R.drawable.home_filled
     ),
     HISTORY(
         key = NavigationRoutes.History,
         label = "History",
-        icon = Icons.Filled.Analytics,
-        selectedIcon = Icons.Filled.Analytics
+        iconRes = R.drawable.leaderboard,
+        selectedIconRes = R.drawable.leaderboard_filled
     ),
     PROFILE(
         key = NavigationRoutes.Profile,
         label = "Profile",
-        icon = Icons.Filled.Person,
-        selectedIcon = Icons.Filled.Person
+        iconRes = R.drawable.person,
+        selectedIconRes = R.drawable.person_filled
     ),
     SETTINGS(
         key = NavigationRoutes.Settings,
         label = "Settings",
-        icon = Icons.Filled.Settings,
-        selectedIcon = Icons.Filled.Settings
+        iconRes = R.drawable.settings,
+        selectedIconRes = R.drawable.settings_filled
     )
 }
 
@@ -170,11 +199,8 @@ fun MainNavigationScaffoldPreview() {
     MainNavigationScaffold(
         backStack = backStack,
         currentKey = NavigationRoutes.Home,
-        content = { paddingValues ->
-            Text(
-                text = "Sample Content",
-                modifier = Modifier.size(paddingValues.calculateBottomPadding())
-            )
+        content = { _ ->
+            Text(text = "Sample Content")
         }
     )
 }
@@ -182,7 +208,6 @@ fun MainNavigationScaffoldPreview() {
 @Preview
 @Composable
 fun HydroNavigationBarPreview() {
-    val backStack = rememberNavBackStack(NavigationRoutes.Home)
     HydroNavigationBar(
         currentKey = NavigationRoutes.Home,
         userProfileImagePath = null,

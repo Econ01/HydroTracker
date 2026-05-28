@@ -9,6 +9,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -59,6 +61,13 @@ private const val POP_DURATION = 300
 private const val PB_OUTGOING_SCALE = 0.85f
 private const val PB_OUTGOING_SLIDE_FRACTION = 0.15f
 private const val PB_INCOMING_INITIAL_SCALE = 0.95f
+
+private val TOP_LEVEL_TAB_KEYS: Set<NavigationRoutes> = setOf(
+    NavigationRoutes.Home,
+    NavigationRoutes.History,
+    NavigationRoutes.Profile,
+    NavigationRoutes.Settings,
+)
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
 class MainActivity : ComponentActivity() {
@@ -205,7 +214,7 @@ fun HydroTrackerApp(
                 backStack = backStack,
                 currentKey = currentKey,
                 userProfileImagePath = userProfile?.profileImagePath
-            ) { padding ->
+            ) { _ ->
                 val popBackStack = {
                     if (backStack.size > 1) backStack.removeLastOrNull()
                 }
@@ -214,12 +223,23 @@ fun HydroTrackerApp(
                     backStack = backStack,
                     onBack = popBackStack,
                     transitionSpec = {
-                        ContentTransform(
-                            targetContentEnter = fadeIn(tween(PUSH_DURATION)) +
-                                slideInHorizontally(tween(PUSH_DURATION)) { it / 4 },
-                            initialContentExit = fadeOut(tween(PUSH_DURATION)) +
-                                slideOutHorizontally(tween(PUSH_DURATION)) { -it / 4 },
-                        )
+                        val isTabSwitch = initialState.entries.size == 1 && targetState.entries.size == 1 &&
+                            initialState.entries.first().contentKey in TOP_LEVEL_TAB_KEYS &&
+                            targetState.entries.first().contentKey in TOP_LEVEL_TAB_KEYS
+
+                        if (isTabSwitch) {
+                            ContentTransform(
+                                targetContentEnter = EnterTransition.None,
+                                initialContentExit = ExitTransition.None,
+                            )
+                        } else {
+                            ContentTransform(
+                                targetContentEnter = fadeIn(tween(PUSH_DURATION)) +
+                                    slideInHorizontally(tween(PUSH_DURATION)) { it / 4 },
+                                initialContentExit = fadeOut(tween(PUSH_DURATION)) +
+                                    slideOutHorizontally(tween(PUSH_DURATION)) { -it / 4 },
+                            )
+                        }
                     },
                     popTransitionSpec = {
                         ContentTransform(
