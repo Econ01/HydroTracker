@@ -1,5 +1,6 @@
 package com.cemcakmak.hydrotracker.presentation.onboarding
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
@@ -61,6 +62,10 @@ fun OnboardingScreen(
             println("DEBUG: OnboardingViewModel reports completion, calling navigation callback")
             onNavigateToHome()
         }
+    }
+
+    BackHandler(enabled = canGoBack && !isAnimating) {
+        viewModel.previousStep()
     }
 
     // Animate the progress value

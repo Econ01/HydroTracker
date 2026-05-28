@@ -60,9 +60,7 @@ fun HomeScreen(
     waterIntakeRepository: WaterIntakeRepository,
     containerPresetRepository: ContainerPresetRepository,
     activeBeverageTypes: List<BeverageType> = BeverageType.getAllSorted(),
-    onNavigateToHistory: () -> Unit = {},
-    onNavigateToSettings: () -> Unit = {},
-    onNavigateToProfile: () -> Unit = {}
+    onNavigateToSettings: () -> Unit = {}
 ) {
     // Check for new user day when HomeScreen is displayed
     LaunchedEffect(Unit) {
@@ -326,31 +324,6 @@ fun HomeScreen(
                             )
                         }
                     }
-                )
-            }
-        },
-        bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-                    label = { Text("Home") },
-                    selected = true,
-                    alwaysShowLabel = true,
-                    onClick = { }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Analytics, contentDescription = "History") },
-                    label = { Text("History") },
-                    selected = false,
-                    alwaysShowLabel = true,
-                    onClick = onNavigateToHistory
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
-                    label = { Text("Profile") },
-                    selected = false,
-                    alwaysShowLabel = true,
-                    onClick = onNavigateToProfile
                 )
             }
         },

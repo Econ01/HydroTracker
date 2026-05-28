@@ -35,33 +35,35 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberNavBackStack
 import com.cemcakmak.hydrotracker.utils.ImageUtils
 import java.io.File
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MainNavigationScaffold(
-    navController: NavController,
-    currentRoute: String,
+    backStack: NavBackStack<NavKey>,
+    currentKey: NavigationRoutes,
     userProfileImagePath: String? = null,
     content: @Composable (PaddingValues) -> Unit
 ) {
-    val shouldShowBottomBar = when (currentRoute) {
-        NavigationRoutes.HOME, NavigationRoutes.HISTORY, NavigationRoutes.PROFILE, NavigationRoutes.SETTINGS -> true
-        else -> false
-    }
+    val shouldShowBottomBar = currentKey in setOf(
+        NavigationRoutes.Home,
+        NavigationRoutes.History,
+        NavigationRoutes.Profile,
+        NavigationRoutes.Settings
+    )
 
     Scaffold(
         bottomBar = {
             if (shouldShowBottomBar) {
                 HydroNavigationBar(
-                    navController = navController,
-                    currentRoute = currentRoute,
+                    backStack = backStack,
+                    currentKey = currentKey,
                     userProfileImagePath = userProfileImagePath
                 )
             }
@@ -72,15 +74,15 @@ fun MainNavigationScaffold(
 
 @Composable
 private fun HydroNavigationBar(
-    navController: NavController,
-    currentRoute: String,
+    backStack: NavBackStack<NavKey>,
+    currentKey: NavigationRoutes,
     userProfileImagePath: String? = null
 ) {
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
     ) {
         NavigationItem.entries.forEach { item ->
-            val isSelected = currentRoute == item.route
+            val isSelected = currentKey == item.key
 
             NavigationBarItem(
                 icon = {
@@ -106,11 +108,13 @@ private fun HydroNavigationBar(
                 },
                 selected = isSelected,
                 onClick = {
-                    if (currentRoute != item.route) {
-                        navController.navigate(item.route) {
-                            popUpTo(NavigationRoutes.HOME) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
+                    if (!isSelected) {
+                        backStack.apply {
+                            clear()
+                            add(NavigationRoutes.Home)
+                            if (item.key != NavigationRoutes.Home) {
+                                add(item.key)
+                            }
                         }
                     }
                 },
@@ -127,31 +131,31 @@ private fun HydroNavigationBar(
 }
 
 enum class NavigationItem(
-    val route: String,
+    val key: NavigationRoutes,
     val label: String,
     val icon: ImageVector,
     val selectedIcon: ImageVector
 ) {
     HOME(
-        route = NavigationRoutes.HOME,
+        key = NavigationRoutes.Home,
         label = "Home",
         icon = Icons.Filled.Home,
         selectedIcon = Icons.Filled.Home
     ),
     HISTORY(
-        route = NavigationRoutes.HISTORY,
+        key = NavigationRoutes.History,
         label = "History",
         icon = Icons.Filled.Analytics,
         selectedIcon = Icons.Filled.Analytics
     ),
     PROFILE(
-        route = NavigationRoutes.PROFILE,
+        key = NavigationRoutes.Profile,
         label = "Profile",
         icon = Icons.Filled.Person,
         selectedIcon = Icons.Filled.Person
     ),
     SETTINGS(
-        route = NavigationRoutes.SETTINGS,
+        key = NavigationRoutes.Settings,
         label = "Settings",
         icon = Icons.Filled.Settings,
         selectedIcon = Icons.Filled.Settings
@@ -162,10 +166,10 @@ enum class NavigationItem(
 @Preview
 @Composable
 fun MainNavigationScaffoldPreview() {
-    val navController = rememberNavController()
+    val backStack = rememberNavBackStack(NavigationRoutes.Home)
     MainNavigationScaffold(
-        navController = navController,
-        currentRoute = NavigationRoutes.HOME,
+        backStack = backStack,
+        currentKey = NavigationRoutes.Home,
         content = { paddingValues ->
             Text(
                 text = "Sample Content",
@@ -178,10 +182,10 @@ fun MainNavigationScaffoldPreview() {
 @Preview
 @Composable
 fun HydroNavigationBarPreview() {
-    val navController = rememberNavController()
+    val backStack = rememberNavBackStack(NavigationRoutes.Home)
     HydroNavigationBar(
-        navController = navController,
-        currentRoute = NavigationRoutes.HOME,
+        backStack = backStack,
+        currentKey = NavigationRoutes.Home,
         userProfileImagePath = null
     )
 }

@@ -8,6 +8,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,12 +23,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.*
-import androidx.compose.animation.*
-import androidx.compose.ui.graphics.TransformOrigin
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.ui.NavDisplay
+import androidx.navigationevent.NavigationEvent
 import com.cemcakmak.hydrotracker.data.repository.*
 import com.cemcakmak.hydrotracker.data.database.DatabaseInitializer
 import com.cemcakmak.hydrotracker.data.database.DatabaseMigrationHelper
@@ -42,6 +53,20 @@ import com.cemcakmak.hydrotracker.presentation.onboarding.*
 import com.cemcakmak.hydrotracker.notifications.*
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.health.HealthConnectManager
+
+// Predictive-back gesture animation tuning
+private const val PB_OUTGOING_SCALE = 0.85f // how much the current screen shrinks (1.0 = no shrink, 0.7 = aggressive)
+private const val PB_OUTGOING_SLIDE_FRACTION = 0.15f    // lateral drift toward the swipe edge, as a fraction of screen width
+private const val PB_INCOMING_INITIAL_SCALE = 0.95f // previous screen starts at this scale, grows to 1.0 (1.0 = no growth)
+private const val PB_SPRING_DAMPING = 1.0f  // 1.0 = critically damped (no bounce); <1.0 adds bounce
+private const val PB_SPRING_STIFFNESS = 1600f   // higher = snappier; Material 3's default effects spec is 1600
+
+private val TOP_LEVEL_TAB_KEYS: Set<NavKey> = setOf(
+    NavigationRoutes.Home,
+    NavigationRoutes.History,
+    NavigationRoutes.Profile,
+    NavigationRoutes.Settings,
+)
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
 class MainActivity : ComponentActivity() {
@@ -154,7 +179,6 @@ fun HydroTrackerApp(
     notificationPermissionLauncher: ActivityResultLauncher<String>,
     healthConnectPermissionLauncher: ActivityResultLauncher<Set<String>>
 ) {
-    val navController = rememberNavController()
     val themeViewModel: ThemeViewModel = viewModel(factory = ThemeViewModelFactory(userRepository))
     val themePreferences by themeViewModel.themePreferences.collectAsState()
     val userProfile by userRepository.userProfile.collectAsState()
@@ -176,200 +200,212 @@ fun HydroTrackerApp(
         }
     }
 
-    val startDestination = if (isOnboardingCompleted && userProfile != null)
-        NavigationRoutes.HOME else NavigationRoutes.ONBOARDING
-
     HydroTrackerTheme(themePreferences = themePreferences) {
         if (isLoading) {
             LoadingScreen()
         } else {
-            val currentRoute by navController.currentBackStackEntryAsState()
-            val route = currentRoute?.destination?.route ?: startDestination
+            val startKey: NavigationRoutes = if (isOnboardingCompleted && userProfile != null)
+                NavigationRoutes.Home else NavigationRoutes.Onboarding
+            val backStack = rememberNavBackStack(startKey)
+            val currentKey = backStack.lastOrNull() as? NavigationRoutes ?: startKey
 
             MainNavigationScaffold(
-                navController = navController, 
-                currentRoute = route, 
+                backStack = backStack,
+                currentKey = currentKey,
                 userProfileImagePath = userProfile?.profileImagePath
             ) { padding ->
-                NavHost(
-                    navController = navController, 
-                    startDestination = startDestination,
-                    // Predictive back gesture animations
-                    popExitTransition = {
-                        scaleOut(
-                            targetScale = 0.7f,
-                            transformOrigin = TransformOrigin(
-                                pivotFractionX = 1f,
-                                pivotFractionY = 0.5f
-                            )
-                        ) + fadeOut()
-                    },
-                    popEnterTransition = {
-                        scaleIn(
-                            initialScale = 1.1f,
-                            transformOrigin = TransformOrigin(
-                                pivotFractionX = 0.4f,
-                                pivotFractionY = 0.5f
-                            )
+                NavDisplay(
+                    backStack = backStack,
+                    onBack = { backStack.removeLastOrNull() },
+                    modifier = Modifier.padding(padding),
+                    predictivePopTransitionSpec = { swipeEdge ->
+                        val floatSpring = spring<Float>(
+                            dampingRatio = PB_SPRING_DAMPING,
+                            stiffness = PB_SPRING_STIFFNESS,
                         )
-                    }
-                ) {
-
-                    composable(NavigationRoutes.ONBOARDING) {
-                        val context = LocalContext.current
-                        val onboardingVM: OnboardingViewModel = viewModel(
-                            factory = OnboardingViewModelFactory(context.applicationContext as Application, userRepository)
-                        )
-
-                        OnboardingScreen(
-                            onNavigateToHome = {
-                                navController.navigate(NavigationRoutes.HOME) {
-                                    popUpTo(NavigationRoutes.ONBOARDING) { inclusive = true }
-                                    launchSingleTop = true
-                                }
-                            },
-                            viewModel = onboardingVM
-                        )
-                    }
-
-                    composable(NavigationRoutes.HOME) {
-                        userProfile?.let {
-                            HomeScreen(
-                                userProfile = it,
-                                waterIntakeRepository = waterIntakeRepository,
-                                containerPresetRepository = containerPresetRepository,
-                                activeBeverageTypes = activeBeverageTypes,
-                                onNavigateToHistory = { navController.navigate(NavigationRoutes.HISTORY) },
-                                onNavigateToSettings = { navController.navigate(NavigationRoutes.SETTINGS_OLD) },
-                                onNavigateToProfile = { navController.navigate(NavigationRoutes.PROFILE) }
+                        val outgoingKey = backStack.lastOrNull()
+                        if (outgoingKey in TOP_LEVEL_TAB_KEYS) {
+                            // No animation when popping a top-level tab back to Home.
+                            ContentTransform(
+                                targetContentEnter = EnterTransition.None,
+                                initialContentExit = ExitTransition.None,
                             )
-                        } ?: LoadingScreen()
-                    }
-
-                    composable(NavigationRoutes.HISTORY) {
-                        HistoryScreen(
-                            waterIntakeRepository = waterIntakeRepository,
-                            themePreferences = themePreferences
-                        ) {
-                            navController.popBackStack()
+                        } else {
+                            val slideDirection = if (swipeEdge == NavigationEvent.EDGE_LEFT) 1 else -1
+                            val offsetSpring = spring<IntOffset>(
+                                dampingRatio = PB_SPRING_DAMPING,
+                                stiffness = PB_SPRING_STIFFNESS,
+                            )
+                            ContentTransform(
+                                targetContentEnter = fadeIn(animationSpec = floatSpring) +
+                                    scaleIn(
+                                        initialScale = PB_INCOMING_INITIAL_SCALE,
+                                        animationSpec = floatSpring,
+                                    ),
+                                initialContentExit = scaleOut(
+                                    targetScale = PB_OUTGOING_SCALE,
+                                    animationSpec = floatSpring,
+                                ) + slideOutHorizontally(animationSpec = offsetSpring) { width ->
+                                    (slideDirection * width * PB_OUTGOING_SLIDE_FRACTION).toInt()
+                                },
+                            )
                         }
-                    }
+                    },
+                    entryProvider = entryProvider {
+                        entry<NavigationRoutes.Onboarding> {
+                            val ctx = LocalContext.current
+                            val onboardingVM: OnboardingViewModel = viewModel(
+                                factory = OnboardingViewModelFactory(ctx.applicationContext as Application, userRepository)
+                            )
 
-                    composable(NavigationRoutes.PROFILE) {
-                        userProfile?.let {
-                            ProfileScreen(
-                                userProfile = it,
+                            OnboardingScreen(
+                                onNavigateToHome = {
+                                    backStack.apply {
+                                        clear()
+                                        add(NavigationRoutes.Home)
+                                    }
+                                },
+                                viewModel = onboardingVM
+                            )
+                        }
+
+                        entry<NavigationRoutes.Home> {
+                            userProfile?.let {
+                                HomeScreen(
+                                    userProfile = it,
+                                    waterIntakeRepository = waterIntakeRepository,
+                                    containerPresetRepository = containerPresetRepository,
+                                    activeBeverageTypes = activeBeverageTypes,
+                                    onNavigateToSettings = { backStack.add(NavigationRoutes.SettingsOld) }
+                                )
+                            } ?: LoadingScreen()
+                        }
+
+                        entry<NavigationRoutes.History> {
+                            HistoryScreen(
+                                waterIntakeRepository = waterIntakeRepository,
+                                themePreferences = themePreferences
+                            ) {
+                                backStack.removeLastOrNull()
+                            }
+                        }
+
+                        entry<NavigationRoutes.Profile> {
+                            userProfile?.let {
+                                ProfileScreen(
+                                    userProfile = it,
+                                    userRepository = userRepository,
+                                    waterIntakeRepository = waterIntakeRepository,
+                                    onNavigateBack = { backStack.removeLastOrNull() }
+                                )
+                            } ?: LoadingScreen()
+                        }
+
+                        entry<NavigationRoutes.SettingsOld> {
+                            SettingsScreen(
+                                themePreferences = themePreferences,
+                                userProfile = userProfile,
                                 userRepository = userRepository,
                                 waterIntakeRepository = waterIntakeRepository,
-                                onNavigateBack = { navController.popBackStack() }
+                                containerPresetRepository = containerPresetRepository,
+                                onColorSourceChange = themeViewModel::setColorSource,
+                                onDarkModeChange = themeViewModel::updateDarkModePreference,
+                                onPureBlackChange = themeViewModel::updatePureBlackPreference,
+                                onWeekStartDayChange = themeViewModel::updateWeekStartDay,
+                                onHydrationStandardChange = { newStandard ->
+                                    userProfile?.let { profile ->
+                                        val newGoal = com.cemcakmak.hydrotracker.utils.WaterCalculator.calculateDailyWaterGoal(
+                                            gender = profile.gender,
+                                            ageGroup = profile.ageGroup,
+                                            activityLevel = profile.activityLevel,
+                                            weight = profile.weight,
+                                            hydrationStandard = newStandard
+                                        )
+
+                                        val updatedProfile = profile.copy(
+                                            hydrationStandard = newStandard,
+                                            dailyWaterGoal = newGoal
+                                        )
+                                        userRepository.saveUserProfile(updatedProfile)
+                                    }
+                                },
+                                isDynamicColorAvailable = themeViewModel.isDynamicColorAvailable(),
+                                onRequestNotificationPermission = {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                        notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                                    }
+                                },
+                                healthConnectPermissionLauncher = healthConnectPermissionLauncher,
+                                onNavigateBack = { backStack.removeLastOrNull() },
+                                onNavigateToOnboarding = {
+                                    backStack.apply {
+                                        clear()
+                                        add(NavigationRoutes.Onboarding)
+                                    }
+                                },
+                                onNavigateToBeverageTypes = {
+                                    backStack.add(NavigationRoutes.BeverageTypes)
+                                },
+                                onNavigateToHealthConnectData = {
+                                    backStack.add(NavigationRoutes.HealthConnectData)
+                                }
                             )
-                        } ?: LoadingScreen()
-                    }
+                        }
 
-                    composable(NavigationRoutes.SETTINGS_OLD) {
-                        SettingsScreen(
-                            themePreferences = themePreferences,
-                            userProfile = userProfile,
-                            userRepository = userRepository,
-                            waterIntakeRepository = waterIntakeRepository,
-                            containerPresetRepository = containerPresetRepository,
-                            onColorSourceChange = themeViewModel::setColorSource,
-                            onDarkModeChange = themeViewModel::updateDarkModePreference,
-                            onPureBlackChange = themeViewModel::updatePureBlackPreference,
-                            onWeekStartDayChange = themeViewModel::updateWeekStartDay,
-                            onHydrationStandardChange = { newStandard ->
-                                userProfile?.let { profile ->
-                                    // Recalculate daily water goal with new standard
-                                    val newGoal = com.cemcakmak.hydrotracker.utils.WaterCalculator.calculateDailyWaterGoal(
-                                        gender = profile.gender,
-                                        ageGroup = profile.ageGroup,
-                                        activityLevel = profile.activityLevel,
-                                        weight = profile.weight,
-                                        hydrationStandard = newStandard
-                                    )
+                        entry<NavigationRoutes.Settings> {
+                            SettingsHubScreen(
+                                developerOptionsEnabled = BuildConfig.DEBUG,
+                                onNavigateTo = { key -> backStack.add(key) }
+                            )
+                        }
 
-                                    val updatedProfile = profile.copy(
-                                        hydrationStandard = newStandard,
-                                        dailyWaterGoal = newGoal
-                                    )
-                                    userRepository.saveUserProfile(updatedProfile)
-                                }
-                            },
-                            isDynamicColorAvailable = themeViewModel.isDynamicColorAvailable(),
-                            onRequestNotificationPermission = {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                    notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-                                }
-                            },
-                            healthConnectPermissionLauncher = healthConnectPermissionLauncher,
-                            onNavigateBack = { navController.popBackStack() },
-                            onNavigateToOnboarding = {
-                                navController.navigate(NavigationRoutes.ONBOARDING) {
-                                    popUpTo(NavigationRoutes.HOME) { inclusive = true }
-                                }
-                            },
-                            onNavigateToBeverageTypes = {
-                                navController.navigate(NavigationRoutes.BEVERAGE_TYPES)
-                            },
-                            onNavigateToHealthConnectData = {
-                                navController.navigate(NavigationRoutes.HEALTH_CONNECT_DATA)
-                            }
-                        )
-                    }
+                        entry<NavigationRoutes.SettingsAppearance> {
+                            AppearanceScreen(
+                                themePreferences = themePreferences,
+                                isDynamicColorAvailable = themeViewModel.isDynamicColorAvailable(),
+                                onColorSourceChange = themeViewModel::setColorSource,
+                                onDarkModeChange = themeViewModel::updateDarkModePreference,
+                                onPureBlackChange = themeViewModel::updatePureBlackPreference,
+                                onNavigateBack = { backStack.removeLastOrNull() }
+                            )
+                        }
+                        entry<NavigationRoutes.SettingsDisplay> {
+                            PlaceholderScreen(title = "Display & Locale", onNavigateBack = { backStack.removeLastOrNull() })
+                        }
+                        entry<NavigationRoutes.SettingsHydration> {
+                            PlaceholderScreen(title = "Hydration & Health", onNavigateBack = { backStack.removeLastOrNull() })
+                        }
+                        entry<NavigationRoutes.SettingsContainers> {
+                            PlaceholderScreen(title = "Quick Add Customization", onNavigateBack = { backStack.removeLastOrNull() })
+                        }
+                        entry<NavigationRoutes.SettingsNotifications> {
+                            PlaceholderScreen(title = "Notifications", onNavigateBack = { backStack.removeLastOrNull() })
+                        }
+                        entry<NavigationRoutes.SettingsSupport> {
+                            PlaceholderScreen(title = "Support Development", onNavigateBack = { backStack.removeLastOrNull() })
+                        }
+                        entry<NavigationRoutes.SettingsAbout> {
+                            PlaceholderScreen(title = "About", onNavigateBack = { backStack.removeLastOrNull() })
+                        }
+                        entry<NavigationRoutes.SettingsDeveloper> {
+                            PlaceholderScreen(title = "Developer Options", onNavigateBack = { backStack.removeLastOrNull() })
+                        }
 
-                    composable(NavigationRoutes.SETTINGS) {
-                        SettingsHubScreen(
-                            developerOptionsEnabled = BuildConfig.DEBUG,
-                            onNavigateTo = { route -> navController.navigate(route) }
-                        )
-                    }
+                        entry<NavigationRoutes.HealthConnectData> {
+                            HealthConnectDataScreen(
+                                waterIntakeRepository = waterIntakeRepository,
+                                onNavigateBack = { backStack.removeLastOrNull() }
+                            )
+                        }
 
-                    composable(NavigationRoutes.SETTINGS_APPEARANCE) {
-                        AppearanceScreen(
-                            themePreferences = themePreferences,
-                            isDynamicColorAvailable = themeViewModel.isDynamicColorAvailable(),
-                            onColorSourceChange = themeViewModel::setColorSource,
-                            onDarkModeChange = themeViewModel::updateDarkModePreference,
-                            onPureBlackChange = themeViewModel::updatePureBlackPreference,
-                            onNavigateBack = { navController.popBackStack() }
-                        )
+                        entry<NavigationRoutes.BeverageTypes> {
+                            BeverageTypesScreen(
+                                userRepository = userRepository,
+                                onNavigateBack = { backStack.removeLastOrNull() }
+                            )
+                        }
                     }
-                    composable(NavigationRoutes.SETTINGS_DISPLAY) {
-                        PlaceholderScreen(title = "Display & Locale", onNavigateBack = { navController.popBackStack() })
-                    }
-                    composable(NavigationRoutes.SETTINGS_HYDRATION) {
-                        PlaceholderScreen(title = "Hydration & Health", onNavigateBack = { navController.popBackStack() })
-                    }
-                    composable(NavigationRoutes.SETTINGS_CONTAINERS) {
-                        PlaceholderScreen(title = "Quick Add Customization", onNavigateBack = { navController.popBackStack() })
-                    }
-                    composable(NavigationRoutes.SETTINGS_NOTIFICATIONS) {
-                        PlaceholderScreen(title = "Notifications", onNavigateBack = { navController.popBackStack() })
-                    }
-                    composable(NavigationRoutes.SETTINGS_SUPPORT) {
-                        PlaceholderScreen(title = "Support Development", onNavigateBack = { navController.popBackStack() })
-                    }
-                    composable(NavigationRoutes.SETTINGS_ABOUT) {
-                        PlaceholderScreen(title = "About", onNavigateBack = { navController.popBackStack() })
-                    }
-                    composable(NavigationRoutes.SETTINGS_DEVELOPER) {
-                        PlaceholderScreen(title = "Developer Options", onNavigateBack = { navController.popBackStack() })
-                    }
-
-                    composable(NavigationRoutes.HEALTH_CONNECT_DATA) {
-                        HealthConnectDataScreen(
-                            waterIntakeRepository = waterIntakeRepository,
-                            onNavigateBack = { navController.popBackStack() }
-                        )
-                    }
-
-                    composable(NavigationRoutes.BEVERAGE_TYPES) {
-                        BeverageTypesScreen(
-                            userRepository = userRepository,
-                            onNavigateBack = { navController.popBackStack() }
-                        )
-                    }
-                }
+                )
             }
         }
     }

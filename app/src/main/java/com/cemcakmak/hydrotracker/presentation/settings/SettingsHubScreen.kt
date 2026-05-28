@@ -45,7 +45,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @Composable
 fun SettingsHubScreen(
     developerOptionsEnabled: Boolean = false,
-    onNavigateTo: (String) -> Unit = {},
+    onNavigateTo: (NavigationRoutes) -> Unit = {},
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var isVisible by remember { mutableStateOf(false) }
@@ -77,7 +77,7 @@ fun SettingsHubScreen(
                         title = "Appearance",
                         description = "Theme, colors and AMOLED mode",
                         icon = { Icon(TablerIcons.PaletteFilled, contentDescription = null) },
-                        route = NavigationRoutes.SETTINGS_APPEARANCE
+                        route = NavigationRoutes.SettingsAppearance
                     )
                 )
                 add(
@@ -85,7 +85,7 @@ fun SettingsHubScreen(
                         title = "Display & Locale",
                         description = "Week start day and locale",
                         icon = { Icon(TablerIcons.CalendarEventFilled, contentDescription = null) },
-                        route = NavigationRoutes.SETTINGS_DISPLAY
+                        route = NavigationRoutes.SettingsDisplay
                     )
                 )
                 add(
@@ -93,7 +93,7 @@ fun SettingsHubScreen(
                         title = "Hydration & Health",
                         description = "Water goal calculation and Health Connect",
                         icon = { Icon(TablerIcons.HeartFilled, contentDescription = null) },
-                        route = NavigationRoutes.SETTINGS_HYDRATION
+                        route = NavigationRoutes.SettingsHydration
                     )
                 )
                 add(
@@ -101,7 +101,7 @@ fun SettingsHubScreen(
                         title = "Quick Add Customization",
                         description = "Container presets and beverage types",
                         icon = { Icon(TablerIcons.EditFilled, contentDescription = null) },
-                        route = NavigationRoutes.SETTINGS_CONTAINERS
+                        route = NavigationRoutes.SettingsContainers
                     )
                 )
                 add(
@@ -109,7 +109,7 @@ fun SettingsHubScreen(
                         title = "Notifications",
                         description = "Hydration reminders and permissions",
                         icon = { Icon(TablerIcons.BellFilled, contentDescription = null) },
-                        route = NavigationRoutes.SETTINGS_NOTIFICATIONS
+                        route = NavigationRoutes.SettingsNotifications
                     )
                 )
                 add(
@@ -117,7 +117,7 @@ fun SettingsHubScreen(
                         title = "Support Development",
                         description = "Donate and support the app",
                         icon = { Icon(TablerIcons.HeartFilled, contentDescription = null) },
-                        route = NavigationRoutes.SETTINGS_SUPPORT
+                        route = NavigationRoutes.SettingsSupport
                     )
                 )
                 add(
@@ -125,7 +125,7 @@ fun SettingsHubScreen(
                         title = "About",
                         description = "Sources, privacy policy and license",
                         icon = { Icon(TablerIcons.InfoCircleFilled, contentDescription = null) },
-                        route = NavigationRoutes.SETTINGS_ABOUT
+                        route = NavigationRoutes.SettingsAbout
                     )
                 )
                 if (developerOptionsEnabled) {
@@ -134,7 +134,7 @@ fun SettingsHubScreen(
                             title = "Developer Options",
                             description = "Debug tools and testing",
                             icon = { Icon(TablerIcons.CodeCircleFilled, contentDescription = null) },
-                            route = NavigationRoutes.SETTINGS_DEVELOPER
+                            route = NavigationRoutes.SettingsDeveloper
                         )
                     )
                 }
@@ -161,7 +161,7 @@ private fun SettingsCategoryCard(
     category: SettingsCategory,
     isVisible: Boolean,
     totalSize: Int,
-    onNavigateTo: (String) -> Unit
+    onNavigateTo: (NavigationRoutes) -> Unit
 ) {
     val offsetY = remember { Animatable(150f) }
     val alpha = remember { Animatable(0f) }
@@ -222,7 +222,7 @@ private data class SettingsCategory(
     val title: String,
     val description: String,
     val icon: @Composable () -> Unit,
-    val route: String
+    val route: NavigationRoutes
 )
 
 private fun getShapeForIndex(
@@ -253,17 +253,17 @@ private fun getShapeForIndex(
 @Composable
 fun SettingsHubInteractivePreview() {
     HydroTrackerTheme {
-        var selectedRoute by remember { mutableStateOf<String?>(null) }
+        var selectedRoute by remember { mutableStateOf<NavigationRoutes?>(null) }
 
         val title = when (selectedRoute) {
-            NavigationRoutes.SETTINGS_APPEARANCE -> "Appearance"
-            NavigationRoutes.SETTINGS_DISPLAY -> "Display & Locale"
-            NavigationRoutes.SETTINGS_HYDRATION -> "Hydration & Health"
-            NavigationRoutes.SETTINGS_CONTAINERS -> "Quick Add Customization"
-            NavigationRoutes.SETTINGS_NOTIFICATIONS -> "Notifications"
-            NavigationRoutes.SETTINGS_SUPPORT -> "Support Development"
-            NavigationRoutes.SETTINGS_ABOUT -> "About"
-            NavigationRoutes.SETTINGS_DEVELOPER -> "Developer Options"
+            NavigationRoutes.SettingsAppearance -> "Appearance"
+            NavigationRoutes.SettingsDisplay -> "Display & Locale"
+            NavigationRoutes.SettingsHydration -> "Hydration & Health"
+            NavigationRoutes.SettingsContainers -> "Quick Add Customization"
+            NavigationRoutes.SettingsNotifications -> "Notifications"
+            NavigationRoutes.SettingsSupport -> "Support Development"
+            NavigationRoutes.SettingsAbout -> "About"
+            NavigationRoutes.SettingsDeveloper -> "Developer Options"
             else -> ""
         }
 
