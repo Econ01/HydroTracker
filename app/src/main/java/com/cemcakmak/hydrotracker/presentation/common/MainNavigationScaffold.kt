@@ -19,14 +19,14 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -132,9 +132,14 @@ fun MainNavigationScaffold(
                     NavigationRoutes.SettingsAppearance -> LargeFlexibleTopAppBar(
                         title = { Text("Appearance") },
                         navigationIcon = {
-                            IconButton(onClick = { backStack.removeLastOrNull() }) {
+                            FilledIconButton(
+                                onClick = { backStack.removeLastOrNull() },
+                                shapes = IconButtonDefaults.shapes(),
+                                colors = IconButtonDefaults.filledIconButtonColors(),
+                                modifier = Modifier.size(width = 32.dp, height = 40.dp)
+                            ) {
                                 Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    imageVector = ImageVector.vectorResource(R.drawable.arrow_back_filled),
                                     contentDescription = "Back"
                                 )
                             }
