@@ -1,5 +1,6 @@
 package com.cemcakmak.hydrotracker.presentation.settings
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -194,15 +195,21 @@ private fun ThemeSection(
                             horizontalArrangement = Arrangement.spacedBy(6.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(
-                                imageVector = when (preference) {
-                                    DarkModePreference.SYSTEM -> if (isSelected) ImageVector.vectorResource(R.drawable.settings_filled) else ImageVector.vectorResource(R.drawable.settings)
-                                    DarkModePreference.LIGHT -> if (isSelected) ImageVector.vectorResource(R.drawable.light_mode_filled) else ImageVector.vectorResource(R.drawable.light_mode)
-                                    DarkModePreference.DARK -> if (isSelected) ImageVector.vectorResource(R.drawable.dark_mode_filled) else ImageVector.vectorResource(R.drawable.dark_mode)
-                                },
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
+                            Crossfade(
+                                targetState = isSelected,
+                                animationSpec = tween(300),
+                                label = "darkModeToggleIcon_${preference.name}"
+                            ) { selected ->
+                                Icon(
+                                    imageVector = when (preference) {
+                                        DarkModePreference.SYSTEM -> if (selected) ImageVector.vectorResource(R.drawable.settings_filled) else ImageVector.vectorResource(R.drawable.settings)
+                                        DarkModePreference.LIGHT -> if (selected) ImageVector.vectorResource(R.drawable.light_mode_filled) else ImageVector.vectorResource(R.drawable.light_mode)
+                                        DarkModePreference.DARK -> if (selected) ImageVector.vectorResource(R.drawable.dark_mode_filled) else ImageVector.vectorResource(R.drawable.dark_mode)
+                                    },
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
                             Text(
                                 text = when (preference) {
                                     DarkModePreference.SYSTEM -> "System"
@@ -235,12 +242,18 @@ private fun ThemeSection(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = if (themePreferences.colorSource == ColorSource.DYNAMIC_COLOR) ImageVector.vectorResource(R.drawable.palette_filled) else ImageVector.vectorResource(R.drawable.palette),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
-                    )
+                    Crossfade(
+                        targetState = themePreferences.colorSource == ColorSource.DYNAMIC_COLOR,
+                        animationSpec = tween(400),
+                        label = "paletteIcon"
+                    ) { isDynamic ->
+                        Icon(
+                            imageVector = if (isDynamic) ImageVector.vectorResource(R.drawable.palette_filled) else ImageVector.vectorResource(R.drawable.palette),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                     Column(
                         modifier = Modifier.weight(1f)
                     ) {
@@ -284,12 +297,18 @@ private fun ThemeSection(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = if (themePreferences.usePureBlack) ImageVector.vectorResource(R.drawable.dark_mode_filled) else ImageVector.vectorResource(R.drawable.dark_mode),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
+                Crossfade(
+                    targetState = themePreferences.usePureBlack,
+                    animationSpec = tween(400),
+                    label = "darkModeIcon"
+                ) { isPureBlack ->
+                    Icon(
+                        imageVector = if (isPureBlack) ImageVector.vectorResource(R.drawable.dark_mode_filled) else ImageVector.vectorResource(R.drawable.dark_mode),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {

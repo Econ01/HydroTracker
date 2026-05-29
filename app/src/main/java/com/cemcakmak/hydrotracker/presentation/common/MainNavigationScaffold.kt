@@ -135,7 +135,7 @@ fun MainNavigationScaffold(
                             val collapsedFraction = appearanceScrollBehavior.state.collapsedFraction
                             val buttonWidth = (40 - collapsedFraction * 8).dp
                             FilledIconButton(
-                                onClick = { backStack.removeLastOrNull() },
+                                onClick = { backStack.removeLastOrNull(); haptics.performHapticFeedback(HapticFeedbackType.ContextClick) },
                                 shapes = IconButtonDefaults.shapes(),
                                 colors = IconButtonDefaults.filledIconButtonColors(),
                                 modifier = Modifier.size(width = buttonWidth, height = 40.dp)
