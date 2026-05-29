@@ -392,7 +392,7 @@ fun HydroTrackerApp(
                                 onColorSourceChange = themeViewModel::setColorSource,
                                 onDarkModeChange = themeViewModel::updateDarkModePreference,
                                 onPureBlackChange = themeViewModel::updatePureBlackPreference,
-                                onNavigateBack = popBackStack
+                                paddingValues = paddingValues
                             )
                         }
                         entry<NavigationRoutes.SettingsDisplay> {

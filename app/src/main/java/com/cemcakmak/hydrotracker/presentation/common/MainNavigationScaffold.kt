@@ -19,12 +19,15 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShortNavigationBar
@@ -94,10 +97,12 @@ fun MainNavigationScaffold(
     // Scroll behaviors remembered per route so collapsed state survives tab switches
     val homeScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val settingsScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val appearanceScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
     val nestedScrollModifier = when (currentKey) {
         NavigationRoutes.Home -> Modifier.nestedScroll(homeScrollBehavior.nestedScrollConnection)
         NavigationRoutes.Settings -> Modifier.nestedScroll(settingsScrollBehavior.nestedScrollConnection)
+        NavigationRoutes.SettingsAppearance -> Modifier.nestedScroll(appearanceScrollBehavior.nestedScrollConnection)
         else -> Modifier
     }
 
@@ -124,6 +129,18 @@ fun MainNavigationScaffold(
                     NavigationRoutes.History -> HistoryTopAppBar()
                     NavigationRoutes.Profile -> ProfileTopAppBar()
                     NavigationRoutes.Settings -> SettingsTopAppBar(scrollBehavior = settingsScrollBehavior)
+                    NavigationRoutes.SettingsAppearance -> LargeFlexibleTopAppBar(
+                        title = { Text("Appearance") },
+                        navigationIcon = {
+                            IconButton(onClick = { backStack.removeLastOrNull() }) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "Back"
+                                )
+                            }
+                        },
+                        scrollBehavior = appearanceScrollBehavior
+                    )
                     else -> {}
                 }
             }
