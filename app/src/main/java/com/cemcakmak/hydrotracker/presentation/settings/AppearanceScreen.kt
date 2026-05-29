@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -22,8 +23,6 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -33,8 +32,13 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.WavyProgressIndicatorDefaults
+import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.compose.runtime.Composable
+import com.cemcakmak.hydrotracker.presentation.common.MainNavigationScaffold
+import com.cemcakmak.hydrotracker.presentation.common.NavigationRoutes
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,7 +51,6 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.R
@@ -110,11 +113,12 @@ private fun ThemePreviewCard(themePreferences: ThemePreferences) {
         null
     }
 
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 24.dp),
+        shape = RoundedCornerShape(size = 30.dp),
+        tonalElevation = 2.dp,
         border = border
     ) {
         Column(
@@ -125,15 +129,8 @@ private fun ThemePreviewCard(themePreferences: ThemePreferences) {
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             Text(
-                text = "Daily Progress",
-                style = MaterialTheme.typography.headlineLargeEmphasized,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            Text(
                 text = "1,250 / 2,500 ml",
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                style = MaterialTheme.typography.headlineMedium
             )
 
             LinearWavyProgressIndicator(
@@ -148,12 +145,14 @@ private fun ThemePreviewCard(themePreferences: ThemePreferences) {
                 waveSpeed = WavyProgressIndicatorDefaults.LinearDeterminateWavelength
             )
 
-            Text(
-                text = "Halfway there! Keep drinking.",
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                PreviewStatChip(label = "Entries", value = "5")
+                PreviewStatChip(label = "First", value = "08:30")
+                PreviewStatChip(label = "Latest", value = "14:45")
+            }
         }
     }
 }
@@ -334,6 +333,29 @@ private fun ThemeSection(
     }
 }
 
+@Composable
+private fun PreviewStatChip(
+    label: String,
+    value: String
+) {
+    Column(
+        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = value,
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+        )
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun ThemePreviewCardPreview() {
@@ -344,25 +366,33 @@ fun ThemePreviewCardPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun AppearanceScreenPreview() {
+fun AppearanceScreenWithAppBarPreview() {
     var previewPreferences by remember {
         mutableStateOf(ThemePreferences())
     }
+    val backStack = rememberNavBackStack(NavigationRoutes.SettingsAppearance)
 
     HydroTrackerTheme(themePreferences = previewPreferences) {
-        AppearanceScreen(
-            themePreferences = previewPreferences,
-            isDynamicColorAvailable = true,
-            onColorSourceChange = { source ->
-                previewPreferences = previewPreferences.copy(colorSource = source)
-            },
-            onDarkModeChange = { mode ->
-                previewPreferences = previewPreferences.copy(darkMode = mode)
-            },
-            onPureBlackChange = { enabled ->
-                previewPreferences = previewPreferences.copy(usePureBlack = enabled)
-            },
-            paddingValues = PaddingValues()
+        MainNavigationScaffold(
+            backStack = backStack,
+            currentKey = NavigationRoutes.SettingsAppearance,
+            snackbarHostState = remember { SnackbarHostState() },
+            content = { paddingValues ->
+                AppearanceScreen(
+                    themePreferences = previewPreferences,
+                    isDynamicColorAvailable = true,
+                    onColorSourceChange = { source ->
+                        previewPreferences = previewPreferences.copy(colorSource = source)
+                    },
+                    onDarkModeChange = { mode ->
+                        previewPreferences = previewPreferences.copy(darkMode = mode)
+                    },
+                    onPureBlackChange = { enabled ->
+                        previewPreferences = previewPreferences.copy(usePureBlack = enabled)
+                    },
+                    paddingValues = paddingValues
+                )
+            }
         )
     }
 }

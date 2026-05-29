@@ -138,8 +138,7 @@ fun MainNavigationScaffold(
                                     contentDescription = "Back"
                                 )
                             }
-                        },
-                        scrollBehavior = appearanceScrollBehavior
+                        }
                     )
                     else -> {}
                 }
