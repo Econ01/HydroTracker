@@ -14,12 +14,8 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -29,7 +25,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShortNavigationBar
@@ -307,31 +302,6 @@ enum class NavigationItem(
     )
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Preview
-@Composable
-fun MainNavigationScaffoldPreview() {
-    val backStack = rememberNavBackStack(NavigationRoutes.Home)
-    MainNavigationScaffold(
-        backStack = backStack,
-        currentKey = NavigationRoutes.Home,
-        snackbarHostState = remember { SnackbarHostState() },
-        content = { _ ->
-            Text(text = "Sample Content")
-        }
-    )
-}
-
-@Preview
-@Composable
-fun HydroNavigationBarPreview() {
-    HydroNavigationBar(
-        currentKey = NavigationRoutes.Home,
-        userProfileImagePath = null,
-        onTabSelected = {}
-    )
-}
-
 /**
  * Profile Icon that shows user's profile picture or default icon
  */
@@ -343,7 +313,7 @@ fun ProfileIcon(
 ) {
     val context = LocalContext.current
     var profileBitmap by remember(profileImagePath) { mutableStateOf<android.graphics.Bitmap?>(null) }
-    
+
     // Load the image when profileImagePath changes
     LaunchedEffect(profileImagePath) {
         profileBitmap = if (profileImagePath != null && File(profileImagePath).exists()) {
@@ -352,7 +322,7 @@ fun ProfileIcon(
             null
         }
     }
-    
+
     if (profileBitmap != null) {
         // Show profile picture
         Box(
@@ -384,4 +354,19 @@ fun ProfileIcon(
             modifier = modifier
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Preview
+@Composable
+fun MainNavigationScaffoldPreview() {
+    val backStack = rememberNavBackStack(NavigationRoutes.Home)
+    MainNavigationScaffold(
+        backStack = backStack,
+        currentKey = NavigationRoutes.Home,
+        snackbarHostState = remember { SnackbarHostState() },
+        content = { _ ->
+            Text(text = "Sample Content")
+        }
+    )
 }
