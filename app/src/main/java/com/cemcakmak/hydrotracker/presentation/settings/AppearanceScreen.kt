@@ -16,6 +16,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.animation.EnterExitState
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import android.content.Context
+import android.os.Build
+import android.view.RoundedCorner
+import android.view.WindowManager
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,6 +57,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -71,6 +81,23 @@ fun AppearanceScreen(
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val haptics = LocalHapticFeedback.current
+
+    val isPreview = LocalInspectionMode.current
+    val animatedContentScope = if (isPreview) null else LocalNavAnimatedContentScope.current
+    val isExiting = animatedContentScope?.transition?.targetState == EnterExitState.PostExit
+
+    val context = LocalContext.current
+    val density = LocalDensity.current
+    val deviceCornerRadius = remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            val insets = windowManager.currentWindowMetrics.windowInsets
+            val corner = insets.getRoundedCorner(RoundedCorner.POSITION_TOP_LEFT)
+            corner?.let { with(density) { it.radius.toDp() } }
+        } else null
+    } ?: 24.dp
+
+    val cornerRadius = if (isExiting) deviceCornerRadius else 0.dp
 
     // Scroll haptic logic
     var wasExpanded by remember { mutableStateOf(true) }
@@ -97,7 +124,8 @@ fun AppearanceScreen(
     Scaffold(
         modifier = Modifier
             .padding(paddingValues)
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .clip(RoundedCornerShape(cornerRadius)),
         topBar = {
             LargeFlexibleTopAppBar(
                 title = { Text("Appearance") },

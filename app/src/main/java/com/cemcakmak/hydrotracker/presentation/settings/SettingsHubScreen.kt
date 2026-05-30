@@ -8,6 +8,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.animation.EnterExitState
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.draw.blur
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.ListItem
@@ -26,6 +31,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -41,12 +47,27 @@ import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsHubScreen(
+    wasPop: Boolean = false,
     developerOptionsEnabled: Boolean = false,
     onNavigateTo: (NavigationRoutes) -> Unit = {}
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
     val haptics = LocalHapticFeedback.current
+
+    val isPreview = LocalInspectionMode.current
+    val shouldBlur = !isPreview && wasPop
+    val blur by if (shouldBlur) {
+        val animatedContentScope = LocalNavAnimatedContentScope.current
+        animatedContentScope.transition.animateDp(
+            transitionSpec = { tween(400) },
+            label = "enterBlur"
+        ) { state ->
+            if (state == EnterExitState.PreEnter) 8.dp else 0.dp
+        }
+    } else {
+        remember { mutableStateOf(0.dp) }
+    }
 
     // Scroll haptic logic
     var settingsWasExpanded by remember { mutableStateOf(true) }
@@ -72,7 +93,8 @@ fun SettingsHubScreen(
 
     Scaffold(
         modifier = Modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .blur(blur),
         topBar = {
             LargeFlexibleTopAppBar(
                 title = { Text("Settings") },

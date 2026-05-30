@@ -81,7 +81,8 @@ fun MainNavigationScaffold(
     fabExpanded: Boolean = true,
     onNavigateToSettings: () -> Unit = {},
     onAddCustomClick: () -> Unit = {},
-    content: @Composable (PaddingValues) -> Unit
+    onTabSwitch: () -> Unit = {},
+    content: @Composable (PaddingValues) -> Unit,
 ) {
     val shouldShowBottomBar = currentKey in setOf(
         NavigationRoutes.Home,
@@ -129,6 +130,7 @@ fun MainNavigationScaffold(
                 HydroNavigationBar(
                     currentKey = currentKey,
                     userProfileImagePath = userProfileImagePath,
+                    onTabSwitch = onTabSwitch,
                     onTabSelected = { key ->
                         backStack.apply {
                             clear()
@@ -197,7 +199,8 @@ private fun ProfileTopAppBar() {
 private fun HydroNavigationBar(
     currentKey: NavigationRoutes,
     userProfileImagePath: String? = null,
-    onTabSelected: (NavigationRoutes) -> Unit = {}
+    onTabSelected: (NavigationRoutes) -> Unit = {},
+    onTabSwitch: () -> Unit = {}
 ) {
     ShortNavigationBar(
         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
@@ -246,6 +249,7 @@ private fun HydroNavigationBar(
                 selected = isSelected,
                 onClick = {
                     if (!isSelected) {
+                        onTabSwitch()
                         onTabSelected(item.key)
                     }
                 },

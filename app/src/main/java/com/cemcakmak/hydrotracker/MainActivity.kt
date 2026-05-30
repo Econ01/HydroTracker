@@ -183,6 +183,7 @@ fun HydroTrackerApp(
     val activeBeverageTypes = remember(beveragePreferences) { beveragePreferences.toDisplayList() }
     var isLoading by remember { mutableStateOf(true) }
     val context = LocalContext.current
+    var wasPop by remember { mutableStateOf(false) }
 
     LaunchedEffect(isOnboardingCompleted, userProfile) {
         isLoading = false
@@ -217,9 +218,11 @@ fun HydroTrackerApp(
                 snackbarHostState = snackbarHostState,
                 fabExpanded = homeFabExpanded,
                 onNavigateToSettings = { backStack.add(NavigationRoutes.SettingsOld) },
-                onAddCustomClick = { homeShowCustomDialog = true }
+                onAddCustomClick = { homeShowCustomDialog = true },
+                onTabSwitch = { wasPop = false }
             ) { paddingValues ->
                 val popBackStack = {
+                    wasPop = true
                     if (backStack.size > 1) backStack.removeLastOrNull()
                 }
 
@@ -392,8 +395,12 @@ fun HydroTrackerApp(
 
                         entry<NavigationRoutes.Settings> {
                             SettingsHubScreen(
+                                wasPop = wasPop,
                                 developerOptionsEnabled = BuildConfig.DEBUG,
-                                onNavigateTo = { key -> backStack.add(key) }
+                                onNavigateTo = { key ->
+                                    wasPop = true
+                                    backStack.add(key)
+                                }
                             )
                         }
 
