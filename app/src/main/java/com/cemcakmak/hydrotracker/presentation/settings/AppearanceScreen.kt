@@ -20,29 +20,33 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.WavyProgressIndicatorDefaults
-import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import com.cemcakmak.hydrotracker.presentation.common.MainNavigationScaffold
-import com.cemcakmak.hydrotracker.presentation.common.NavigationRoutes
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -62,25 +66,84 @@ fun AppearanceScreen(
     onColorSourceChange: (ColorSource) -> Unit = {},
     onDarkModeChange: (DarkModePreference) -> Unit = {},
     onPureBlackChange: (Boolean) -> Unit = {},
+    onNavigateBack: () -> Unit = {},
     paddingValues: PaddingValues = PaddingValues()
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
-    ) {
-        ThemePreviewCard(themePreferences = themePreferences)
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val haptics = LocalHapticFeedback.current
 
-        ThemeSection(
-            themePreferences = themePreferences,
-            onColorSourceChange = onColorSourceChange,
-            onDarkModeChange = onDarkModeChange,
-            onPureBlackChange = onPureBlackChange,
-            isDynamicColorAvailable = isDynamicColorAvailable
-        )
+    // Scroll haptic logic
+    var wasExpanded by remember { mutableStateOf(true) }
+    var wasCollapsed by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(scrollBehavior.state) {
+        snapshotFlow { scrollBehavior.state.collapsedFraction }
+            .collect { fraction ->
+                val isExpanded = fraction == 0f
+                val isCollapsed = fraction == 1f
+
+                if (isExpanded && !wasExpanded) {
+                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                }
+                if (isCollapsed && !wasCollapsed) {
+                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                }
+
+                wasExpanded = isExpanded
+                wasCollapsed = isCollapsed
+            }
+    }
+
+    Scaffold(
+        modifier = Modifier
+            .padding(paddingValues)
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            LargeFlexibleTopAppBar(
+                title = { Text("Appearance") },
+                navigationIcon = {
+                    val collapsedFraction = scrollBehavior.state.collapsedFraction
+                    val buttonWidth = (40 - collapsedFraction * 8).dp
+                    FilledIconButton(
+                        onClick = {
+                            onNavigateBack()
+                            haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                        },
+                        shapes = IconButtonDefaults.shapes(),
+                        colors = IconButtonDefaults.filledIconButtonColors(),
+                        modifier = Modifier.size(width = buttonWidth, height = 40.dp)
+                    ) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.arrow_back_filled),
+                            contentDescription = "Back"
+                        )
+                    }
+                },
+                scrollBehavior = scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface
+                )
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            ThemePreviewCard(themePreferences = themePreferences)
+
+            ThemeSection(
+                themePreferences = themePreferences,
+                onColorSourceChange = onColorSourceChange,
+                onDarkModeChange = onDarkModeChange,
+                onPureBlackChange = onPureBlackChange,
+                isDynamicColorAvailable = isDynamicColorAvailable
+            )
+        }
     }
 }
 
@@ -383,28 +446,19 @@ fun AppearanceScreenWithAppBarPreview() {
     var previewPreferences by remember {
         mutableStateOf(ThemePreferences())
     }
-    val backStack = rememberNavBackStack(NavigationRoutes.SettingsAppearance)
 
     HydroTrackerTheme(themePreferences = previewPreferences) {
-        MainNavigationScaffold(
-            backStack = backStack,
-            currentKey = NavigationRoutes.SettingsAppearance,
-            snackbarHostState = remember { SnackbarHostState() },
-            content = { paddingValues ->
-                AppearanceScreen(
-                    themePreferences = previewPreferences,
-                    isDynamicColorAvailable = true,
-                    onColorSourceChange = { source ->
-                        previewPreferences = previewPreferences.copy(colorSource = source)
-                    },
-                    onDarkModeChange = { mode ->
-                        previewPreferences = previewPreferences.copy(darkMode = mode)
-                    },
-                    onPureBlackChange = { enabled ->
-                        previewPreferences = previewPreferences.copy(usePureBlack = enabled)
-                    },
-                    paddingValues = paddingValues
-                )
+        AppearanceScreen(
+            themePreferences = previewPreferences,
+            isDynamicColorAvailable = true,
+            onColorSourceChange = { source ->
+                previewPreferences = previewPreferences.copy(colorSource = source)
+            },
+            onDarkModeChange = { mode ->
+                previewPreferences = previewPreferences.copy(darkMode = mode)
+            },
+            onPureBlackChange = { enabled ->
+                previewPreferences = previewPreferences.copy(usePureBlack = enabled)
             }
         )
     }

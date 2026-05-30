@@ -9,12 +9,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.animation.ContentTransform
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.*
@@ -25,6 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -32,12 +31,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import androidx.navigationevent.NavigationEvent
 import com.cemcakmak.hydrotracker.data.repository.*
 import com.cemcakmak.hydrotracker.data.database.DatabaseInitializer
 import com.cemcakmak.hydrotracker.data.database.DatabaseMigrationHelper
 import kotlinx.coroutines.launch
 import androidx.lifecycle.lifecycleScope
+import androidx.navigationevent.NavigationEvent
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
 import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
 import com.cemcakmak.hydrotracker.presentation.common.*
@@ -56,11 +55,7 @@ import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.health.HealthConnectManager
 
 // Navigation animation tuning
-private const val PUSH_DURATION = 300
-private const val POP_DURATION = 300
-private const val PB_OUTGOING_SCALE = 0.85f
-private const val PB_OUTGOING_SLIDE_FRACTION = 0.15f
-private const val PB_INCOMING_INITIAL_SCALE = 0.95f
+private const val TAB_SWITCH_DURATION = 400
 
 private val TOP_LEVEL_TAB_KEYS: Set<NavigationRoutes> = setOf(
     NavigationRoutes.Home,
@@ -232,43 +227,61 @@ fun HydroTrackerApp(
                     backStack = backStack,
                     onBack = popBackStack,
                     transitionSpec = {
+                        // We have to get explicitly string. Nav3 converts NavigationRoutes data objects into
+                        // plain text strings when managing the backstack. Therefore, we have to compare str to str
+                        // otherwise isTabSwitch logic will return null
+                        val rawInit = initialState.entries.firstOrNull()?.contentKey?.toString()
+                        val rawTarget = targetState.entries.firstOrNull()?.contentKey?.toString()
+
+                        // Reverse map the strings back to actual NavigationRoutes objects
+                        val initialRoute = TOP_LEVEL_TAB_KEYS.find { it.toString() == rawInit }
+                        val targetRoute = TOP_LEVEL_TAB_KEYS.find { it.toString() == rawTarget }
+
+                        // If both routes were successfully found in TOP_LEVEL_TAB_KEYS, it is a valid tab switch
                         val isTabSwitch = initialState.entries.size == 1 && targetState.entries.size == 1 &&
-                            initialState.entries.first().contentKey in TOP_LEVEL_TAB_KEYS &&
-                            targetState.entries.first().contentKey in TOP_LEVEL_TAB_KEYS
+                                initialRoute != null && targetRoute != null
 
                         if (isTabSwitch) {
+                            // Determine tab orders for the target and destionation tabs
+                            val fromIndex = NavigationItem.entries.indexOfFirst { it.key == initialRoute }
+                            val toIndex = NavigationItem.entries.indexOfFirst { it.key == targetRoute }
+                            val goingForward = toIndex > fromIndex
+
                             ContentTransform(
-                                targetContentEnter = EnterTransition.None,
-                                initialContentExit = ExitTransition.None,
+                                targetContentEnter = slideInHorizontally(tween(TAB_SWITCH_DURATION)) {
+                                    if (goingForward) it else -it
+                                } + fadeIn(),
+                                initialContentExit = slideOutHorizontally(tween(TAB_SWITCH_DURATION)) {
+                                    if (goingForward) -it else it
+                                } + fadeOut(),
                             )
                         } else {
                             ContentTransform(
-                                targetContentEnter = fadeIn(tween(PUSH_DURATION)) +
-                                    slideInHorizontally(tween(PUSH_DURATION)) { it / 4 },
-                                initialContentExit = fadeOut(tween(PUSH_DURATION)) +
-                                    slideOutHorizontally(tween(PUSH_DURATION)) { -it / 4 },
+                                targetContentEnter = slideInHorizontally(tween(TAB_SWITCH_DURATION)) { it } + fadeIn(),
+                                initialContentExit = slideOutHorizontally(tween(TAB_SWITCH_DURATION)) { -it } + fadeOut(),
                             )
                         }
                     },
                     popTransitionSpec = {
                         ContentTransform(
-                            targetContentEnter = fadeIn(tween(POP_DURATION)) +
-                                scaleIn(tween(POP_DURATION), initialScale = 0.95f),
-                            initialContentExit = fadeOut(tween(POP_DURATION)) +
-                                scaleOut(tween(POP_DURATION), targetScale = 0.90f),
+                            targetContentEnter = fadeIn(tween(TAB_SWITCH_DURATION)) +
+                                scaleIn(tween(TAB_SWITCH_DURATION), initialScale = 0.95f),
+                            initialContentExit = fadeOut(tween(TAB_SWITCH_DURATION)) +
+                                scaleOut(tween(TAB_SWITCH_DURATION), targetScale = 0.90f),
                         )
                     },
                     predictivePopTransitionSpec = { swipeEdge ->
                         val slideDirection = if (swipeEdge == NavigationEvent.EDGE_LEFT) 1 else -1
+
                         ContentTransform(
-                            targetContentEnter = fadeIn(tween(POP_DURATION)) +
-                                scaleIn(tween(POP_DURATION), initialScale = PB_INCOMING_INITIAL_SCALE),
+                            targetContentEnter = scaleIn(tween(400), initialScale = 0.8f),
                             initialContentExit = scaleOut(
-                                tween(POP_DURATION),
-                                targetScale = PB_OUTGOING_SCALE,
-                            ) + slideOutHorizontally(tween(POP_DURATION)) { width ->
-                                (slideDirection * width * PB_OUTGOING_SLIDE_FRACTION).toInt()
-                            },
+                                targetScale = 0.8f,
+                                transformOrigin = TransformOrigin(
+                                    pivotFractionX = if (slideDirection == 1) 0f else 1f,
+                                    pivotFractionY = 0.5f
+                                )
+                            ) + slideOutHorizontally(animationSpec = tween(400)) { it * slideDirection }
                         )
                     },
                     entryProvider = entryProvider {
@@ -380,8 +393,7 @@ fun HydroTrackerApp(
                         entry<NavigationRoutes.Settings> {
                             SettingsHubScreen(
                                 developerOptionsEnabled = BuildConfig.DEBUG,
-                                onNavigateTo = { key -> backStack.add(key) },
-                                paddingValues = paddingValues
+                                onNavigateTo = { key -> backStack.add(key) }
                             )
                         }
 
@@ -392,7 +404,7 @@ fun HydroTrackerApp(
                                 onColorSourceChange = themeViewModel::setColorSource,
                                 onDarkModeChange = themeViewModel::updateDarkModePreference,
                                 onPureBlackChange = themeViewModel::updatePureBlackPreference,
-                                paddingValues = paddingValues
+                                onNavigateBack = popBackStack
                             )
                         }
                         entry<NavigationRoutes.SettingsDisplay> {

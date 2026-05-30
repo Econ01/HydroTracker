@@ -24,10 +24,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShortNavigationBar
@@ -69,7 +66,6 @@ import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.presentation.home.HomeTopAppBar
-import com.cemcakmak.hydrotracker.presentation.settings.SettingsTopAppBar
 import com.cemcakmak.hydrotracker.utils.ImageUtils
 import java.io.File
 
@@ -96,13 +92,9 @@ fun MainNavigationScaffold(
 
     // Scroll behaviors remembered per route so collapsed state survives tab switches
     val homeScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-    val settingsScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
-    val appearanceScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
     val nestedScrollModifier = when (currentKey) {
         NavigationRoutes.Home -> Modifier.nestedScroll(homeScrollBehavior.nestedScrollConnection)
-        NavigationRoutes.Settings -> Modifier.nestedScroll(settingsScrollBehavior.nestedScrollConnection)
-        NavigationRoutes.SettingsAppearance -> Modifier.nestedScroll(appearanceScrollBehavior.nestedScrollConnection)
         else -> Modifier
     }
 
@@ -114,8 +106,8 @@ fun MainNavigationScaffold(
             AnimatedContent(
                 targetState = currentKey,
                 transitionSpec = {
-                    fadeIn(animationSpec = tween(200)) togetherWith
-                    fadeOut(animationSpec = tween(200))
+                    fadeIn(animationSpec = tween(400)) togetherWith
+                    fadeOut(animationSpec = tween(400))
                 },
                 label = "top_bar_crossfade"
             ) { route ->
@@ -128,29 +120,6 @@ fun MainNavigationScaffold(
                     )
                     NavigationRoutes.History -> HistoryTopAppBar()
                     NavigationRoutes.Profile -> ProfileTopAppBar()
-                    NavigationRoutes.Settings -> SettingsTopAppBar(scrollBehavior = settingsScrollBehavior)
-                    NavigationRoutes.SettingsAppearance -> LargeFlexibleTopAppBar(
-                        title = { Text("Appearance") },
-                        navigationIcon = {
-                            val collapsedFraction = appearanceScrollBehavior.state.collapsedFraction
-                            val buttonWidth = (40 - collapsedFraction * 8).dp
-                            FilledIconButton(
-                                onClick = { backStack.removeLastOrNull(); haptics.performHapticFeedback(HapticFeedbackType.ContextClick) },
-                                shapes = IconButtonDefaults.shapes(),
-                                colors = IconButtonDefaults.filledIconButtonColors(),
-                                modifier = Modifier.size(width = buttonWidth, height = 40.dp)
-                            ) {
-                                Icon(
-                                    imageVector = ImageVector.vectorResource(R.drawable.arrow_back_filled),
-                                    contentDescription = "Back"
-                                )
-                            }
-                        },
-                        scrollBehavior = appearanceScrollBehavior,
-                        colors = TopAppBarDefaults.topAppBarColors(
-                            scrolledContainerColor = MaterialTheme.colorScheme.surface
-                        )
-                    )
                     else -> {}
                 }
             }
@@ -219,12 +188,7 @@ private fun HistoryTopAppBar() {
 @Composable
 private fun ProfileTopAppBar() {
     TopAppBar(
-        title = {
-            Text(
-                text = "Profile",
-                fontWeight = FontWeight.Bold
-            )
-        }
+        title = { Text("Profile") }
     )
 }
 

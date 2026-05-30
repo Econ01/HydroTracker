@@ -1,12 +1,7 @@
 package com.cemcakmak.hydrotracker.presentation.settings
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -14,21 +9,26 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.vectorResource
 
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,32 +37,58 @@ import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.presentation.common.NavigationRoutes
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsHubScreen(
     developerOptionsEnabled: Boolean = false,
-    onNavigateTo: (NavigationRoutes) -> Unit = {},
-    paddingValues: PaddingValues
+    onNavigateTo: (NavigationRoutes) -> Unit = {}
 ) {
-    var isVisible by remember { mutableStateOf(false) }
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
-    LaunchedEffect(Unit) {
-        isVisible = true
+    val haptics = LocalHapticFeedback.current
+
+    // Scroll haptic logic
+    var settingsWasExpanded by remember { mutableStateOf(true) }
+    var settingsWasCollapsed by remember { mutableStateOf(false) }
+
+    LaunchedEffect(scrollBehavior.state) {
+        snapshotFlow { scrollBehavior.state.collapsedFraction }
+            .collect { fraction ->
+                val isExpanded = fraction == 0f
+                val isCollapsed = fraction == 1f
+
+                if (isExpanded && !settingsWasExpanded) {
+                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                }
+                if (isCollapsed && !settingsWasCollapsed) {
+                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                }
+
+                settingsWasExpanded = isExpanded
+                settingsWasCollapsed = isCollapsed
+            }
     }
 
-    Column(
+    Scaffold(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)
-            .padding(top = 16.dp)
-            .padding(horizontal = 16.dp)
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            LargeFlexibleTopAppBar(
+                title = { Text("Settings") },
+                scrollBehavior = scrollBehavior
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(top = 16.dp)
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
             val categories = buildList {
                 add(
                     SettingsCategory(
@@ -137,47 +163,22 @@ fun SettingsHubScreen(
                     SettingsCategoryCard(
                         index = index,
                         category = category,
-                        isVisible = isVisible,
                         totalSize = categories.size,
                         onNavigateTo = onNavigateTo
                     )
                 }
             }
         }
+    }
 }
 
 @Composable
 private fun SettingsCategoryCard(
     index: Int,
     category: SettingsCategory,
-    isVisible: Boolean,
     totalSize: Int,
     onNavigateTo: (NavigationRoutes) -> Unit
 ) {
-    val offsetY = remember { Animatable(150f) }
-    val alpha = remember { Animatable(0f) }
-
-    LaunchedEffect(isVisible) {
-        if (isVisible) {
-            delay((index * 80).milliseconds)
-            launch {
-                offsetY.animateTo(
-                    targetValue = 0f,
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessLow
-                    )
-                )
-            }
-            launch {
-                alpha.animateTo(
-                    targetValue = 1f,
-                    animationSpec = tween(300)
-                )
-            }
-        }
-    }
-
     val shape = getShapeForIndex(
         index = index,
         size = totalSize,
@@ -191,11 +192,7 @@ private fun SettingsCategoryCard(
         shape = shape,
         tonalElevation = 2.dp,
         modifier = Modifier
-            .padding(bottom = 4.dp)
-            .graphicsLayer {
-                translationY = offsetY.value
-                this.alpha = alpha.value
-            },
+            .padding(bottom = 4.dp),
         onClick = {
             haptics.performHapticFeedback(HapticFeedbackType.LongPress)
             onNavigateTo(category.route)
@@ -261,8 +258,7 @@ fun SettingsHubInteractivePreview() {
         if (selectedRoute == null) {
             SettingsHubScreen(
                 developerOptionsEnabled = true,
-                onNavigateTo = { route -> selectedRoute = route },
-                paddingValues = PaddingValues()
+                onNavigateTo = { route -> selectedRoute = route }
             )
         } else {
             PlaceholderScreen(

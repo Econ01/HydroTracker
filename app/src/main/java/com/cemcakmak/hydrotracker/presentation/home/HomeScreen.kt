@@ -242,13 +242,6 @@ fun HomeScreen(
         }
     }
 
-    // Animation states
-    var isVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        isVisible = true
-    }
-
     // Animate the progress value
     val animatedProgress by animateFloatAsState(
         targetValue = todayProgress.progress,
@@ -286,83 +279,72 @@ fun HomeScreen(
             ) {
 
             // Daily Progress Section
-            AnimatedVisibility(
-                visible = isVisible,
-                enter = slideInVertically(
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessMedium
-                    ),
-                    initialOffsetY = { it / 3 }
-                ) + fadeIn(animationSpec = tween(600, delayMillis = 200))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
             ) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    ),
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(20.dp)
-                    ) {
-                        Text(
-                            text = "Daily Progress",
-                            style = MaterialTheme.typography.headlineLargeEmphasized,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                    Text(
+                        text = "Daily Progress",
+                        style = MaterialTheme.typography.headlineLargeEmphasized,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
 
-                        // Progress amount display
-                        Text(
-                            text = "${todayProgress.getFormattedCurrent()} / ${todayProgress.getFormattedGoal()}",
-                            style = MaterialTheme.typography.headlineMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                    // Progress amount display
+                    Text(
+                        text = "${todayProgress.getFormattedCurrent()} / ${todayProgress.getFormattedGoal()}",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
 
-                        // Wavy Progress Indicator
-                        LinearWavyProgressIndicator(
-                            progress = { animatedProgress },
+                    // Wavy Progress Indicator
+                    LinearWavyProgressIndicator(
+                        progress = { animatedProgress },
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                        stroke = WavyProgressIndicatorDefaults.linearIndicatorStroke,
+                        trackStroke = WavyProgressIndicatorDefaults.linearTrackStroke,
+                        amplitude = WavyProgressIndicatorDefaults.indicatorAmplitude,
+                        wavelength = WavyProgressIndicatorDefaults.LinearDeterminateWavelength,
+                        waveSpeed = WavyProgressIndicatorDefaults.LinearDeterminateWavelength
+                    )
+
+                    // Motivational message
+                    Text(
+                        text = getMotivationalMessage(todayProgress.progress, userProfile, todayProgress.isGoalAchieved),
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    // Additional stats row
+                    if (todayStatistics.entryCount > 0) {
+                        Row(
                             modifier = Modifier.fillMaxWidth(),
-                            color = MaterialTheme.colorScheme.primary,
-                            trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-                            stroke = WavyProgressIndicatorDefaults.linearIndicatorStroke,
-                            trackStroke = WavyProgressIndicatorDefaults.linearTrackStroke,
-                            amplitude = WavyProgressIndicatorDefaults.indicatorAmplitude,
-                            wavelength = WavyProgressIndicatorDefaults.LinearDeterminateWavelength,
-                            waveSpeed = WavyProgressIndicatorDefaults.LinearDeterminateWavelength
-                        )
-
-                        // Motivational message
-                        Text(
-                            text = getMotivationalMessage(todayProgress.progress, userProfile, todayProgress.isGoalAchieved),
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-
-                        // Additional stats row
-                        if (todayStatistics.entryCount > 0) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly
-                            ) {
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            StatChip(
+                                label = "Entries",
+                                value = "${todayStatistics.entryCount}"
+                            )
+                            if (todayStatistics.firstIntakeTime != null) {
                                 StatChip(
-                                    label = "Entries",
-                                    value = "${todayStatistics.entryCount}"
+                                    label = "First",
+                                    value = todayStatistics.firstIntakeTime!!
                                 )
-                                if (todayStatistics.firstIntakeTime != null) {
-                                    StatChip(
-                                        label = "First",
-                                        value = todayStatistics.firstIntakeTime!!
-                                    )
-                                }
-                                if (todayStatistics.lastIntakeTime != null && todayStatistics.entryCount > 1) {
-                                    StatChip(
-                                        label = "Latest",
-                                        value = todayStatistics.lastIntakeTime!!
-                                    )
-                                }
+                            }
+                            if (todayStatistics.lastIntakeTime != null && todayStatistics.entryCount > 1) {
+                                StatChip(
+                                    label = "Latest",
+                                    value = todayStatistics.lastIntakeTime!!
+                                )
                             }
                         }
                     }
@@ -378,127 +360,105 @@ fun HomeScreen(
                 ),
                 shape = MaterialTheme.shapes.extraLargeIncreased
             ){
-                AnimatedVisibility(
-                    visible = isVisible,
-                    enter = slideInVertically(
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessMedium
-                        ),
-                        initialOffsetY = { it / 2 }
-                    ) + fadeIn(animationSpec = tween(600, delayMillis = 400))
-                ) {
-                    // +1 for the "Add" button at the end
-                    val carouselItemCount = presets.size + 1
-                    val carouselState = rememberCarouselState { carouselItemCount }
+                // +1 for the "Add" button at the end
+                val carouselItemCount = presets.size + 1
+                val carouselState = rememberCarouselState { carouselItemCount }
 
-                    Column(
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, bottom = 12.dp)
+                        .padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = "Quick Select",
+                        style = MaterialTheme.typography.titleLargeEmphasized,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+
+                    HorizontalMultiBrowseCarousel(
+                        state = carouselState,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 16.dp, bottom = 12.dp)
-                            .padding(horizontal = 20.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Text(
-                            text = "Quick Select",
-                            style = MaterialTheme.typography.titleLargeEmphasized,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-
-                        HorizontalMultiBrowseCarousel(
-                            state = carouselState,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(135.dp),
-                            preferredItemWidth = 130.dp,
-                            itemSpacing = 8.dp,
-                        ) { index ->
-                            if (index < presets.size) {
-                                val preset = presets[index]
-                                CarouselWaterCard(
-                                    preset = preset,
-                                    onClick = {
-                                        addWaterIntake(preset.volume, preset.name)
-                                        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
-                                    },
-                                    onLongPress = {
-                                        presetToEdit = preset
-                                        showEditPresetSheet = true
-                                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    },
-                                    modifier = Modifier
-                                        .height(130.dp)
-                                        .maskClip(MaterialTheme.shapes.extraLarge)
-                                )
-                            } else {
-                                // Add button at the end
-                                AddContainerCard(
-                                    onClick = {
-                                        showAddPresetSheet = true
-                                        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
-                                    },
-                                    modifier = Modifier
-                                        .height(130.dp)
-                                        .maskClip(MaterialTheme.shapes.extraLarge)
-                                )
-                            }
+                            .height(135.dp),
+                        preferredItemWidth = 130.dp,
+                        itemSpacing = 8.dp,
+                    ) { index ->
+                        if (index < presets.size) {
+                            val preset = presets[index]
+                            CarouselWaterCard(
+                                preset = preset,
+                                onClick = {
+                                    addWaterIntake(preset.volume, preset.name)
+                                    haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                                },
+                                onLongPress = {
+                                    presetToEdit = preset
+                                    showEditPresetSheet = true
+                                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                },
+                                modifier = Modifier
+                                    .height(130.dp)
+                                    .maskClip(MaterialTheme.shapes.extraLarge)
+                            )
+                        } else {
+                            // Add button at the end
+                            AddContainerCard(
+                                onClick = {
+                                    showAddPresetSheet = true
+                                    haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                                },
+                                modifier = Modifier
+                                    .height(130.dp)
+                                    .maskClip(MaterialTheme.shapes.extraLarge)
+                            )
                         }
-
-                        // Beverage Selection Section
-                        BeverageSelectionSection(
-                            selectedBeverageType = selectedBeverageType,
-                            onBeverageTypeChange = { beverageType ->
-                                selectedBeverageType = beverageType
-                                haptics.performHapticFeedback(HapticFeedbackType.Confirm)
-                            },
-                            beverageTypes = activeBeverageTypes,
-                            modifier = Modifier.fillMaxWidth()
-                        )
                     }
+
+                    // Beverage Selection Section
+                    BeverageSelectionSection(
+                        selectedBeverageType = selectedBeverageType,
+                        onBeverageTypeChange = { beverageType ->
+                            selectedBeverageType = beverageType
+                            haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                        },
+                        beverageTypes = activeBeverageTypes,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
 
                 // Recent Entries Section
                 if (todayEntries.isNotEmpty()) {
-                    AnimatedVisibility(
-                        visible = isVisible,
-                        enter = slideInVertically(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessMedium
-                            ),
-                            initialOffsetY = { it / 2 }
-                        ) + fadeIn(animationSpec = tween(600, delayMillis = 500))
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer
+                        )
                     ) {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer
-                            )
+                        Column(
+                            modifier = Modifier.padding(20.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            Column(
-                                modifier = Modifier.padding(20.dp),
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                Text(
-                                    text = "Recent Entries",
-                                    style = MaterialTheme.typography.titleLargeEmphasized,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                )
+                            Text(
+                                text = "Recent Entries",
+                                style = MaterialTheme.typography.titleLargeEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
 
-                                todayEntries.forEach { entry ->
-                                    key(entry.id) {
-                                        RecentEntryItem(
-                                            entry = entry,
-                                            onEdit = { entry ->
-                                                entryToEdit = entry
-                                                showEditDialog = true
-                                            },
-                                            onDelete = { entryToDelete ->
-                                                deleteWaterIntake(entryToDelete)
-                                            }
-                                        )
-                                        HorizontalDivider()
-                                    }
+                            todayEntries.forEach { entry ->
+                                key(entry.id) {
+                                    RecentEntryItem(
+                                        entry = entry,
+                                        onEdit = { entry ->
+                                            entryToEdit = entry
+                                            showEditDialog = true
+                                        },
+                                        onDelete = { entryToDelete ->
+                                            deleteWaterIntake(entryToDelete)
+                                        }
+                                    )
+                                    HorizontalDivider()
                                 }
                             }
                         }

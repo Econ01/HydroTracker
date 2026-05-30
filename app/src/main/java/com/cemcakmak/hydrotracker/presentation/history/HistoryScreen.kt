@@ -63,13 +63,6 @@ fun HistoryScreen(
 
 
 
-    // Animation states
-    var isVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        isVisible = true
-    }
-
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -78,92 +71,59 @@ fun HistoryScreen(
     ) {
             // Period Selector
             item {
-                AnimatedVisibility(
-                    visible = isVisible,
-                    enter = slideInVertically(
-                        initialOffsetY = { -it / 3 },
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessMedium
-                        )
-                    ) + fadeIn(animationSpec = tween(500))
-                ) {
-                    PeriodSelector(
-                        selectedPeriod = selectedPeriod,
-                        onPeriodSelected = { 
-                            selectedPeriod = it
-                            // Reset navigation when switching between periods
-                            currentWeekOffset = 0
-                            currentMonthOffset = 0
-                            currentYearOffset = 0
-                        },
-                        currentWeekOffset = currentWeekOffset,
-                        currentMonthOffset = currentMonthOffset,
-                        currentYearOffset = currentYearOffset,
-                        onWeekOffsetChanged = { currentWeekOffset = it },
-                        onMonthOffsetChanged = { currentMonthOffset = it },
-                        onYearOffsetChanged = { currentYearOffset = it },
-                        weekStartDay = themePreferences.weekStartDay
-                    )
-                }
+                PeriodSelector(
+                    selectedPeriod = selectedPeriod,
+                    onPeriodSelected = { 
+                        selectedPeriod = it
+                        // Reset navigation when switching between periods
+                        currentWeekOffset = 0
+                        currentMonthOffset = 0
+                        currentYearOffset = 0
+                    },
+                    currentWeekOffset = currentWeekOffset,
+                    currentMonthOffset = currentMonthOffset,
+                    currentYearOffset = currentYearOffset,
+                    onWeekOffsetChanged = { currentWeekOffset = it },
+                    onMonthOffsetChanged = { currentMonthOffset = it },
+                    onYearOffsetChanged = { currentYearOffset = it },
+                    weekStartDay = themePreferences.weekStartDay
+                )
             }
 
             // Main Chart Section
             item {
-                AnimatedVisibility(
-                    visible = isVisible,
-                    enter = slideInVertically(
-                        initialOffsetY = { it / 3 },
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessLow
+                when (selectedPeriod) {
+                    TimePeriod.WEEKLY -> {
+                        WeeklyChartSection(
+                            selectedPeriod = selectedPeriod,
+                            weekOffset = currentWeekOffset,
+                            summaries = allSummaries,
+                            weekStartDay = themePreferences.weekStartDay
                         )
-                    ) + fadeIn(animationSpec = tween(700, delayMillis = 200))
-                ) {
-                    when (selectedPeriod) {
-                        TimePeriod.WEEKLY -> {
-                            WeeklyChartSection(
-                                selectedPeriod = selectedPeriod,
-                                weekOffset = currentWeekOffset,
-                                summaries = allSummaries,
-                                weekStartDay = themePreferences.weekStartDay
-                            )
-                        }
-                        TimePeriod.MONTHLY -> {
-                            MonthlyChartSection(
-                                summaries = allSummaries,
-                                selectedPeriod = selectedPeriod,
-                                monthOffset = currentMonthOffset,
-                                weekStartDay = themePreferences.weekStartDay
-                            )
-                        }
-                        TimePeriod.YEARLY -> {
-                            YearlyChartSection(
-                                summaries = allSummaries,
-                                selectedPeriod = selectedPeriod,
-                                yearOffset = currentYearOffset
-                            )
-                        }
+                    }
+                    TimePeriod.MONTHLY -> {
+                        MonthlyChartSection(
+                            summaries = allSummaries,
+                            selectedPeriod = selectedPeriod,
+                            monthOffset = currentMonthOffset,
+                            weekStartDay = themePreferences.weekStartDay
+                        )
+                    }
+                    TimePeriod.YEARLY -> {
+                        YearlyChartSection(
+                            summaries = allSummaries,
+                            selectedPeriod = selectedPeriod,
+                            yearOffset = currentYearOffset
+                        )
                     }
                 }
             }
 
             // Statistics Overview
             item {
-                AnimatedVisibility(
-                    visible = isVisible,
-                    enter = slideInVertically(
-                        initialOffsetY = { it / 4 },
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessMedium
-                        )
-                    ) + fadeIn(animationSpec = tween(600, delayMillis = 300))
-                ) {
-                    StatisticsGrid(
-                        summaries = allSummaries
-                    )
-                }
+                StatisticsGrid(
+                    summaries = allSummaries
+                )
             }
 
             item {
@@ -172,25 +132,14 @@ fun HistoryScreen(
 
             // Goal Achievement
             item {
-                AnimatedVisibility(
-                    visible = isVisible,
-                    enter = slideInVertically(
-                        initialOffsetY = { it / 4 },
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessMedium
-                        )
-                    ) + fadeIn(animationSpec = tween(600, delayMillis = 400))
-                ) {
-                    GoalAchievementSection(
-                        summaries = allSummaries,
-                        selectedPeriod = selectedPeriod,
-                        weekOffset = currentWeekOffset,
-                        monthOffset = currentMonthOffset,
-                        yearOffset = currentYearOffset,
-                        weekStartDay = themePreferences.weekStartDay
-                    )
-                }
+                GoalAchievementSection(
+                    summaries = allSummaries,
+                    selectedPeriod = selectedPeriod,
+                    weekOffset = currentWeekOffset,
+                    monthOffset = currentMonthOffset,
+                    yearOffset = currentYearOffset,
+                    weekStartDay = themePreferences.weekStartDay
+                )
             }
 
             // Bottom spacer for navigation bar

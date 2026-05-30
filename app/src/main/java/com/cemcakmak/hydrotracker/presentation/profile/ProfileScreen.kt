@@ -76,13 +76,6 @@ fun ProfileScreen(
     var showUsernameDialog by remember { mutableStateOf(false) }
     var showProfilePictureBottomSheet by remember { mutableStateOf(false) }
 
-    // Animation state
-    var isVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        isVisible = true
-    }
-
     fun updateUserProfile(updatedProfile: UserProfile) {
         coroutineScope.launch {
             // Check if notification-affecting fields changed
@@ -116,78 +109,34 @@ fun ProfileScreen(
     ) {
 
             // Profile Header Section
-            AnimatedVisibility(
-                visible = isVisible,
-                enter = slideInVertically(
-                    initialOffsetY = { -it / 3 },
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessMedium
-                    )
-                ) + fadeIn(animationSpec = tween(600))
-            ) {
-                ProfileHeaderCard(
-                    userProfile = userProfile,
-                    todayStatistics = todayStatistics,
-                    totalDaysTracked = last30DaysEntries.groupBy { it.date }.size,
-                    onEditProfilePicture = { showProfilePictureBottomSheet = true },
-                    onEditUsername = { showUsernameDialog = true }
-                )
-            }
+            ProfileHeaderCard(
+                userProfile = userProfile,
+                todayStatistics = todayStatistics,
+                totalDaysTracked = last30DaysEntries.groupBy { it.date }.size,
+                onEditProfilePicture = { showProfilePictureBottomSheet = true },
+                onEditUsername = { showUsernameDialog = true }
+            )
 
             // Profile Details Section
-            AnimatedVisibility(
-                visible = isVisible,
-                enter = slideInVertically(
-                    initialOffsetY = { it / 3 },
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessMedium
-                    )
-                ) + fadeIn(animationSpec = tween(600, delayMillis = 200))
-            ) {
-                ProfileDetailsCard(
-                    userProfile = userProfile,
-                    onEditGender = { showGenderBottomSheet = true },
-                    onEditAgeGroup = { showAgeGroupBottomSheet = true },
-                    onEditWeight = { showWeightBottomSheet = true }
-                )
-            }
+            ProfileDetailsCard(
+                userProfile = userProfile,
+                onEditGender = { showGenderBottomSheet = true },
+                onEditAgeGroup = { showAgeGroupBottomSheet = true },
+                onEditWeight = { showWeightBottomSheet = true }
+            )
 
             // Daily Goals Section
-            AnimatedVisibility(
-                visible = isVisible,
-                enter = slideInVertically(
-                    initialOffsetY = { it / 3 },
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessMedium
-                    )
-                ) + fadeIn(animationSpec = tween(600, delayMillis = 300))
-            ) {
-                DailyGoalsCard(
-                    userProfile = userProfile,
-                    onEditGoal = { showGoalBottomSheet = true },
-                    onEditActivity = { showActivityBottomSheet = true }
-                )
-            }
+            DailyGoalsCard(
+                userProfile = userProfile,
+                onEditGoal = { showGoalBottomSheet = true },
+                onEditActivity = { showActivityBottomSheet = true }
+            )
 
             // Active Schedule Section
-            AnimatedVisibility(
-                visible = isVisible,
-                enter = slideInVertically(
-                    initialOffsetY = { it / 3 },
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessMedium
-                    )
-                ) + fadeIn(animationSpec = tween(600, delayMillis = 400))
-            ) {
-                ActiveScheduleCard(
-                    userProfile = userProfile,
-                    onEditSchedule = { showScheduleBottomSheet = true }
-                )
-            }
+            ActiveScheduleCard(
+                userProfile = userProfile,
+                onEditSchedule = { showScheduleBottomSheet = true }
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
         }
