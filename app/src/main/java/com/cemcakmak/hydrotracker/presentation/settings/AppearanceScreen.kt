@@ -4,6 +4,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,16 +27,17 @@ import android.os.Build
 import android.view.RoundedCorner
 import android.view.WindowManager
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -44,6 +46,7 @@ import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.WavyProgressIndicatorDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,6 +57,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -106,7 +110,8 @@ fun AppearanceScreen(
     // Scroll haptic logic
     var wasExpanded by remember { mutableStateOf(true) }
     var wasCollapsed by remember { mutableStateOf(false) }
-    
+    var showFontSheet by remember { mutableStateOf(false) }
+
     LaunchedEffect(scrollBehavior.state) {
         snapshotFlow { scrollBehavior.state.collapsedFraction }
             .collect { fraction ->
@@ -168,19 +173,31 @@ fun AppearanceScreen(
         ) {
             ThemePreviewCard(themePreferences = themePreferences)
 
-            ThemeSection(
+            DarkModeSection(
+                darkMode = themePreferences.darkMode,
+                onDarkModeChange = onDarkModeChange
+            )
+
+            ColorSection(
                 themePreferences = themePreferences,
+                isDynamicColorAvailable = isDynamicColorAvailable,
                 onColorSourceChange = onColorSourceChange,
-                onDarkModeChange = onDarkModeChange,
-                onPureBlackChange = onPureBlackChange,
-                isDynamicColorAvailable = isDynamicColorAvailable
+                onPureBlackChange = onPureBlackChange
             )
 
             FontSection(
                 selectedFont = themePreferences.appFont,
-                onAppFontChange = onAppFontChange
+                onOpenFontSheet = { showFontSheet = true }
             )
         }
+    }
+
+    if (showFontSheet) {
+        FontBottomSheet(
+            selectedFont = themePreferences.appFont,
+            onAppFontChange = onAppFontChange,
+            onDismiss = { showFontSheet = false }
+        )
     }
 }
 
@@ -252,261 +269,378 @@ private fun ThemePreviewCard(themePreferences: ThemePreferences) {
     }
 }
 
+private fun getGroupShape(index: Int, size: Int): Shape {
+    val outer = 30.dp
+    val inner = 6.dp
+    return when {
+        size == 1 -> RoundedCornerShape(outer)
+        index == 0 -> RoundedCornerShape(
+            topStart = outer,
+            topEnd = outer,
+            bottomStart = inner,
+            bottomEnd = inner
+        )
+        index == size - 1 -> RoundedCornerShape(
+            topStart = inner,
+            topEnd = inner,
+            bottomStart = outer,
+            bottomEnd = outer
+        )
+        else -> RoundedCornerShape(inner)
+    }
+}
+
+@Composable
+private fun SettingsSectionHeader(title: String) {
+    Text(
+        modifier = Modifier.padding(start = 4.dp),
+        text = title,
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.SemiBold,
+        color = MaterialTheme.colorScheme.primary
+    )
+}
+
+@Composable
+private fun SettingsGroupCard(
+    index: Int,
+    size: Int,
+    onClick: (() -> Unit)? = null,
+    content: @Composable () -> Unit
+) {
+    val shape = getGroupShape(index, size)
+    val modifier = Modifier
+        .fillMaxWidth()
+        .padding(bottom = 2.dp)
+    if (onClick != null) {
+        Surface(
+            onClick = onClick,
+            shape = shape,
+            tonalElevation = 2.dp,
+            modifier = modifier
+        ) { content() }
+    } else {
+        Surface(
+            shape = shape,
+            tonalElevation = 2.dp,
+            modifier = modifier
+        ) { content() }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun ThemeSection(
-    themePreferences: ThemePreferences,
-    onColorSourceChange: (ColorSource) -> Unit,
-    onDarkModeChange: (DarkModePreference) -> Unit,
-    onPureBlackChange: (Boolean) -> Unit,
-    isDynamicColorAvailable: Boolean,
+private fun DarkModeSection(
+    darkMode: DarkModePreference,
+    onDarkModeChange: (DarkModePreference) -> Unit
 ) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(24.dp)
-    ) {
-        // Dark Mode Section
-        Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        SettingsSectionHeader("Theme")
+        val haptics = LocalHapticFeedback.current
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(
-                text = "Dark mode",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            DarkModePreference.entries.forEach { preference ->
+                val isSelected = darkMode == preference
 
-            val haptics = LocalHapticFeedback.current
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                DarkModePreference.entries.forEach { preference ->
-                    val isSelected = themePreferences.darkMode == preference
-
-                    ToggleButton(
-                        checked = isSelected,
-                        onCheckedChange = {
-                            onDarkModeChange(preference)
-                            haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Crossfade(
-                                targetState = isSelected,
-                                animationSpec = tween(300),
-                                label = "darkModeToggleIcon_${preference.name}"
-                            ) { selected ->
-                                Icon(
-                                    imageVector = when (preference) {
-                                        DarkModePreference.SYSTEM -> if (selected) ImageVector.vectorResource(R.drawable.settings_filled) else ImageVector.vectorResource(R.drawable.settings)
-                                        DarkModePreference.LIGHT -> if (selected) ImageVector.vectorResource(R.drawable.light_mode_filled) else ImageVector.vectorResource(R.drawable.light_mode)
-                                        DarkModePreference.DARK -> if (selected) ImageVector.vectorResource(R.drawable.dark_mode_filled) else ImageVector.vectorResource(R.drawable.dark_mode)
-                                    },
-                                    contentDescription = null,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
-                            Text(
-                                text = when (preference) {
-                                    DarkModePreference.SYSTEM -> "System"
-                                    DarkModePreference.LIGHT -> "Light"
-                                    DarkModePreference.DARK -> "Dark"
-                                },
-                                style = MaterialTheme.typography.labelLarge
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        // Color Section
-        Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text(
-                text = "Color",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            if (isDynamicColorAvailable) {
-                val haptics = LocalHapticFeedback.current
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Crossfade(
-                        targetState = themePreferences.colorSource == ColorSource.DYNAMIC_COLOR,
-                        animationSpec = tween(400),
-                        label = "paletteIcon"
-                    ) { isDynamic ->
-                        Icon(
-                            imageVector = if (isDynamic) ImageVector.vectorResource(R.drawable.palette_filled) else ImageVector.vectorResource(R.drawable.palette),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = "Dynamic Colors",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Text(
-                            text = "Colors from your wallpaper",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Switch(
-                        checked = themePreferences.colorSource == ColorSource.DYNAMIC_COLOR,
-                        onCheckedChange = { enabled ->
-                            haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
-                            onColorSourceChange(
-                                if (enabled) ColorSource.DYNAMIC_COLOR else ColorSource.HYDRO_THEME,
-                            )
-                        },
-                        thumbContent = if (themePreferences.colorSource == ColorSource.DYNAMIC_COLOR) {
-                            {
-                                Icon(
-                                    imageVector = Icons.Filled.Check,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(SwitchDefaults.IconSize),
-                                )
-                            }
-                        } else {
-                            null
-                        }
-                    )
-                }
-            }
-
-            val haptics = LocalHapticFeedback.current
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Crossfade(
-                    targetState = themePreferences.usePureBlack,
-                    animationSpec = tween(400),
-                    label = "darkModeIcon"
-                ) { isPureBlack ->
-                    Icon(
-                        imageVector = if (isPureBlack) ImageVector.vectorResource(R.drawable.dark_mode_filled) else ImageVector.vectorResource(R.drawable.dark_mode),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = "AMOLED Mode",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Text(
-                        text = "True black backgrounds in dark mode",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                Switch(
-                    checked = themePreferences.usePureBlack,
-                    onCheckedChange = { enabled ->
-                        onPureBlackChange(enabled)
+                ToggleButton(
+                    checked = isSelected,
+                    onCheckedChange = {
+                        onDarkModeChange(preference)
                         haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
                     },
-                    thumbContent = if (themePreferences.usePureBlack) {
-                        {
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Crossfade(
+                            targetState = isSelected,
+                            animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
+                            label = "darkModeToggleIcon_${preference.name}"
+                        ) { selected ->
                             Icon(
-                                imageVector = Icons.Filled.Check,
+                                imageVector = when (preference) {
+                                    DarkModePreference.SYSTEM -> if (selected) ImageVector.vectorResource(R.drawable.settings_filled) else ImageVector.vectorResource(R.drawable.settings)
+                                    DarkModePreference.LIGHT -> if (selected) ImageVector.vectorResource(R.drawable.light_mode_filled) else ImageVector.vectorResource(R.drawable.light_mode)
+                                    DarkModePreference.DARK -> if (selected) ImageVector.vectorResource(R.drawable.dark_mode_filled) else ImageVector.vectorResource(R.drawable.dark_mode)
+                                },
                                 contentDescription = null,
-                                modifier = Modifier.size(SwitchDefaults.IconSize),
+                                modifier = Modifier.size(18.dp)
                             )
                         }
-                    } else {
-                        null
+                        Text(
+                            text = when (preference) {
+                                DarkModePreference.SYSTEM -> "System"
+                                DarkModePreference.LIGHT -> "Light"
+                                DarkModePreference.DARK -> "Dark"
+                            },
+                            style = MaterialTheme.typography.labelLarge
+                        )
                     }
-                )
+                }
             }
         }
     }
 }
 
 @Composable
-private fun FontSection(
-    selectedFont: AppFont,
-    onAppFontChange: (AppFont) -> Unit
+private fun ColorSection(
+    themePreferences: ThemePreferences,
+    isDynamicColorAvailable: Boolean,
+    onColorSourceChange: (ColorSource) -> Unit,
+    onPureBlackChange: (Boolean) -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        SettingsSectionHeader("Color")
+        Column {
+            // Build the rows for this section; add another entry here to grow the list.
+            val rows = buildList<@Composable () -> Unit> {
+                if (isDynamicColorAvailable) {
+                    add {
+                        DynamicColorsRow(
+                            themePreferences = themePreferences,
+                            onColorSourceChange = onColorSourceChange
+                        )
+                    }
+                }
+                add {
+                    AmoledRow(
+                        themePreferences = themePreferences,
+                        onPureBlackChange = onPureBlackChange
+                    )
+                }
+            }
+            rows.forEachIndexed { index, row ->
+                SettingsGroupCard(index = index, size = rows.size) {
+                    row()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DynamicColorsRow(
+    themePreferences: ThemePreferences,
+    onColorSourceChange: (ColorSource) -> Unit
 ) {
     val haptics = LocalHapticFeedback.current
-    Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "Font",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
+        Crossfade(
+            targetState = themePreferences.colorSource == ColorSource.DYNAMIC_COLOR,
+            animationSpec = tween(400),
+            label = "paletteIcon"
+        ) { isDynamic ->
+            Icon(
+                imageVector = if (isDynamic) ImageVector.vectorResource(R.drawable.palette_filled) else ImageVector.vectorResource(R.drawable.palette),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp)
+            )
+        }
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.weight(1f)
         ) {
+            Text(
+                text = "Dynamic Colors",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "Colors from your wallpaper",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Switch(
+            checked = themePreferences.colorSource == ColorSource.DYNAMIC_COLOR,
+            onCheckedChange = { enabled ->
+                haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
+                onColorSourceChange(
+                    if (enabled) ColorSource.DYNAMIC_COLOR else ColorSource.HYDRO_THEME,
+                )
+            },
+            thumbContent = if (themePreferences.colorSource == ColorSource.DYNAMIC_COLOR) {
+                {
+                    Icon(
+                        imageVector = Icons.Filled.Check,
+                        contentDescription = null,
+                        modifier = Modifier.size(SwitchDefaults.IconSize),
+                    )
+                }
+            } else {
+                null
+            }
+        )
+    }
+}
+
+@Composable
+private fun AmoledRow(
+    themePreferences: ThemePreferences,
+    onPureBlackChange: (Boolean) -> Unit
+) {
+    val haptics = LocalHapticFeedback.current
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Crossfade(
+            targetState = themePreferences.usePureBlack,
+            animationSpec = tween(400),
+            label = "darkModeIcon"
+        ) { isPureBlack ->
+            Icon(
+                imageVector = if (isPureBlack) ImageVector.vectorResource(R.drawable.dark_mode_filled) else ImageVector.vectorResource(R.drawable.dark_mode),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = "AMOLED Mode",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "True black backgrounds in dark mode",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Switch(
+            checked = themePreferences.usePureBlack,
+            onCheckedChange = { enabled ->
+                onPureBlackChange(enabled)
+                haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
+            },
+            thumbContent = if (themePreferences.usePureBlack) {
+                {
+                    Icon(
+                        imageVector = Icons.Filled.Check,
+                        contentDescription = null,
+                        modifier = Modifier.size(SwitchDefaults.IconSize),
+                    )
+                }
+            } else {
+                null
+            }
+        )
+    }
+}
+
+@Composable
+private fun FontSection(
+    selectedFont: AppFont,
+    onOpenFontSheet: () -> Unit
+) {
+    val haptics = LocalHapticFeedback.current
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        SettingsSectionHeader("Font")
+        SettingsGroupCard(
+            index = 0,
+            size = 1,
+            onClick = {
+                haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                onOpenFontSheet()
+            }
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.font_filled),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Text(
+                    text = selectedFont.getDisplayName(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontFamily = fontFamilyFor(selectedFont),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FontBottomSheet(
+    selectedFont: AppFont,
+    onAppFontChange: (AppFont) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState()
+    val haptics = LocalHapticFeedback.current
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp)
+        ) {
+            Text(
+                text = "Font",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+            )
+            // Single-select list: each name in its own typeface, applied live, sheet stays open.
             AppFont.entries.forEach { font ->
                 val isSelected = font == selectedFont
-                Surface(
-                    onClick = {
-                        if (!isSelected) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
                             onAppFontChange(font)
                             haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
                         }
-                    },
-                    shape = RoundedCornerShape(16.dp),
-                    color = if (isSelected) {
-                        MaterialTheme.colorScheme.primaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.surface
-                    },
-                    tonalElevation = if (isSelected) 0.dp else 1.dp,
-                    modifier = Modifier.fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp, vertical = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = font.getDisplayName(),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = fontFamilyFor(font),
-                            color = if (isSelected) {
-                                MaterialTheme.colorScheme.onPrimaryContainer
-                            } else {
-                                MaterialTheme.colorScheme.onSurface
-                            },
-                            modifier = Modifier.weight(1f)
+                    Text(
+                        text = font.getDisplayName(),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontFamily = fontFamilyFor(font),
+                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.weight(1f)
+                    )
+                    if (isSelected) {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = "Selected",
+                            tint = MaterialTheme.colorScheme.primary
                         )
-                        if (isSelected) {
-                            Icon(
-                                imageVector = Icons.Filled.Check,
-                                contentDescription = "Selected",
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                        }
                     }
                 }
             }
