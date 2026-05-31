@@ -85,7 +85,7 @@ enum class AppFont {
     fun getDisplayName(): String {
         return when (this) {
             GOOGLE_SANS_FLEX -> "Google Sans Flex"
-            SYSTEM -> "System"
+            SYSTEM -> "System Default"
             OUTFIT -> "Outfit"
             DM_SANS -> "DM Sans"
             JETBRAINS_MONO -> "JetBrains Mono"

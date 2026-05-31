@@ -1,10 +1,11 @@
 package com.cemcakmak.hydrotracker.presentation.settings
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -66,7 +68,9 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.models.AppFont
 import com.cemcakmak.hydrotracker.data.models.ColorSource
@@ -269,25 +273,33 @@ private fun ThemePreviewCard(themePreferences: ThemePreferences) {
     }
 }
 
-private fun getGroupShape(index: Int, size: Int): Shape {
+private data class GroupCorners(
+    val topStart: Dp,
+    val topEnd: Dp,
+    val bottomStart: Dp,
+    val bottomEnd: Dp
+)
+
+/** Per-corner radii for a card at [index] within a grouped list of [size] items. */
+private fun groupCorners(index: Int, size: Int): GroupCorners {
     val outer = 30.dp
     val inner = 6.dp
     return when {
-        size == 1 -> RoundedCornerShape(outer)
-        index == 0 -> RoundedCornerShape(
-            topStart = outer,
-            topEnd = outer,
-            bottomStart = inner,
-            bottomEnd = inner
-        )
-        index == size - 1 -> RoundedCornerShape(
-            topStart = inner,
-            topEnd = inner,
-            bottomStart = outer,
-            bottomEnd = outer
-        )
-        else -> RoundedCornerShape(inner)
+        size == 1 -> GroupCorners(outer, outer, outer, outer)
+        index == 0 -> GroupCorners(outer, outer, inner, inner)
+        index == size - 1 -> GroupCorners(inner, inner, outer, outer)
+        else -> GroupCorners(inner, inner, inner, inner)
     }
+}
+
+private fun getGroupShape(index: Int, size: Int): Shape {
+    val c = groupCorners(index, size)
+    return RoundedCornerShape(
+        topStart = c.topStart,
+        topEnd = c.topEnd,
+        bottomStart = c.bottomStart,
+        bottomEnd = c.bottomEnd
+    )
 }
 
 @Composable
@@ -606,44 +618,81 @@ private fun FontBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 24.dp)
+                .padding(horizontal = 16.dp)
+                .padding(top = 8.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            val fonts = AppFont.entries
+            fonts.forEachIndexed { index, font ->
+                FontOptionCard(
+                    font = font,
+                    index = index,
+                    size = fonts.size,
+                    selected = font == selectedFont,
+                    onClick = {
+                        onAppFontChange(font)
+                        haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
+                    }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FontOptionCard(
+    font: AppFont,
+    index: Int,
+    size: Int,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    // Selected option morphs to a pill
+    val progress by animateFloatAsState(
+        targetValue = if (selected) 1f else 0f,
+        animationSpec = MaterialTheme.motionScheme.slowSpatialSpec(),
+        label = "fontSelection"
+    )
+    val corners = groupCorners(index, size)
+    val pill = 28.dp
+    val shape = RoundedCornerShape(
+        topStart = lerp(corners.topStart, pill, progress),
+        topEnd = lerp(corners.topEnd, pill, progress),
+        bottomStart = lerp(corners.bottomStart, pill, progress),
+        bottomEnd = lerp(corners.bottomEnd, pill, progress)
+    )
+    val containerColor by animateColorAsState(
+        targetValue = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainerHigh,
+        animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
+        label = "fontContainer"
+    )
+    val contentColor by animateColorAsState(
+        targetValue = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+        animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
+        label = "fontContent"
+    )
+    Surface(
+        onClick = onClick,
+        shape = shape,
+        color = containerColor,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Font",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+                text = font.getDisplayName(),
+                style = MaterialTheme.typography.bodyLarge,
+                fontFamily = fontFamilyFor(font),
+                color = contentColor
             )
-            // Single-select list: each name in its own typeface, applied live, sheet stays open.
-            AppFont.entries.forEach { font ->
-                val isSelected = font == selectedFont
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            onAppFontChange(font)
-                            haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
-                        }
-                        .padding(horizontal = 24.dp, vertical = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = font.getDisplayName(),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontFamily = fontFamilyFor(font),
-                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.weight(1f)
-                    )
-                    if (isSelected) {
-                        Icon(
-                            imageVector = Icons.Filled.Check,
-                            contentDescription = "Selected",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-            }
         }
     }
 }
