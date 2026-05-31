@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LargeFlexibleTopAppBar
@@ -63,10 +64,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.R
+import com.cemcakmak.hydrotracker.data.models.AppFont
 import com.cemcakmak.hydrotracker.data.models.ColorSource
 import com.cemcakmak.hydrotracker.data.models.DarkModePreference
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
+import com.cemcakmak.hydrotracker.ui.theme.fontFamilyFor
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -76,6 +79,7 @@ fun AppearanceScreen(
     onColorSourceChange: (ColorSource) -> Unit = {},
     onDarkModeChange: (DarkModePreference) -> Unit = {},
     onPureBlackChange: (Boolean) -> Unit = {},
+    onAppFontChange: (AppFont) -> Unit = {},
     onNavigateBack: () -> Unit = {},
     paddingValues: PaddingValues = PaddingValues()
 ) {
@@ -170,6 +174,11 @@ fun AppearanceScreen(
                 onDarkModeChange = onDarkModeChange,
                 onPureBlackChange = onPureBlackChange,
                 isDynamicColorAvailable = isDynamicColorAvailable
+            )
+
+            FontSection(
+                selectedFont = themePreferences.appFont,
+                onAppFontChange = onAppFontChange
             )
         }
     }
@@ -432,6 +441,74 @@ private fun ThemeSection(
                         null
                     }
                 )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FontSection(
+    selectedFont: AppFont,
+    onAppFontChange: (AppFont) -> Unit
+) {
+    val haptics = LocalHapticFeedback.current
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text(
+            text = "Font",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            AppFont.entries.forEach { font ->
+                val isSelected = font == selectedFont
+                Surface(
+                    onClick = {
+                        if (!isSelected) {
+                            onAppFontChange(font)
+                            haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
+                        }
+                    },
+                    shape = RoundedCornerShape(16.dp),
+                    color = if (isSelected) {
+                        MaterialTheme.colorScheme.primaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.surface
+                    },
+                    tonalElevation = if (isSelected) 0.dp else 1.dp,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp, vertical = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = font.getDisplayName(),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontFamily = fontFamilyFor(font),
+                            color = if (isSelected) {
+                                MaterialTheme.colorScheme.onPrimaryContainer
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+                        if (isSelected) {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = "Selected",
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
+                    }
+                }
             }
         }
     }

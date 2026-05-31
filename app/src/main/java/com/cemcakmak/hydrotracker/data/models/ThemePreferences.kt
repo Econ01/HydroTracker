@@ -11,7 +11,8 @@ data class ThemePreferences(
     val darkMode: DarkModePreference = DarkModePreference.SYSTEM,
     val colorSource: ColorSource = ColorSource.DYNAMIC_COLOR,
     val weekStartDay: WeekStartDay = WeekStartDay.MONDAY,
-    val usePureBlack: Boolean = false // Pure black backgrounds in dark mode
+    val usePureBlack: Boolean = false, // Pure black backgrounds in dark mode
+    val appFont: AppFont = AppFont.GOOGLE_SANS_FLEX // App-wide typeface
 )
 
 enum class DarkModePreference {
@@ -70,6 +71,24 @@ enum class WeekStartDay(val displayName: String, val dayOfWeek: DayOfWeek) {
         return when (this) {
             SUNDAY -> "Week starts on Sunday"
             MONDAY -> "Week starts on Monday"
+        }
+    }
+}
+
+enum class AppFont {
+    GOOGLE_SANS_FLEX,
+    SYSTEM,
+    OUTFIT,
+    DM_SANS,
+    JETBRAINS_MONO;
+
+    fun getDisplayName(): String {
+        return when (this) {
+            GOOGLE_SANS_FLEX -> "Google Sans Flex"
+            SYSTEM -> "System"
+            OUTFIT -> "Outfit"
+            DM_SANS -> "DM Sans"
+            JETBRAINS_MONO -> "JetBrains Mono"
         }
     }
 }

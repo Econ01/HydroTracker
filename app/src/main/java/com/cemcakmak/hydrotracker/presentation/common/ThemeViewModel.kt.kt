@@ -10,12 +10,9 @@ import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.DarkModePreference
 import com.cemcakmak.hydrotracker.data.models.ColorSource
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
+import com.cemcakmak.hydrotracker.data.models.AppFont
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
 
-/**
- * Material 3 Expressive Theme ViewModel
- * Manages theme preferences and dynamic color settings with persistence
- */
 class ThemeViewModel(private val userRepository: UserRepository) : ViewModel() {
 
     private val _themePreferences = MutableStateFlow(
@@ -24,24 +21,6 @@ class ThemeViewModel(private val userRepository: UserRepository) : ViewModel() {
     )
     val themePreferences: StateFlow<ThemePreferences> = _themePreferences.asStateFlow()
 
-    /**
-     * Toggle dynamic color on/off
-     * MD3 Expressive: Smooth transition between color schemes
-     */
-    fun toggleDynamicColor(enabled: Boolean) {
-        viewModelScope.launch {
-            val newPreferences = _themePreferences.value.copy(
-                useDynamicColor = enabled,
-                colorSource = if (enabled) ColorSource.DYNAMIC_COLOR else ColorSource.HYDRO_THEME
-            )
-            _themePreferences.value = newPreferences
-            userRepository.updateThemePreferences(newPreferences)
-        }
-    }
-
-    /**
-     * Update dark mode preference
-     */
     fun updateDarkModePreference(preference: DarkModePreference) {
         viewModelScope.launch {
             val newPreferences = _themePreferences.value.copy(
@@ -52,9 +31,6 @@ class ThemeViewModel(private val userRepository: UserRepository) : ViewModel() {
         }
     }
 
-    /**
-     * Set color source
-     */
     fun setColorSource(source: ColorSource) {
         viewModelScope.launch {
             val newPreferences = _themePreferences.value.copy(
@@ -66,9 +42,6 @@ class ThemeViewModel(private val userRepository: UserRepository) : ViewModel() {
         }
     }
 
-    /**
-     * Update week start day preference
-     */
     fun updateWeekStartDay(weekStartDay: WeekStartDay) {
         viewModelScope.launch {
             val newPreferences = _themePreferences.value.copy(
@@ -79,9 +52,6 @@ class ThemeViewModel(private val userRepository: UserRepository) : ViewModel() {
         }
     }
 
-    /**
-     * Update pure black preference
-     */
     fun updatePureBlackPreference(usePureBlack: Boolean) {
         viewModelScope.launch {
             val newPreferences = _themePreferences.value.copy(
@@ -92,22 +62,18 @@ class ThemeViewModel(private val userRepository: UserRepository) : ViewModel() {
         }
     }
 
-    /**
-     * Check if dynamic color is available on this device
-     */
-    fun isDynamicColorAvailable(): Boolean {
-        return android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S
+    fun setAppFont(font: AppFont) {
+        viewModelScope.launch {
+            val newPreferences = _themePreferences.value.copy(
+                appFont = font
+            )
+            _themePreferences.value = newPreferences
+            userRepository.updateThemePreferences(newPreferences)
+        }
     }
 
-    /**
-     * Get user-friendly status message for dynamic color
-     */
-    fun getDynamicColorStatus(): String {
-        return when {
-            !isDynamicColorAvailable() -> "Requires Android 12+"
-            _themePreferences.value.useDynamicColor -> "Using wallpaper colors"
-            else -> "Using HydroTracker theme"
-        }
+    fun isDynamicColorAvailable(): Boolean {
+        return android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S
     }
 }
 
@@ -116,7 +82,7 @@ class ThemeViewModel(private val userRepository: UserRepository) : ViewModel() {
  */
 class ThemeViewModelFactory(private val userRepository: UserRepository) : androidx.lifecycle.ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
-    override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ThemeViewModel::class.java)) {
             return ThemeViewModel(userRepository) as T
         }

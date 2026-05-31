@@ -411,6 +411,7 @@ fun HydroTrackerApp(
                                 onColorSourceChange = themeViewModel::setColorSource,
                                 onDarkModeChange = themeViewModel::updateDarkModePreference,
                                 onPureBlackChange = themeViewModel::updatePureBlackPreference,
+                                onAppFontChange = themeViewModel::setAppFont,
                                 onNavigateBack = popBackStack
                             )
                         }
