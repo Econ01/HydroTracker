@@ -1,6 +1,8 @@
 package com.cemcakmak.hydrotracker.presentation.settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -11,11 +13,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.animation.EnterExitState
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.scale
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,6 +29,7 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -32,7 +38,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.vectorResource
@@ -56,8 +64,9 @@ fun SettingsHubScreen(
     val haptics = LocalHapticFeedback.current
 
     val isPreview = LocalInspectionMode.current
-    val shouldBlur = !isPreview && wasPop
-    val blur by if (shouldBlur) {
+    val shouldApplyDepth = !isPreview && wasPop
+
+    val blur by if (shouldApplyDepth) {
         val animatedContentScope = LocalNavAnimatedContentScope.current
         animatedContentScope.transition.animateDp(
             transitionSpec = { tween(400) },
@@ -67,6 +76,26 @@ fun SettingsHubScreen(
         }
     } else {
         remember { mutableStateOf(0.dp) }
+    }
+
+    // Depth scrim that clears in sync with the blur as the hub comes forward.
+    val scrimAlpha by if (shouldApplyDepth) {
+        val animatedContentScope = LocalNavAnimatedContentScope.current
+        animatedContentScope.transition.animateFloat(
+            transitionSpec = { tween(400) },
+            label = "enterScrim"
+        ) { state ->
+            if (state == EnterExitState.PreEnter) 0.4f else 0f
+        }
+    } else {
+        remember { mutableFloatStateOf(0f) }
+    }
+
+    // Black on light surfaces, white on dark/AMOLED so the receding page still reads.
+    val scrimColor = if (MaterialTheme.colorScheme.surface.luminance() < 0.5f) {
+        Color.White
+    } else {
+        Color.Black
     }
 
     // Scroll haptic logic
@@ -91,6 +120,7 @@ fun SettingsHubScreen(
             }
     }
 
+    Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
         modifier = Modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection)
@@ -191,6 +221,19 @@ fun SettingsHubScreen(
                 }
             }
         }
+    }
+
+    // Oversized so it still blankets the screen while NavDisplay scales the entry to 0.8,
+    // leaving no bright ring. Sits above the hub but inside the incoming entry, so the
+    // foreground page stays bright.
+    if (scrimAlpha > 0f) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .scale(1.3f)
+                .background(scrimColor.copy(alpha = scrimAlpha))
+        )
+    }
     }
 }
 
