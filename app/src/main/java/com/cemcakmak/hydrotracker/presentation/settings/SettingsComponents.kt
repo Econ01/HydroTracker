@@ -233,6 +233,11 @@ internal fun SelectableOptionCard(
     size: Int,
     selected: Boolean,
     onClick: () -> Unit,
+    selectedContainerColor: Color = MaterialTheme.colorScheme.primary,
+    unselectedContainerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
+    selectedContentColor: Color = MaterialTheme.colorScheme.onPrimary,
+    unselectedContentColor: Color = MaterialTheme.colorScheme.onSurface,
+    tonalElevation: Dp = 0.dp,
     content: @Composable (contentColor: Color) -> Unit
 ) {
     // Selected option morphs to a pill and turns primary.
@@ -250,12 +255,12 @@ internal fun SelectableOptionCard(
         bottomEnd = lerp(corners.bottomEnd, pill, progress)
     )
     val containerColor by animateColorAsState(
-        targetValue = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainerHigh,
+        targetValue = if (selected) selectedContainerColor else unselectedContainerColor,
         animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
         label = "optionContainer"
     )
     val contentColor by animateColorAsState(
-        targetValue = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+        targetValue = if (selected) selectedContentColor else unselectedContentColor,
         animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
         label = "optionContent"
     )
@@ -263,6 +268,7 @@ internal fun SelectableOptionCard(
         onClick = onClick,
         shape = shape,
         color = containerColor,
+        tonalElevation = tonalElevation,
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)

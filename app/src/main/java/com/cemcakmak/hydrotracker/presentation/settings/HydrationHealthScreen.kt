@@ -5,8 +5,15 @@ import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.EnterExitState
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,12 +21,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +36,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
@@ -106,21 +115,25 @@ private fun CalculationStandardSection(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        // Hydration standard name
-                        Text(
-                            text = profile.hydrationStandard.getDisplayName(),
-                            style = MaterialTheme.typography.headlineSmall
-                        )
+                    BlurMorph(targetState = profile.hydrationStandard, label = "standardInfo") { standard, blurModifier ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .then(blurModifier),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            // Hydration standard name
+                            Text(
+                                text = standard.getDisplayName(),
+                                style = MaterialTheme.typography.headlineSmall
+                            )
 
-                        // Hydration standard description
-                        Text(
-                            text = "(" + profile.hydrationStandard.getDescription() + ")",
-                            style = MaterialTheme.typography.bodySmall
-                        )
+                            // Hydration standard description
+                            Text(
+                                text = "(" + standard.getDescription() + ")",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
                     }
 
                     HorizontalDivider()
@@ -134,18 +147,18 @@ private fun CalculationStandardSection(
                             text = "Daily baseline intake",
                             style = MaterialTheme.typography.bodyMedium
                         )
-
+ 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             HydrationStatChip(
                                 label = "Male",
-                                value = "${profile.hydrationStandard.getMaleIntake().toInt() / 1000.0} L"
+                                value = profile.hydrationStandard.getMaleIntake().toInt() / 1000.0
                             )
                             HydrationStatChip(
                                 label = "Female",
-                                value = "${profile.hydrationStandard.getFemaleIntake().toInt() / 1000.0} L"
+                                value = profile.hydrationStandard.getFemaleIntake().toInt() / 1000.0
                             )
                         }
                     }
@@ -196,16 +209,45 @@ private fun CalculationStandardSection(
 }
 
 @Composable
-private fun HydrationStatChip(label: String, value: String) {
+private fun <T> BlurMorph(
+    targetState: T,
+    label: String,
+    content: @Composable (state: T, blurModifier: Modifier) -> Unit
+) {
+    val fadeSpec = tween<Float>(durationMillis = 450)
+    val blurSpec = tween<Dp>(durationMillis = 450)
+    AnimatedContent(
+        targetState = targetState,
+        transitionSpec = {
+            (fadeIn(fadeSpec) togetherWith fadeOut(fadeSpec)) using SizeTransform(clip = false)
+        },
+        label = label
+    ) { state ->
+        val blur by transition.animateDp(
+            transitionSpec = { blurSpec },
+            label = "${label}Blur"
+        ) { enterExit ->
+            if (enterExit == EnterExitState.Visible) 0.dp else 12.dp
+        }
+        content(state, Modifier.blur(blur, BlurredEdgeTreatment.Unbounded))
+    }
+}
+
+@Composable
+private fun HydrationStatChip(label: String, value: Double) {
     Column(
         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = value,
-            style = MaterialTheme.typography.headlineMediumEmphasized,
-            color = MaterialTheme.colorScheme.tertiary
-        )
+        BlurMorph(targetState = value, label = "statValue") { v, blurModifier ->
+            Text(
+                text = "$v L",
+                style = MaterialTheme.typography.headlineMediumEmphasized,
+                color = MaterialTheme.colorScheme.tertiary,
+                maxLines = 1,
+                modifier = blurModifier
+            )
+        }
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
@@ -479,41 +521,51 @@ private fun RestoreHealthConnectDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
+    val haptics = LocalHapticFeedback.current
     AlertDialog(
         onDismissRequest = { if (!isRestoring) onDismiss() },
         title = { Text("Restore from Health Connect") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text("Import your past HydroTracker entries from Health Connect. Choose a time range:")
-                Column {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        RadioButton(
-                            selected = restoreTimeRange == "all",
-                            onClick = { onTimeRangeChange("all") },
-                            enabled = !isRestoring
-                        )
-                        Text("All history", style = MaterialTheme.typography.bodyMedium)
-                    }
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        RadioButton(
-                            selected = restoreTimeRange == "90days",
-                            onClick = { onTimeRangeChange("90days") },
-                            enabled = !isRestoring
-                        )
-                        Text("Last 90 days", style = MaterialTheme.typography.bodyMedium)
+                val options = listOf(
+                    "all" to "All history",
+                    "90days" to "Last 90 days"
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    options.forEachIndexed { index, (value, label) ->
+                        SelectableOptionCard(
+                            index = index,
+                            size = options.size,
+                            selected = restoreTimeRange == value,
+                            selectedContainerColor = MaterialTheme.colorScheme.tertiary,
+                            unselectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            selectedContentColor = MaterialTheme.colorScheme.onTertiary,
+                            unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            tonalElevation = 0.dp,
+                            onClick = {
+                                if (!isRestoring) {
+                                    haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
+                                    onTimeRangeChange(value)
+                                }
+                            }
+                        ) { contentColor ->
+                            Text(
+                                text = label,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = contentColor
+                            )
+                        }
                     }
                 }
             }
         },
         confirmButton = {
             Button(
-                onClick = onConfirm,
+                onClick = {
+                    haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                    onConfirm()
+                },
                 enabled = !isRestoring && canRestore
             ) {
                 if (isRestoring) {
@@ -529,7 +581,12 @@ private fun RestoreHealthConnectDialog(
         },
         dismissButton = {
             TextButton(
-                onClick = { if (!isRestoring) onDismiss() },
+                onClick = {
+                    if (!isRestoring) {
+                        haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                        onDismiss()
+                    }
+                },
                 enabled = !isRestoring
             ) {
                 Text("Cancel")
