@@ -2,22 +2,11 @@ package com.cemcakmak.hydrotracker.presentation.settings
 
 import android.app.Activity
 import android.app.Application
-import android.os.Build
 import android.os.Bundle
-import android.view.HapticFeedbackConstants
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.EnterExitState
-import androidx.compose.animation.SizeTransform
-import androidx.compose.animation.core.EaseInOut
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,18 +19,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.BlurredEdgeTreatment
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
@@ -54,6 +39,8 @@ import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
 import com.cemcakmak.hydrotracker.health.HealthConnectManager
 import com.cemcakmak.hydrotracker.health.HealthConnectSyncManager
+import com.cemcakmak.hydrotracker.presentation.common.BlurMorph
+import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -214,64 +201,15 @@ private fun CalculationStandardSection(
 }
 
 @Composable
-private fun <T> BlurMorph(
-    targetState: T,
-    content: @Composable (state: T, blurModifier: Modifier) -> Unit
-) {
-    val fadeSpec = tween<Float>(durationMillis = 600, delayMillis = 100, easing = EaseInOut)
-    val blurSpec = tween<Dp>(durationMillis = 800, easing = EaseInOut)
-    AnimatedContent(
-        targetState = targetState,
-        transitionSpec = {
-            (fadeIn(fadeSpec) togetherWith fadeOut(fadeSpec)) using SizeTransform(clip = false)
-        },
-        label = "standardInfo"
-    ) { state ->
-        val blur by transition.animateDp(
-            transitionSpec = { blurSpec },
-            label = "standardInfoBlur"
-        ) { enterExit ->
-            if (enterExit == EnterExitState.Visible) 0.dp else 12.dp
-        }
-        content(state, Modifier.blur(blur, BlurredEdgeTreatment.Unbounded))
-    }
-}
-
-@Composable
 private fun HydrationStatChip(label: String, value: Double) {
-    val view = LocalView.current
+    val animatedValue = rememberAnimatedDouble(targetValue = value)
 
     Column(
         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val animatable = remember { Animatable(0f) }
-
-        LaunchedEffect(value) {
-            animatable.animateTo(
-                targetValue = value.toFloat(),
-                animationSpec = tween(durationMillis = 800, easing = EaseInOut)
-            )
-        }
-
-        LaunchedEffect(Unit) {
-            var lastTick = -1
-            snapshotFlow { animatable.value }.collect { animatedValue ->
-                val step = 0.2
-                val currentTick = (animatedValue / step).toInt()
-                if (currentTick != lastTick && animatedValue > 0f) {
-                    lastTick = currentTick
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                        view.performHapticFeedback(HapticFeedbackConstants.SEGMENT_FREQUENT_TICK)
-                    } else {
-                        view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-                    }
-                }
-            }
-        }
-
         Text(
-            text = "%.1f L".format(animatable.value),
+            text = "%.1f L".format(animatedValue),
             style = MaterialTheme.typography.headlineMediumEmphasized,
             color = MaterialTheme.colorScheme.tertiary,
             maxLines = 1
