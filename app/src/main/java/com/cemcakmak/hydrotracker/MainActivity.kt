@@ -47,6 +47,7 @@ import com.cemcakmak.hydrotracker.presentation.profile.ProfileScreen
 import com.cemcakmak.hydrotracker.presentation.settings.SettingsScreen
 import com.cemcakmak.hydrotracker.presentation.settings.SettingsHubScreen
 import com.cemcakmak.hydrotracker.presentation.settings.AppearanceScreen
+import com.cemcakmak.hydrotracker.presentation.settings.DisplayLocaleScreen
 import com.cemcakmak.hydrotracker.presentation.settings.PlaceholderScreen
 import com.cemcakmak.hydrotracker.presentation.settings.HealthConnectDataScreen
 import com.cemcakmak.hydrotracker.presentation.settings.BeverageTypesScreen
@@ -442,7 +443,11 @@ fun HydroTrackerApp(
                             )
                         }
                         entry<NavigationRoutes.SettingsDisplay> {
-                            PlaceholderScreen(title = "Display & Locale", onNavigateBack = popBackStack)
+                            DisplayLocaleScreen(
+                                themePreferences = themePreferences,
+                                onWeekStartDayChange = themeViewModel::updateWeekStartDay,
+                                onNavigateBack = popBackStack
+                            )
                         }
                         entry<NavigationRoutes.SettingsHydration> {
                             PlaceholderScreen(title = "Hydration & Health", onNavigateBack = popBackStack)
