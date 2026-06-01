@@ -194,6 +194,8 @@ class UserRepository(context: Context) {
             putString("week_start_day", themePreferences.weekStartDay.name)
             putBoolean("use_pure_black", themePreferences.usePureBlack)
             putString("app_font", themePreferences.appFont.name)
+            putBoolean("auto_hide_nav_bar", themePreferences.autoHideNavBar)
+            putString("nav_bar_label_mode", themePreferences.navBarLabelMode.name)
             apply()
         }
     }
@@ -216,6 +218,10 @@ class UserRepository(context: Context) {
             usePureBlack = prefs.getBoolean("use_pure_black", false),
             appFont = AppFont.valueOf(
                 prefs.getString("app_font", AppFont.GOOGLE_SANS_FLEX.name) ?: AppFont.GOOGLE_SANS_FLEX.name
+            ),
+            autoHideNavBar = prefs.getBoolean("auto_hide_nav_bar", false),
+            navBarLabelMode = NavBarLabelMode.valueOf(
+                prefs.getString("nav_bar_label_mode", NavBarLabelMode.ALWAYS.name) ?: NavBarLabelMode.ALWAYS.name
             )
         )
     }

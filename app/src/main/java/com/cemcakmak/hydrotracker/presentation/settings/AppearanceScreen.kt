@@ -59,6 +59,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -75,6 +76,7 @@ import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.models.AppFont
 import com.cemcakmak.hydrotracker.data.models.ColorSource
 import com.cemcakmak.hydrotracker.data.models.DarkModePreference
+import com.cemcakmak.hydrotracker.data.models.NavBarLabelMode
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.ui.theme.fontFamilyFor
@@ -88,6 +90,8 @@ fun AppearanceScreen(
     onDarkModeChange: (DarkModePreference) -> Unit = {},
     onPureBlackChange: (Boolean) -> Unit = {},
     onAppFontChange: (AppFont) -> Unit = {},
+    onAutoHideNavBarChange: (Boolean) -> Unit = {},
+    onNavBarLabelModeChange: (NavBarLabelMode) -> Unit = {},
     onNavigateBack: () -> Unit = {},
     paddingValues: PaddingValues = PaddingValues()
 ) {
@@ -115,6 +119,7 @@ fun AppearanceScreen(
     var wasExpanded by remember { mutableStateOf(true) }
     var wasCollapsed by remember { mutableStateOf(false) }
     var showFontSheet by remember { mutableStateOf(false) }
+    var showLabelSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(scrollBehavior.state) {
         snapshotFlow { scrollBehavior.state.collapsedFraction }
@@ -172,7 +177,8 @@ fun AppearanceScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             ThemePreviewCard(themePreferences = themePreferences)
@@ -189,6 +195,13 @@ fun AppearanceScreen(
                 onPureBlackChange = onPureBlackChange
             )
 
+            NavigationBarSection(
+                autoHide = themePreferences.autoHideNavBar,
+                onAutoHideChange = onAutoHideNavBarChange,
+                labelMode = themePreferences.navBarLabelMode,
+                onOpenLabelSheet = { showLabelSheet = true }
+            )
+
             FontSection(
                 selectedFont = themePreferences.appFont,
                 onOpenFontSheet = { showFontSheet = true }
@@ -201,6 +214,14 @@ fun AppearanceScreen(
             selectedFont = themePreferences.appFont,
             onAppFontChange = onAppFontChange,
             onDismiss = { showFontSheet = false }
+        )
+    }
+
+    if (showLabelSheet) {
+        NavLabelBottomSheet(
+            selected = themePreferences.navBarLabelMode,
+            onSelect = onNavBarLabelModeChange,
+            onDismiss = { showLabelSheet = false }
         )
     }
 }
@@ -624,8 +645,7 @@ private fun FontBottomSheet(
         ) {
             val fonts = AppFont.entries
             fonts.forEachIndexed { index, font ->
-                FontOptionCard(
-                    font = font,
+                SelectableOptionCard(
                     index = index,
                     size = fonts.size,
                     selected = font == selectedFont,
@@ -633,26 +653,33 @@ private fun FontBottomSheet(
                         onAppFontChange(font)
                         haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
                     }
-                )
+                ) { contentColor ->
+                    Text(
+                        text = font.getDisplayName(),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontFamily = fontFamilyFor(font),
+                        color = contentColor
+                    )
+                }
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun FontOptionCard(
-    font: AppFont,
+private fun SelectableOptionCard(
     index: Int,
     size: Int,
     selected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    content: @Composable (contentColor: Color) -> Unit
 ) {
-    // Selected option morphs to a pill
+    // Selected option morphs to a pill and turns primary.
     val progress by animateFloatAsState(
         targetValue = if (selected) 1f else 0f,
         animationSpec = MaterialTheme.motionScheme.slowSpatialSpec(),
-        label = "fontSelection"
+        label = "optionSelection"
     )
     val corners = groupCorners(index, size)
     val pill = 28.dp
@@ -665,12 +692,12 @@ private fun FontOptionCard(
     val containerColor by animateColorAsState(
         targetValue = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainerHigh,
         animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
-        label = "fontContainer"
+        label = "optionContainer"
     )
     val contentColor by animateColorAsState(
         targetValue = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
         animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
-        label = "fontContent"
+        label = "optionContent"
     )
     Surface(
         onClick = onClick,
@@ -687,12 +714,158 @@ private fun FontOptionCard(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = font.getDisplayName(),
-                style = MaterialTheme.typography.bodyLarge,
-                fontFamily = fontFamilyFor(font),
-                color = contentColor
-            )
+            content(contentColor)
+        }
+    }
+}
+
+@Composable
+private fun NavigationBarSection(
+    autoHide: Boolean,
+    onAutoHideChange: (Boolean) -> Unit,
+    labelMode: NavBarLabelMode,
+    onOpenLabelSheet: () -> Unit
+) {
+    val haptics = LocalHapticFeedback.current
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        SettingsSectionHeader("Navigation bar")
+        Column {
+            // Auto-hide on scroll (switch row)
+            SettingsGroupCard(index = 0, size = 2) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Crossfade(
+                        targetState = autoHide,
+                        animationSpec = tween(400),
+                        label = "autoHideIcon"
+                    ) { on ->
+                        Icon(
+                            imageVector = if (on) ImageVector.vectorResource(R.drawable.bottom_panel_close_filled) else ImageVector.vectorResource(R.drawable.bottom_panel_close),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Auto-hide on scroll",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = "Hide the bar when scrolling down",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = autoHide,
+                        onCheckedChange = { enabled ->
+                            onAutoHideChange(enabled)
+                            haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
+                        },
+                        thumbContent = if (autoHide) {
+                            {
+                                Icon(
+                                    imageVector = Icons.Filled.Check,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize),
+                                )
+                            }
+                        } else {
+                            null
+                        }
+                    )
+                }
+            }
+            // Labels (opens a bottom sheet)
+            SettingsGroupCard(
+                index = 1,
+                size = 2,
+                onClick = {
+                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                    onOpenLabelSheet()
+                }
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.bottom_navigation_filled),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Labels",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = labelMode.getDisplayName(),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun NavLabelBottomSheet(
+    selected: NavBarLabelMode,
+    onSelect: (NavBarLabelMode) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState()
+    val haptics = LocalHapticFeedback.current
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(top = 8.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            val modes = NavBarLabelMode.entries
+            modes.forEachIndexed { index, mode ->
+                SelectableOptionCard(
+                    index = index,
+                    size = modes.size,
+                    selected = mode == selected,
+                    onClick = {
+                        onSelect(mode)
+                        haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
+                    }
+                ) { contentColor ->
+                    Text(
+                        text = mode.getDisplayName(),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = contentColor
+                    )
+                }
+            }
         }
     }
 }

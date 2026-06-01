@@ -11,6 +11,7 @@ import com.cemcakmak.hydrotracker.data.models.DarkModePreference
 import com.cemcakmak.hydrotracker.data.models.ColorSource
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
 import com.cemcakmak.hydrotracker.data.models.AppFont
+import com.cemcakmak.hydrotracker.data.models.NavBarLabelMode
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
 
 class ThemeViewModel(private val userRepository: UserRepository) : ViewModel() {
@@ -66,6 +67,26 @@ class ThemeViewModel(private val userRepository: UserRepository) : ViewModel() {
         viewModelScope.launch {
             val newPreferences = _themePreferences.value.copy(
                 appFont = font
+            )
+            _themePreferences.value = newPreferences
+            userRepository.updateThemePreferences(newPreferences)
+        }
+    }
+
+    fun setAutoHideNavBar(enabled: Boolean) {
+        viewModelScope.launch {
+            val newPreferences = _themePreferences.value.copy(
+                autoHideNavBar = enabled
+            )
+            _themePreferences.value = newPreferences
+            userRepository.updateThemePreferences(newPreferences)
+        }
+    }
+
+    fun setNavBarLabelMode(mode: NavBarLabelMode) {
+        viewModelScope.launch {
+            val newPreferences = _themePreferences.value.copy(
+                navBarLabelMode = mode
             )
             _themePreferences.value = newPreferences
             userRepository.updateThemePreferences(newPreferences)

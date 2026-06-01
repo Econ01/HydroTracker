@@ -241,7 +241,9 @@ fun HydroTrackerApp(
                 fabExpanded = homeFabExpanded,
                 onNavigateToSettings = { backStack.add(NavigationRoutes.SettingsOld) },
                 onAddCustomClick = { homeShowCustomDialog = true },
-                onTabSwitch = { wasPop = false }
+                onTabSwitch = { wasPop = false },
+                autoHideNavBar = themePreferences.autoHideNavBar,
+                navBarLabelMode = themePreferences.navBarLabelMode
             ) { paddingValues ->
                 val popBackStack = {
                     wasPop = true
@@ -434,6 +436,8 @@ fun HydroTrackerApp(
                                 onDarkModeChange = themeViewModel::updateDarkModePreference,
                                 onPureBlackChange = themeViewModel::updatePureBlackPreference,
                                 onAppFontChange = themeViewModel::setAppFont,
+                                onAutoHideNavBarChange = themeViewModel::setAutoHideNavBar,
+                                onNavBarLabelModeChange = themeViewModel::setNavBarLabelMode,
                                 onNavigateBack = popBackStack
                             )
                         }

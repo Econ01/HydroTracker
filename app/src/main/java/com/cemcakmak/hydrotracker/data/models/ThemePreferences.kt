@@ -12,7 +12,9 @@ data class ThemePreferences(
     val colorSource: ColorSource = ColorSource.DYNAMIC_COLOR,
     val weekStartDay: WeekStartDay = WeekStartDay.MONDAY,
     val usePureBlack: Boolean = false, // Pure black backgrounds in dark mode
-    val appFont: AppFont = AppFont.GOOGLE_SANS_FLEX // App-wide typeface
+    val appFont: AppFont = AppFont.GOOGLE_SANS_FLEX, // App-wide typeface
+    val autoHideNavBar: Boolean = false, // Hide the bottom nav bar when scrolling down
+    val navBarLabelMode: NavBarLabelMode = NavBarLabelMode.ALWAYS // Bottom nav label visibility
 )
 
 enum class DarkModePreference {
@@ -89,6 +91,20 @@ enum class AppFont {
             OUTFIT -> "Outfit"
             DM_SANS -> "DM Sans"
             JETBRAINS_MONO -> "JetBrains Mono"
+        }
+    }
+}
+
+enum class NavBarLabelMode {
+    ALWAYS,    // Show every tab's label
+    SELECTED,  // Show only the selected tab's label
+    NONE;      // No labels
+
+    fun getDisplayName(): String {
+        return when (this) {
+            ALWAYS -> "Always shown"
+            SELECTED -> "Selected only"
+            NONE -> "Off"
         }
     }
 }

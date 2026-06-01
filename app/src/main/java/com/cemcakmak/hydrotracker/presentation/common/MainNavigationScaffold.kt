@@ -49,10 +49,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -66,6 +69,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
+import com.cemcakmak.hydrotracker.data.models.NavBarLabelMode
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.presentation.home.HomeTopAppBar
 import com.cemcakmak.hydrotracker.utils.ImageUtils
@@ -84,6 +88,8 @@ fun MainNavigationScaffold(
     onNavigateToSettings: () -> Unit = {},
     onAddCustomClick: () -> Unit = {},
     onTabSwitch: () -> Unit = {},
+    autoHideNavBar: Boolean = false,
+    navBarLabelMode: NavBarLabelMode = NavBarLabelMode.ALWAYS,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     val shouldShowBottomBar = currentKey in setOf(
@@ -93,12 +99,28 @@ fun MainNavigationScaffold(
         NavigationRoutes.Settings
     )
 
+    // Auto-hide on scroll: hide the bar when scrolling down, reveal when scrolling up.
+    val barVisibleByScroll = remember { mutableStateOf(true) }
+    LaunchedEffect(currentKey) { barVisibleByScroll.value = true }
+    val autoHideConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                if (available.y < -0.5f) barVisibleByScroll.value = false
+                else if (available.y > 0.5f) barVisibleByScroll.value = true
+                return Offset.Zero
+            }
+        }
+    }
+
     // Scroll behaviors remembered per route so collapsed state survives tab switches
     val homeScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
-    val nestedScrollModifier = when (currentKey) {
-        NavigationRoutes.Home -> Modifier.nestedScroll(homeScrollBehavior.nestedScrollConnection)
-        else -> Modifier
+    val nestedScrollModifier = run {
+        val base = when (currentKey) {
+            NavigationRoutes.Home -> Modifier.nestedScroll(homeScrollBehavior.nestedScrollConnection)
+            else -> Modifier
+        }
+        if (autoHideNavBar) base.nestedScroll(autoHideConnection) else base
     }
 
     val haptics = LocalHapticFeedback.current
@@ -129,13 +151,14 @@ fun MainNavigationScaffold(
         },
         bottomBar = {
             AnimatedVisibility(
-                visible = shouldShowBottomBar,
+                visible = shouldShowBottomBar && (!autoHideNavBar || barVisibleByScroll.value),
                 enter = slideInVertically { it } + fadeIn(),
                 exit = slideOutVertically { it } + fadeOut()
             ) {
                 HydroNavigationBar(
                     currentKey = currentKey,
                     userProfileImagePath = userProfileImagePath,
+                    labelMode = navBarLabelMode,
                     onTabSwitch = onTabSwitch,
                     onTabSelected = { key ->
                         backStack.apply {
@@ -205,6 +228,7 @@ private fun ProfileTopAppBar() {
 private fun HydroNavigationBar(
     currentKey: NavigationRoutes,
     userProfileImagePath: String? = null,
+    labelMode: NavBarLabelMode = NavBarLabelMode.ALWAYS,
     onTabSelected: (NavigationRoutes) -> Unit = {},
     onTabSwitch: () -> Unit = {}
 ) {
@@ -213,6 +237,8 @@ private fun HydroNavigationBar(
     ) {
         NavigationItem.entries.forEach { item ->
             val isSelected = currentKey == item.key
+            val showLabel = labelMode == NavBarLabelMode.ALWAYS ||
+                    (labelMode == NavBarLabelMode.SELECTED && isSelected)
             val tooltipState = rememberTooltipState()
             val haptics = LocalHapticFeedback.current
 
@@ -246,11 +272,15 @@ private fun HydroNavigationBar(
                         }
                     }
                 },
-                label = {
-                    Text(
-                        text = item.label,
-                        style = MaterialTheme.typography.labelMediumEmphasized
-                    )
+                label = if (showLabel) {
+                    {
+                        Text(
+                            text = item.label,
+                            style = MaterialTheme.typography.labelMediumEmphasized
+                        )
+                    }
+                } else {
+                    null
                 },
                 selected = isSelected,
                 onClick = {
