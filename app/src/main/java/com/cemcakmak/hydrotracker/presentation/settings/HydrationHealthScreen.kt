@@ -9,7 +9,9 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -115,7 +117,7 @@ private fun CalculationStandardSection(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    BlurMorph(targetState = profile.hydrationStandard, label = "standardInfo") { standard, blurModifier ->
+                    BlurMorph(targetState = profile.hydrationStandard) { standard, blurModifier ->
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -211,21 +213,20 @@ private fun CalculationStandardSection(
 @Composable
 private fun <T> BlurMorph(
     targetState: T,
-    label: String,
     content: @Composable (state: T, blurModifier: Modifier) -> Unit
 ) {
-    val fadeSpec = tween<Float>(durationMillis = 450)
-    val blurSpec = tween<Dp>(durationMillis = 450)
+    val fadeSpec = tween<Float>(durationMillis = 600, delayMillis = 100, easing = EaseInOut)
+    val blurSpec = tween<Dp>(durationMillis = 800, easing = EaseInOut)
     AnimatedContent(
         targetState = targetState,
         transitionSpec = {
             (fadeIn(fadeSpec) togetherWith fadeOut(fadeSpec)) using SizeTransform(clip = false)
         },
-        label = label
+        label = "standardInfo"
     ) { state ->
         val blur by transition.animateDp(
             transitionSpec = { blurSpec },
-            label = "${label}Blur"
+            label = "standardInfoBlur"
         ) { enterExit ->
             if (enterExit == EnterExitState.Visible) 0.dp else 12.dp
         }
@@ -239,15 +240,17 @@ private fun HydrationStatChip(label: String, value: Double) {
         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BlurMorph(targetState = value, label = "statValue") { v, blurModifier ->
-            Text(
-                text = "$v L",
-                style = MaterialTheme.typography.headlineMediumEmphasized,
-                color = MaterialTheme.colorScheme.tertiary,
-                maxLines = 1,
-                modifier = blurModifier
-            )
-        }
+        val animatedValue by animateFloatAsState(
+            targetValue = value.toFloat(),
+            animationSpec = tween(durationMillis = 800, easing = EaseInOut),
+            label = "statValue"
+        )
+        Text(
+            text = "%.1f L".format(animatedValue),
+            style = MaterialTheme.typography.headlineMediumEmphasized,
+            color = MaterialTheme.colorScheme.tertiary,
+            maxLines = 1
+        )
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
