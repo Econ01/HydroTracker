@@ -2,7 +2,9 @@ package com.cemcakmak.hydrotracker.presentation.settings
 
 import android.app.Activity
 import android.app.Application
+import android.os.Build
 import android.os.Bundle
+import android.view.HapticFeedbackConstants
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.animation.AnimatedContent
@@ -10,8 +12,8 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateDp
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -35,6 +37,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -236,17 +239,39 @@ private fun <T> BlurMorph(
 
 @Composable
 private fun HydrationStatChip(label: String, value: Double) {
+    val view = LocalView.current
+
     Column(
         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val animatedValue by animateFloatAsState(
-            targetValue = value.toFloat(),
-            animationSpec = tween(durationMillis = 800, easing = EaseInOut),
-            label = "statValue"
-        )
+        val animatable = remember { Animatable(0f) }
+
+        LaunchedEffect(value) {
+            animatable.animateTo(
+                targetValue = value.toFloat(),
+                animationSpec = tween(durationMillis = 800, easing = EaseInOut)
+            )
+        }
+
+        LaunchedEffect(Unit) {
+            var lastTick = -1
+            snapshotFlow { animatable.value }.collect { animatedValue ->
+                val step = 0.2
+                val currentTick = (animatedValue / step).toInt()
+                if (currentTick != lastTick && animatedValue > 0f) {
+                    lastTick = currentTick
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                        view.performHapticFeedback(HapticFeedbackConstants.SEGMENT_FREQUENT_TICK)
+                    } else {
+                        view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                    }
+                }
+            }
+        }
+
         Text(
-            text = "%.1f L".format(animatedValue),
+            text = "%.1f L".format(animatable.value),
             style = MaterialTheme.typography.headlineMediumEmphasized,
             color = MaterialTheme.colorScheme.tertiary,
             maxLines = 1
