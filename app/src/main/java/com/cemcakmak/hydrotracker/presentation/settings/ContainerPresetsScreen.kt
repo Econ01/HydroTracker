@@ -87,20 +87,22 @@ fun ContainerPresetsScreen(
                 onMove = { haptics.performHapticFeedback(HapticFeedbackType.ContextClick) },
                 modifier = Modifier.fillMaxWidth()
             ) { index, preset, isDragging ->
-                val handleModifier = Modifier.draggableHandle(
-                    onDragStarted = { haptics.performHapticFeedback(HapticFeedbackType.LongPress) }
-                )
-                ContainerPresetRow(
-                    preset = preset,
-                    index = index,
-                    size = items.size,
-                    isDragging = isDragging,
-                    onClick = {
-                        presetToEdit = preset
-                        showEditSheet = true
-                    },
-                    handleModifier = handleModifier
-                )
+                key(preset.id, items.size) {
+                    val handleModifier = Modifier.draggableHandle(
+                        onDragStarted = { haptics.performHapticFeedback(HapticFeedbackType.LongPress) }
+                    )
+                    ContainerPresetRow(
+                        preset = preset,
+                        index = index,
+                        size = items.size,
+                        isDragging = isDragging,
+                        onClick = {
+                            presetToEdit = preset
+                            showEditSheet = true
+                        },
+                        modifier = handleModifier
+                    )
+                }
             }
 
             val resetInteractionSource = remember { MutableInteractionSource() }
@@ -296,7 +298,7 @@ private fun ContainerPresetRow(
     size: Int,
     isDragging: Boolean,
     onClick: () -> Unit,
-    handleModifier: Modifier
+    modifier: Modifier
 ) {
     val scale by animateFloatAsState(
         targetValue = if (isDragging) 1.03f else 1f,
@@ -353,7 +355,7 @@ private fun ContainerPresetRow(
                 imageVector = ImageVector.vectorResource(R.drawable.drag_handle_filled),
                 contentDescription = "Reorder",
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = handleModifier.size(24.dp)
+                modifier = modifier.size(24.dp)
             )
         }
     }
