@@ -20,6 +20,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemColors
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -257,7 +259,7 @@ private fun SettingsCategoryCard(
         shape = shape,
         tonalElevation = 2.dp,
         modifier = Modifier
-            .padding(bottom = 4.dp),
+            .padding(bottom = 2.dp),
         onClick = {
             haptics.performHapticFeedback(HapticFeedbackType.LongPress)
             onNavigateTo(category.route)
@@ -267,6 +269,17 @@ private fun SettingsCategoryCard(
             headlineContent = { Text(category.title) },
             supportingContent = { Text(category.description) },
             leadingContent = category.icon,
+            colors = ListItemColors(
+                leadingIconColor = MaterialTheme.colorScheme.primary,
+                headlineColor = ListItemDefaults.colors().headlineColor,
+                supportingTextColor = ListItemDefaults.colors().supportingTextColor,
+                containerColor = ListItemDefaults.colors().containerColor,
+                overlineColor = ListItemDefaults.colors().overlineColor,
+                trailingIconColor = ListItemDefaults.colors().trailingIconColor,
+                disabledHeadlineColor = ListItemDefaults.colors().disabledHeadlineColor,
+                disabledLeadingIconColor = ListItemDefaults.colors().disabledLeadingIconColor,
+                disabledTrailingIconColor = ListItemDefaults.colors().disabledTrailingIconColor
+            )
         )
     }
 }
