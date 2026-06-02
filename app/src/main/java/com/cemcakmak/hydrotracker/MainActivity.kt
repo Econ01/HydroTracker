@@ -40,6 +40,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigationevent.NavigationEvent
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
 import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
+import com.cemcakmak.hydrotracker.data.database.repository.CustomBeverageRepository
 import com.cemcakmak.hydrotracker.presentation.common.*
 import com.cemcakmak.hydrotracker.presentation.home.HomeScreen
 import com.cemcakmak.hydrotracker.presentation.history.HistoryScreen
@@ -49,6 +50,9 @@ import com.cemcakmak.hydrotracker.presentation.settings.SettingsHubScreen
 import com.cemcakmak.hydrotracker.presentation.settings.AppearanceScreen
 import com.cemcakmak.hydrotracker.presentation.settings.DisplayLocaleScreen
 import com.cemcakmak.hydrotracker.presentation.settings.HydrationHealthScreen
+import com.cemcakmak.hydrotracker.presentation.settings.QuickAddCustomizationScreen
+import com.cemcakmak.hydrotracker.presentation.settings.ContainerPresetsScreen
+import com.cemcakmak.hydrotracker.presentation.settings.BeverageTypesEditScreen
 import com.cemcakmak.hydrotracker.presentation.settings.PlaceholderScreen
 import com.cemcakmak.hydrotracker.presentation.settings.HealthConnectDataScreen
 import com.cemcakmak.hydrotracker.presentation.settings.BeverageTypesScreen
@@ -72,6 +76,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var userRepository: UserRepository
     private lateinit var waterIntakeRepository: WaterIntakeRepository
     private lateinit var containerPresetRepository: ContainerPresetRepository
+    private lateinit var customBeverageRepository: CustomBeverageRepository
 
     // Modern permission launcher
     private val notificationPermissionLauncher = registerForActivityResult(
@@ -158,6 +163,10 @@ class MainActivity : ComponentActivity() {
             applicationContext
         )
 
+        customBeverageRepository = DatabaseInitializer.getCustomBeverageRepository(
+            applicationContext
+        )
+
         // Seed default container presets if needed
         lifecycleScope.launch {
             containerPresetRepository.seedDefaultsIfNeeded()
@@ -174,6 +183,7 @@ class MainActivity : ComponentActivity() {
                 userRepository,
                 waterIntakeRepository,
                 containerPresetRepository,
+                customBeverageRepository,
                 notificationPermissionLauncher,
                 healthConnectPermissionLauncher
             )
@@ -196,6 +206,7 @@ fun HydroTrackerApp(
     userRepository: UserRepository,
     waterIntakeRepository: WaterIntakeRepository,
     containerPresetRepository: ContainerPresetRepository,
+    customBeverageRepository: CustomBeverageRepository,
     notificationPermissionLauncher: ActivityResultLauncher<String>,
     healthConnectPermissionLauncher: ActivityResultLauncher<Set<String>>
 ) {
@@ -204,10 +215,14 @@ fun HydroTrackerApp(
     val userProfile by userRepository.userProfile.collectAsState()
     val isOnboardingCompleted by userRepository.isOnboardingCompleted.collectAsState()
     val beveragePreferences by userRepository.beveragePreferences.collectAsState()
-    val activeBeverageTypes = remember(beveragePreferences) { beveragePreferences.toDisplayList() }
+    val customBeverages by customBeverageRepository.getAll().collectAsState(initial = emptyList())
+    val activeBeverages = remember(beveragePreferences, customBeverages) {
+        buildActiveBeverages(beveragePreferences, customBeverages)
+    }
     var isLoading by remember { mutableStateOf(true) }
     val context = LocalContext.current
     var wasPop by remember { mutableStateOf(false) }
+    var quickAddWasPop by remember { mutableStateOf(false) }
 
     LaunchedEffect(isOnboardingCompleted, userProfile) {
         isLoading = false
@@ -337,7 +352,7 @@ fun HydroTrackerApp(
                                     userProfile = it,
                                     waterIntakeRepository = waterIntakeRepository,
                                     containerPresetRepository = containerPresetRepository,
-                                    activeBeverageTypes = activeBeverageTypes,
+                                    activeBeverages = activeBeverages,
                                     onNavigateToSettings = { backStack.add(NavigationRoutes.SettingsOld) },
                                     paddingValues = paddingValues,
                                     snackbarHostState = snackbarHostState,
@@ -425,6 +440,7 @@ fun HydroTrackerApp(
                                 developerOptionsEnabled = BuildConfig.DEBUG,
                                 onNavigateTo = { key ->
                                     wasPop = true
+                                    quickAddWasPop = false
                                     backStack.add(key)
                                 }
                             )
@@ -482,7 +498,32 @@ fun HydroTrackerApp(
                             )
                         }
                         entry<NavigationRoutes.SettingsContainers> {
-                            PlaceholderScreen(title = "Quick Add Customization", onNavigateBack = popBackStack)
+                            QuickAddCustomizationScreen(
+                                wasPop = quickAddWasPop,
+                                onNavigateToContainerPresets = {
+                                    quickAddWasPop = true
+                                    backStack.add(NavigationRoutes.SettingsContainerPresets)
+                                },
+                                onNavigateToBeverageTypes = {
+                                    quickAddWasPop = true
+                                    backStack.add(NavigationRoutes.SettingsBeverageTypes)
+                                },
+                                onNavigateBack = popBackStack
+                            )
+                        }
+                        entry<NavigationRoutes.SettingsContainerPresets> {
+                            ContainerPresetsScreen(
+                                containerPresetRepository = containerPresetRepository,
+                                snackbarHostState = snackbarHostState,
+                                onNavigateBack = popBackStack
+                            )
+                        }
+                        entry<NavigationRoutes.SettingsBeverageTypes> {
+                            BeverageTypesEditScreen(
+                                userRepository = userRepository,
+                                customBeverageRepository = customBeverageRepository,
+                                onNavigateBack = popBackStack
+                            )
                         }
                         entry<NavigationRoutes.SettingsNotifications> {
                             PlaceholderScreen(title = "Notifications", onNavigateBack = popBackStack)
