@@ -766,17 +766,17 @@ private fun HealthConnectHistoryItem(
                             )
                         }
 
-                        val beverageType = entry.getBeverageType()
+                        val beverageName = entry.getBeverageDisplayName()
                         val effectiveAmount = entry.getEffectiveHydrationAmount().toInt()
-                        if (beverageType.hydrationMultiplier != 1.0) {
+                        if (entry.amount.toInt() != effectiveAmount) {
                             Text(
-                                text = "Beverage: ${beverageType.displayName} (${effectiveAmount}ml eff.)",
+                                text = "Beverage: $beverageName (${effectiveAmount}ml eff.)",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.secondary
                             )
                         } else {
                             Text(
-                                text = "Beverage: ${beverageType.displayName}",
+                                text = "Beverage: $beverageName",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.secondary
                             )

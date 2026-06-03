@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.material3.carousel.rememberCarouselState
@@ -26,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -47,8 +45,13 @@ import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
 import com.cemcakmak.hydrotracker.utils.WaterCalculator
 import com.cemcakmak.hydrotracker.presentation.common.showSuccessSnackbar
 import com.cemcakmak.hydrotracker.presentation.common.showErrorSnackbar
+import com.cemcakmak.hydrotracker.presentation.common.AddContainerPresetBottomSheet
+import com.cemcakmak.hydrotracker.presentation.common.EditContainerPresetBottomSheet
+import com.cemcakmak.hydrotracker.presentation.common.BeverageOption
+import com.cemcakmak.hydrotracker.presentation.common.toOption
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -56,7 +59,7 @@ fun HomeScreen(
     userProfile: UserProfile,
     waterIntakeRepository: WaterIntakeRepository,
     containerPresetRepository: ContainerPresetRepository,
-    activeBeverageTypes: List<BeverageType> = BeverageType.getAllSorted(),
+    activeBeverages: List<BeverageOption> = BeverageType.getAllSorted().map { it.toOption() },
     onNavigateToSettings: () -> Unit = {},
     paddingValues: PaddingValues,
     snackbarHostState: SnackbarHostState,
@@ -108,7 +111,7 @@ fun HomeScreen(
     var entryToEdit by remember { mutableStateOf<WaterIntakeEntry?>(null) }
 
     // Beverage selection state
-    var selectedBeverageType by remember { mutableStateOf(BeverageType.WATER) }
+    var selectedBeverage by remember { mutableStateOf(BeverageType.WATER.toOption()) }
 
     // Container preset management state
     val presets by containerPresetRepository.getAllPresets().collectAsState(initial = emptyList())
@@ -130,12 +133,13 @@ fun HomeScreen(
             val result = waterIntakeRepository.addWaterIntake(
                 amount = amount,
                 containerPreset = containerPreset,
-                beverageType = selectedBeverageType
+                beverageKey = selectedBeverage.storageKey,
+                beverageMultiplier = selectedBeverage.storedMultiplier
             )
 
             result.onSuccess {
-                val beverageInfo = if (selectedBeverageType != BeverageType.WATER) {
-                    " ${selectedBeverageType.displayName}"
+                val beverageInfo = if (!selectedBeverage.isWater) {
+                    " ${selectedBeverage.displayName}"
                 } else {
                     ""
                 }
@@ -196,7 +200,7 @@ fun HomeScreen(
                     waterIntakeRepository.getSyncManager().importExternalHydrationData(context, waterIntakeRepository.getUserRepository(), waterIntakeRepository, since) { imported, errors ->
                         coroutineScope.launch {
                             // Always show loading for at least 1.5 seconds for better UX
-                            kotlinx.coroutines.delay(1500)
+                            kotlinx.coroutines.delay(1500.milliseconds)
 
                             when {
                                 imported > 0 -> {
@@ -220,7 +224,7 @@ fun HomeScreen(
                     }
                 } catch (e: Exception) {
                     // Show loading for at least 1.5 seconds even on error
-                    kotlinx.coroutines.delay(1500)
+                    kotlinx.coroutines.delay(1500.milliseconds)
                     snackbarHostState.showErrorSnackbar(
                         message = "Sync failed: ${e.message}"
                     )
@@ -228,7 +232,7 @@ fun HomeScreen(
                 }
             } else {
                 // Show loading animation even when disabled for consistency
-                kotlinx.coroutines.delay(1500)
+                kotlinx.coroutines.delay(1500.milliseconds)
                 snackbarHostState.showSnackbar(
                     message = "Health Connect sync is disabled",
                     actionLabel = "Enable"
@@ -418,12 +422,12 @@ fun HomeScreen(
 
                     // Beverage Selection Section
                     BeverageSelectionSection(
-                        selectedBeverageType = selectedBeverageType,
-                        onBeverageTypeChange = { beverageType ->
-                            selectedBeverageType = beverageType
+                        selectedBeverage = selectedBeverage,
+                        onBeverageChange = { beverage ->
+                            selectedBeverage = beverage
                             haptics.performHapticFeedback(HapticFeedbackType.Confirm)
                         },
-                        beverageTypes = activeBeverageTypes,
+                        beverages = activeBeverages,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -479,11 +483,11 @@ fun HomeScreen(
                 addWaterIntake(amount, "Custom")
                 onCustomDialogChange(false)
             },
-            selectedBeverageType = selectedBeverageType,
-            onBeverageTypeChange = { newType ->
-                selectedBeverageType = newType
+            selectedBeverage = selectedBeverage,
+            onBeverageChange = { newBeverage ->
+                selectedBeverage = newBeverage
             },
-            beverageTypes = activeBeverageTypes
+            beverages = activeBeverages
         )
     }
 
@@ -500,7 +504,7 @@ fun HomeScreen(
                 showEditDialog = false
                 entryToEdit = null
             },
-            beverageTypes = activeBeverageTypes
+            beverages = activeBeverages
         )
     }
 
@@ -556,10 +560,10 @@ fun HomeScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CarouselWaterCard(
+    modifier: Modifier = Modifier,
     preset: ContainerPreset,
     onClick: () -> Unit,
     onLongPress: () -> Unit = {},
-    modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
@@ -665,9 +669,9 @@ fun AddContainerCard(
 private fun CustomWaterDialog(
     onDismiss: () -> Unit,
     onConfirm: (Double) -> Unit,
-    selectedBeverageType: BeverageType,
-    onBeverageTypeChange: (BeverageType) -> Unit,
-    beverageTypes: List<BeverageType> = BeverageType.getAllSorted()
+    selectedBeverage: BeverageOption,
+    onBeverageChange: (BeverageOption) -> Unit,
+    beverages: List<BeverageOption> = BeverageType.getAllSorted().map { it.toOption() }
 ) {
     var amountText by remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(false) }
@@ -698,13 +702,13 @@ private fun CustomWaterDialog(
                     onExpandedChange = { beverageExpanded = !beverageExpanded }
                 ) {
                     OutlinedTextField(
-                        value = selectedBeverageType.displayName,
+                        value = selectedBeverage.displayName,
                         onValueChange = { },
                         readOnly = true,
                         label = { Text("Beverage Type") },
                         leadingIcon = {
                             Icon(
-                                painter = painterResource(selectedBeverageType.iconRes),
+                                painter = painterResource(selectedBeverage.iconRes),
                                 contentDescription = null,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -721,7 +725,7 @@ private fun CustomWaterDialog(
                         expanded = beverageExpanded,
                         onDismissRequest = { beverageExpanded = false }
                     ) {
-                        beverageTypes.forEach { beverageType ->
+                        beverages.forEach { beverage ->
                             DropdownMenuItem(
                                 text = {
                                     Row(
@@ -729,17 +733,17 @@ private fun CustomWaterDialog(
                                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                                     ) {
                                         Icon(
-                                            painter = painterResource(beverageType.iconRes),
+                                            painter = painterResource(beverage.iconRes),
                                             contentDescription = null,
                                             modifier = Modifier.size(20.dp)
                                         )
                                         Column {
                                             Text(
-                                                text = beverageType.displayName,
+                                                text = beverage.displayName,
                                                 style = MaterialTheme.typography.bodyLarge
                                             )
                                             Text(
-                                                text = "${(beverageType.hydrationMultiplier * 100).toInt()}% hydration",
+                                                text = "${(beverage.hydrationMultiplier * 100).toInt()}% hydration",
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
@@ -747,7 +751,7 @@ private fun CustomWaterDialog(
                                     }
                                 },
                                 onClick = {
-                                    onBeverageTypeChange(beverageType)
+                                    onBeverageChange(beverage)
                                     beverageExpanded = false
                                 }
                             )
@@ -756,7 +760,7 @@ private fun CustomWaterDialog(
                 }
 
                 // Show selected beverage info
-                if (selectedBeverageType != BeverageType.WATER) {
+                if (!selectedBeverage.isWater) {
                     Card(
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
@@ -768,17 +772,19 @@ private fun CustomWaterDialog(
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             Text(
-                                text = "Selected: ${selectedBeverageType.displayName}",
+                                text = "Selected: ${selectedBeverage.displayName}",
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Medium
                             )
+                            selectedBeverage.description?.let { description ->
+                                Text(
+                                    text = description,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                             Text(
-                                text = selectedBeverageType.description,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                text = "Hydration effectiveness: ${(selectedBeverageType.hydrationMultiplier * 100).toInt()}%",
+                                text = "Hydration effectiveness: ${(selectedBeverage.hydrationMultiplier * 100).toInt()}%",
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Medium
@@ -837,13 +843,15 @@ private fun EditWaterDialog(
     entry: WaterIntakeEntry,
     onDismiss: () -> Unit,
     onConfirm: (WaterIntakeEntry) -> Unit,
-    beverageTypes: List<BeverageType> = BeverageType.getAllSorted()
+    beverages: List<BeverageOption> = BeverageType.getAllSorted().map { it.toOption() }
 ) {
     var amountText by remember { mutableStateOf(entry.amount.toString()) }
     var containerType by remember { mutableStateOf(entry.containerType) }
-    var selectedBeverageType by remember {
+    var selectedBeverage by remember {
         mutableStateOf(
-            entry.getBeverageType().let { t -> if (t in beverageTypes) t else BeverageType.WATER }
+            beverages.find { it.storageKey == entry.beverageType }
+                ?: beverages.firstOrNull { it.isWater }
+                ?: BeverageType.WATER.toOption()
         )
     }
     var isError by remember { mutableStateOf(false) }
@@ -978,13 +986,13 @@ private fun EditWaterDialog(
                         onExpandedChange = { beverageExpanded = !beverageExpanded }
                     ) {
                         OutlinedTextField(
-                            value = selectedBeverageType.displayName,
+                            value = selectedBeverage.displayName,
                             onValueChange = { },
                             readOnly = true,
                             label = { Text("Beverage Type") },
                             leadingIcon = {
                                 Icon(
-                                    painter = painterResource(selectedBeverageType.iconRes),
+                                    painter = painterResource(selectedBeverage.iconRes),
                                     contentDescription = null,
                                     modifier = Modifier.size(20.dp)
                                 )
@@ -1001,7 +1009,7 @@ private fun EditWaterDialog(
                             expanded = beverageExpanded,
                             onDismissRequest = { beverageExpanded = false }
                         ) {
-                            beverageTypes.forEach { beverageType ->
+                            beverages.forEach { beverage ->
                                 DropdownMenuItem(
                                     text = {
                                         Row(
@@ -1009,17 +1017,17 @@ private fun EditWaterDialog(
                                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                                         ) {
                                             Icon(
-                                                painter = painterResource(beverageType.iconRes),
+                                                painter = painterResource(beverage.iconRes),
                                                 contentDescription = null,
                                                 modifier = Modifier.size(20.dp)
                                             )
                                             Column {
                                                 Text(
-                                                    text = beverageType.displayName,
+                                                    text = beverage.displayName,
                                                     style = MaterialTheme.typography.bodyLarge
                                                 )
                                                 Text(
-                                                    text = "${(beverageType.hydrationMultiplier * 100).toInt()}% hydration",
+                                                    text = "${(beverage.hydrationMultiplier * 100).toInt()}% hydration",
                                                     style = MaterialTheme.typography.bodySmall,
                                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                                 )
@@ -1027,7 +1035,7 @@ private fun EditWaterDialog(
                                         }
                                     },
                                     onClick = {
-                                        selectedBeverageType = beverageType
+                                        selectedBeverage = beverage
                                         beverageExpanded = false
                                     }
                                 )
@@ -1112,7 +1120,8 @@ private fun EditWaterDialog(
                                     val updatedEntry = entry.copy(
                                         amount = amount,
                                         containerType = containerType,
-                                        beverageType = selectedBeverageType.name,
+                                        beverageType = selectedBeverage.storageKey,
+                                        beverageMultiplier = selectedBeverage.storedMultiplier,
                                         timestamp = newCalendar.timeInMillis
                                     )
                                     onConfirm(updatedEntry)
@@ -1239,7 +1248,7 @@ private fun RecentEntryItem(
                 hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onEdit(entry)
                 // Reset to center after action
-                kotlinx.coroutines.delay(100)
+                kotlinx.coroutines.delay(100.milliseconds)
                 dismissState.snapTo(SwipeToDismissBoxValue.Settled)
             }
             SwipeToDismissBoxValue.EndToStart -> {
@@ -1247,7 +1256,7 @@ private fun RecentEntryItem(
                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                 showDeleteDialog = true
                 // Reset to center after showing dialog
-                kotlinx.coroutines.delay(100)
+                kotlinx.coroutines.delay(100.milliseconds)
                 dismissState.snapTo(SwipeToDismissBoxValue.Settled)
             }
             SwipeToDismissBoxValue.Settled -> {
@@ -1399,9 +1408,9 @@ private fun RecentEntryItem(
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        if (entry.getBeverageType() != BeverageType.WATER) {
+                        if (entry.beverageType != BeverageType.WATER.name) {
                             Text(
-                                text = "${entry.getBeverageType().displayName} • ${entry.getFormattedEffectiveAmount()} effective",
+                                text = "${entry.getBeverageDisplayName()} • ${entry.getFormattedEffectiveAmount()} effective",
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -1534,16 +1543,16 @@ private fun getMotivationalMessage(progress: Float, userProfile: UserProfile, is
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun BeverageSelectionSection(
-    selectedBeverageType: BeverageType,
-    onBeverageTypeChange: (BeverageType) -> Unit,
-    beverageTypes: List<BeverageType> = BeverageType.getAllSorted(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    selectedBeverage: BeverageOption,
+    onBeverageChange: (BeverageOption) -> Unit,
+    beverages: List<BeverageOption> = BeverageType.getAllSorted().map { it.toOption() },
 ) {
     val haptics = LocalHapticFeedback.current
 
-    val safeSelected = if (selectedBeverageType in beverageTypes) selectedBeverageType else beverageTypes.first()
-    LaunchedEffect(beverageTypes) {
-        if (selectedBeverageType !in beverageTypes) onBeverageTypeChange(BeverageType.WATER)
+    val safeSelected = if (selectedBeverage in beverages) selectedBeverage else beverages.first()
+    LaunchedEffect(beverages) {
+        if (selectedBeverage !in beverages) onBeverageChange(beverages.firstOrNull { it.isWater } ?: beverages.first())
     }
 
     Column(
@@ -1557,8 +1566,8 @@ private fun BeverageSelectionSection(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(horizontal = 4.dp)
         ) {
-            items(beverageTypes) { beverageType ->
-                val isSelected = safeSelected == beverageType
+            items(beverages) { beverage ->
+                val isSelected = safeSelected == beverage
 
                 FilterChip(
                     shape = if (isSelected){
@@ -1568,18 +1577,18 @@ private fun BeverageSelectionSection(
                     },
                     onClick = {
                         haptics.performHapticFeedback(HapticFeedbackType.Confirm)
-                        onBeverageTypeChange(beverageType)
+                        onBeverageChange(beverage)
                     },
                     label = {
                         if (isSelected){
                             Text(
-                                text = beverageType.displayName,
+                                text = beverage.displayName,
                                 style = MaterialTheme.typography.labelMediumEmphasized,
                                 textAlign = TextAlign.Center
                             )
                         } else {
                             Text(
-                                text = beverageType.displayName,
+                                text = beverage.displayName,
                                 style = MaterialTheme.typography.labelMedium,
                                 textAlign = TextAlign.Center
                             )
@@ -1588,13 +1597,13 @@ private fun BeverageSelectionSection(
                     leadingIcon = {
                         if (isSelected){
                             Icon(
-                                painter = painterResource(beverageType.iconResFilled),
+                                painter = painterResource(beverage.iconResFilled),
                                 contentDescription = null,
                                 modifier = Modifier.size(18.dp)
                             )
                         } else {
                             Icon(
-                                painter = painterResource(beverageType.iconRes),
+                                painter = painterResource(beverage.iconRes),
                                 contentDescription = null,
                                 modifier = Modifier.size(18.dp)
                             )
@@ -1608,7 +1617,7 @@ private fun BeverageSelectionSection(
 
         // Show selected beverage info with animation
         AnimatedVisibility(
-            visible = safeSelected != BeverageType.WATER,
+            visible = !safeSelected.isWater,
             enter = expandVertically(
                 animationSpec = spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
