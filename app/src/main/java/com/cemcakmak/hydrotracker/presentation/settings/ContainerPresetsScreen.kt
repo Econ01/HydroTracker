@@ -2,10 +2,8 @@ package com.cemcakmak.hydrotracker.presentation.settings
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -108,22 +106,6 @@ fun ContainerPresetsScreen(
             val resetInteractionSource = remember { MutableInteractionSource() }
             val addInteractionSource = remember { MutableInteractionSource() }
 
-            // Track pressed states for shape animation
-            val isResetPressed by resetInteractionSource.collectIsPressedAsState()
-            val isAddPressed by addInteractionSource.collectIsPressedAsState()
-
-            // Animate corner radius: pill (50.dp) -> rounded rectangle (16.dp) when pressed
-            val resetCornerRadius by animateDpAsState(
-                targetValue = if (isResetPressed) 16.dp else 50.dp,
-                animationSpec = spring(),
-                label = "deleteCornerRadius"
-            )
-            val addCornerRadius by animateDpAsState(
-                targetValue = if (isAddPressed) 16.dp else 50.dp,
-                animationSpec = spring(),
-                label = "saveCornerRadius"
-            )
-
             LaunchedEffect(resetInteractionSource) {
                 resetInteractionSource.interactions.collect { interaction ->
                     when (interaction) {
@@ -159,7 +141,7 @@ fun ContainerPresetsScreen(
                                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
                                 contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                             ),
-                            shape = RoundedCornerShape(resetCornerRadius),
+                            shapes = ButtonDefaults.shapes(),
                             interactionSource = resetInteractionSource,
                             modifier = with(scope) {
                                 Modifier
@@ -184,7 +166,7 @@ fun ContainerPresetsScreen(
                             onClick = {
                                 showAddSheet = true
                             },
-                            shape = RoundedCornerShape(addCornerRadius),
+                            shapes = ButtonDefaults.shapes(),
                             interactionSource = addInteractionSource,
                             modifier = with(scope) {
                                 Modifier
