@@ -53,6 +53,7 @@ import com.cemcakmak.hydrotracker.presentation.settings.HydrationHealthScreen
 import com.cemcakmak.hydrotracker.presentation.settings.QuickAddCustomizationScreen
 import com.cemcakmak.hydrotracker.presentation.settings.ContainerPresetsScreen
 import com.cemcakmak.hydrotracker.presentation.settings.BeverageTypesEditScreen
+import com.cemcakmak.hydrotracker.presentation.settings.NotificationsScreen
 import com.cemcakmak.hydrotracker.presentation.settings.PlaceholderScreen
 import com.cemcakmak.hydrotracker.presentation.settings.HealthConnectDataScreen
 import com.cemcakmak.hydrotracker.presentation.onboarding.*
@@ -522,7 +523,20 @@ fun HydroTrackerApp(
                             )
                         }
                         entry<NavigationRoutes.SettingsNotifications> {
-                            PlaceholderScreen(title = "Notifications", onNavigateBack = popBackStack)
+                            NotificationsScreen(
+                                userProfile = userProfile,
+                                onNavigateBack = popBackStack,
+                                onRequestNotificationPermission = {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                        notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                                    }
+                                },
+                                onUserProfileUpdate = { updatedProfile ->
+                                    userRepository.saveUserProfile(updatedProfile)
+                                    HydroNotificationScheduler.rescheduleNotifications(context, updatedProfile)
+                                },
+                                paddingValues = paddingValues
+                            )
                         }
                         entry<NavigationRoutes.SettingsSupport> {
                             PlaceholderScreen(title = "Support Development", onNavigateBack = popBackStack)
