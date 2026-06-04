@@ -1,12 +1,20 @@
 package com.cemcakmak.hydrotracker.presentation.settings
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,6 +24,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
@@ -28,12 +37,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.models.ActivityLevel
@@ -45,6 +62,7 @@ import com.cemcakmak.hydrotracker.data.models.ReminderIntervalMode
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.presentation.common.BlurMorph
+import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.utils.WaterCalculator
 
@@ -71,6 +89,14 @@ fun ReminderIntervalScreen(
                 previewText = previewText,
                 reminderIntervalMode = userProfile.reminderIntervalMode,
                 dayEndMode = userProfile.dayEndMode
+            )
+
+            DayEndSection(
+                currentMode = userProfile.dayEndMode,
+                onModeChange = { newMode ->
+                    haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
+                    onUserProfileUpdate(userProfile.copy(dayEndMode = newMode))
+                }
             )
 
             // Mode selector
@@ -143,7 +169,13 @@ fun ReminderIntervalScreen(
                 }
 
                 // Custom interval picker
-                if (userProfile.reminderIntervalMode == ReminderIntervalMode.CUSTOM) {
+                AnimatedVisibility(
+                    visible = userProfile.reminderIntervalMode == ReminderIntervalMode.CUSTOM,
+                    enter = fadeIn(animationSpec = MaterialTheme.motionScheme.slowSpatialSpec()) +
+                            expandVertically(animationSpec = MaterialTheme.motionScheme.slowSpatialSpec()),
+                    exit = fadeOut(animationSpec = MaterialTheme.motionScheme.slowSpatialSpec()) +
+                           shrinkVertically(animationSpec = MaterialTheme.motionScheme.slowSpatialSpec())
+                ) {
                     CustomIntervalPicker(
                         currentInterval = userProfile.customReminderInterval,
                         onIntervalChange = { newInterval ->
@@ -159,17 +191,6 @@ fun ReminderIntervalScreen(
             }
 
 
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                DayEndSection(
-                    currentMode = userProfile.dayEndMode,
-                    onModeChange = { newMode ->
-                        haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
-                        onUserProfileUpdate(userProfile.copy(dayEndMode = newMode))
-                    }
-                )
-            }
         }
     }
 }
@@ -295,7 +316,6 @@ private fun DayEndSection(
     val haptics = LocalHapticFeedback.current
 
     Column(
-        modifier = Modifier.padding(top = 24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         SettingsSectionHeader("Day end")
@@ -314,10 +334,30 @@ private fun DayEndSection(
                     },
                     modifier = Modifier.weight(1f)
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Crossfade(
+                            targetState = isSelected,
+                            animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
+                            label = "modeIcon_${mode.getDisplayName()}"
+                        ) { selected ->
+                            Icon(
+                                imageVector = when (mode) {
+                                    DayEndMode.SLEEP_TIME -> if (selected) ImageVector.vectorResource(
+                                        R.drawable.bed_filled
+                                    ) else ImageVector.vectorResource(R.drawable.bed)
+
+                                    DayEndMode.MIDNIGHT -> if (selected) ImageVector.vectorResource(
+                                        R.drawable.bedtime_filled
+                                    ) else ImageVector.vectorResource(R.drawable.bedtime)
+                                },
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+
                         Text(
                             text = mode.getDisplayName(),
                             style = if (isSelected) {
@@ -333,6 +373,7 @@ private fun DayEndSection(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CustomIntervalPicker(
     currentInterval: Int,
@@ -342,24 +383,32 @@ private fun CustomIntervalPicker(
     var sliderPosition by remember { mutableIntStateOf(currentInterval) }
 
     Column(
-        modifier = Modifier.padding(top = 24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        SettingsSectionHeader("Custom interval")
+        val animatedMinutes = rememberAnimatedDouble(
+            targetValue = sliderPosition.toDouble(),
+            hapticsEnabled = false,
+            animationSpec = tween(durationMillis = 150, easing = EaseInOut)
+        )
 
         Text(
-            text = formatInterval(sliderPosition),
+            text = formatInterval(animatedMinutes.toInt()),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
+        val startIcon = rememberVectorPainter(ImageVector.vectorResource(R.drawable.sunny_filled))
+        val endIcon = rememberVectorPainter(ImageVector.vectorResource(R.drawable.bedtime_filled))
         Slider(
             value = sliderPosition.toFloat(),
             onValueChange = {
-                val newValue = it.toInt()
+                val stepSize = 10f
+                val rawValue = it.coerceIn(1f, 480f)
+                val snappedValue = kotlin.math.round(rawValue / stepSize) * stepSize
+                val newValue = snappedValue.toInt().coerceIn(1, 480)
                 if (newValue != sliderPosition) {
-                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)
                     sliderPosition = newValue
                 }
             },
@@ -367,7 +416,58 @@ private fun CustomIntervalPicker(
                 onIntervalChange(sliderPosition)
             },
             valueRange = 1f..480f,
-            steps = 478,
+            steps = 0,
+            track = { sliderState ->
+                val iconSize = DpSize(25.dp, 25.dp)
+                val iconPadding = 10.dp
+                val thumbTrackGapSize = 6.dp
+                val activeIconColor = SliderDefaults.colors().activeTickColor
+                val inactiveIconColor = SliderDefaults.colors().inactiveTickColor
+                val trackIconStart: DrawScope.(Offset, Color) -> Unit = { offset, color ->
+                    translate(offset.x + iconPadding.toPx(), offset.y) {
+                        with(startIcon) {
+                            draw(iconSize.toSize(), colorFilter = ColorFilter.tint(color))
+                        }
+                    }
+                }
+                val trackIconEnd: DrawScope.(Offset, Color) -> Unit = { offset, color ->
+                    translate(offset.x - iconPadding.toPx() - iconSize.toSize().width, offset.y) {
+                        with(endIcon) {
+                            draw(iconSize.toSize(), colorFilter = ColorFilter.tint(color))
+                        }
+                    }
+                }
+                SliderDefaults.Track(
+                    sliderState = sliderState,
+                    modifier = Modifier.height(36.dp).drawWithContent {
+                        drawContent()
+
+                        val yOffset = size.height / 2 - iconSize.toSize().height / 2
+                        val activeTrackStart = 0f
+                        val activeTrackEnd = size.width * sliderState.coercedValueAsFraction - thumbTrackGapSize.toPx()
+                        val inactiveTrackStart = activeTrackEnd + thumbTrackGapSize.toPx() * 2
+                        val inactiveTrackEnd = size.width
+
+                        val activeTrackWidth = activeTrackEnd - activeTrackStart
+                        val inactiveTrackWith = inactiveTrackEnd - inactiveTrackStart
+                        if (
+                            iconSize.toSize().width * 2 < activeTrackWidth - iconPadding.toPx() * 2
+                        ) {
+                            trackIconStart(Offset(activeTrackStart, yOffset), activeIconColor)
+                            trackIconEnd(Offset(activeTrackEnd, yOffset), activeIconColor)
+                        }
+                        if (
+                            iconSize.toSize().width * 2 < inactiveTrackWith - iconPadding.toPx() * 2
+                        ) {
+                            trackIconStart(Offset(inactiveTrackStart, yOffset), inactiveIconColor)
+                            trackIconEnd(Offset(inactiveTrackEnd, yOffset), inactiveIconColor)
+                        }
+                    },
+                    trackCornerSize = 12.dp,
+                    drawStopIndicator = null,
+                    thumbTrackGapSize = thumbTrackGapSize
+                )
+            },
             modifier = Modifier.fillMaxWidth()
         )
 
