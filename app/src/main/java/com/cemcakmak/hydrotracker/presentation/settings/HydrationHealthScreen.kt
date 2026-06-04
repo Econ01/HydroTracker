@@ -58,13 +58,11 @@ fun HydrationHealthScreen(
     healthConnectPermissionLauncher: ActivityResultLauncher<Set<String>>? = null,
     onHydrationStandardChange: (HydrationStandard) -> Unit = {},
     onHealthConnectSyncChange: (Boolean) -> Unit = {},
-    onNavigateBack: () -> Unit = {},
-    paddingValues: PaddingValues = PaddingValues()
+    onNavigateBack: () -> Unit = {}
 ) {
     SettingsDetailScaffold(
         title = "Hydration & Health",
-        onNavigateBack = onNavigateBack,
-        paddingValues = paddingValues
+        onNavigateBack = onNavigateBack
     ) {
         CalculationStandardSection(
             userProfile = userProfile,

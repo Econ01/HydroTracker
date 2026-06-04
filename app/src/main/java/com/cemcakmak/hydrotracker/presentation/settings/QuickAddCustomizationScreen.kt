@@ -8,7 +8,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -48,8 +47,7 @@ fun QuickAddCustomizationScreen(
     wasPop: Boolean = false,
     onNavigateToContainerPresets: () -> Unit = {},
     onNavigateToBeverageTypes: () -> Unit = {},
-    onNavigateBack: () -> Unit = {},
-    paddingValues: PaddingValues = PaddingValues()
+    onNavigateBack: () -> Unit = {}
 ) {
     val isPreview = LocalInspectionMode.current
     val shouldApplyDepth = !isPreview && wasPop
@@ -89,8 +87,7 @@ fun QuickAddCustomizationScreen(
         Box(modifier = Modifier.fillMaxSize().blur(blur)) {
             SettingsDetailScaffold(
                 title = "Quick Add Customization",
-                onNavigateBack = onNavigateBack,
-                paddingValues = paddingValues
+                onNavigateBack = onNavigateBack
             ) {
                 Column(
                     modifier = Modifier.padding(top = 24.dp),

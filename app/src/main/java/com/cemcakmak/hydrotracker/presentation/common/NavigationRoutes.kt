@@ -19,6 +19,7 @@ sealed interface NavigationRoutes : NavKey {
     @Serializable data object SettingsContainerPresets : NavigationRoutes
     @Serializable data object SettingsBeverageTypes : NavigationRoutes
     @Serializable data object SettingsNotifications : NavigationRoutes
+    @Serializable data object SettingsReminderInterval : NavigationRoutes
     @Serializable data object SettingsSupport : NavigationRoutes
     @Serializable data object SettingsAbout : NavigationRoutes
     @Serializable data object SettingsDeveloper : NavigationRoutes

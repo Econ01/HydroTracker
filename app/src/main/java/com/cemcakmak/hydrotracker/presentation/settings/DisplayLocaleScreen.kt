@@ -2,7 +2,6 @@ package com.cemcakmak.hydrotracker.presentation.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -37,13 +36,11 @@ import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 fun DisplayLocaleScreen(
     themePreferences: ThemePreferences = ThemePreferences(),
     onWeekStartDayChange: (WeekStartDay) -> Unit = {},
-    onNavigateBack: () -> Unit = {},
-    paddingValues: PaddingValues = PaddingValues()
+    onNavigateBack: () -> Unit = {}
 ) {
     SettingsDetailScaffold(
         title = "Display & Locale",
-        onNavigateBack = onNavigateBack,
-        paddingValues = paddingValues
+        onNavigateBack = onNavigateBack
     ) {
         WeekStartSection(
             weekStartDay = themePreferences.weekStartDay,

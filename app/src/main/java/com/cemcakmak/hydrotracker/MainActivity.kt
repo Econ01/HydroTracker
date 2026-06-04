@@ -54,6 +54,7 @@ import com.cemcakmak.hydrotracker.presentation.settings.QuickAddCustomizationScr
 import com.cemcakmak.hydrotracker.presentation.settings.ContainerPresetsScreen
 import com.cemcakmak.hydrotracker.presentation.settings.BeverageTypesEditScreen
 import com.cemcakmak.hydrotracker.presentation.settings.NotificationsScreen
+import com.cemcakmak.hydrotracker.presentation.settings.ReminderIntervalScreen
 import com.cemcakmak.hydrotracker.presentation.settings.PlaceholderScreen
 import com.cemcakmak.hydrotracker.presentation.settings.HealthConnectDataScreen
 import com.cemcakmak.hydrotracker.presentation.onboarding.*
@@ -223,6 +224,7 @@ fun HydroTrackerApp(
     val context = LocalContext.current
     var wasPop by remember { mutableStateOf(false) }
     var quickAddWasPop by remember { mutableStateOf(false) }
+    var notificationsWasPop by remember { mutableStateOf(false) }
 
     LaunchedEffect(isOnboardingCompleted, userProfile) {
         isLoading = false
@@ -347,9 +349,9 @@ fun HydroTrackerApp(
                         }
 
                         entry<NavigationRoutes.Home> {
-                            userProfile?.let {
+                            userProfile?.let { profile ->
                                 HomeScreen(
-                                    userProfile = it,
+                                    userProfile = profile,
                                     waterIntakeRepository = waterIntakeRepository,
                                     containerPresetRepository = containerPresetRepository,
                                     activeBeverages = activeBeverages,
@@ -524,6 +526,12 @@ fun HydroTrackerApp(
                         }
                         entry<NavigationRoutes.SettingsNotifications> {
                             NotificationsScreen(
+                                wasPop = notificationsWasPop,
+                                onNavigateToReminderInterval = {
+                                    notificationsWasPop = true
+                                    backStack.add(NavigationRoutes.SettingsReminderInterval)
+                                },
+                                themePreferences = themePreferences,
                                 userProfile = userProfile,
                                 onNavigateBack = popBackStack,
                                 onRequestNotificationPermission = {
@@ -534,8 +542,17 @@ fun HydroTrackerApp(
                                 onUserProfileUpdate = { updatedProfile ->
                                     userRepository.saveUserProfile(updatedProfile)
                                     HydroNotificationScheduler.rescheduleNotifications(context, updatedProfile)
-                                },
-                                paddingValues = paddingValues
+                                }
+                            )
+                        }
+                        entry<NavigationRoutes.SettingsReminderInterval> {
+                            ReminderIntervalScreen(
+                                userProfile = userProfile,
+                                onNavigateBack = popBackStack,
+                                onUserProfileUpdate = { updatedProfile ->
+                                    userRepository.saveUserProfile(updatedProfile)
+                                    HydroNotificationScheduler.rescheduleNotifications(context, updatedProfile)
+                                }
                             )
                         }
                         entry<NavigationRoutes.SettingsSupport> {

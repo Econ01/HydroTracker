@@ -7,7 +7,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -62,16 +61,14 @@ fun AppearanceScreen(
     onAppFontChange: (AppFont) -> Unit = {},
     onAutoHideNavBarChange: (Boolean) -> Unit = {},
     onNavBarLabelModeChange: (NavBarLabelMode) -> Unit = {},
-    onNavigateBack: () -> Unit = {},
-    paddingValues: PaddingValues = PaddingValues()
+    onNavigateBack: () -> Unit = {}
 ) {
     var showFontSheet by remember { mutableStateOf(false) }
     var showLabelSheet by remember { mutableStateOf(false) }
 
     SettingsDetailScaffold(
         title = "Appearance",
-        onNavigateBack = onNavigateBack,
-        paddingValues = paddingValues
+        onNavigateBack = onNavigateBack
     ) {
         ThemePreviewCard(themePreferences = themePreferences)
 
