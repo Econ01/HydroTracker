@@ -362,11 +362,11 @@ class WaterIntakeRepository(
     }
 
     /**
-     * Debug function to inject realistic water intake data for the past 30 days
+     * Debug function to inject realistic water intake data for the past [days] days
      * This helps test the History & Statistics screen with meaningful data
-     * FIXED: Now also creates DailySummary records for 30-day view
+     * Also creates DailySummary records so the multi-day views are populated
      */
-    suspend fun injectDebugData(): Result<Unit> = withContext(Dispatchers.IO) {
+    suspend fun injectDebugData(days: Int = 30): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             val calendar = Calendar.getInstance()
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -384,8 +384,8 @@ class WaterIntakeRepository(
             val entries = mutableListOf<WaterIntakeEntry>()
             val summaries = mutableListOf<DailySummary>()
 
-            // Generate data for the past 30 days
-            for (dayOffset in 0..29) {
+            // Generate data for the past [days] days
+            for (dayOffset in 0 until days) {
                 calendar.time = Date()
                 calendar.add(Calendar.DAY_OF_YEAR, -dayOffset)
 

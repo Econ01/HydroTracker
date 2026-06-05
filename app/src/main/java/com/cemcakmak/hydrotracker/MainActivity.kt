@@ -55,6 +55,7 @@ import com.cemcakmak.hydrotracker.presentation.settings.ContainerPresetsScreen
 import com.cemcakmak.hydrotracker.presentation.settings.BeverageTypesEditScreen
 import com.cemcakmak.hydrotracker.presentation.settings.NotificationsScreen
 import com.cemcakmak.hydrotracker.presentation.settings.ReminderIntervalScreen
+import com.cemcakmak.hydrotracker.presentation.settings.DeveloperOptionsScreen
 import com.cemcakmak.hydrotracker.presentation.settings.PlaceholderScreen
 import com.cemcakmak.hydrotracker.presentation.settings.HealthConnectDataScreen
 import com.cemcakmak.hydrotracker.presentation.onboarding.*
@@ -560,7 +561,18 @@ fun HydroTrackerApp(
                             PlaceholderScreen(title = "About", onNavigateBack = popBackStack)
                         }
                         entry<NavigationRoutes.SettingsDeveloper> {
-                            PlaceholderScreen(title = "Developer Options", onNavigateBack = popBackStack)
+                            DeveloperOptionsScreen(
+                                userProfile = userProfile,
+                                userRepository = userRepository,
+                                waterIntakeRepository = waterIntakeRepository,
+                                onNavigateBack = popBackStack,
+                                onNavigateToOnboarding = {
+                                    backStack.apply {
+                                        clear()
+                                        add(NavigationRoutes.Onboarding)
+                                    }
+                                }
+                            )
                         }
 
                         entry<NavigationRoutes.HealthConnectData> {
