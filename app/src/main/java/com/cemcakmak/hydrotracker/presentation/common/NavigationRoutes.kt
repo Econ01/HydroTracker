@@ -23,4 +23,5 @@ sealed interface NavigationRoutes : NavKey {
     @Serializable data object SettingsSupport : NavigationRoutes
     @Serializable data object SettingsAbout : NavigationRoutes
     @Serializable data object SettingsDeveloper : NavigationRoutes
+    @Serializable data object SettingsDeveloperHaptics : NavigationRoutes
 }

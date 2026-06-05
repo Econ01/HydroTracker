@@ -20,7 +20,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.ExperimentalTextApi
+import com.cemcakmak.hydrotracker.utils.SmartComposeHapticFeedback
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -56,6 +58,7 @@ import com.cemcakmak.hydrotracker.presentation.settings.BeverageTypesEditScreen
 import com.cemcakmak.hydrotracker.presentation.settings.NotificationsScreen
 import com.cemcakmak.hydrotracker.presentation.settings.ReminderIntervalScreen
 import com.cemcakmak.hydrotracker.presentation.settings.DeveloperOptionsScreen
+import com.cemcakmak.hydrotracker.presentation.settings.HapticsTestScreen
 import com.cemcakmak.hydrotracker.presentation.settings.PlaceholderScreen
 import com.cemcakmak.hydrotracker.presentation.settings.HealthConnectDataScreen
 import com.cemcakmak.hydrotracker.presentation.onboarding.*
@@ -181,14 +184,18 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            HydroTrackerApp(
-                userRepository,
-                waterIntakeRepository,
-                containerPresetRepository,
-                customBeverageRepository,
-                notificationPermissionLauncher,
-                healthConnectPermissionLauncher
-            )
+            CompositionLocalProvider(
+                LocalHapticFeedback provides SmartComposeHapticFeedback(this)
+            ) {
+                HydroTrackerApp(
+                    userRepository,
+                    waterIntakeRepository,
+                    containerPresetRepository,
+                    customBeverageRepository,
+                    notificationPermissionLauncher,
+                    healthConnectPermissionLauncher
+                )
+            }
         }
     }
 
@@ -226,6 +233,7 @@ fun HydroTrackerApp(
     var wasPop by remember { mutableStateOf(false) }
     var quickAddWasPop by remember { mutableStateOf(false) }
     var notificationsWasPop by remember { mutableStateOf(false) }
+    var developerOptionsWasPop by remember { mutableStateOf(false) }
 
     LaunchedEffect(isOnboardingCompleted, userProfile) {
         isLoading = false
@@ -547,6 +555,7 @@ fun HydroTrackerApp(
                         entry<NavigationRoutes.SettingsReminderInterval> {
                             ReminderIntervalScreen(
                                 userProfile = userProfile,
+                                themePreferences = themePreferences,
                                 onNavigateBack = popBackStack,
                                 onUserProfileUpdate = { updatedProfile ->
                                     userRepository.saveUserProfile(updatedProfile)
@@ -562,6 +571,7 @@ fun HydroTrackerApp(
                         }
                         entry<NavigationRoutes.SettingsDeveloper> {
                             DeveloperOptionsScreen(
+                                wasPop = developerOptionsWasPop,
                                 userProfile = userProfile,
                                 userRepository = userRepository,
                                 waterIntakeRepository = waterIntakeRepository,
@@ -571,7 +581,17 @@ fun HydroTrackerApp(
                                         clear()
                                         add(NavigationRoutes.Onboarding)
                                     }
+                                },
+                                onNavigateToHapticsTest = {
+                                    developerOptionsWasPop = true
+                                    backStack.add(NavigationRoutes.SettingsDeveloperHaptics)
                                 }
+                            )
+                        }
+                        entry<NavigationRoutes.SettingsDeveloperHaptics> {
+                            HapticsTestScreen(
+                                themePreferences = themePreferences,
+                                onNavigateBack = popBackStack
                             )
                         }
 

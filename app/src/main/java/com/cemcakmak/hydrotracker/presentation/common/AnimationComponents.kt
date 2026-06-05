@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Dp
+import com.cemcakmak.hydrotracker.utils.SmartHaptics
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -74,9 +75,9 @@ fun rememberAnimatedDouble(
                 if (currentTick != lastTick && animatedValue > 0f) {
                     lastTick = currentTick
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                        view.performHapticFeedback(HapticFeedbackConstants.SEGMENT_FREQUENT_TICK)
+                        SmartHaptics.performRaw(view.context, HapticFeedbackConstants.SEGMENT_FREQUENT_TICK)
                     } else {
-                        view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                        SmartHaptics.performRaw(view.context, HapticFeedbackConstants.CLOCK_TICK)
                     }
                 }
             }
