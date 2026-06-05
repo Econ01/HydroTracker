@@ -7,8 +7,6 @@ import android.util.Log
 import androidx.core.net.toUri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -43,7 +41,6 @@ import java.io.File
 
 /**
  * Main Profile Screen
- * Modular architecture with separate components
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -160,7 +157,6 @@ fun ProfileScreen(
             // Recalculate goal with new activity level
             val newGoal = WaterCalculator.calculateDailyWaterGoal(
                 gender = userProfile.gender,
-                ageGroup = userProfile.ageGroup,
                 activityLevel = newLevel,
                 weight = userProfile.weight,
                 hydrationStandard = userProfile.hydrationStandard
@@ -185,7 +181,9 @@ fun ProfileScreen(
             val newInterval = WaterCalculator.calculateReminderInterval(
                 wakeUpTime = wakeUp,
                 sleepTime = sleep,
-                dailyGoal = userProfile.dailyWaterGoal
+                dailyGoal = userProfile.dailyWaterGoal,
+                reminderIntervalMode = userProfile.reminderIntervalMode,
+                customReminderInterval = userProfile.customReminderInterval
             )
 
             Log.d("Interval", "New interval: $newInterval")
@@ -209,7 +207,6 @@ fun ProfileScreen(
             // Recalculate goal with new gender
             val newGoal = WaterCalculator.calculateDailyWaterGoal(
                 gender = newGender,
-                ageGroup = userProfile.ageGroup,
                 activityLevel = userProfile.activityLevel,
                 weight = userProfile.weight,
                 hydrationStandard = userProfile.hydrationStandard
@@ -232,7 +229,6 @@ fun ProfileScreen(
             // Recalculate goal with new age group
             val newGoal = WaterCalculator.calculateDailyWaterGoal(
                 gender = userProfile.gender,
-                ageGroup = newAgeGroup,
                 activityLevel = userProfile.activityLevel,
                 weight = userProfile.weight,
                 hydrationStandard = userProfile.hydrationStandard
@@ -255,7 +251,6 @@ fun ProfileScreen(
             // Recalculate goal with new weight
             val newGoal = WaterCalculator.calculateDailyWaterGoal(
                 gender = userProfile.gender,
-                ageGroup = userProfile.ageGroup,
                 activityLevel = userProfile.activityLevel,
                 weight = newWeight,
                 hydrationStandard = userProfile.hydrationStandard

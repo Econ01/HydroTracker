@@ -6,6 +6,7 @@ import com.cemcakmak.hydrotracker.data.models.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import androidx.core.content.edit
 
 /**
  * Repository for managing user data persistence
@@ -54,13 +55,36 @@ class UserRepository(context: Context) {
             // Migration for usePureBlack (added in version 0.9.3)
             if (!prefs.contains("use_pure_black")) {
                 println("UserRepository: Adding missing use_pure_black preference")
-                prefs.edit().putBoolean("use_pure_black", false).apply()
+                prefs.edit { putBoolean("use_pure_black", false) }
             }
 
             // Migration for hydrationStandard (added in version 0.9.4)
             if (!prefs.contains("hydration_standard")) {
                 println("UserRepository: Adding missing hydration_standard preference - defaulting to EFSA")
-                prefs.edit().putString("hydration_standard", HydrationStandard.EFSA.name).apply()
+                prefs.edit { putString("hydration_standard", HydrationStandard.EFSA.name) }
+            }
+
+            // Migration for dayEndMode (added in version 1.0.7)
+            if (!prefs.contains("day_end_mode")) {
+                println("UserRepository: Adding missing day_end_mode preference - defaulting to SLEEP_TIME")
+                prefs.edit { putString("day_end_mode", DayEndMode.SLEEP_TIME.name) }
+            }
+
+            // Migration for reminderIntervalMode (added in version 1.0.7)
+            if (!prefs.contains("reminder_interval_mode")) {
+                println("UserRepository: Adding missing reminder_interval_mode preference - defaulting to AUTOMATIC")
+                prefs.edit {
+                    putString(
+                        "reminder_interval_mode",
+                        ReminderIntervalMode.AUTOMATIC.name
+                    )
+                }
+            }
+
+            // Migration for customReminderInterval (added in version 1.0.7)
+            if (!prefs.contains("custom_reminder_interval")) {
+                println("UserRepository: Adding missing custom_reminder_interval preference - defaulting to 60")
+                prefs.edit { putInt("custom_reminder_interval", 60) }
             }
 
             println("UserRepository: Migration complete")
@@ -87,6 +111,9 @@ class UserRepository(context: Context) {
             putString("reminder_style", profile.reminderStyle.name)
             putString("hydration_standard", profile.hydrationStandard.name)
             putBoolean("health_connect_sync_enabled", profile.healthConnectSyncEnabled)
+            putString("day_end_mode", profile.dayEndMode.name)
+            putString("reminder_interval_mode", profile.reminderIntervalMode.name)
+            putInt("custom_reminder_interval", profile.customReminderInterval)
 
             // Optional fields
             profile.weight?.let { putFloat("weight", it.toFloat()) }
@@ -144,7 +171,14 @@ class UserRepository(context: Context) {
                         hydrationStandard = HydrationStandard.valueOf(
                             prefs.getString("hydration_standard", HydrationStandard.EFSA.name) ?: HydrationStandard.EFSA.name
                         ),
-                        healthConnectSyncEnabled = prefs.getBoolean("health_connect_sync_enabled", false)
+                        healthConnectSyncEnabled = prefs.getBoolean("health_connect_sync_enabled", false),
+                        dayEndMode = DayEndMode.valueOf(
+                            prefs.getString("day_end_mode", DayEndMode.SLEEP_TIME.name) ?: DayEndMode.SLEEP_TIME.name
+                        ),
+                        reminderIntervalMode = ReminderIntervalMode.valueOf(
+                            prefs.getString("reminder_interval_mode", ReminderIntervalMode.AUTOMATIC.name) ?: ReminderIntervalMode.AUTOMATIC.name
+                        ),
+                        customReminderInterval = prefs.getInt("custom_reminder_interval", 60)
                     )
 
                     _userProfile.value = profile
@@ -154,7 +188,7 @@ class UserRepository(context: Context) {
                     clearUserProfile()
                 }
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Handle any corrupted data by resetting
             _isOnboardingCompleted.value = false
             clearUserProfile()
@@ -166,7 +200,7 @@ class UserRepository(context: Context) {
      */
     fun clearUserProfile() {
         println("UserRepository: Clearing all user data...")
-        prefs.edit().clear().apply()
+        prefs.edit { clear() }
         _userProfile.value = null
         _isOnboardingCompleted.value = false
         println("UserRepository: User data cleared. Onboarding status = ${_isOnboardingCompleted.value}")
@@ -177,7 +211,7 @@ class UserRepository(context: Context) {
      */
     fun resetOnboarding() {
         println("UserRepository: Resetting onboarding...")
-        prefs.edit().putBoolean("onboarding_completed", false).apply()
+        prefs.edit { putBoolean("onboarding_completed", false) }
         _isOnboardingCompleted.value = false
         _userProfile.value = null
         println("UserRepository: Onboarding reset complete")
@@ -224,20 +258,6 @@ class UserRepository(context: Context) {
                 prefs.getString("nav_bar_label_mode", NavBarLabelMode.ALWAYS.name) ?: NavBarLabelMode.ALWAYS.name
             )
         )
-    }
-    
-    /**
-     * Save developer options enabled state
-     */
-    fun saveDeveloperOptionsEnabled(enabled: Boolean) {
-        prefs.edit().putBoolean("developer_options_enabled", enabled).apply()
-    }
-    
-    /**
-     * Load developer options enabled state
-     */
-    fun loadDeveloperOptionsEnabled(): Boolean {
-        return prefs.getBoolean("developer_options_enabled", false)
     }
 
     private fun loadBeveragePreferences(): BeveragePreferences {

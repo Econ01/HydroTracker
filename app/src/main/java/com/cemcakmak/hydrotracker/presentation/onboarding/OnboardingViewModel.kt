@@ -13,10 +13,10 @@ import com.cemcakmak.hydrotracker.data.repository.UserRepository
 import com.cemcakmak.hydrotracker.notifications.NotificationPermissionManager
 import com.cemcakmak.hydrotracker.notifications.HydroNotificationScheduler
 import com.cemcakmak.hydrotracker.utils.WaterCalculator
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * ViewModel for managing onboarding flow state and user profile creation
- * Follows Material Design 3 Expressive principles with smooth state transitions
  * Integrated with UserRepository for data persistence and notification system
  */
 class OnboardingViewModel(
@@ -94,7 +94,7 @@ class OnboardingViewModel(
             updateNavigationState()
 
             // Simulate animation duration
-            kotlinx.coroutines.delay(300)
+            kotlinx.coroutines.delay(300.milliseconds)
             _isAnimating.value = false
         }
     }
@@ -120,7 +120,7 @@ class OnboardingViewModel(
             _currentStep.value = previousStep
             updateNavigationState()
 
-            kotlinx.coroutines.delay(300)
+            kotlinx.coroutines.delay(300.milliseconds)
             _isAnimating.value = false
         }
     }
@@ -143,7 +143,7 @@ class OnboardingViewModel(
         updateNavigationState()
     }
 
-    /** Update wake up time */
+    /** Update wake-up time */
     fun updateWakeUpTime(time: String) {
         _userProfile.value = _userProfile.value.copy(wakeUpTime = time)
         updateNavigationState()
@@ -173,7 +173,6 @@ class OnboardingViewModel(
 
         val dailyGoal = WaterCalculator.calculateDailyWaterGoal(
             gender = profile.gender,
-            ageGroup = profile.ageGroup,
             activityLevel = profile.activityLevel,
             weight = profile.weight,
             hydrationStandard = profile.hydrationStandard
@@ -182,7 +181,9 @@ class OnboardingViewModel(
         val reminderInterval = WaterCalculator.calculateReminderInterval(
             wakeUpTime = profile.wakeUpTime,
             sleepTime = profile.sleepTime,
-            dailyGoal = dailyGoal
+            dailyGoal = dailyGoal,
+            reminderIntervalMode = profile.reminderIntervalMode,
+            customReminderInterval = profile.customReminderInterval
         )
 
         _userProfile.value = _userProfile.value.copy(
@@ -237,7 +238,7 @@ class OnboardingViewModel(
             OnboardingStep.SCHEDULE -> true // Times are always valid (have defaults)
             OnboardingStep.PROFILE_SETUP -> _userProfile.value.name.isNotBlank() // Name is required
             OnboardingStep.GOAL -> true
-            OnboardingStep.COMPLETE -> false // No next step after complete
+            OnboardingStep.COMPLETE -> false // No, next step after complete
         }
     }
 

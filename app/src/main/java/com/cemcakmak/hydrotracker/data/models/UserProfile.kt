@@ -1,12 +1,11 @@
 package com.cemcakmak.hydrotracker.data.models
 
 /**
- * User profile data model following Material 3 Expressive principles
- * Supports personalized theming and compassionate health design
+ * User profile data model
  */
 data class UserProfile(
     val id: Int = 1,
-    val name: String, // Required user name (max 15 characters)
+    val name: String, // Required username (max 15 characters)
     val profileImagePath: String? = null, // Optional local file path to profile image
     val gender: Gender,
     val ageGroup: AgeGroup,
@@ -21,7 +20,10 @@ data class UserProfile(
     val useSystemTheme: Boolean = true, // Material 3 dynamic color
     val reminderStyle: ReminderStyle = ReminderStyle.GENTLE,
     val hydrationStandard: HydrationStandard = HydrationStandard.EFSA, // Default to EFSA
-    val healthConnectSyncEnabled: Boolean = false // Health Connect data sync setting
+    val healthConnectSyncEnabled: Boolean = false, // Health Connect data sync setting
+    val dayEndMode: DayEndMode = DayEndMode.SLEEP_TIME,
+    val reminderIntervalMode: ReminderIntervalMode = ReminderIntervalMode.AUTOMATIC,
+    val customReminderInterval: Int = 60
 )
 
 enum class Gender {
@@ -37,7 +39,7 @@ enum class Gender {
         }
     }
 
-    // MD3 Expressive: Use inclusive, compassionate language
+    // Use inclusive, compassionate language
     fun getPersonalizedGreeting(): String {
         return when (this) {
             MALE -> "Stay hydrated, champion!"
@@ -62,16 +64,7 @@ enum class AgeGroup {
         }
     }
 
-    fun getAgeRange(): Pair<Int, Int> {
-        return when (this) {
-            YOUNG_ADULT_18_30 -> 18 to 30
-            ADULT_31_50 -> 31 to 50
-            MIDDLE_AGED_51_60 -> 51 to 60
-            SENIOR_60_PLUS -> 60 to 100
-        }
-    }
-
-    // MD3 Expressive: Age-appropriate messaging
+    // Age-appropriate messaging
     fun getMotivationalMessage(): String {
         return when (this) {
             YOUNG_ADULT_18_30 -> "Your body is building its foundation - keep it hydrated!"
@@ -109,18 +102,7 @@ enum class ActivityLevel {
         }
     }
 
-    // Multiplier for water intake calculation
-    fun getActivityMultiplier(): Double {
-        return when (this) {
-            SEDENTARY -> 1.0
-            LIGHT -> 1.1
-            MODERATE -> 1.2
-            ACTIVE -> 1.3
-            VERY_ACTIVE -> 1.5
-        }
-    }
-
-    // MD3 Expressive: Activity-specific encouragement
+    // Activity-specific encouragement
     fun getHydrationTip(): String {
         return when (this) {
             SEDENTARY -> "Even at rest, your body needs consistent hydration!"
@@ -132,7 +114,7 @@ enum class ActivityLevel {
     }
 }
 
-// MD3 Expressive: Compassionate reminder styles
+// Compassionate reminder styles
 enum class ReminderStyle {
     GENTLE,      // Soft, encouraging reminders
     MOTIVATING,  // Energetic, goal-focused reminders
@@ -143,14 +125,6 @@ enum class ReminderStyle {
             GENTLE -> "Gentle & Caring"
             MOTIVATING -> "Motivating & Energetic"
             MINIMAL -> "Simple & Clean"
-        }
-    }
-
-    fun getSampleReminder(): String {
-        return when (this) {
-            GENTLE -> "💧 Time for a refreshing sip of water"
-            MOTIVATING -> "🚀 Fuel your success with hydration!"
-            MINIMAL -> "💧 Water reminder"
         }
     }
 }
@@ -184,6 +158,30 @@ enum class HydrationStandard {
         return when (this) {
             EFSA -> 2000.0  // 2.0L
             IOM -> 2700.0   // 2.7L
+        }
+    }
+}
+
+enum class DayEndMode {
+    SLEEP_TIME,
+    MIDNIGHT;
+
+    fun getDisplayName(): String {
+        return when (this) {
+            SLEEP_TIME -> "Sleep time"
+            MIDNIGHT -> "Midnight"
+        }
+    }
+}
+
+enum class ReminderIntervalMode {
+    AUTOMATIC,
+    CUSTOM;
+
+    fun getDisplayName(): String {
+        return when (this) {
+            AUTOMATIC -> "Automatic"
+            CUSTOM -> "Custom"
         }
     }
 }

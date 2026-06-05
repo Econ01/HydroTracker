@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Manages Health Connect synchronization operations
@@ -84,7 +85,7 @@ object HealthConnectSyncManager {
                 Log.e(TAG, "Entry details: amount=${entry.amount}ml, date=${entry.date}")
             } finally {
                 // Add a small delay to ensure the sync state is visible to users
-                kotlinx.coroutines.delay(800)
+                kotlinx.coroutines.delay(800.milliseconds)
                 _isSyncing.value = false
                 Log.d(TAG, "🔄 Setting isSyncing = false for regular sync")
             }
@@ -143,13 +144,15 @@ object HealthConnectSyncManager {
                 var errorCount = 0
 
                 // Process each external record with conflict resolution
-                val wakeUpTime = userRepository.userProfile.value?.wakeUpTime ?: "07:00"
+                val wakeUpTime = userProfile.wakeUpTime
+                val dayEndMode = userProfile.dayEndMode
                 externalRecords.forEach { record ->
                     try {
                         val waterIntakeEntry = HealthConnectManager.hydrationRecordToWaterIntakeEntry(
                             record,
                             record.metadata.dataOrigin.toString(),
-                            wakeUpTime
+                            wakeUpTime,
+                            dayEndMode
                         )
 
                         // Check for potential duplicates using timestamp and amount
@@ -187,7 +190,7 @@ object HealthConnectSyncManager {
                 onImportComplete(0, 1)
             } finally {
                 // Add a small delay to ensure the sync state is visible to users
-                kotlinx.coroutines.delay(800)
+                kotlinx.coroutines.delay(800.milliseconds)
                 _isSyncing.value = false
                 Log.d(TAG, "🔄 Setting isSyncing = false for import sync")
             }
@@ -294,7 +297,8 @@ object HealthConnectSyncManager {
                 var importedCount = 0
                 var skippedCount = 0
 
-                val wakeUpTime = userRepository.userProfile.value?.wakeUpTime ?: "07:00"
+                val wakeUpTime = userProfile.wakeUpTime
+                val dayEndMode = userProfile.dayEndMode
                 hydroTrackerRecords.forEach { record ->
                     try {
                         // For HydroTracker records, prefer our clientRecordId so it matches
@@ -305,6 +309,7 @@ object HealthConnectSyncManager {
                             record,
                             record.metadata.dataOrigin.toString(),
                             wakeUpTime,
+                            dayEndMode,
                             healthConnectRecordId = recordIdForLocalStorage
                         )
 
@@ -339,7 +344,7 @@ object HealthConnectSyncManager {
                 Log.e(TAG, "💥 Unexpected error during HydroTracker history restore", e)
                 onComplete(0, 0)
             } finally {
-                kotlinx.coroutines.delay(800)
+                kotlinx.coroutines.delay(800.milliseconds)
                 _isSyncing.value = false
                 Log.d(TAG, "🔄 Setting isSyncing = false for restore sync")
             }
@@ -409,7 +414,7 @@ object HealthConnectSyncManager {
                 Log.e(TAG, "💥 Unexpected error during update sync", e)
             } finally {
                 // Add a small delay to ensure the sync state is visible to users
-                kotlinx.coroutines.delay(800)
+                kotlinx.coroutines.delay(800.milliseconds)
                 _isSyncing.value = false
                 Log.d(TAG, "🔄 Setting isSyncing = false for update sync")
             }
@@ -473,7 +478,7 @@ object HealthConnectSyncManager {
             } catch (e: Exception) {
                 Log.e(TAG, "💥 Error during Health Connect delete", e)
             } finally {
-                kotlinx.coroutines.delay(800)
+                kotlinx.coroutines.delay(800.milliseconds)
                 _isSyncing.value = false
             }
         }
@@ -491,7 +496,7 @@ object HealthConnectSyncManager {
      * Check if an entry is a potential duplicate based on timestamp and amount
      * Uses a tolerance window to account for slight time differences
      *
-     * ARCHITECTURAL NOTE: This function uses the stored [date] field (user-day) as the
+     * ARCHITECTURAL NOTE: This function uses the stored [WaterIntakeEntry.date] field (user-day) as the
      * single source of truth for date-based queries. It does NOT recompute the date from
      * the timestamp to avoid inconsistencies with UserDayCalculator logic. Time display
      * formatting is a UI concern and must remain separate from deduplication logic.

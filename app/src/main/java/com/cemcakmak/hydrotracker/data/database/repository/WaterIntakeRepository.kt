@@ -50,7 +50,8 @@ class WaterIntakeRepository(
     private fun getTodayUserDayString(): String {
         val userProfile = userRepository.userProfile.value
         val wakeUpTime = userProfile?.wakeUpTime ?: "07:00"
-        return UserDayCalculator.getCurrentUserDayString(wakeUpTime)
+        val dayEndMode = userProfile?.dayEndMode ?: com.cemcakmak.hydrotracker.data.models.DayEndMode.SLEEP_TIME
+        return UserDayCalculator.getCurrentUserDayString(wakeUpTime, dayEndMode)
     }
 
     /**
@@ -69,7 +70,8 @@ class WaterIntakeRepository(
             return@withContext
         }
 
-        if (UserDayCalculator.hasNewUserDayStarted(lastCheckTime, wakeUpTime)) {
+        val dayEndMode = userProfile.dayEndMode
+        if (UserDayCalculator.hasNewUserDayStarted(lastCheckTime, wakeUpTime, dayEndMode)) {
             // New user day has started, update widgets to reflect reset
             WidgetUpdateHelper.updateAllWidgets(context)
             
@@ -302,12 +304,6 @@ class WaterIntakeRepository(
                 remainingAmount = progress.remainingAmount
             )
         }
-    }
-
-    // ===== DAILY SUMMARY OPERATIONS =====
-
-    fun getLast30DaysSummaries(): Flow<List<DailySummary>> {
-        return dailySummaryDao.getLast30DaysSummaries()
     }
 
     fun getAllSummaries(): Flow<List<DailySummary>> {

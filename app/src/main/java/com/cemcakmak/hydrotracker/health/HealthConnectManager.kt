@@ -156,9 +156,8 @@ object HealthConnectManager {
 
             // Create volume using effective hydration amount (considers beverage type multiplier)
             val effectiveAmount = entry.getEffectiveHydrationAmount()
-            val volumeInMilliliters = effectiveAmount
-            Log.d(TAG, "Using effective volume: ${volumeInMilliliters}ml (raw: ${entry.amount}ml, beverage: ${entry.getBeverageType().displayName}, multiplier: ${entry.getBeverageType().hydrationMultiplier})")
-            Log.d(TAG, "Type check - effectiveAmount: $effectiveAmount (${effectiveAmount::class.simpleName}), volumeInMilliliters: $volumeInMilliliters (${volumeInMilliliters::class.simpleName})")
+            Log.d(TAG, "Using effective volume: ${effectiveAmount}ml (raw: ${entry.amount}ml, beverage: ${entry.getBeverageType().displayName}, multiplier: ${entry.getBeverageType().hydrationMultiplier})")
+            Log.d(TAG, "Type check - effectiveAmount: $effectiveAmount (${effectiveAmount::class.simpleName}), volumeInMilliliters: $effectiveAmount (${effectiveAmount::class.simpleName})")
 
             // Create unique ID for tracking this record
             val uniqueId = "hydrotracker_${entry.id}_${System.currentTimeMillis()}"
@@ -169,15 +168,15 @@ object HealthConnectManager {
                 startZoneOffset = ZoneOffset.systemDefault().rules.getOffset(startTime),
                 endTime = endTime,
                 endZoneOffset = ZoneOffset.systemDefault().rules.getOffset(endTime),
-                volume = Volume.milliliters(volumeInMilliliters),
+                volume = Volume.milliliters(effectiveAmount),
                 metadata = Metadata.manualEntry(
                     device = Device(type = Device.TYPE_PHONE),
                     clientRecordId = uniqueId
                 )
             )
 
-            Log.d(TAG, "Created HydrationRecord: startTime=$startTime, endTime=$endTime, volume=${volumeInMilliliters}ml")
-            Log.d(TAG, "Volume object created: ${Volume.milliliters(volumeInMilliliters)} (${Volume.milliliters(volumeInMilliliters).inMilliliters}ml)")
+            Log.d(TAG, "Created HydrationRecord: startTime=$startTime, endTime=$endTime, volume=${effectiveAmount}ml")
+            Log.d(TAG, "Volume object created: ${Volume.milliliters(effectiveAmount)} (${Volume.milliliters(effectiveAmount).inMilliliters}ml)")
 
             // Write to Health Connect
             Log.d(TAG, "Writing HydrationRecord to Health Connect...")
@@ -187,7 +186,7 @@ object HealthConnectManager {
             // Return the custom ID we set in metadata for tracking
             Log.d(TAG, "Health Connect record ID: $uniqueId")
 
-            Log.i(TAG, "✅ Successfully wrote hydration record to Health Connect: ${volumeInMilliliters}ml effective (${entry.amount}ml ${entry.getBeverageType().displayName})")
+            Log.i(TAG, "✅ Successfully wrote hydration record to Health Connect: ${effectiveAmount}ml effective (${entry.amount}ml ${entry.getBeverageType().displayName})")
             Result.success(uniqueId)
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error writing hydration record to Health Connect", e)
@@ -345,13 +344,15 @@ object HealthConnectManager {
         record: HydrationRecord,
         sourceName: String?,
         wakeUpTime: String = "07:00",
+        dayEndMode: com.cemcakmak.hydrotracker.data.models.DayEndMode = com.cemcakmak.hydrotracker.data.models.DayEndMode.SLEEP_TIME,
         healthConnectRecordId: String? = null
     ): WaterIntakeEntry {
         val volumeInML = record.volume.inMilliliters
         val timestamp = record.startTime.toEpochMilli()
         val date = com.cemcakmak.hydrotracker.utils.UserDayCalculator.getUserDayStringForTimestamp(
             timestamp,
-            wakeUpTime
+            wakeUpTime,
+            dayEndMode
         )
 
         // Extract a user-friendly source name from the dataOrigin

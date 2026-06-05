@@ -400,7 +400,6 @@ fun HydroTrackerApp(
                                     userProfile?.let { profile ->
                                         val newGoal = com.cemcakmak.hydrotracker.utils.WaterCalculator.calculateDailyWaterGoal(
                                             gender = profile.gender,
-                                            ageGroup = profile.ageGroup,
                                             activityLevel = profile.activityLevel,
                                             weight = profile.weight,
                                             hydrationStandard = newStandard
@@ -476,7 +475,6 @@ fun HydroTrackerApp(
                                     userProfile?.let { profile ->
                                         val newGoal = com.cemcakmak.hydrotracker.utils.WaterCalculator.calculateDailyWaterGoal(
                                             gender = profile.gender,
-                                            ageGroup = profile.ageGroup,
                                             activityLevel = profile.activityLevel,
                                             weight = profile.weight,
                                             hydrationStandard = newStandard
