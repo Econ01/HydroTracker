@@ -1,4 +1,6 @@
 import java.util.Properties
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import javax.xml.parsers.DocumentBuilderFactory
 
 plugins {
     alias(libs.plugins.android.application)
@@ -121,4 +123,136 @@ dependencies {
     // Debug tools
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+// ---------------------------------------------------------------------------------------------
+// Third-party license collection (in-house replacement for Google's OSS Licenses plugin, which is
+// incompatible with AGP 9). For each variant, resolves the runtime dependencies' POMs at build time
+// and emits licenses.json as a generated asset, rendered by LicensesScreen. Uses only stable Gradle
+// APIs, so it isn't affected by AGP variant-API churn.
+// ---------------------------------------------------------------------------------------------
+androidComponents {
+    onVariants { variant ->
+        val capName = variant.name.replaceFirstChar { it.uppercase() }
+        val runtimeClasspath = configurations.getByName("${variant.name}RuntimeClasspath")
+        val depHandler = dependencies
+        val catalogFile = rootProject.layout.projectDirectory.file("gradle/libs.versions.toml")
+
+        // Collect each runtime dependency's .pom via a detached "@pom" configuration, whose dependency
+        // set is populated lazily in withDependencies {}. The task consumes pomFiles as @Internal and
+        // resolves it inside its action, so the runtime classpath is resolved only at execution time —
+        // never during the configuration phase (which would be a performance/config-cache penalty).
+        // The version catalog is the task's tracked input, so it re-runs when dependencies change.
+        val pomConfig = configurations.detachedConfiguration().apply {
+            isTransitive = false
+            withDependencies {
+                runtimeClasspath.incoming.resolutionResult.allComponents
+                    .mapNotNull { it.id as? ModuleComponentIdentifier }
+                    .forEach { add(depHandler.create("${it.group}:${it.module}:${it.version}@pom")) }
+            }
+        }
+
+        val licensesTask = tasks.register<GenerateLicensesTask>("generate${capName}LicensesJson") {
+            outputDir.set(layout.buildDirectory.dir("generated/licenses/${variant.name}"))
+            pomFiles.from(pomConfig)
+            versionCatalog.set(catalogFile)
+        }
+        variant.sources.assets?.addGeneratedSourceDirectory(licensesTask) { it.outputDir }
+    }
+}
+
+abstract class GenerateLicensesTask : DefaultTask() {
+    // @Internal (not @InputFiles): tracking this as an input would force the runtime classpath to
+    // resolve while Gradle builds the task graph (configuration phase). We resolve it in the action.
+    @get:Internal
+    abstract val pomFiles: ConfigurableFileCollection
+
+    // Tracked input so the task re-runs when dependencies change.
+    @get:InputFile
+    abstract val versionCatalog: RegularFileProperty
+
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
+
+    @TaskAction
+    fun generate() {
+        val factory = DocumentBuilderFactory.newInstance()
+        val seen = mutableSetOf<String>()
+        val entries = mutableListOf<Map<String, String>>()
+
+        pomFiles.files.filter { it.name.endsWith(".pom") }.forEach { pom ->
+            runCatching {
+                val root = factory.newDocumentBuilder().parse(pom).documentElement
+                val parent = directChild(root, "parent")
+                val group = directChildText(root, "groupId")
+                    ?: parent?.let { directChildText(it, "groupId") }
+                val artifact = directChildText(root, "artifactId") ?: return@runCatching
+                if (group == null) return@runCatching
+                val key = "$group:$artifact"
+                if (!seen.add(key)) return@runCatching
+
+                val version = directChildText(root, "version")
+                    ?: parent?.let { directChildText(it, "version") }
+                    ?: ""
+                val projectName = directChildText(root, "name")?.takeIf { it.isNotBlank() }
+                val projectUrl = directChildText(root, "url").orEmpty()
+
+                val licenseEl = directChild(root, "licenses")?.let { directChild(it, "license") }
+                val override = LICENSE_OVERRIDES[group]
+                val licenseName = licenseEl?.let { directChildText(it, "name") }
+                    ?.takeIf { it.isNotBlank() } ?: override?.first ?: "Unknown"
+                val licenseUrl = licenseEl?.let { directChildText(it, "url") }
+                    ?.takeIf { it.isNotBlank() } ?: override?.second ?: projectUrl
+
+                entries.add(
+                    linkedMapOf(
+                        "name" to (projectName ?: key),
+                        "version" to version,
+                        "license" to normalizeLicense(licenseName),
+                        "url" to licenseUrl
+                    )
+                )
+            }
+        }
+
+        entries.sortBy { (it["name"] ?: "").lowercase() }
+
+        val dir = outputDir.get().asFile
+        dir.mkdirs()
+        dir.resolve("licenses.json").writeText(
+            groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(entries))
+        )
+    }
+
+    private fun directChild(parent: org.w3c.dom.Element, tag: String): org.w3c.dom.Element? {
+        val nodes = parent.childNodes
+        for (i in 0 until nodes.length) {
+            val node = nodes.item(i)
+            if (node is org.w3c.dom.Element && node.tagName == tag) return node
+        }
+        return null
+    }
+
+    private fun directChildText(parent: org.w3c.dom.Element, tag: String): String? =
+        directChild(parent, tag)?.textContent?.trim()
+
+    // Collapse the many vendor spellings of common licenses into clean SPDX-ish tags for display.
+    private fun normalizeLicense(name: String): String {
+        val n = name.lowercase()
+        return when {
+            "apache" in n -> "Apache-2.0"
+            n == "mit" || "mit license" in n -> "MIT"
+            "bsd" in n && "3" in n -> "BSD-3-Clause"
+            "bsd" in n && "2" in n -> "BSD-2-Clause"
+            "bsd" in n -> "BSD"
+            else -> name
+        }
+    }
+
+    companion object {
+        // Fallback licenses for artifacts whose POMs declare the license only in a parent.
+        private val LICENSE_OVERRIDES = mapOf(
+            "com.google.guava" to ("Apache-2.0" to "https://www.apache.org/licenses/LICENSE-2.0.txt")
+        )
+    }
 }
