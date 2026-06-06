@@ -115,6 +115,9 @@ dependencies {
     // Health Connect
     implementation(libs.androidx.health.connect)
 
+    // Google Play Store
+    implementation(libs.review.ktx)
+
     // Debug tools
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)

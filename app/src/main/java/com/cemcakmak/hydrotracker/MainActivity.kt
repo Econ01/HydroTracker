@@ -60,6 +60,7 @@ import com.cemcakmak.hydrotracker.presentation.settings.ReminderIntervalScreen
 import com.cemcakmak.hydrotracker.presentation.settings.DeveloperOptionsScreen
 import com.cemcakmak.hydrotracker.presentation.settings.HapticsLabScreen
 import com.cemcakmak.hydrotracker.presentation.settings.HapticsTestScreen
+import com.cemcakmak.hydrotracker.presentation.settings.SupportDevelopmentScreen
 import com.cemcakmak.hydrotracker.presentation.settings.PlaceholderScreen
 import com.cemcakmak.hydrotracker.presentation.settings.HealthConnectDataScreen
 import com.cemcakmak.hydrotracker.presentation.onboarding.*
@@ -565,7 +566,7 @@ fun HydroTrackerApp(
                             )
                         }
                         entry<NavigationRoutes.SettingsSupport> {
-                            PlaceholderScreen(title = "Support Development", onNavigateBack = popBackStack)
+                            SupportDevelopmentScreen(onNavigateBack = popBackStack)
                         }
                         entry<NavigationRoutes.SettingsAbout> {
                             PlaceholderScreen(title = "About", onNavigateBack = popBackStack)
