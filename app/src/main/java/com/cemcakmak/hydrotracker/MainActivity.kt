@@ -573,6 +573,7 @@ fun HydroTrackerApp(
                         }
                         entry<NavigationRoutes.SettingsDeveloper> {
                             DeveloperOptionsScreen(
+                                themePreferences = themePreferences,
                                 wasPop = developerOptionsWasPop,
                                 userProfile = userProfile,
                                 userRepository = userRepository,

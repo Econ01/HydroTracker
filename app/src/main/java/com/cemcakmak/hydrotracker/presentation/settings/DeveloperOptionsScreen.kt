@@ -9,7 +9,9 @@ import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.AlertDialog
@@ -27,8 +30,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -60,7 +65,9 @@ import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
 import com.cemcakmak.hydrotracker.data.database.repository.WaterProgress
 import com.cemcakmak.hydrotracker.data.models.ActivityLevel
 import com.cemcakmak.hydrotracker.data.models.AgeGroup
+import com.cemcakmak.hydrotracker.data.models.DarkModePreference
 import com.cemcakmak.hydrotracker.data.models.Gender
+import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
 import com.cemcakmak.hydrotracker.health.HealthConnectManager
@@ -69,6 +76,7 @@ import com.cemcakmak.hydrotracker.notifications.HydroNotificationScheduler
 import com.cemcakmak.hydrotracker.notifications.HydroNotificationService
 import com.cemcakmak.hydrotracker.notifications.NotificationPermissionManager
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
+import com.cemcakmak.hydrotracker.utils.SmartHaptics
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -83,6 +91,7 @@ private const val HC_DEBUG_TAG = "HealthConnectDebug"
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun DeveloperOptionsScreen(
+    themePreferences: ThemePreferences = ThemePreferences(),
     wasPop: Boolean = false,
     userProfile: UserProfile? = null,
     userRepository: UserRepository? = null,
@@ -160,6 +169,9 @@ fun DeveloperOptionsScreen(
                 title = "Developer Options",
                 onNavigateBack = onNavigateBack
             ) {
+                // Device Info
+                DeviceInfoSection(themePreferences = themePreferences)
+
                 // Data
                 DevSection("Data", modifier = Modifier.padding(top = 24.dp)) {
                     DeveloperActionCard(
@@ -552,6 +564,80 @@ fun DeveloperOptionsScreen(
                 }
             },
             onDismiss = { showInjectDialog = false }
+        )
+    }
+}
+
+@Composable
+private fun DeviceInfoSection(
+    themePreferences: ThemePreferences
+) {
+    val isDark = when (themePreferences.darkMode) {
+        DarkModePreference.DARK -> true
+        DarkModePreference.LIGHT -> false
+        DarkModePreference.SYSTEM -> isSystemInDarkTheme()
+    }
+
+    val border = if (themePreferences.usePureBlack && isDark) {
+        BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+    } else {
+        null
+    }
+
+    val context = LocalContext.current
+
+    // Which tier SmartHaptics will actually route to on this device — straight from the engine,
+    // so the readout always matches real behavior. Uses a representative token (Confirm).
+    val resolvedTier = remember { SmartHaptics.resolveTierLabel(context) }
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 24.dp),
+        shape = RoundedCornerShape(size = 30.dp),
+        tonalElevation = 2.dp,
+        border = border
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            InfoRow("Brand", Build.BRAND)
+            HorizontalDivider()
+            InfoRow("Model", Build.MODEL)
+            HorizontalDivider()
+            InfoRow("Device", Build.DEVICE)
+            HorizontalDivider()
+            InfoRow("Manufacturer", Build.MANUFACTURER)
+            HorizontalDivider()
+            InfoRow("API Level", Build.VERSION.SDK_INT.toString())
+            HorizontalDivider()
+            InfoRow("Android Version", Build.VERSION.RELEASE)
+            HorizontalDivider()
+            InfoRow("Haptics Tier", resolvedTier)
+        }
+    }
+}
+
+@Composable
+private fun InfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmallEmphasized,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodySmall
         )
     }
 }
