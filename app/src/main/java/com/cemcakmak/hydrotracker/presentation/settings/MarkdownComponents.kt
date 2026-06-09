@@ -103,7 +103,7 @@ internal fun MarkdownText(
     text: String,
     modifier: Modifier = Modifier
 ) {
-    val lines = text.split("\n")
+    val lines = text.lines()
     var versionCount = 0
 
     Column(

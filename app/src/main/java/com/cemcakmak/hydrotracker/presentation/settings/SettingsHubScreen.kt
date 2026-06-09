@@ -51,6 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.R
+import com.cemcakmak.hydrotracker.data.update.UpdateStatus
 import com.cemcakmak.hydrotracker.presentation.common.NavigationRoutes
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 
@@ -59,6 +60,7 @@ import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 fun SettingsHubScreen(
     wasPop: Boolean = false,
     developerOptionsEnabled: Boolean = false,
+    updateStatus: UpdateStatus = UpdateStatus.Idle,
     onNavigateTo: (NavigationRoutes) -> Unit = {}
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
@@ -192,9 +194,11 @@ fun SettingsHubScreen(
                         route = NavigationRoutes.SettingsSupport
                     )
                 )
+                val isUpdateAvailable = updateStatus is UpdateStatus.Available
                 add(
                     SettingsCategory(
-                        title = "About",
+                        title = if (isUpdateAvailable) "About - Update Available" else "About",
+                        titleColor = if (isUpdateAvailable) MaterialTheme.colorScheme.tertiary else null,
                         description = "Sources, privacy policy and license",
                         icon = { Icon(ImageVector.vectorResource(R.drawable.info_filled), contentDescription = null) },
                         route = NavigationRoutes.SettingsAbout
@@ -271,7 +275,7 @@ private fun SettingsCategoryCard(
             leadingContent = category.icon,
             colors = ListItemColors(
                 leadingIconColor = MaterialTheme.colorScheme.primary,
-                headlineColor = ListItemDefaults.colors().headlineColor,
+                headlineColor = category.titleColor ?: ListItemDefaults.colors().headlineColor,
                 supportingTextColor = ListItemDefaults.colors().supportingTextColor,
                 containerColor = ListItemDefaults.colors().containerColor,
                 overlineColor = ListItemDefaults.colors().overlineColor,
@@ -286,6 +290,7 @@ private fun SettingsCategoryCard(
 
 private data class SettingsCategory(
     val title: String,
+    val titleColor: Color? = null,
     val description: String,
     val icon: @Composable () -> Unit,
     val route: NavigationRoutes

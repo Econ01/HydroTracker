@@ -35,6 +35,8 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.cemcakmak.hydrotracker.data.repository.*
+import com.cemcakmak.hydrotracker.data.update.UpdateRepository
+import com.cemcakmak.hydrotracker.data.update.UpdateStatus
 import com.cemcakmak.hydrotracker.data.database.DatabaseInitializer
 import com.cemcakmak.hydrotracker.data.database.DatabaseMigrationHelper
 import kotlinx.coroutines.launch
@@ -50,6 +52,9 @@ import com.cemcakmak.hydrotracker.presentation.profile.ProfileScreen
 import com.cemcakmak.hydrotracker.presentation.settings.SettingsScreen
 import com.cemcakmak.hydrotracker.presentation.settings.SettingsHubScreen
 import com.cemcakmak.hydrotracker.presentation.settings.AboutScreen
+import com.cemcakmak.hydrotracker.presentation.settings.UpdatesScreen
+import com.cemcakmak.hydrotracker.presentation.settings.WhatsNewBottomSheet
+import com.cemcakmak.hydrotracker.presentation.settings.UpdateAvailableDialog
 import com.cemcakmak.hydrotracker.presentation.settings.AppearanceScreen
 import com.cemcakmak.hydrotracker.presentation.settings.DisplayLocaleScreen
 import com.cemcakmak.hydrotracker.presentation.settings.HydrationHealthScreen
@@ -85,6 +90,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var waterIntakeRepository: WaterIntakeRepository
     private lateinit var containerPresetRepository: ContainerPresetRepository
     private lateinit var customBeverageRepository: CustomBeverageRepository
+    private lateinit var updateRepository: UpdateRepository
 
     // Modern permission launcher
     private val notificationPermissionLauncher = registerForActivityResult(
@@ -126,6 +132,7 @@ class MainActivity : ComponentActivity() {
 
         // Init
         userRepository = UserRepository(applicationContext)
+        updateRepository = UpdateRepository(applicationContext)
 
         // Perform comprehensive database health check (critical for Room 2.8.1 compatibility)
         lifecycleScope.launch {
@@ -195,6 +202,7 @@ class MainActivity : ComponentActivity() {
                     waterIntakeRepository,
                     containerPresetRepository,
                     customBeverageRepository,
+                    updateRepository,
                     notificationPermissionLauncher,
                     healthConnectPermissionLauncher
                 )
@@ -219,6 +227,7 @@ fun HydroTrackerApp(
     waterIntakeRepository: WaterIntakeRepository,
     containerPresetRepository: ContainerPresetRepository,
     customBeverageRepository: CustomBeverageRepository,
+    updateRepository: UpdateRepository,
     notificationPermissionLauncher: ActivityResultLauncher<String>,
     healthConnectPermissionLauncher: ActivityResultLauncher<Set<String>>
 ) {
@@ -263,6 +272,53 @@ fun HydroTrackerApp(
             var homeShowCustomDialog by remember { mutableStateOf(false) }
             var homeFabExpanded by remember { mutableStateOf(true) }
 
+            // Auto-check for updates on launch (throttled to once per 24h inside the repository).
+            LaunchedEffect(Unit) {
+                updateRepository.maybeAutoCheck()
+            }
+
+            // Home-screen update dialog — only shown when on Home and an update is available.
+            var showUpdateDialog by remember { mutableStateOf(false) }
+            val updateStatus by updateRepository.updateStatus.collectAsState()
+            LaunchedEffect(currentKey, updateStatus) {
+                showUpdateDialog = currentKey == NavigationRoutes.Home && updateStatus is UpdateStatus.Available
+            }
+            if (showUpdateDialog && updateStatus is UpdateStatus.Available) {
+                val availableStatus = updateStatus as UpdateStatus.Available
+                UpdateAvailableDialog(
+                    status = availableStatus,
+                    installSource = updateRepository.installSource,
+                    updateRepository = updateRepository,
+                    themePreferences = themePreferences,
+                    onDismiss = { showUpdateDialog = false }
+                )
+            }
+
+            // Show "What's New?" once after the user updates and onboarding is complete.
+            val whatsNewAvailable by updateRepository.whatsNewAvailable.collectAsState()
+            var showWhatsNew by remember { mutableStateOf(false) }
+            LaunchedEffect(isOnboardingCompleted, whatsNewAvailable) {
+                if (isOnboardingCompleted && whatsNewAvailable) {
+                    showWhatsNew = true
+                }
+            }
+            if (showWhatsNew) {
+                val whatsNewContent = remember { updateRepository.loadWhatsNewContent() }
+                if (whatsNewContent.isNotBlank()) {
+                    WhatsNewBottomSheet(
+                        versionName = BuildConfig.VERSION_NAME,
+                        content = whatsNewContent,
+                        onDismiss = {
+                            showWhatsNew = false
+                            updateRepository.markWhatsNewSeen()
+                        }
+                    )
+                } else {
+                    updateRepository.markWhatsNewSeen()
+                    showWhatsNew = false
+                }
+            }
+
             MainNavigationScaffold(
                 backStack = backStack,
                 currentKey = currentKey,
@@ -301,7 +357,7 @@ fun HydroTrackerApp(
                                 initialRoute != null && targetRoute != null
 
                         if (isTabSwitch) {
-                            // Determine tab orders for the target and destionation tabs
+                            // Determine tab orders for the target and destination tabs
                             val fromIndex = NavigationItem.entries.indexOfFirst { it.key == initialRoute }
                             val toIndex = NavigationItem.entries.indexOfFirst { it.key == targetRoute }
                             val goingForward = toIndex > fromIndex
@@ -449,6 +505,7 @@ fun HydroTrackerApp(
                             SettingsHubScreen(
                                 wasPop = wasPop,
                                 developerOptionsEnabled = BuildConfig.DEBUG,
+                                updateStatus = updateStatus,
                                 onNavigateTo = { key ->
                                     wasPop = true
                                     quickAddWasPop = false
@@ -573,11 +630,23 @@ fun HydroTrackerApp(
                         entry<NavigationRoutes.SettingsAbout> {
                             AboutScreen(
                                 wasPop = aboutWasPop,
+                                updateStatus = updateStatus,
+                                onNavigateToUpdates = {
+                                    aboutWasPop = true
+                                    backStack.add(NavigationRoutes.SettingsUpdates)
+                                },
                                 onNavigateBack = popBackStack,
                                 onNavigateToLicenses = {
                                     aboutWasPop = true
                                     backStack.add(NavigationRoutes.SettingsLicenses)
                                 }
+                            )
+                        }
+                        entry<NavigationRoutes.SettingsUpdates> {
+                            UpdatesScreen(
+                                updateRepository = updateRepository,
+                                themePreferences = themePreferences,
+                                onNavigateBack = popBackStack
                             )
                         }
                         entry<NavigationRoutes.SettingsLicenses> {
@@ -590,6 +659,7 @@ fun HydroTrackerApp(
                                 userProfile = userProfile,
                                 userRepository = userRepository,
                                 waterIntakeRepository = waterIntakeRepository,
+                                updateRepository = updateRepository,
                                 onNavigateBack = popBackStack,
                                 onNavigateToOnboarding = {
                                     backStack.apply {

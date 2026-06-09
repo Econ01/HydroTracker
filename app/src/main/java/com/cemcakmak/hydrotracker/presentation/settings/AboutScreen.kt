@@ -41,6 +41,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.cemcakmak.hydrotracker.data.update.UpdateStatus
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -61,6 +62,8 @@ private const val URL_GITHUB_PROFILE = "https://github.com/Econ01"
 @Composable
 fun AboutScreen(
     wasPop: Boolean = false,
+    updateStatus: UpdateStatus = UpdateStatus.Idle,
+    onNavigateToUpdates: () -> Unit = {},
     onNavigateBack: () -> Unit = {},
     onNavigateToLicenses: () -> Unit = {}
 ) {
@@ -121,6 +124,23 @@ fun AboutScreen(
                                 haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
                                 openUrl(context, URL_GITHUB_PROFILE)
                             }
+                        )
+                    }
+                }
+
+                // Updates
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    SettingsSectionHeader("Updates & Bug Report")
+                    Column {
+                        val isUpdateAvailable = updateStatus is UpdateStatus.Available
+                        AboutRow(
+                            index = 0,
+                            size = 1,
+                            icon = ImageVector.vectorResource(R.drawable.update_filled),
+                            title = if (isUpdateAvailable) "Update Available" else "Updates",
+                            titleColor = if (isUpdateAvailable) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurface,
+                            description = "Updates and bug reports",
+                            onClick = onNavigateToUpdates
                         )
                     }
                 }
@@ -310,6 +330,7 @@ private fun AboutRow(
     size: Int,
     icon: ImageVector,
     title: String,
+    titleColor: Color = MaterialTheme.colorScheme.onSurface,
     description: String,
     showChevron: Boolean = false,
     onClick: () -> Unit
@@ -329,7 +350,11 @@ private fun AboutRow(
                 modifier = Modifier.size(24.dp)
             )
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = title, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = titleColor
+                )
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,

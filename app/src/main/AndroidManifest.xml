@@ -9,6 +9,9 @@
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Internet access for checking app updates (GitHub releases) -->
+    <uses-permission android:name="android.permission.INTERNET" />
     
     <!-- Permissions for profile photo capture and selection -->
     <uses-permission android:name="android.permission.CAMERA" />

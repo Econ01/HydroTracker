@@ -119,6 +119,7 @@ dependencies {
 
     // Google Play Store
     implementation(libs.review.ktx)
+    implementation(libs.app.update.ktx)
 
     // Debug tools
     debugImplementation(libs.androidx.ui.tooling)

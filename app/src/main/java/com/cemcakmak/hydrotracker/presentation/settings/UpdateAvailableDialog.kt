@@ -1,0 +1,453 @@
+package com.cemcakmak.hydrotracker.presentation.settings
+
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.view.RoundedCorner
+import android.view.WindowManager
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.Animatable
+import kotlinx.coroutines.delay
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonGroup
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialShapes
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.toPath
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Matrix
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.core.net.toUri
+import androidx.graphics.shapes.Morph
+import com.cemcakmak.hydrotracker.BuildConfig
+import com.cemcakmak.hydrotracker.R
+import com.cemcakmak.hydrotracker.data.models.DarkModePreference
+import com.cemcakmak.hydrotracker.data.models.ThemePreferences
+import com.cemcakmak.hydrotracker.data.update.InstallSource
+import com.cemcakmak.hydrotracker.data.update.UpdateRepository
+import com.cemcakmak.hydrotracker.data.update.UpdateStatus
+import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import kotlin.time.Duration.Companion.milliseconds
+
+/**
+ * A Shape that morphs between two RoundedPolygons for a given progress (0..1).
+ * Recreate this Shape on every recomposition with the new progress to animate.
+ */
+class MorphShape(
+    private val morph: Morph,
+    private val percentage: Float
+) : Shape {
+    private var workPath: Path? = null
+    private var lastSize = Size.Unspecified
+
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density
+    ): Outline {
+        if (size != lastSize || workPath == null) {
+            lastSize = size
+            workPath = Path()
+        } else {
+            workPath!!.rewind()
+        }
+        val path = workPath!!
+        path.addPath(morph.toPath(progress = percentage))
+        val scaleMatrix = Matrix().apply { scale(x = size.width, y = size.height) }
+        path.transform(scaleMatrix)
+        val bounds = path.getBounds()
+        val centerMatrix = Matrix().apply {
+            translate(
+                size.width / 2f - (bounds.left + bounds.right) / 2f,
+                size.height / 2f - (bounds.top + bounds.bottom) / 2f
+            )
+        }
+        path.transform(centerMatrix)
+        return Outline.Generic(path)
+    }
+}
+
+/**
+ * A custom modal dialog shown on the Home screen when a new app update is available.
+ * Displays version info, install source, and triggers the update flow directly.
+ */
+@Composable
+fun UpdateAvailableDialog(
+    status: UpdateStatus.Available,
+    installSource: InstallSource,
+    updateRepository: UpdateRepository,
+    themePreferences: ThemePreferences = ThemePreferences(),
+    onDismiss: () -> Unit = {}
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        UpdateAvailableDialogContent(
+            status = status,
+            installSource = installSource,
+            updateRepository = updateRepository,
+            themePreferences = themePreferences,
+            onDismiss = onDismiss
+        )
+    }
+}
+
+@Composable
+private fun UpdateAvailableDialogContent(
+    status: UpdateStatus.Available,
+    installSource: InstallSource,
+    updateRepository: UpdateRepository,
+    themePreferences: ThemePreferences = ThemePreferences(),
+    onDismiss: () -> Unit = {}
+) {
+    val context = LocalContext.current
+    val density = LocalDensity.current
+
+    val isDark = when (themePreferences.darkMode) {
+        DarkModePreference.DARK -> true
+        DarkModePreference.LIGHT -> false
+        DarkModePreference.SYSTEM -> isSystemInDarkTheme()
+    }
+    val border = if (themePreferences.usePureBlack && isDark) {
+        BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+    } else {
+        null
+    }
+
+    val deviceCornerRadius = remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            val insets = windowManager.currentWindowMetrics.windowInsets
+            val corner = insets.getRoundedCorner(RoundedCorner.POSITION_TOP_LEFT)
+            corner?.let { with(density) { it.radius.toDp() } }
+        } else null
+    } ?: 30.dp
+
+    val actionContext = when (installSource) {
+        InstallSource.PLAY_STORE -> "Open Google Play to update HydroTracker."
+        InstallSource.F_DROID -> "Open the F-Droid app to update HydroTracker."
+        InstallSource.OTHER -> "Download the latest APK from GitHub."
+    }
+
+    val currentVersionLabel = if (installSource == InstallSource.PLAY_STORE) {
+        BuildConfig.VERSION_CODE.toString()
+    } else {
+        BuildConfig.VERSION_NAME
+    }
+
+    val updateLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { /* Result handled by Play's install-state listener */ }
+
+    fun performUpdate() {
+        when {
+            status.playUpdateInfo != null && status.playUpdateType != null -> {
+                try {
+                    updateRepository.appUpdateManager?.startUpdateFlowForResult(
+                        status.playUpdateInfo,
+                        updateLauncher,
+                        AppUpdateOptions.defaultOptions(status.playUpdateType)
+                    )
+                } catch (_: Exception) {
+                    Toast.makeText(context, "Couldn't start the update", Toast.LENGTH_SHORT).show()
+                }
+            }
+            status.downloadUrl != null -> {
+                try {
+                    context.startActivity(Intent(Intent.ACTION_VIEW, status.downloadUrl.toUri()))
+                } catch (_: ActivityNotFoundException) {
+                    Toast.makeText(context, "No app found to open this link", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        onDismiss()
+    }
+
+    Surface(
+        shape = RoundedCornerShape(deviceCornerRadius),
+        tonalElevation = 2.dp,
+        border = border,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp)
+        ) {
+            // Header
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.update_filled),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(28.dp)
+                )
+                Text(
+                    text = "Update Available",
+                    style = MaterialTheme.typography.headlineMediumEmphasized
+                )
+            }
+
+            HorizontalDivider()
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Version info
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    // Current version
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Text(
+                            text = "Current version",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        Text(
+                            text = currentVersionLabel,
+                            style = MaterialTheme.typography.titleLargeEmphasized,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.arrow_forward_filled),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+
+                    // New version with morphing shape
+                    val shapes = remember {
+                        listOf(
+                            MaterialShapes.Circle,
+                            MaterialShapes.Pentagon,
+                            MaterialShapes.Sunny,
+                            MaterialShapes.VerySunny,
+                            MaterialShapes.Cookie4Sided,
+                            MaterialShapes.Cookie12Sided,
+                            MaterialShapes.Gem
+                        )
+                    }
+
+                    val segmentIndex = remember { Animatable(0f) }
+                    val morphSpec = MaterialTheme.motionScheme.defaultSpatialSpec<Float>()
+
+                    LaunchedEffect(Unit) {
+                        while (true) {
+                            delay(600.milliseconds)
+                            segmentIndex.animateTo(
+                                targetValue = segmentIndex.value + 1f,
+                                animationSpec = morphSpec
+                            )
+                        }
+                    }
+
+                    val currentIndex = (segmentIndex.value.toInt() % shapes.size).coerceIn(shapes.indices)
+                    val nextIndex = ((currentIndex + 1) % shapes.size).coerceIn(shapes.indices)
+                    val morphProgress = segmentIndex.value % 1f
+
+                    val morph = remember(currentIndex, nextIndex) {
+                        Morph(shapes[currentIndex], shapes[nextIndex])
+                    }
+
+                    Surface(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .size(110.dp),
+                        shape = MorphShape(morph, morphProgress),
+                        color = MaterialTheme.colorScheme.tertiary
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(horizontal = 12.dp)
+                                .fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "New version",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = status.versionName,
+                                style = MaterialTheme.typography.titleLargeEmphasized
+                            )
+                        }
+                    }
+                }
+
+                Text(
+                    text = actionContext,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                // Action buttons - Standard button group with press animations
+                val haptics = LocalHapticFeedback.current
+                val cancelInteractionSource = remember { MutableInteractionSource() }
+                val updateInteractionSource = remember { MutableInteractionSource() }
+
+                LaunchedEffect(cancelInteractionSource) {
+                    cancelInteractionSource.interactions.collect { interaction ->
+                        when (interaction) {
+                            is PressInteraction.Press -> haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                            is PressInteraction.Release -> haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                            else -> {  }
+                        }
+                    }
+                }
+
+                LaunchedEffect(updateInteractionSource) {
+                    updateInteractionSource.interactions.collect { interaction ->
+                        when (interaction) {
+                            is PressInteraction.Press -> haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                            is PressInteraction.Release -> haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                            else -> {  }
+                        }
+                    }
+                }
+
+                // Buttons
+                ButtonGroup(
+                    modifier = Modifier.fillMaxWidth(),
+                    overflowIndicator = {}
+                ) {
+                    val scope = this
+                    customItem(
+                        buttonGroupContent = {
+                            FilledTonalButton(
+                                onClick = onDismiss,
+                                shapes = ButtonDefaults.shapes(),
+                                interactionSource = cancelInteractionSource,
+                                modifier = with(scope) {
+                                    Modifier
+                                        .weight(1f)
+                                        .height(56.dp)
+                                        .animateWidth(interactionSource = cancelInteractionSource)
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(R.drawable.cancel_filled),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Later", maxLines = 1, softWrap = false)
+                            }
+                        },
+                        menuContent = {}
+                    )
+                    customItem(
+                        buttonGroupContent = {
+                            Button(
+                                onClick = ::performUpdate,
+                                shapes = ButtonDefaults.shapes(),
+                                interactionSource = updateInteractionSource,
+                                modifier = with(scope) {
+                                    Modifier
+                                        .weight(1f)
+                                        .height(56.dp)
+                                        .animateWidth(interactionSource = updateInteractionSource)
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(R.drawable.update_filled),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Update", maxLines = 1, softWrap = false)
+                            }
+                        },
+                        menuContent = {}
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun UpdateAvailableDialogGitHubPreview() {
+    HydroTrackerTheme {
+        UpdateAvailableDialogContent(
+            status = UpdateStatus.Available(
+                versionName = "1.0.7",
+                downloadUrl = "https://github.com/Econ01/HydroTracker/releases"
+            ),
+            installSource = InstallSource.OTHER,
+            updateRepository = UpdateRepository(LocalContext.current)
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun UpdateAvailableDialogPlayPreview() {
+    HydroTrackerTheme {
+        UpdateAvailableDialogContent(
+            status = UpdateStatus.Available(
+                versionName = "27",
+                playUpdateInfo = null,
+                playUpdateType = null
+            ),
+            installSource = InstallSource.PLAY_STORE,
+            updateRepository = UpdateRepository(LocalContext.current)
+        )
+    }
+}
