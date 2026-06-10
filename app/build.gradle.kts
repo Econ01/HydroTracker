@@ -66,6 +66,16 @@ android {
         compose = true
         buildConfig = true
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
+    sourceSets {
+        // Robolectric reads the debug variant's merged assets, so expose the exported Room schemas
+        // there for MigrationTestHelper. Scoped to debug only, so they never ship in the release APK.
+        getByName("debug").assets.directories.add("$projectDir/schemas")
+    }
 }
 
 kotlin {
@@ -114,6 +124,10 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
+    // DataStore (typed) + kotlinx serialization for the preferences store
+    implementation(libs.androidx.datastore)
+    implementation(libs.kotlinx.serialization.json)
+
     // Health Connect
     implementation(libs.androidx.health.connect)
 
@@ -124,6 +138,14 @@ dependencies {
     // Debug tools
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Unit testing (Robolectric runs Room MigrationTestHelper on the JVM — no emulator)
+    testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.room.testing)
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.androidx.test.ext.junit)
+    testImplementation(libs.androidx.sqlite.framework)
 }
 
 // ---------------------------------------------------------------------------------------------

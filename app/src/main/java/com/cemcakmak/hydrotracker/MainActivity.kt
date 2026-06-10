@@ -40,7 +40,9 @@ import com.cemcakmak.hydrotracker.data.update.UpdateStatus
 import com.cemcakmak.hydrotracker.data.database.DatabaseInitializer
 import com.cemcakmak.hydrotracker.data.database.DatabaseMigrationHelper
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
 import androidx.lifecycle.lifecycleScope
+import com.cemcakmak.hydrotracker.data.models.BeveragePreferences
 import androidx.navigationevent.NavigationEvent
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
 import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
@@ -96,9 +98,11 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            val userProfile = userRepository.userProfile.value
-            userProfile?.takeIf { it.isOnboardingCompleted }?.let {
-                HydroNotificationScheduler.startNotifications(this, it)
+            lifecycleScope.launch {
+                val userProfile = userRepository.userProfile.first()
+                userProfile?.takeIf { it.isOnboardingCompleted }?.let {
+                    HydroNotificationScheduler.startNotifications(this@MainActivity, it)
+                }
             }
         }
         // Handle denied case if needed - currently no-op as per original logic
@@ -152,7 +156,7 @@ class MainActivity : ComponentActivity() {
                 }
                 else -> {
                     // For healthy or fresh install, validate notification state
-                    val userProfile = userRepository.userProfile.value
+                    val userProfile = userRepository.userProfile.first()
                     if (userProfile != null) {
                         val notificationStateValid = HydroNotificationScheduler.validateAndRepairNotificationState(
                             applicationContext, userProfile
@@ -232,14 +236,18 @@ fun HydroTrackerApp(
 ) {
     val themeViewModel: ThemeViewModel = viewModel(factory = ThemeViewModelFactory(userRepository))
     val themePreferences by themeViewModel.themePreferences.collectAsState()
-    val userProfile by userRepository.userProfile.collectAsState()
-    val isOnboardingCompleted by userRepository.isOnboardingCompleted.collectAsState()
-    val beveragePreferences by userRepository.beveragePreferences.collectAsState()
+    val appPreferences by userRepository.appPreferences.collectAsState(initial = null)
+    val userProfile = appPreferences?.profile
+    val isOnboardingCompleted = appPreferences?.onboardingCompleted ?: false
+    val beveragePreferences = appPreferences?.beverages ?: BeveragePreferences.default()
     val customBeverages by customBeverageRepository.getAll().collectAsState(initial = emptyList())
     val activeBeverages = remember(beveragePreferences, customBeverages) {
         buildActiveBeverages(beveragePreferences, customBeverages)
     }
-    var isLoading by remember { mutableStateOf(true) }
+    // Loading until the first persisted snapshot arrives, so existing users are never briefly routed
+    // to onboarding while DataStore performs its first read (and its one-time SharedPreferences import).
+    val isLoading = appPreferences == null
+    val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     var wasPop by remember { mutableStateOf(false) }
     var quickAddWasPop by remember { mutableStateOf(false) }
@@ -248,8 +256,6 @@ fun HydroTrackerApp(
     var aboutWasPop by remember { mutableStateOf(false) }
 
     LaunchedEffect(isOnboardingCompleted, userProfile) {
-        isLoading = false
-
         // Check for new user day when app starts
         if (isOnboardingCompleted && userProfile != null) {
             waterIntakeRepository.checkAndHandleNewUserDay()
@@ -503,12 +509,12 @@ fun HydroTrackerApp(
                                             hydrationStandard = newStandard,
                                             dailyWaterGoal = newGoal
                                         )
-                                        userRepository.saveUserProfile(updatedProfile)
+                                        coroutineScope.launch { userRepository.saveUserProfile(updatedProfile) }
                                     }
                                 },
                                 onHealthConnectSyncChange = { enabled ->
                                     userProfile?.let { profile ->
-                                        userRepository.saveUserProfile(profile.copy(healthConnectSyncEnabled = enabled))
+                                        coroutineScope.launch { userRepository.saveUserProfile(profile.copy(healthConnectSyncEnabled = enabled)) }
                                     }
                                 },
                                 onNavigateBack = popBackStack
@@ -558,8 +564,10 @@ fun HydroTrackerApp(
                                     }
                                 },
                                 onUserProfileUpdate = { updatedProfile ->
-                                    userRepository.saveUserProfile(updatedProfile)
-                                    HydroNotificationScheduler.rescheduleNotifications(context, updatedProfile)
+                                    coroutineScope.launch {
+                                        userRepository.saveUserProfile(updatedProfile)
+                                        HydroNotificationScheduler.rescheduleNotifications(context, updatedProfile)
+                                    }
                                 }
                             )
                         }
@@ -569,8 +577,10 @@ fun HydroTrackerApp(
                                 themePreferences = themePreferences,
                                 onNavigateBack = popBackStack,
                                 onUserProfileUpdate = { updatedProfile ->
-                                    userRepository.saveUserProfile(updatedProfile)
-                                    HydroNotificationScheduler.rescheduleNotifications(context, updatedProfile)
+                                    coroutineScope.launch {
+                                        userRepository.saveUserProfile(updatedProfile)
+                                        HydroNotificationScheduler.rescheduleNotifications(context, updatedProfile)
+                                    }
                                 }
                             )
                         }

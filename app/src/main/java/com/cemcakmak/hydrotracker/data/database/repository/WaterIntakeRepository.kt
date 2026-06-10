@@ -19,6 +19,7 @@ import androidx.core.content.edit
 import android.content.SharedPreferences
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
 import com.cemcakmak.hydrotracker.health.HealthConnectSyncManager
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlin.random.Random
 import android.util.Log
@@ -47,8 +48,8 @@ class WaterIntakeRepository(
     }
 
     // Get today's user day string based on wake-up time
-    private fun getTodayUserDayString(): String {
-        val userProfile = userRepository.userProfile.value
+    private suspend fun getTodayUserDayString(): String {
+        val userProfile = userRepository.userProfile.first()
         val wakeUpTime = userProfile?.wakeUpTime ?: "07:00"
         val dayEndMode = userProfile?.dayEndMode ?: com.cemcakmak.hydrotracker.data.models.DayEndMode.SLEEP_TIME
         return UserDayCalculator.getCurrentUserDayString(wakeUpTime, dayEndMode)
@@ -59,7 +60,7 @@ class WaterIntakeRepository(
      * Should be called when the app starts or becomes foreground
      */
     suspend fun checkAndHandleNewUserDay() = withContext(Dispatchers.IO) {
-        val userProfile = userRepository.userProfile.value ?: return@withContext
+        val userProfile = userRepository.userProfile.first() ?: return@withContext
         val wakeUpTime = userProfile.wakeUpTime
         val currentTime = System.currentTimeMillis()
         val lastCheckTime = prefs.getLong("last_day_check_time", 0L)
@@ -312,7 +313,7 @@ class WaterIntakeRepository(
 
     private suspend fun updateDailySummaryForDate(date: String) = withContext(Dispatchers.IO) {
         try {
-            val userProfile = userRepository.userProfile.value
+            val userProfile = userRepository.userProfile.first()
             val dailyGoal = userProfile?.dailyWaterGoal ?: 2700.0
 
             // Get all entries for this date to calculate effective hydration
@@ -393,7 +394,7 @@ class WaterIntakeRepository(
                 val baseDate = calendar.timeInMillis
 
                 // Simulate realistic daily patterns
-                val dailyGoal = userRepository.userProfile.value?.dailyWaterGoal ?: 2700.0
+                val dailyGoal = userRepository.userProfile.first()?.dailyWaterGoal ?: 2700.0
                 val achievementRate = random.nextFloat()
 
                 // Create different daily patterns

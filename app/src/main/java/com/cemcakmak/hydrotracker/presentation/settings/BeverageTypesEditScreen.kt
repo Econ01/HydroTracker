@@ -97,12 +97,14 @@ fun BeverageTypesEditScreen(
     var showResetDialog by remember { mutableStateOf(false) }
 
     fun persist(newVisible: List<BeverageItem>, newHidden: Set<String>) {
-        userRepository?.saveBeveragePreferences(
-            BeveragePreferences(
-                orderedVisible = newVisible.map { it.token() },
-                hidden = newHidden
+        coroutineScope.launch {
+            userRepository?.saveBeveragePreferences(
+                BeveragePreferences(
+                    orderedVisible = newVisible.map { it.token() },
+                    hidden = newHidden
+                )
             )
-        )
+        }
     }
 
     SettingsDetailScaffold(

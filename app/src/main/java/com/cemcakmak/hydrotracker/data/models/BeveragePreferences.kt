@@ -1,10 +1,13 @@
 package com.cemcakmak.hydrotracker.data.models
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class BeveragePreferences(
     // Display-order tokens, WATER excluded. Each token is either a BeverageType.name (preset)
     // or a "custom:<id>" token referencing a CustomBeverageEntity.
-    val orderedVisible: List<String>,
-    val hidden: Set<String>            // BeverageType.name values only (customs are deleted, never hidden)
+    val orderedVisible: List<String> = emptyList(),
+    val hidden: Set<String> = emptySet()   // BeverageType.name values only (customs are deleted, never hidden)
 ) {
     /** Preset beverages shown on Home. Custom tokens are intentionally ignored here (not yet loggable). */
     fun toDisplayList(): List<BeverageType> {

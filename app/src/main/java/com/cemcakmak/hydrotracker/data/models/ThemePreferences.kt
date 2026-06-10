@@ -1,11 +1,13 @@
 package com.cemcakmak.hydrotracker.data.models
 
 import java.time.DayOfWeek
+import kotlinx.serialization.Serializable
 
 /**
  * Material 3 Expressive theme preferences
  * Manages dynamic color settings and theme customization
  */
+@Serializable
 data class ThemePreferences(
     val useDynamicColor: Boolean = true, // Default to dynamic colors
     val darkMode: DarkModePreference = DarkModePreference.SYSTEM,
@@ -17,6 +19,7 @@ data class ThemePreferences(
     val navBarLabelMode: NavBarLabelMode = NavBarLabelMode.ALWAYS // Bottom nav label visibility
 )
 
+@Serializable
 enum class DarkModePreference {
     SYSTEM,     // Follow system setting
     LIGHT,      // Always light mode
@@ -39,6 +42,7 @@ enum class DarkModePreference {
     }
 }
 
+@Serializable
 enum class ColorSource {
     HYDRO_THEME,    // Our default water-themed colors
     DYNAMIC_COLOR,  // Material You dynamic colors from wallpaper
@@ -65,6 +69,7 @@ enum class ColorSource {
     }
 }
 
+@Serializable
 enum class WeekStartDay(val displayName: String, val dayOfWeek: DayOfWeek) {
     SUNDAY("Sunday", DayOfWeek.SUNDAY),
     MONDAY("Monday", DayOfWeek.MONDAY);
@@ -77,6 +82,7 @@ enum class WeekStartDay(val displayName: String, val dayOfWeek: DayOfWeek) {
     }
 }
 
+@Serializable
 enum class AppFont {
     GOOGLE_SANS_FLEX,
     SYSTEM,
@@ -95,6 +101,7 @@ enum class AppFont {
     }
 }
 
+@Serializable
 enum class NavBarLabelMode {
     ALWAYS,    // Show every tab's label
     SELECTED,  // Show only the selected tab's label

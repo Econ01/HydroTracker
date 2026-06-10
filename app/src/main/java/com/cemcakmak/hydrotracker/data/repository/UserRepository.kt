@@ -1,280 +1,57 @@
 package com.cemcakmak.hydrotracker.data.repository
 
 import android.content.Context
-import android.content.SharedPreferences
-import com.cemcakmak.hydrotracker.data.models.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import androidx.core.content.edit
+import com.cemcakmak.hydrotracker.data.models.BeveragePreferences
+import com.cemcakmak.hydrotracker.data.models.ThemePreferences
+import com.cemcakmak.hydrotracker.data.models.UserProfile
+import com.cemcakmak.hydrotracker.data.preferences.AppPreferences
+import com.cemcakmak.hydrotracker.data.preferences.appPreferencesStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 /**
- * Repository for managing user data persistence
+ * Repository for user preferences, backed by a typed DataStore (see [appPreferencesStore]).
+ *
+ * Reads are [Flow]s; writes are `suspend`. Existing users' legacy SharedPreferences data is imported
+ * once, automatically, by the DataStore migration the first time the store is read — so callers see
+ * their data with no extra work.
  */
 class UserRepository(context: Context) {
 
-    private val prefs: SharedPreferences = context.getSharedPreferences(
-        "hydrotracker_prefs",
-        Context.MODE_PRIVATE
-    )
+    // Always go through the application-scoped singleton DataStore (one instance per process/file).
+    private val dataStore = context.applicationContext.appPreferencesStore
 
-    private val _userProfile = MutableStateFlow<UserProfile?>(null)
-    val userProfile: StateFlow<UserProfile?> = _userProfile.asStateFlow()
+    /** The full preferences snapshot. `null` from a collector's initial value means "not loaded yet". */
+    val appPreferences: Flow<AppPreferences> = dataStore.data
+    val userProfile: Flow<UserProfile?> = dataStore.data.map { it.profile }
+    val isOnboardingCompleted: Flow<Boolean> = dataStore.data.map { it.onboardingCompleted }
+    val themePreferences: Flow<ThemePreferences> = dataStore.data.map { it.theme }
+    val beveragePreferences: Flow<BeveragePreferences> = dataStore.data.map { it.beverages }
 
-    private val _isOnboardingCompleted = MutableStateFlow(false)
-    val isOnboardingCompleted: StateFlow<Boolean> = _isOnboardingCompleted.asStateFlow()
-
-    private val _beveragePreferences = MutableStateFlow(loadBeveragePreferences())
-    val beveragePreferences: StateFlow<BeveragePreferences> = _beveragePreferences.asStateFlow()
-
-    init {
-        // Add debug logging
-        println("UserRepository: Initializing...")
-        val currentCompletionStatus = prefs.getBoolean("onboarding_completed", false)
-        println("UserRepository: Current onboarding_completed = $currentCompletionStatus")
-
-        // Migration: Ensure existing users have new theme preferences
-        migratePreferencesIfNeeded()
-
-        loadUserProfile()
-        // Ensure we emit the initial state immediately
-        _isOnboardingCompleted.value = prefs.getBoolean("onboarding_completed", false)
-
-        println("UserRepository: Initialization complete. Final status = ${_isOnboardingCompleted.value}")
-    }
-
-    /**
-     * Migrate SharedPreferences for existing users when new features are added
-     */
-    private fun migratePreferencesIfNeeded() {
-        val isExistingUser = prefs.getBoolean("onboarding_completed", false)
-
-        if (isExistingUser) {
-            println("UserRepository: Migrating preferences for existing user...")
-
-            // Migration for usePureBlack (added in version 0.9.3)
-            if (!prefs.contains("use_pure_black")) {
-                println("UserRepository: Adding missing use_pure_black preference")
-                prefs.edit { putBoolean("use_pure_black", false) }
-            }
-
-            // Migration for hydrationStandard (added in version 0.9.4)
-            if (!prefs.contains("hydration_standard")) {
-                println("UserRepository: Adding missing hydration_standard preference - defaulting to EFSA")
-                prefs.edit { putString("hydration_standard", HydrationStandard.EFSA.name) }
-            }
-
-            // Migration for dayEndMode (added in version 1.0.7)
-            if (!prefs.contains("day_end_mode")) {
-                println("UserRepository: Adding missing day_end_mode preference - defaulting to SLEEP_TIME")
-                prefs.edit { putString("day_end_mode", DayEndMode.SLEEP_TIME.name) }
-            }
-
-            // Migration for reminderIntervalMode (added in version 1.0.7)
-            if (!prefs.contains("reminder_interval_mode")) {
-                println("UserRepository: Adding missing reminder_interval_mode preference - defaulting to AUTOMATIC")
-                prefs.edit {
-                    putString(
-                        "reminder_interval_mode",
-                        ReminderIntervalMode.AUTOMATIC.name
-                    )
-                }
-            }
-
-            // Migration for customReminderInterval (added in version 1.0.7)
-            if (!prefs.contains("custom_reminder_interval")) {
-                println("UserRepository: Adding missing custom_reminder_interval preference - defaulting to 60")
-                prefs.edit { putInt("custom_reminder_interval", 60) }
-            }
-
-            println("UserRepository: Migration complete")
-        }
-    }
-
-    /**
-     * Save user profile to SharedPreferences
-     */
-    fun saveUserProfile(profile: UserProfile) {
-        println("UserRepository: Saving user profile...")
-        println("UserRepository: Profile onboarding completed = ${profile.isOnboardingCompleted}")
-
-        prefs.edit().apply {
-            putString("name", profile.name)
-            putString("gender", profile.gender.name)
-            putString("age_group", profile.ageGroup.name)
-            putString("activity_level", profile.activityLevel.name)
-            putString("wake_up_time", profile.wakeUpTime)
-            putString("sleep_time", profile.sleepTime)
-            putFloat("daily_water_goal", profile.dailyWaterGoal.toFloat())
-            putInt("reminder_interval", profile.reminderInterval)
-            putBoolean("onboarding_completed", profile.isOnboardingCompleted)
-            putString("reminder_style", profile.reminderStyle.name)
-            putString("hydration_standard", profile.hydrationStandard.name)
-            putBoolean("health_connect_sync_enabled", profile.healthConnectSyncEnabled)
-            putString("day_end_mode", profile.dayEndMode.name)
-            putString("reminder_interval_mode", profile.reminderIntervalMode.name)
-            putInt("custom_reminder_interval", profile.customReminderInterval)
-
-            // Optional fields
-            profile.weight?.let { putFloat("weight", it.toFloat()) }
-            profile.preferredThemeColor?.let { putString("preferred_theme_color", it) }
-            profile.profileImagePath?.let { putString("profile_image_path", it) }
-            putBoolean("use_system_theme", profile.useSystemTheme)
-
-            apply()
-        }
-
-        println("UserRepository: Profile saved to SharedPreferences")
-
-        // Immediately update StateFlows
-        _userProfile.value = profile
-        _isOnboardingCompleted.value = profile.isOnboardingCompleted
-
-        println("UserRepository: StateFlows updated - isOnboardingCompleted = ${_isOnboardingCompleted.value}")
-
-        // Verify the save worked
-        val savedValue = prefs.getBoolean("onboarding_completed", false)
-        println("UserRepository: Verification - SharedPreferences onboarding_completed = $savedValue")
-    }
-
-    /**
-     * Load user profile from SharedPreferences
-     */
-    private fun loadUserProfile() {
-        try {
-            val isCompleted = prefs.getBoolean("onboarding_completed", false)
-            _isOnboardingCompleted.value = isCompleted
-
-            if (isCompleted) {
-                val genderName = prefs.getString("gender", null)
-                val ageGroupName = prefs.getString("age_group", null)
-                val activityLevelName = prefs.getString("activity_level", null)
-
-                if (genderName != null && ageGroupName != null && activityLevelName != null) {
-                    val profile = UserProfile(
-                        name = prefs.getString("name", "User") ?: "User", // Default name for existing users
-                        profileImagePath = prefs.getString("profile_image_path", null),
-                        gender = Gender.valueOf(genderName),
-                        ageGroup = AgeGroup.valueOf(ageGroupName),
-                        activityLevel = ActivityLevel.valueOf(activityLevelName),
-                        wakeUpTime = prefs.getString("wake_up_time", "07:00") ?: "07:00",
-                        sleepTime = prefs.getString("sleep_time", "23:00") ?: "23:00",
-                        dailyWaterGoal = prefs.getFloat("daily_water_goal", 2700f).toDouble(),
-                        reminderInterval = prefs.getInt("reminder_interval", 120),
-                        isOnboardingCompleted = true,
-                        weight = prefs.getFloat("weight", 0f).let { if (it > 0) it.toDouble() else null },
-                        preferredThemeColor = prefs.getString("preferred_theme_color", null),
-                        useSystemTheme = prefs.getBoolean("use_system_theme", true),
-                        reminderStyle = ReminderStyle.valueOf(
-                            prefs.getString("reminder_style", ReminderStyle.GENTLE.name) ?: ReminderStyle.GENTLE.name
-                        ),
-                        hydrationStandard = HydrationStandard.valueOf(
-                            prefs.getString("hydration_standard", HydrationStandard.EFSA.name) ?: HydrationStandard.EFSA.name
-                        ),
-                        healthConnectSyncEnabled = prefs.getBoolean("health_connect_sync_enabled", false),
-                        dayEndMode = DayEndMode.valueOf(
-                            prefs.getString("day_end_mode", DayEndMode.SLEEP_TIME.name) ?: DayEndMode.SLEEP_TIME.name
-                        ),
-                        reminderIntervalMode = ReminderIntervalMode.valueOf(
-                            prefs.getString("reminder_interval_mode", ReminderIntervalMode.AUTOMATIC.name) ?: ReminderIntervalMode.AUTOMATIC.name
-                        ),
-                        customReminderInterval = prefs.getInt("custom_reminder_interval", 60)
-                    )
-
-                    _userProfile.value = profile
-                } else {
-                    // Data is corrupted, reset onboarding
-                    _isOnboardingCompleted.value = false
-                    clearUserProfile()
-                }
-            }
-        } catch (_: Exception) {
-            // Handle any corrupted data by resetting
-            _isOnboardingCompleted.value = false
-            clearUserProfile()
-        }
-    }
-
-    /**
-     * Clear user profile (for testing or reset purposes)
-     */
-    fun clearUserProfile() {
-        println("UserRepository: Clearing all user data...")
-        prefs.edit { clear() }
-        _userProfile.value = null
-        _isOnboardingCompleted.value = false
-        println("UserRepository: User data cleared. Onboarding status = ${_isOnboardingCompleted.value}")
-    }
-
-    /**
-     * Force reset onboarding for testing
-     */
-    fun resetOnboarding() {
-        println("UserRepository: Resetting onboarding...")
-        prefs.edit { putBoolean("onboarding_completed", false) }
-        _isOnboardingCompleted.value = false
-        _userProfile.value = null
-        println("UserRepository: Onboarding reset complete")
-    }
-
-    /**
-     * Update theme preferences
-     */
-    fun updateThemePreferences(themePreferences: ThemePreferences) {
-        prefs.edit().apply {
-            putBoolean("use_dynamic_color", themePreferences.useDynamicColor)
-            putString("dark_mode", themePreferences.darkMode.name)
-            putString("color_source", themePreferences.colorSource.name)
-            putString("week_start_day", themePreferences.weekStartDay.name)
-            putBoolean("use_pure_black", themePreferences.usePureBlack)
-            putString("app_font", themePreferences.appFont.name)
-            putBoolean("auto_hide_nav_bar", themePreferences.autoHideNavBar)
-            putString("nav_bar_label_mode", themePreferences.navBarLabelMode.name)
-            apply()
-        }
-    }
-
-    /**
-     * Load theme preferences
-     */
-    fun loadThemePreferences(): ThemePreferences {
-        return ThemePreferences(
-            useDynamicColor = prefs.getBoolean("use_dynamic_color", true),
-            darkMode = DarkModePreference.valueOf(
-                prefs.getString("dark_mode", DarkModePreference.SYSTEM.name) ?: DarkModePreference.SYSTEM.name
-            ),
-            colorSource = ColorSource.valueOf(
-                prefs.getString("color_source", ColorSource.DYNAMIC_COLOR.name) ?: ColorSource.DYNAMIC_COLOR.name
-            ),
-            weekStartDay = WeekStartDay.valueOf(
-                prefs.getString("week_start_day", WeekStartDay.MONDAY.name) ?: WeekStartDay.MONDAY.name
-            ),
-            usePureBlack = prefs.getBoolean("use_pure_black", false),
-            appFont = AppFont.valueOf(
-                prefs.getString("app_font", AppFont.GOOGLE_SANS_FLEX.name) ?: AppFont.GOOGLE_SANS_FLEX.name
-            ),
-            autoHideNavBar = prefs.getBoolean("auto_hide_nav_bar", false),
-            navBarLabelMode = NavBarLabelMode.valueOf(
-                prefs.getString("nav_bar_label_mode", NavBarLabelMode.ALWAYS.name) ?: NavBarLabelMode.ALWAYS.name
+    suspend fun saveUserProfile(profile: UserProfile) {
+        dataStore.updateData { current ->
+            current.copy(
+                profile = profile,
+                onboardingCompleted = profile.isOnboardingCompleted,
             )
-        )
-    }
-
-    private fun loadBeveragePreferences(): BeveragePreferences {
-        val orderStr = prefs.getString("beverage_order", null)
-        val hiddenStr = prefs.getString("beverage_hidden", null)
-        if (orderStr == null && hiddenStr == null) return BeveragePreferences.default()
-        val ordered = orderStr?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
-        val hidden = hiddenStr?.split(",")?.filter { it.isNotBlank() }?.toSet() ?: emptySet()
-        return BeveragePreferences(orderedVisible = ordered, hidden = hidden)
-    }
-
-    fun saveBeveragePreferences(beveragePreferences: BeveragePreferences) {
-        prefs.edit().apply {
-            putString("beverage_order", beveragePreferences.orderedVisible.joinToString(","))
-            putString("beverage_hidden", beveragePreferences.hidden.joinToString(","))
-            apply()
         }
-        _beveragePreferences.value = beveragePreferences
+    }
+
+    suspend fun updateThemePreferences(themePreferences: ThemePreferences) {
+        dataStore.updateData { it.copy(theme = themePreferences) }
+    }
+
+    suspend fun saveBeveragePreferences(beveragePreferences: BeveragePreferences) {
+        dataStore.updateData { it.copy(beverages = beveragePreferences) }
+    }
+
+    /** Resets all preferences (profile, theme, beverages) back to defaults. */
+    suspend fun clearUserProfile() {
+        dataStore.updateData { AppPreferences() }
+    }
+
+    /** Sends the user back to onboarding without discarding theme/beverage settings. */
+    suspend fun resetOnboarding() {
+        dataStore.updateData { it.copy(onboardingCompleted = false, profile = null) }
     }
 }

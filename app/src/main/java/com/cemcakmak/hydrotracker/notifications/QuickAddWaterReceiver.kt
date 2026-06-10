@@ -12,6 +12,7 @@ import com.cemcakmak.hydrotracker.data.models.ContainerPreset
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /**
@@ -65,7 +66,7 @@ class QuickAddWaterReceiver : BroadcastReceiver() {
                     showSuccessNotification(context)
 
                     // Reschedule next reminder
-                    val userProfile = userRepository.userProfile.value
+                    val userProfile = userRepository.userProfile.first()
                     if (userProfile != null) {
                         HydroNotificationScheduler.scheduleNextReminder(context, userProfile)
                     }

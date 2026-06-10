@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -36,7 +37,7 @@ object HealthConnectSyncManager {
             Log.d(TAG, "🔄 Setting isSyncing = true for regular sync")
             try {
                 // Check if user has sync enabled
-                val userProfile = userRepository.userProfile.value
+                val userProfile = userRepository.userProfile.first()
                 if (userProfile?.healthConnectSyncEnabled != true) {
                     Log.d(TAG, "⏭️ Sync skipped: Health Connect sync disabled in user settings")
                     _isSyncing.value = false
@@ -104,7 +105,7 @@ object HealthConnectSyncManager {
             Log.d(TAG, "🔄 Setting isSyncing = true for import sync")
             try {
                 // Check if user has sync enabled
-                val userProfile = userRepository.userProfile.value
+                val userProfile = userRepository.userProfile.first()
                 if (userProfile?.healthConnectSyncEnabled != true) {
                     Log.d(TAG, "⏭️ Import skipped: Health Connect sync disabled")
                     _isSyncing.value = false
@@ -207,7 +208,7 @@ object HealthConnectSyncManager {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 // Check if user has sync enabled
-                val userProfile = userRepository.userProfile.value
+                val userProfile = userRepository.userProfile.first()
                 if (userProfile?.healthConnectSyncEnabled != true) {
                     Log.d(TAG, "⏭️ App launch sync skipped: Health Connect sync disabled")
                     return@launch
@@ -257,7 +258,7 @@ object HealthConnectSyncManager {
             Log.d(TAG, "🔄 Setting isSyncing = true for restore sync")
             try {
                 // Check if user has sync enabled
-                val userProfile = userRepository.userProfile.value
+                val userProfile = userRepository.userProfile.first()
                 if (userProfile?.healthConnectSyncEnabled != true) {
                     Log.d(TAG, "⏭️ Restore skipped: Health Connect sync disabled")
                     _isSyncing.value = false
@@ -363,7 +364,7 @@ object HealthConnectSyncManager {
             Log.d(TAG, "🔄 Setting isSyncing = true for update sync")
             try {
                 // Check if user has sync enabled
-                val userProfile = userRepository.userProfile.value
+                val userProfile = userRepository.userProfile.first()
                 if (userProfile?.healthConnectSyncEnabled != true) {
                     Log.d(TAG, "⏭️ Update sync skipped: Health Connect sync disabled")
                     return@launch
@@ -434,7 +435,7 @@ object HealthConnectSyncManager {
             _isSyncing.value = true
             try {
                 // Check if user has sync enabled
-                val userProfile = userRepository.userProfile.value
+                val userProfile = userRepository.userProfile.first()
                 if (userProfile?.healthConnectSyncEnabled != true) {
                     Log.d(TAG, "⏭️ Delete handling skipped: Health Connect sync disabled")
                     return@launch

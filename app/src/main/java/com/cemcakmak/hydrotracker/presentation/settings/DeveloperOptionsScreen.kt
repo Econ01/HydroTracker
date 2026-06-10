@@ -547,8 +547,10 @@ fun DeveloperOptionsScreen(
             confirmLabel = "Reset",
             onConfirm = {
                 showResetDialog = false
-                userRepository?.resetOnboarding()
-                onNavigateToOnboarding()
+                scope.launch {
+                    userRepository?.resetOnboarding()
+                    onNavigateToOnboarding()
+                }
             },
             onDismiss = { showResetDialog = false }
         )

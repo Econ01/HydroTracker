@@ -16,11 +16,16 @@ import com.cemcakmak.hydrotracker.data.repository.UserRepository
 
 class ThemeViewModel(private val userRepository: UserRepository) : ViewModel() {
 
-    private val _themePreferences = MutableStateFlow(
-        // Load persisted preferences on initialization
-        userRepository.loadThemePreferences()
-    )
+    private val _themePreferences = MutableStateFlow(ThemePreferences())
     val themePreferences: StateFlow<ThemePreferences> = _themePreferences.asStateFlow()
+
+    init {
+        // Mirror the persisted theme into the in-memory state. Collecting also triggers the one-time
+        // SharedPreferences -> DataStore import on first read.
+        viewModelScope.launch {
+            userRepository.themePreferences.collect { _themePreferences.value = it }
+        }
+    }
 
     fun updateDarkModePreference(preference: DarkModePreference) {
         viewModelScope.launch {

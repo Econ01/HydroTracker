@@ -210,6 +210,12 @@ object DatabaseInitializer {
         }
     }
 
+    /** Every shipped schema migration, in order. Exposed so migration tests exercise the real chain. */
+    val ALL_MIGRATIONS: Array<Migration> = arrayOf(
+        MIGRATION_1_2, MIGRATION_1_3, MIGRATION_2_3, MIGRATION_3_4,
+        MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8
+    )
+
     fun getDatabase(context: Context): HydroTrackerDatabase {
         return database ?: synchronized(this) {
             val instance = Room.databaseBuilder(
@@ -217,7 +223,7 @@ object DatabaseInitializer {
                 HydroTrackerDatabase::class.java,
                 HydroTrackerDatabase.DATABASE_NAME
             )
-                .addMigrations(MIGRATION_1_2, MIGRATION_1_3, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
+                .addMigrations(*ALL_MIGRATIONS)
                 // Add fallback strategy for Room 2.8.1 compatibility issues
                 .fallbackToDestructiveMigrationOnDowngrade(true)
                 .build()
@@ -250,52 +256,5 @@ object DatabaseInitializer {
         return CustomBeverageRepository(
             customBeverageDao = db.customBeverageDao()
         )
-    }
-
-    /**
-     * Validate database connection (simplified version for synchronous use)
-     * Call this method if you suspect database corruption or migration issues
-     */
-    fun validateDatabase(context: Context): Boolean {
-        return try {
-            println("DatabaseInitializer: Validating database...")
-            val db = getDatabase(context)
-
-            // Try to open database connection - this will trigger migrations if needed
-            db.openHelper.readableDatabase.version
-            println("DatabaseInitializer: Database validation successful")
-            true
-        } catch (e: Exception) {
-            println("DatabaseInitializer: Database validation failed: ${e.message}")
-            false
-        }
-    }
-
-    /**
-     * Repair corrupted database by recreating it
-     */
-    fun repairDatabase(context: Context): Boolean {
-        return try {
-            println("DatabaseInitializer: Attempting database repair...")
-
-            // Close existing database connection
-            database?.close()
-            database = null
-
-            // Clear database file and recreate
-            val dbFile = context.getDatabasePath(HydroTrackerDatabase.DATABASE_NAME)
-            if (dbFile.exists()) {
-                dbFile.delete()
-                println("DatabaseInitializer: Deleted corrupted database file")
-            }
-
-            // Force recreation
-            val newDb = getDatabase(context)
-            println("DatabaseInitializer: Database recreated successfully")
-            true
-        } catch (repairError: Exception) {
-            println("DatabaseInitializer: Database repair failed: ${repairError.message}")
-            false
-        }
     }
 }

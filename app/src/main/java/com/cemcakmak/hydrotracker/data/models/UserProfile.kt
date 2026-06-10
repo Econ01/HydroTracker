@@ -1,8 +1,11 @@
 package com.cemcakmak.hydrotracker.data.models
 
+import kotlinx.serialization.Serializable
+
 /**
  * User profile data model
  */
+@Serializable
 data class UserProfile(
     val id: Int = 1,
     val name: String, // Required username (max 15 characters)
@@ -26,6 +29,7 @@ data class UserProfile(
     val customReminderInterval: Int = 60
 )
 
+@Serializable
 enum class Gender {
     MALE,
     FEMALE,
@@ -49,6 +53,7 @@ enum class Gender {
     }
 }
 
+@Serializable
 enum class AgeGroup {
     YOUNG_ADULT_18_30,
     ADULT_31_50,
@@ -75,6 +80,7 @@ enum class AgeGroup {
     }
 }
 
+@Serializable
 enum class ActivityLevel {
     SEDENTARY,      // Little to no exercise
     LIGHT,          // Light exercise 1-3 days/week
@@ -115,6 +121,7 @@ enum class ActivityLevel {
 }
 
 // Compassionate reminder styles
+@Serializable
 enum class ReminderStyle {
     GENTLE,      // Soft, encouraging reminders
     MOTIVATING,  // Energetic, goal-focused reminders
@@ -129,6 +136,7 @@ enum class ReminderStyle {
     }
 }
 
+@Serializable
 enum class HydrationStandard {
     EFSA,    // European Food Safety Authority (default)
     IOM;     // Institute of Medicine (US)
@@ -162,6 +170,7 @@ enum class HydrationStandard {
     }
 }
 
+@Serializable
 enum class DayEndMode {
     SLEEP_TIME,
     MIDNIGHT;
@@ -174,6 +183,7 @@ enum class DayEndMode {
     }
 }
 
+@Serializable
 enum class ReminderIntervalMode {
     AUTOMATIC,
     CUSTOM;
