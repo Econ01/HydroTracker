@@ -63,6 +63,7 @@ class HydroNotificationService(private val context: Context) {
         }
 
         val content = NotificationContentProvider.getNotificationContent(
+            context = context,
             reminderStyle = userProfile.reminderStyle,
             userName = null, // Can be added to UserProfile if needed
             currentProgress = waterProgress.progress,
@@ -90,6 +91,7 @@ class HydroNotificationService(private val context: Context) {
 
         // Generate actual notification content using the real system
         val content = NotificationContentProvider.getNotificationContent(
+            context = context,
             reminderStyle = userProfile.reminderStyle,
             userName = null,
             currentProgress = waterProgress.progress,
@@ -144,7 +146,7 @@ class HydroNotificationService(private val context: Context) {
             )
             .setSubText("${waterProgress.getFormattedCurrent()} / ${waterProgress.getFormattedGoal()}")
             .setColorized(true)
-            .setColor(0xFF0077BE.toInt()) // HydroTracker primary color
+            .setColor(0xFF0077BE.toInt()) // HydroTracker primary colour
             .build()
     }
 

@@ -868,4 +868,193 @@
     <string name="weekday_short_fri">Fri</string>
     <string name="weekday_short_sat">Sat</string>
 
+    <!-- ============================================================================
+         Notifications
+         ============================================================================ -->
+    <!-- %1$s = the random water fact -->
+    <string name="notification_gentle_fact_prefix">Did you know? %1$s</string>
+    <!-- %1$d = remaining milliliters -->
+    <string name="notification_minimal_remaining">%1$d ml remaining</string>
+
+    <!-- Quick-add success notification -->
+    <string name="notification_quick_add_title">💧 Water Added!</string>
+    <!-- %1$d = amount added in ml -->
+    <string name="notification_quick_add_text">Added %1$d ml to your daily intake</string>
+
+    <!-- Gentle reminder titles -->
+    <string-array name="notification_gentle_titles">
+        <item>Gentle Hydration Reminder</item>
+        <item>Time for Some Water</item>
+        <item>Your Body is Calling</item>
+        <item>Gentle Hydration Break</item>
+        <item>Soft Reminder from HydroTracker</item>
+        <item>A Moment for Hydration</item>
+        <item>Water Wellness Check</item>
+    </string-array>
+
+    <!-- Gentle reminder messages: low progress (&lt; 25%) -->
+    <string-array name="notification_gentle_messages_low">
+        <item>Your body would love some refreshing water right now.</item>
+        <item>How about a sip of something refreshing?</item>
+        <item>A gentle reminder to nurture yourself with water.</item>
+        <item>Time to give your body the hydration it deserves.</item>
+        <item>Let\'s start building that healthy hydration habit.</item>
+        <item>Starting your day with water sets a healthy tone.</item>
+        <item>A small glass now can make a big difference later.</item>
+        <item>Your cells are asking for a little attention.</item>
+    </string-array>
+
+    <!-- Gentle reminder messages: mid progress (25–50%) -->
+    <string-array name="notification_gentle_messages_mid">
+        <item>You\'re making great progress! Keep it flowing.</item>
+        <item>Halfway there! Your body appreciates every drop.</item>
+        <item>Looking good! Time for another refreshing moment.</item>
+        <item>Your hydration journey is flowing beautifully.</item>
+        <item>Keep up the wonderful work! Another sip awaits.</item>
+        <item>You\'re building a great rhythm today.</item>
+        <item>Steady progress is the best kind of progress.</item>
+        <item>Every sip is a step toward your goal.</item>
+    </string-array>
+
+    <!-- Gentle reminder messages: high progress (50–75%) -->
+    <string-array name="notification_gentle_messages_high">
+        <item>Almost there! You\'re doing wonderfully.</item>
+        <item>Your dedication to hydration is inspiring.</item>
+        <item>So close to your goal! Keep flowing forward.</item>
+        <item>Your body is thanking you for this care.</item>
+        <item>Beautiful progress! Just a bit more to go.</item>
+        <item>Your consistency is paying off.</item>
+        <item>You have come so far — don\'t stop now.</item>
+        <item>The finish line is closer than you think.</item>
+    </string-array>
+
+    <!-- Gentle reminder messages: final progress (&gt; 75%) -->
+    <string-array name="notification_gentle_messages_final">
+        <item>You\'re so close to achieving your daily goal!</item>
+        <item>Final stretch! Your consistency is amazing.</item>
+        <item>Almost at the finish line! You\'ve got this.</item>
+        <item>Your dedication today has been incredible.</item>
+        <item>One more push to complete your hydration victory.</item>
+        <item>Just a little more to reach your goal.</item>
+        <item>You should be proud of today\'s effort.</item>
+        <item>Victory is just a few sips away.</item>
+    </string-array>
+
+    <!-- Motivating reminder titles -->
+    <string-array name="notification_motivating_titles">
+        <item>Hydration Champion!</item>
+        <item>Water Warrior Alert!</item>
+        <item>Power Up with H2O!</item>
+        <item>Hydration Hero Time!</item>
+        <item>Fuel Your Success!</item>
+        <item>Time to Level Up!</item>
+        <item>Champion Mode: Activated</item>
+    </string-array>
+
+    <!-- Motivating reminder messages: low progress -->
+    <string-array name="notification_motivating_messages_low">
+        <item>Time to CRUSH your hydration goals! Let\'s GO!</item>
+        <item>Your SUCCESS starts with the next sip!</item>
+        <item>Champions hydrate! Are you ready to DOMINATE?</item>
+        <item>FUEL your potential with premium H2O!</item>
+        <item>Winners stay hydrated! Time to LEVEL UP!</item>
+        <item>First step to victory — grab some water!</item>
+        <item>Every champion starts with the basics. Hydrate!</item>
+        <item>Your competition is hydrating. Are you?</item>
+    </string-array>
+
+    <!-- Motivating reminder messages: mid progress -->
+    <string-array name="notification_motivating_messages_mid">
+        <item>UNSTOPPABLE! You\'re building momentum!</item>
+        <item>CRUSHING IT! Halfway to hydration victory!</item>
+        <item>POWERFUL progress! Keep that energy flowing!</item>
+        <item>AMAZING work! You\'re on fire today!</item>
+        <item>CHAMPION mindset! Push forward!</item>
+        <item>Momentum is building, keep it going!</item>
+        <item>You are stronger than your excuses. Drink up!</item>
+        <item>No limits, no excuses. Just hydration.</item>
+    </string-array>
+
+    <!-- Motivating reminder messages: high progress -->
+    <string-array name="notification_motivating_messages_high">
+        <item>INCREDIBLE dedication! Victory is within reach!</item>
+        <item>OUTSTANDING! You\'re in the winner\'s zone!</item>
+        <item>PHENOMENAL! Final quarter — you\'ve got this!</item>
+        <item>EXCELLENCE in action! Keep dominating!</item>
+        <item>LEGENDARY persistence! Almost at the summit!</item>
+        <item>The finish line is in sight!</item>
+        <item>Leave it all on the field. Hydrate!</item>
+        <item>Greatness is earned one sip at a time.</item>
+    </string-array>
+
+    <!-- Motivating reminder messages: final progress -->
+    <string-array name="notification_motivating_messages_final">
+        <item>FINAL PUSH! Greatness awaits!</item>
+        <item>SO CLOSE to TOTAL VICTORY!</item>
+        <item>MAXIMUM effort for MAXIMUM results!</item>
+        <item>ULTIMATE hydration hero! Finish strong!</item>
+        <item>LEGENDARY status incoming! Complete the mission!</item>
+        <item>Close it out strong, champion!</item>
+        <item>This is what separates good from great. Finish!</item>
+        <item>One last push. You were born for this.</item>
+    </string-array>
+
+    <!-- Minimal reminder titles -->
+    <string-array name="notification_minimal_titles">
+        <item>Water reminder</item>
+    </string-array>
+
+    <!-- Minimal reminder messages -->
+    <string name="notification_minimal_message_low">Time to hydrate</string>
+    <string name="notification_minimal_message_mid">Continue hydrating</string>
+
+    <!-- Water facts shown with gentle reminders -->
+    <string-array name="notification_facts">
+        <item>Your brain is 75% water — feed it well!</item>
+        <item>Water helps regulate your body temperature.</item>
+        <item>Proper hydration can improve your mood and concentration.</item>
+        <item>Your muscles are 75% water.</item>
+        <item>Water helps transport nutrients throughout your body.</item>
+        <item>Staying hydrated can boost your energy levels.</item>
+        <item>Water helps your kidneys filter waste efficiently.</item>
+        <item>Proper hydration supports healthy skin.</item>
+        <item>Your blood is 90% water.</item>
+        <item>Water helps lubricate your joints.</item>
+        <item>Hydration can improve your physical performance.</item>
+        <item>Water aids in digestion and nutrient absorption.</item>
+        <item>Staying hydrated helps maintain healthy blood pressure.</item>
+        <item>Water helps prevent kidney stones.</item>
+        <item>Your heart works more efficiently when you\'re hydrated.</item>
+        <item>Dehydration can cause headaches and fatigue.</item>
+        <item>Drinking water before meals can help with portion control.</item>
+        <item>Water is essential for maintaining body temperature during exercise.</item>
+        <item>Even mild dehydration can impair cognitive function.</item>
+        <item>Water makes up about 60% of your total body weight.</item>
+    </string-array>
+
+    <!-- Water puns shown with motivating reminders. These are language-dependent word
+         play, so they are not translated; each locale should provide its own if desired. -->
+    <string-array name="notification_puns" translatable="false">
+        <item>Water you waiting for? Let\'s hydrate!</item>
+        <item>Don\'t let your hydration goals go down the drain!</item>
+        <item>H2-Oh yeah! Time for water!</item>
+        <item>You\'re one in a mill-ion! Stay hydrated!</item>
+        <item>Water wonderful day to stay hydrated!</item>
+        <item>Sea what happens when you drink more water!</item>
+        <item>Don\'t be a drip — drink up!</item>
+        <item>Water pressure? We prefer hydration pleasure!</item>
+        <item>Make waves with your hydration game!</item>
+        <item>Pool your energy and drink some water!</item>
+        <item>Current mood: Needs more water!</item>
+        <item>Tide yourself over with some H2O!</item>
+        <item>Water good choice to stay hydrated!</item>
+        <item>Flow with the hydration rhythm!</item>
+        <item>Sink or swim — we choose hydrate!</item>
+        <item>Stay hydrated and keep your spirits afloat.</item>
+        <item>Life is better when you\'re well-hydrated.</item>
+        <item>Keep calm and drink water.</item>
+        <item>Hydration is the best medication.</item>
+        <item>A glass a day keeps the fatigue away.</item>
+    </string-array>
+
 </resources>

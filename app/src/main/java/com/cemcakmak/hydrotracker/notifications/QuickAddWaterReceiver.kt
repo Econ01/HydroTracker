@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
+import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.DatabaseInitializer
 import com.cemcakmak.hydrotracker.data.models.ContainerPreset
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
@@ -88,8 +89,8 @@ class QuickAddWaterReceiver : BroadcastReceiver() {
         // Create a simple success notification that auto-dismisses
         val successNotification = android.app.Notification.Builder(context, HydroNotificationService.CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_menu_save) // System checkmark icon
-            .setContentTitle("💧 Water Added!")
-            .setContentText("Added 250ml to your daily intake")
+            .setContentTitle(context.getString(R.string.notification_quick_add_title))
+            .setContentText(context.getString(R.string.notification_quick_add_text, QUICK_ADD_AMOUNT.toInt()))
             .setAutoCancel(true)
             .setTimeoutAfter(3000) // Auto dismiss after 3 seconds
             .setPriority(android.app.Notification.PRIORITY_LOW)

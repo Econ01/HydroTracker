@@ -407,6 +407,7 @@ private fun NotificationPreviewCard(
     currentStyle: ReminderStyle,
     themePreferences: ThemePreferences
 ) {
+    val context = LocalContext.current
     val isDark = when (themePreferences.darkMode) {
         DarkModePreference.DARK -> true
         DarkModePreference.LIGHT -> false
@@ -477,7 +478,7 @@ private fun NotificationPreviewCard(
 
             BlurMorph(targetState = currentStyle) { style, blurModifier ->
                 val preview = remember(style) {
-                    NotificationContentProvider.getNotificationPreview(style)
+                    NotificationContentProvider.getNotificationPreview(context, style)
                 }
 
                 Column(
@@ -518,7 +519,7 @@ private fun NotificationPreviewCard(
 
             BlurMorph(targetState = currentStyle) { style, blurModifier ->
                 val preview = remember(style) {
-                    NotificationContentProvider.getNotificationPreview(style)
+                    NotificationContentProvider.getNotificationPreview(context, style)
                 }
 
                 Column(
