@@ -16,9 +16,12 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.utils.ImageUtils
 import java.io.File
 import java.time.LocalTime
@@ -61,7 +64,7 @@ fun ProfileHeaderCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = getTimeBasedGreeting(),
+                    text = timeBasedGreeting(),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                     modifier = Modifier.alignByBaseline()
@@ -84,7 +87,7 @@ fun ProfileHeaderCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit Name",
+                        contentDescription = stringResource(R.string.cd_edit_name),
                         tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                         modifier = Modifier.size(16.dp)
                     )
@@ -98,15 +101,15 @@ fun ProfileHeaderCard(
             ) {
                 QuickStatItem(
                     value = "${todayStatistics.entryCount}",
-                    label = "Today's Entries"
+                    label = stringResource(R.string.profile_stat_today_entries)
                 )
                 QuickStatItem(
                     value = "$totalDaysTracked",
-                    label = "Days Tracked"
+                    label = stringResource(R.string.profile_stat_days_tracked)
                 )
                 QuickStatItem(
                     value = "${(todayStatistics.goalProgress * 100).toInt()}%",
-                    label = "Today's Goal"
+                    label = stringResource(R.string.profile_stat_today_goal)
                 )
             }
 
@@ -185,7 +188,7 @@ fun ProfileAvatar(
             profileBitmap?.let { bitmap ->
                 androidx.compose.foundation.Image(
                     bitmap = bitmap,
-                    contentDescription = "Profile Photo",
+                    contentDescription = stringResource(R.string.cd_profile_photo),
                     modifier = Modifier
                         .size(size)
                         .clip(CircleShape),
@@ -217,15 +220,16 @@ private fun getInitials(name: String): String {
 }
 
 /**
- * Get time-based greeting message
+ * Get a time-based greeting message for the profile header.
  */
-private fun getTimeBasedGreeting(): String {
+@Composable
+private fun timeBasedGreeting(): String {
     val currentHour = LocalTime.now().hour
     return when (currentHour) {
-        in 5..11 -> "Good morning,"
-        in 12..16 -> "Good afternoon,"
-        in 17..21 -> "Good evening,"
-        else -> "Hello,"
+        in 5..11 -> stringResource(R.string.profile_greeting_morning)
+        in 12..16 -> stringResource(R.string.profile_greeting_afternoon)
+        in 17..21 -> stringResource(R.string.profile_greeting_evening)
+        else -> stringResource(R.string.profile_greeting_default)
     }
 }
 
@@ -256,7 +260,7 @@ fun ProfileDetailsCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Profile Details",
+                    text = stringResource(R.string.profile_section_details),
                     style = MaterialTheme.typography.titleLargeEmphasized
                 )
             }
@@ -268,8 +272,8 @@ fun ProfileDetailsCard(
                 // Gender
                 EditableInfoRow(
                     icon = Icons.Default.Person,
-                    label = "Gender",
-                    value = userProfile.gender.getDisplayName(),
+                    label = stringResource(R.string.profile_label_gender),
+                    value = stringResource(userProfile.gender.labelResId),
                     onClick = {haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
                         onEditGender() }
                 )
@@ -277,8 +281,8 @@ fun ProfileDetailsCard(
                 // Age Group
                 EditableInfoRow(
                     icon = Icons.Default.Cake,
-                    label = "Age Group",
-                    value = userProfile.ageGroup.getDisplayName(),
+                    label = stringResource(R.string.profile_label_age_group),
+                    value = stringResource(userProfile.ageGroup.labelResId),
                     onClick = {haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
                         onEditAgeGroup() }
                 )
@@ -286,8 +290,12 @@ fun ProfileDetailsCard(
                 // Weight
                 EditableInfoRow(
                     icon = Icons.Default.MonitorWeight,
-                    label = "Weight",
-                    value = if (userProfile.weight != null) "${userProfile.weight.toInt()} kg" else "Not set",
+                    label = stringResource(R.string.profile_label_weight),
+                    value = if (userProfile.weight != null) {
+                        stringResource(R.string.unit_kilograms_format, userProfile.weight.toInt())
+                    } else {
+                        stringResource(R.string.profile_weight_not_set)
+                    },
                     onClick = {haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
                         onEditWeight() }
                 )
@@ -326,7 +334,7 @@ fun DailyGoalsCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Daily Goals",
+                    text = stringResource(R.string.profile_section_daily_goals),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -339,7 +347,7 @@ fun DailyGoalsCard(
                 // Daily Goal
                 EditableInfoRow(
                     icon = Icons.Default.WaterDrop,
-                    label = "Daily Water Goal",
+                    label = stringResource(R.string.profile_label_daily_goal),
                     value = WaterCalculator.formatWaterAmount(userProfile.dailyWaterGoal),
                     onClick = {haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
                         onEditGoal() }
@@ -348,8 +356,8 @@ fun DailyGoalsCard(
                 // Activity Level
                 EditableInfoRow(
                     icon = Icons.Default.FitnessCenter,
-                    label = "Activity Level",
-                    value = userProfile.activityLevel.getDisplayName(),
+                    label = stringResource(R.string.profile_label_activity_level),
+                    value = stringResource(userProfile.activityLevel.labelResId),
                     onClick = {haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
                         onEditActivity() }
                 )
@@ -387,7 +395,7 @@ fun ActiveScheduleCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Active Schedule",
+                    text = stringResource(R.string.profile_section_active_schedule),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -400,8 +408,12 @@ fun ActiveScheduleCard(
                 // Schedule
                 EditableInfoRow(
                     icon = Icons.Default.AccessTime,
-                    label = "Active Hours",
-                    value = "${userProfile.wakeUpTime} - ${userProfile.sleepTime}",
+                    label = stringResource(R.string.profile_label_active_hours),
+                    value = stringResource(
+                        R.string.profile_active_hours_format,
+                        userProfile.wakeUpTime,
+                        userProfile.sleepTime
+                    ),
                     onClick = {haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
                         onEditSchedule() }
                 )
@@ -409,8 +421,12 @@ fun ActiveScheduleCard(
                 // Reminder Frequency (Read-only)
                 InfoRow(
                     icon = Icons.Default.Notifications,
-                    label = "Reminder Interval",
-                    value = "Every ${userProfile.reminderInterval} minutes"
+                    label = stringResource(R.string.profile_label_reminder_interval),
+                    value = pluralStringResource(
+                        R.plurals.every_x_minutes,
+                        userProfile.reminderInterval,
+                        userProfile.reminderInterval
+                    )
                 )
             }
         }

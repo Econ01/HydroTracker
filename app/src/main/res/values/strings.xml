@@ -54,6 +54,7 @@
          ============================================================================ -->
     <string name="unit_milliliters_format">%1$s ml</string>
     <string name="unit_liters_format">%1$s L</string>
+    <string name="unit_kilograms_format">%1$d kg</string>
     <!-- current / goal, e.g. "1.2 L / 2.7 L" -->
     <string name="progress_current_of_goal_format">%1$s / %2$s</string>
     <string name="percent_format">%1$d%%</string>
@@ -199,7 +200,7 @@
     <string name="beverage_effectiveness_placeholder">e.g., 100</string>
     <!-- Validation; %1$d = min, %2$d = max -->
     <string name="beverage_effectiveness_error">Enter a value between %1$d and %2$d</string>
-    <string name="beverage_effectiveness_hint">100% counts the full amount toward your goal</string>
+    <string name="beverage_effectiveness_hint">100%% counts the full amount toward your goal</string>
 
     <!-- Container preset sheet -->
     <string name="container_add_title">Add Container</string>
@@ -717,5 +718,89 @@
     <string name="home_motivation_almost_there">💪 You\'re doing great! Almost there!</string>
     <string name="home_motivation_halfway">🌟 Halfway there! Keep up the good work!</string>
     <string name="home_motivation_good_start">👍 Good start! Stay consistent!</string>
+
+    <!-- ============================================================================
+         Profile
+         ============================================================================ -->
+    <string name="profile_snackbar_updated">Profile updated successfully!</string>
+
+    <!-- Time-based greeting shown above the user name; keep the trailing comma if the
+         language separates greeting and name with a comma. -->
+    <string name="profile_greeting_morning">Good morning,</string>
+    <string name="profile_greeting_afternoon">Good afternoon,</string>
+    <string name="profile_greeting_evening">Good evening,</string>
+    <string name="profile_greeting_default">Hello,</string>
+
+    <string name="cd_edit_name">Edit name</string>
+
+    <!-- Quick stats under the profile header -->
+    <string name="profile_stat_today_entries">Today\'s Entries</string>
+    <string name="profile_stat_days_tracked">Days Tracked</string>
+    <string name="profile_stat_today_goal">Today\'s Goal</string>
+
+    <!-- Section titles on the Profile screen -->
+    <string name="profile_section_details">Profile Details</string>
+    <string name="profile_section_daily_goals">Daily Goals</string>
+    <string name="profile_section_active_schedule">Active Schedule</string>
+
+    <!-- Info-row labels -->
+    <string name="profile_label_gender">Gender</string>
+    <string name="profile_label_age_group">Age Group</string>
+    <string name="profile_label_weight">Weight</string>
+    <string name="profile_weight_not_set">Not set</string>
+    <string name="profile_label_daily_goal">Daily Water Goal</string>
+    <string name="profile_label_activity_level">Activity Level</string>
+    <string name="profile_label_active_hours">Active Hours</string>
+    <string name="profile_label_reminder_interval">Reminder Interval</string>
+
+    <!-- e.g. "07:00 - 23:00" -->
+    <string name="profile_active_hours_format">%1$s - %2$s</string>
+
+    <!-- Profile photo sheet -->
+    <string name="profile_photo_sheet_title">Update Profile Photo</string>
+    <string name="profile_remove_photo_desc">Use default avatar</string>
+
+    <!-- Name edit dialog -->
+    <string name="profile_name_dialog_title">Edit Name</string>
+    <string name="profile_name_error_empty">Name cannot be empty</string>
+    <string name="profile_name_error_too_long">Name is too long</string>
+
+    <!-- Daily goal bottom sheet -->
+    <string name="profile_goal_edit_title">Edit Daily Goal</string>
+    <string name="profile_goal_edit_description">Set your daily water intake goal. This will be used to track your progress and calculate reminders.</string>
+    <!-- %1$s = formatted liters such as "2.50" -->
+    <string name="profile_goal_slider_label">Use slider to adjust: %1$s L</string>
+    <string name="profile_goal_manual_label">Or enter manually:</string>
+    <string name="profile_goal_input_label">Daily Goal (Liters)</string>
+    <string name="profile_goal_input_error">Please enter a valid amount (0.5–10 L)</string>
+    <string name="profile_goal_input_hint">Recommended: 1.5 - 4.0 liters per day</string>
+
+    <!-- Activity level bottom sheet -->
+    <string name="profile_activity_title">Activity Level</string>
+    <string name="profile_activity_description">Your activity level affects your daily water needs. Changing this will automatically update your daily goal.</string>
+
+    <!-- Schedule bottom sheet -->
+    <string name="profile_schedule_title">Edit Schedule</string>
+    <string name="profile_schedule_description">Set your daily schedule to get reminders only during your active hours. This will automatically adjust your reminder frequency.</string>
+    <string name="profile_schedule_wake_label">Wake Up Time</string>
+    <string name="profile_schedule_sleep_label">Sleep Time</string>
+
+    <!-- Gender bottom sheet -->
+    <string name="profile_gender_title">Select Gender</string>
+    <string name="profile_gender_description">Gender helps us calculate more accurate hydration recommendations based on physiological differences.</string>
+
+    <!-- Age group bottom sheet -->
+    <string name="profile_age_title">Select Age Group</string>
+    <string name="profile_age_description">Age affects your daily water needs. Different age groups have varying hydration requirements.</string>
+
+    <!-- Weight bottom sheet -->
+    <string name="profile_weight_title">Enter Weight</string>
+    <string name="profile_weight_description">Adding your weight helps us provide more accurate hydration recommendations. This information is optional and stored locally.</string>
+    <string name="profile_weight_input_label">Weight (kg)</string>
+    <string name="profile_weight_input_error">Please enter a valid weight (30–300 kg)</string>
+    <string name="profile_weight_input_hint">Leave empty if you prefer not to share</string>
+
+    <!-- Generic OK button for time pickers and similar dialogs -->
+    <string name="action_ok">OK</string>
 
 </resources>

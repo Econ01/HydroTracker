@@ -19,12 +19,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.core.content.ContextCompat
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
@@ -62,6 +64,7 @@ fun ProfileScreen(
 
     // State management
     val context = LocalContext.current
+    val profileUpdatedMessage = stringResource(R.string.profile_snackbar_updated)
     val coroutineScope = rememberCoroutineScope()
     // Bottom sheet states
     var showGoalBottomSheet by remember { mutableStateOf(false) }
@@ -90,7 +93,7 @@ fun ProfileScreen(
             }
 
             snackbarHostState.showSuccessSnackbar(
-                message = "Profile updated successfully!"
+                message = profileUpdatedMessage
             )
         }
     }
@@ -265,7 +268,7 @@ fun ProfileScreen(
         }
     )
     
-    // Profile Picture Bottom Sheet and Username Dialog
+    // Profile Picture Bottom Sheet and Username Dialogue
     ProfilePictureBottomSheet(
         showBottomSheet = showProfilePictureBottomSheet,
         onDismiss = { showProfilePictureBottomSheet = false },
@@ -418,7 +421,7 @@ fun ProfilePictureBottomSheet(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "Update Profile Photo",
+                    text = stringResource(R.string.profile_photo_sheet_title),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -447,12 +450,12 @@ fun ProfilePictureBottomSheet(
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
                             Text(
-                                text = "Choose from Gallery",
+                                text = stringResource(R.string.profile_choose_gallery),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Medium
                             )
                             Text(
-                                text = "Select an existing photo",
+                                text = stringResource(R.string.profile_choose_gallery_desc),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -501,12 +504,12 @@ fun ProfilePictureBottomSheet(
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
                             Text(
-                                text = "Take Photo",
+                                text = stringResource(R.string.profile_take_photo),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Medium
                             )
                             Text(
-                                text = "Use your camera to take a new photo",
+                                text = stringResource(R.string.profile_take_photo_desc),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -541,13 +544,13 @@ fun ProfilePictureBottomSheet(
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
                             Text(
-                                text = "Remove Photo",
+                                text = stringResource(R.string.profile_remove_photo),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Medium,
                                 color = MaterialTheme.colorScheme.error
                             )
                             Text(
-                                text = "Use default avatar",
+                                text = stringResource(R.string.profile_remove_photo_desc),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onErrorContainer
                             )
@@ -562,7 +565,7 @@ fun ProfilePictureBottomSheet(
 }
 
 /**
- * Username Edit Dialog Component
+ * Username Edit Dialogue Component
  */
 @Composable
 fun UsernameEditDialog(
@@ -576,7 +579,7 @@ fun UsernameEditDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(text = "Edit Name")
+            Text(text = stringResource(R.string.profile_name_dialog_title))
         },
         text = {
             Column(
@@ -589,9 +592,9 @@ fun UsernameEditDialog(
                             name = newName
                         }
                     },
-                    label = { Text("Your name") },
-                    supportingText = { 
-                        Text("${name.length}/15 characters")
+                    label = { Text(stringResource(R.string.profile_name_label)) },
+                    supportingText = {
+                        Text(stringResource(R.string.character_count, name.length, 15))
                     },
                     isError = !isValidName,
                     keyboardOptions = KeyboardOptions(
@@ -602,7 +605,11 @@ fun UsernameEditDialog(
                 
                 if (!isValidName) {
                     Text(
-                        text = if (name.isBlank()) "Name cannot be empty" else "Name is too long",
+                        text = if (name.isBlank()) {
+                            stringResource(R.string.profile_name_error_empty)
+                        } else {
+                            stringResource(R.string.profile_name_error_too_long)
+                        },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.error
                     )
@@ -614,12 +621,12 @@ fun UsernameEditDialog(
                 onClick = { onConfirm(name) },
                 enabled = isValidName
             ) {
-                Text("Save")
+                Text(stringResource(R.string.action_save))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.action_cancel))
             }
         }
     )

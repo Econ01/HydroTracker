@@ -5,9 +5,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import com.cemcakmak.hydrotracker.R
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
@@ -79,7 +81,7 @@ fun EditableInfoRow(
 
             Icon(
                 imageVector = Icons.Default.ChevronRight,
-                contentDescription = "Edit",
+                contentDescription = stringResource(R.string.action_edit),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                 modifier = Modifier.size(24.dp)
             )

@@ -10,9 +10,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.models.ActivityLevel
 import com.cemcakmak.hydrotracker.data.models.Gender
 import com.cemcakmak.hydrotracker.data.models.AgeGroup
@@ -58,14 +60,14 @@ fun GoalEditBottomSheet(
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 Text(
-                    text = "Edit Daily Goal",
+                    text = stringResource(R.string.profile_goal_edit_title),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 8.dp)
                 )
 
                 Text(
-                    text = "Set your daily water intake goal. This will be used to track your progress and calculate reminders.",
+                    text = stringResource(R.string.profile_goal_edit_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -86,7 +88,10 @@ fun GoalEditBottomSheet(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = "Use slider to adjust: ${String.format(Locale.getDefault(), "%.2f", sliderValue)} L",
+                        text = stringResource(
+                            R.string.profile_goal_slider_label,
+                            String.format(Locale.getDefault(), "%.2f", sliderValue)
+                        ),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -124,12 +129,12 @@ fun GoalEditBottomSheet(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "1.0L",
+                            text = stringResource(R.string.unit_liters_format, "1.0"),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = "5.0L",
+                            text = stringResource(R.string.unit_liters_format, "5.0"),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -141,7 +146,7 @@ fun GoalEditBottomSheet(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Or enter manually:",
+                        text = stringResource(R.string.profile_goal_manual_label),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -158,13 +163,13 @@ fun GoalEditBottomSheet(
                                 }
                             }
                         },
-                        label = { Text("Daily Goal (Liters)") },
+                        label = { Text(stringResource(R.string.profile_goal_input_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         isError = isError,
                         supportingText = if (isError) {
-                            { Text("Please enter a valid amount (0.5-10 L)") }
+                            { Text(stringResource(R.string.profile_goal_input_error)) }
                         } else {
-                            { Text("Recommended: 1.5 - 4.0 liters per day") }
+                            { Text(stringResource(R.string.profile_goal_input_hint)) }
                         },
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -177,10 +182,10 @@ fun GoalEditBottomSheet(
                     OutlinedButton(
                         shapes = ButtonDefaults.shapes(),
                         onClick = { haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                            onDismiss },
+                            onDismiss() },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.action_cancel))
                     }
 
                     Button(
@@ -196,7 +201,7 @@ fun GoalEditBottomSheet(
                         },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Save")
+                        Text(stringResource(R.string.action_save))
                     }
                 }
                 
@@ -233,14 +238,14 @@ fun ActivityLevelBottomSheet(
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 Text(
-                    text = "Activity Level",
+                    text = stringResource(R.string.profile_activity_title),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 8.dp)
                 )
 
                 Text(
-                    text = "Your activity level affects your daily water needs. Changing this will automatically update your daily goal.",
+                    text = stringResource(R.string.profile_activity_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -266,13 +271,13 @@ fun ActivityLevelBottomSheet(
                                 modifier = Modifier.padding(20.dp)
                             ) {
                                 Text(
-                                    text = level.getDisplayName(),
+                                    text = stringResource(level.labelResId),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = level.getDescription(),
+                                    text = stringResource(level.descriptionResId),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -339,14 +344,14 @@ fun ScheduleEditBottomSheet(
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 Text(
-                    text = "Edit Schedule",
+                    text = stringResource(R.string.profile_schedule_title),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 8.dp)
                 )
 
                 Text(
-                    text = "Set your daily schedule to get reminders only during your active hours. This will automatically adjust your reminder frequency.",
+                    text = stringResource(R.string.profile_schedule_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -354,12 +359,12 @@ fun ScheduleEditBottomSheet(
                 Column(
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    // Wake Up Time Picker
+                    // Wake-Up Time Picker
                     Column(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
-                            text = "Wake Up Time",
+                            text = stringResource(R.string.profile_schedule_wake_label),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -407,7 +412,7 @@ fun ScheduleEditBottomSheet(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
-                            text = "Sleep Time",
+                            text = stringResource(R.string.profile_schedule_sleep_label),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -459,10 +464,10 @@ fun ScheduleEditBottomSheet(
                     OutlinedButton(
                         shapes = ButtonDefaults.shapes(),
                         onClick = { haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                            onDismiss },
+                            onDismiss() },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.action_cancel))
                     }
 
                     Button(
@@ -475,7 +480,7 @@ fun ScheduleEditBottomSheet(
                         },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Save")
+                        Text(stringResource(R.string.action_save))
                     }
                 }
                 
@@ -484,7 +489,7 @@ fun ScheduleEditBottomSheet(
         }
     }
 
-    // Wake Up Time Picker Dialog
+    // Wake-Up Time Picker Dialogue
     if (showWakeUpTimePicker) {
         TimePickerDialog(
             onDismissRequest = { showWakeUpTimePicker = false },
@@ -498,7 +503,7 @@ fun ScheduleEditBottomSheet(
         }
     }
 
-    // Sleep Time Picker Dialog
+    // Sleep Time Picker Dialogue
     if (showSleepTimePicker) {
         TimePickerDialog(
             onDismissRequest = { showSleepTimePicker = false },
@@ -514,7 +519,7 @@ fun ScheduleEditBottomSheet(
 }
 
 /**
- * Time Picker Dialog Component
+ * Time Picker Dialogue Component
  */
 @Composable
 fun TimePickerDialog(
@@ -526,12 +531,12 @@ fun TimePickerDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("OK")
+                Text(stringResource(R.string.action_ok))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismissRequest) {
-                Text("Cancel")
+                Text(stringResource(R.string.action_cancel))
             }
         },
         text = { content() }
@@ -565,14 +570,14 @@ fun GenderEditBottomSheet(
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 Text(
-                    text = "Select Gender",
+                    text = stringResource(R.string.profile_gender_title),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 8.dp)
                 )
 
                 Text(
-                    text = "Gender helps us calculate more accurate hydration recommendations based on physiological differences.",
+                    text = stringResource(R.string.profile_gender_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -595,7 +600,7 @@ fun GenderEditBottomSheet(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
-                                text = gender.getDisplayName(),
+                                text = stringResource(gender.labelResId),
                                 modifier = Modifier.padding(20.dp),
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = if (gender == currentGender) FontWeight.SemiBold else FontWeight.Normal
@@ -637,14 +642,14 @@ fun AgeGroupEditBottomSheet(
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 Text(
-                    text = "Select Age Group",
+                    text = stringResource(R.string.profile_age_title),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 8.dp)
                 )
 
                 Text(
-                    text = "Age affects your daily water needs. Different age groups have varying hydration requirements.",
+                    text = stringResource(R.string.profile_age_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -667,7 +672,7 @@ fun AgeGroupEditBottomSheet(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
-                                text = ageGroup.getDisplayName(),
+                                text = stringResource(ageGroup.labelResId),
                                 modifier = Modifier.padding(20.dp),
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = if (ageGroup == currentAgeGroup) FontWeight.SemiBold else FontWeight.Normal
@@ -711,14 +716,14 @@ fun WeightEditBottomSheet(
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 Text(
-                    text = "Enter Weight",
+                    text = stringResource(R.string.profile_weight_title),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 8.dp)
                 )
 
                 Text(
-                    text = "Adding your weight helps us provide more accurate hydration recommendations. This information is optional and stored locally.",
+                    text = stringResource(R.string.profile_weight_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -729,13 +734,13 @@ fun WeightEditBottomSheet(
                         weightText = it
                         isWeightError = false
                     },
-                    label = { Text("Weight (kg)") },
+                    label = { Text(stringResource(R.string.profile_weight_input_label)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     isError = isWeightError,
                     supportingText = if (isWeightError) {
-                        { Text("Please enter a valid weight (30-300 kg)") }
+                        { Text(stringResource(R.string.profile_weight_input_error)) }
                     } else {
-                        { Text("Leave empty if you prefer not to share") }
+                        { Text(stringResource(R.string.profile_weight_input_hint)) }
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -748,10 +753,10 @@ fun WeightEditBottomSheet(
                     OutlinedButton(
                         shapes = ButtonDefaults.shapes(),
                         onClick = { haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                            onDismiss },
+                            onDismiss() },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.action_cancel))
                     }
 
                     Button(
@@ -772,7 +777,7 @@ fun WeightEditBottomSheet(
                         },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Save")
+                        Text(stringResource(R.string.action_save))
                     }
                 }
                 
