@@ -10,11 +10,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cemcakmak.hydrotracker.R
 
 @Composable
 fun WelcomeStep(
@@ -53,7 +55,7 @@ fun WelcomeStep(
             ) {
                 Icon(
                     imageVector = Icons.Filled.WaterDrop,
-                    contentDescription = "Water drop",
+                    contentDescription = stringResource(R.string.cd_water_drop),
                     tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(64.dp)
                 )
@@ -77,7 +79,7 @@ fun WelcomeStep(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Welcome to HydroTracker",
+                    text = stringResource(R.string.onboarding_welcome_title),
                     style = MaterialTheme.typography.displayLargeEmphasized,
                     fontSize = 32.sp,
                     lineHeight = 40.sp,
@@ -88,7 +90,7 @@ fun WelcomeStep(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Let's set up your personalized water intake goal based on your lifestyle and preferences.",
+                    text = stringResource(R.string.onboarding_welcome_subtitle),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -102,8 +104,8 @@ fun WelcomeStep(
         Column(modifier = Modifier.fillMaxWidth()) {
             FeatureItem(
                 emoji = "🎯",
-                title = "Personalized Goals",
-                description = "Based on scientific research and your profile",
+                title = stringResource(R.string.onboarding_feature_goals_title),
+                description = stringResource(R.string.onboarding_feature_goals_desc),
                 isVisible = isVisible,
                 delay = 600
             )
@@ -112,8 +114,8 @@ fun WelcomeStep(
 
             FeatureItem(
                 emoji = "⏰",
-                title = "Smart Reminders",
-                description = "Gentle nudges during your active hours",
+                title = stringResource(R.string.onboarding_feature_reminders_title),
+                description = stringResource(R.string.onboarding_feature_reminders_desc),
                 isVisible = isVisible,
                 delay = 800
             )
@@ -122,8 +124,8 @@ fun WelcomeStep(
 
             FeatureItem(
                 emoji = "📊",
-                title = "Progress Tracking",
-                description = "Detailed insights and history",
+                title = stringResource(R.string.onboarding_feature_progress_title),
+                description = stringResource(R.string.onboarding_feature_progress_desc),
                 isVisible = isVisible,
                 delay = 1000
             )
@@ -153,7 +155,7 @@ fun WelcomeStep(
                         .height(56.dp)
                 ) {
                     Text(
-                        text = "Get Started",
+                        text = stringResource(R.string.onboarding_get_started),
                         style = MaterialTheme.typography.labelLargeEmphasized,
                         fontSize = 18.sp
                     )

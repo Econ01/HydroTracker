@@ -29,12 +29,13 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.models.*
 import com.cemcakmak.hydrotracker.utils.WaterCalculator
 
@@ -58,7 +59,7 @@ fun GoalStep(
 
             GoalInfoCard(
                 icon = Icons.Rounded.WaterDrop,
-                title = "Daily Water Goal",
+                title = stringResource(R.string.goal_daily_water_goal),
                 value = WaterCalculator.formatWaterAmount(userProfile.dailyWaterGoal),
                 accent = MaterialTheme.colorScheme.primary,
                 container = MaterialTheme.colorScheme.surface,
@@ -67,8 +68,12 @@ fun GoalStep(
 
             GoalInfoCard(
                 icon = Icons.Rounded.AccessTime,
-                title = "Reminder Interval",
-                value = "${userProfile.reminderInterval} minutes",
+                title = stringResource(R.string.goal_reminder_interval),
+                value = pluralStringResource(
+                    R.plurals.reminder_interval_minutes,
+                    userProfile.reminderInterval,
+                    userProfile.reminderInterval
+                ),
                 accent = MaterialTheme.colorScheme.tertiary,
                 container = MaterialTheme.colorScheme.surface,
                 iconContainer = MaterialTheme.colorScheme.tertiaryContainer
@@ -76,8 +81,8 @@ fun GoalStep(
 
             GoalInfoCard(
                 icon = Icons.Rounded.FitnessCenter,
-                title = "Activity Level",
-                value = userProfile.activityLevel.getDisplayName(),
+                title = stringResource(R.string.goal_activity_level),
+                value = stringResource(userProfile.activityLevel.labelResId),
                 accent = MaterialTheme.colorScheme.secondary,
                 container = MaterialTheme.colorScheme.surface,
                 iconContainer = MaterialTheme.colorScheme.secondaryContainer
@@ -92,13 +97,13 @@ fun GoalStep(
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
                     Text(
-                        text = "How we personalized this",
+                        text = stringResource(R.string.goal_personalized_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        text = "Your goal considers your profile and schedule. These factors influence total intake and notification cadence.",
+                        text = stringResource(R.string.goal_personalized_body),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = MaterialTheme.typography.bodyMedium.lineHeight
@@ -128,7 +133,6 @@ private fun ExpressiveHeaderStrip() {
                     )
                 )
             )
-            .semantics { contentDescription = "expressive header accent" }
     )
 }
 
@@ -143,7 +147,7 @@ private fun ReasonChipsRow(userProfile: UserProfile) {
     ) {
         AssistChip(
             onClick = {},
-            label = { Text(userProfile.gender.displayName()) },
+            label = { Text(stringResource(userProfile.gender.labelResId)) },
             colors = AssistChipDefaults.assistChipColors(
                 labelColor = c.onSurfaceVariant,
                 containerColor = c.surface
@@ -152,7 +156,7 @@ private fun ReasonChipsRow(userProfile: UserProfile) {
         )
         AssistChip(
             onClick = {},
-            label = { Text(userProfile.ageGroup.displayName()) },
+            label = { Text(stringResource(userProfile.ageGroup.labelResId)) },
             colors = AssistChipDefaults.assistChipColors(
                 labelColor = c.onSurfaceVariant,
                 containerColor = c.surface
@@ -161,7 +165,7 @@ private fun ReasonChipsRow(userProfile: UserProfile) {
         )
         AssistChip(
             onClick = {},
-            label = { Text("Wake: ${userProfile.wakeUpTime}") },
+            label = { Text(stringResource(R.string.goal_chip_wake, userProfile.wakeUpTime)) },
             colors = AssistChipDefaults.assistChipColors(
                 labelColor = c.onSurfaceVariant,
                 containerColor = c.surface
@@ -170,7 +174,7 @@ private fun ReasonChipsRow(userProfile: UserProfile) {
         )
         AssistChip(
             onClick = {},
-            label = { Text("Sleep: ${userProfile.sleepTime}") },
+            label = { Text(stringResource(R.string.goal_chip_sleep, userProfile.sleepTime)) },
             colors = AssistChipDefaults.assistChipColors(
                 labelColor = c.onSurfaceVariant,
                 containerColor = c.surface
@@ -292,7 +296,7 @@ fun CompleteStep(
         Spacer(Modifier.height(28.dp))
 
         Text(
-            text = "You're all set!",
+            text = stringResource(R.string.onboarding_complete_title),
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.Black,
             textAlign = TextAlign.Center
@@ -301,7 +305,7 @@ fun CompleteStep(
         Spacer(Modifier.height(10.dp))
 
         Text(
-            text = "Your personalized hydration plan is ready.",
+            text = stringResource(R.string.complete_subtitle),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -321,7 +325,7 @@ fun CompleteStep(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Your Daily Goal",
+                    text = stringResource(R.string.complete_daily_goal),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -342,12 +346,12 @@ fun CompleteStep(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         SmallRecapChip(
-                            label = "${userProfile.reminderInterval} min",
+                            label = stringResource(R.string.reminder_interval_min_short, userProfile.reminderInterval),
                             container = MaterialTheme.colorScheme.surface,
                             border = MaterialTheme.colorScheme.outlineVariant
                         )
                         SmallRecapChip(
-                            label = userProfile.activityLevel.getDisplayName(),
+                            label = stringResource(userProfile.activityLevel.labelResId),
                             container = MaterialTheme.colorScheme.surface,
                             border = MaterialTheme.colorScheme.outlineVariant
                         )
@@ -368,7 +372,7 @@ fun CompleteStep(
             Icon(imageVector = Icons.Rounded.WaterDrop, contentDescription = null)
             Spacer(Modifier.width(8.dp))
             Text(
-                text = "Start hydrating",
+                text = stringResource(R.string.complete_start_button),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
@@ -393,20 +397,6 @@ private fun SmallRecapChip(
             style = MaterialTheme.typography.labelLarge
         )
     }
-}
-
-/* ------------ Helpers ------------ */
-
-private fun Gender.displayName(): String = when (this) {
-    Gender.MALE -> "Male"
-    Gender.FEMALE -> "Female"
-    else -> name.replace('_', ' ').lowercase().replaceFirstChar { it.uppercase() }
-}
-
-private fun AgeGroup.displayName(): String = when (this) {
-    AgeGroup.YOUNG_ADULT_18_30 -> "18–30"
-    AgeGroup.ADULT_31_50 -> "31–50"
-    else -> name.replace('_', ' ').lowercase().replaceFirstChar { it.uppercase() }
 }
 
 /* ---------------------------------- Previews ---------------------------------- */

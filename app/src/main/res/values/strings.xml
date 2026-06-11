@@ -42,6 +42,7 @@
     <string name="cd_previous">Previous</string>
     <string name="cd_next">Next</string>
     <string name="cd_profile_photo">Profile photo</string>
+    <string name="cd_water_drop">Water drop</string>
 
     <!-- ============================================================================
          Units & number formatting
@@ -53,6 +54,8 @@
     <!-- current / goal, e.g. "1.2 L / 2.7 L" -->
     <string name="progress_current_of_goal_format">%1$s / %2$s</string>
     <string name="percent_format">%1$d%%</string>
+    <!-- Character counter, e.g. "12/15 characters"; %1$d = current length, %2$d = max -->
+    <string name="character_count">%1$d/%2$d characters</string>
 
     <!-- ============================================================================
          Notification channel (Android 8+)
@@ -112,6 +115,62 @@
     <string name="onboarding_complete_title">You\'re all set!</string>
     <string name="onboarding_complete_description">Tap the button to start hydrating!</string>
     <string name="onboarding_finish">Finish</string>
+
+    <!-- Welcome step -->
+    <string name="onboarding_welcome_subtitle">Let\'s set up your personalized water intake goal based on your lifestyle and preferences.</string>
+    <string name="onboarding_feature_goals_title">Personalized Goals</string>
+    <string name="onboarding_feature_goals_desc">Based on scientific research and your profile</string>
+    <string name="onboarding_feature_reminders_title">Smart Reminders</string>
+    <string name="onboarding_feature_reminders_desc">Gentle nudges during your active hours</string>
+    <string name="onboarding_feature_progress_title">Progress Tracking</string>
+    <string name="onboarding_feature_progress_desc">Detailed insights and history</string>
+    <string name="onboarding_get_started">Get Started</string>
+
+    <!-- Schedule step -->
+    <string name="onboarding_wake_label">Wake-Up Time</string>
+    <string name="onboarding_sleep_label">Sleep Time</string>
+    <string name="onboarding_wake_picker_title">Wake Up Time</string>
+    <string name="onboarding_wake_picker_subtitle">Choose your wake-up time</string>
+    <string name="onboarding_sleep_picker_title">Sleep Time</string>
+    <string name="onboarding_sleep_picker_subtitle">Choose your sleep time</string>
+    <string name="time_picker_set">Set Time</string>
+    <!-- Awake duration, e.g. "Awake for 16h 0m"; %1$d = hours, %2$d = minutes -->
+    <string name="onboarding_awake_duration">Awake for %1$dh %2$dm</string>
+
+    <!-- Profile setup step -->
+    <string name="profile_add_photo">Add Photo</string>
+    <string name="profile_remove_photo">Remove Photo</string>
+    <string name="profile_name_prompt">What should we call you?</string>
+    <string name="profile_name_label">Your name</string>
+    <string name="profile_name_placeholder">Enter your name</string>
+    <string name="profile_name_required">Name is required to continue</string>
+    <string name="profile_select_photo">Select Profile Photo</string>
+    <string name="profile_choose_gallery">Choose from Gallery</string>
+    <string name="profile_choose_gallery_desc">Select an existing photo</string>
+    <string name="profile_take_photo">Take Photo</string>
+    <string name="profile_take_photo_desc">Use your camera to take a new photo</string>
+
+    <!-- Goal step -->
+    <string name="goal_daily_water_goal">Daily Water Goal</string>
+    <string name="goal_reminder_interval">Reminder Interval</string>
+    <string name="goal_activity_level">Activity Level</string>
+    <string name="goal_personalized_title">How we personalized this</string>
+    <string name="goal_personalized_body">Your goal considers your profile and schedule. These factors influence total intake and notification cadence.</string>
+    <!-- Profile recap chips; %1$s = a time like 07:00 -->
+    <string name="goal_chip_wake">Wake: %1$s</string>
+    <string name="goal_chip_sleep">Sleep: %1$s</string>
+    <!-- Reminder interval shown in the Goal step; pluralized on the minute count -->
+    <plurals name="reminder_interval_minutes">
+        <item quantity="one">%1$d minute</item>
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
+
+    <!-- Complete step -->
+    <string name="complete_subtitle">Your personalized hydration plan is ready.</string>
+    <string name="complete_daily_goal">Your Daily Goal</string>
+    <string name="complete_start_button">Start hydrating</string>
+    <!-- Abbreviated reminder interval, e.g. "60 min"; %1$d = minutes -->
+    <string name="reminder_interval_min_short">%1$d min</string>
 
     <!-- ============================================================================
          Data-model enum labels
