@@ -8,7 +8,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.cemcakmak.hydrotracker.MainActivity
@@ -26,8 +25,6 @@ class HydroNotificationService(private val context: Context) {
 
     companion object {
         const val CHANNEL_ID = "hydro_reminders"
-        const val CHANNEL_NAME = "Hydration Reminders"
-        const val CHANNEL_DESCRIPTION = "Notifications to remind you to stay hydrated"
         const val NOTIFICATION_ID = 1001
     }
 
@@ -40,21 +37,18 @@ class HydroNotificationService(private val context: Context) {
      * Required for Android 8.0+ (API 26+)
      */
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                description = CHANNEL_DESCRIPTION
-                enableVibration(true)
-                vibrationPattern = longArrayOf(0, 300, 200, 300) // Gentle vibration pattern
-                setShowBadge(true)
-            }
-
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            context.getString(R.string.notification_channel_name),
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            description = context.getString(R.string.notification_channel_description)
+            enableVibration(true)
+            setShowBadge(true)
         }
+
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
     }
 
     /**

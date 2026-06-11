@@ -1,5 +1,7 @@
 package com.cemcakmak.hydrotracker.data.models
 
+import androidx.annotation.StringRes
+import com.cemcakmak.hydrotracker.R
 import kotlinx.serialization.Serializable
 
 /**
@@ -30,11 +32,16 @@ data class UserProfile(
 )
 
 @Serializable
-enum class Gender {
-    MALE,
-    FEMALE,
-    OTHER;
+enum class Gender(
+    @param:StringRes val labelResId: Int,
+    @param:StringRes val greetingResId: Int
+) {
+    MALE(R.string.gender_male, R.string.gender_greeting_male),
+    FEMALE(R.string.gender_female, R.string.gender_greeting_female),
+    OTHER(R.string.gender_other, R.string.gender_greeting_other);
 
+    // Transitional: prefer labelResId/greetingResId with stringResource() in Compose.
+    // These String accessors are kept until all call sites migrate, then removed.
     fun getDisplayName(): String {
         return when (this) {
             MALE -> "Male"
@@ -54,11 +61,14 @@ enum class Gender {
 }
 
 @Serializable
-enum class AgeGroup {
-    YOUNG_ADULT_18_30,
-    ADULT_31_50,
-    MIDDLE_AGED_51_60,
-    SENIOR_60_PLUS;
+enum class AgeGroup(
+    @param:StringRes val labelResId: Int,
+    @param:StringRes val motivationResId: Int
+) {
+    YOUNG_ADULT_18_30(R.string.age_group_young_adult, R.string.age_motivation_young_adult),
+    ADULT_31_50(R.string.age_group_adult, R.string.age_motivation_adult),
+    MIDDLE_AGED_51_60(R.string.age_group_middle_aged, R.string.age_motivation_middle_aged),
+    SENIOR_60_PLUS(R.string.age_group_senior, R.string.age_motivation_senior);
 
     fun getDisplayName(): String {
         return when (this) {
@@ -81,12 +91,16 @@ enum class AgeGroup {
 }
 
 @Serializable
-enum class ActivityLevel {
-    SEDENTARY,      // Little to no exercise
-    LIGHT,          // Light exercise 1-3 days/week
-    MODERATE,       // Moderate exercise 3-5 days/week
-    ACTIVE,         // Heavy exercise 6-7 days/week
-    VERY_ACTIVE;    // Very heavy exercise, physical job
+enum class ActivityLevel(
+    @param:StringRes val labelResId: Int,
+    @param:StringRes val descriptionResId: Int,
+    @param:StringRes val hydrationTipResId: Int
+) {
+    SEDENTARY(R.string.activity_sedentary, R.string.activity_desc_sedentary, R.string.activity_tip_sedentary),
+    LIGHT(R.string.activity_light, R.string.activity_desc_light, R.string.activity_tip_light),
+    MODERATE(R.string.activity_moderate, R.string.activity_desc_moderate, R.string.activity_tip_moderate),
+    ACTIVE(R.string.activity_active, R.string.activity_desc_active, R.string.activity_tip_active),
+    VERY_ACTIVE(R.string.activity_very_active, R.string.activity_desc_very_active, R.string.activity_tip_very_active);
 
     fun getDisplayName(): String {
         return when (this) {
@@ -122,10 +136,10 @@ enum class ActivityLevel {
 
 // Compassionate reminder styles
 @Serializable
-enum class ReminderStyle {
-    GENTLE,      // Soft, encouraging reminders
-    MOTIVATING,  // Energetic, goal-focused reminders
-    MINIMAL;     // Simple, unobtrusive reminders
+enum class ReminderStyle(@param:StringRes val labelResId: Int) {
+    GENTLE(R.string.reminder_style_gentle),      // Soft, encouraging reminders
+    MOTIVATING(R.string.reminder_style_motivating),  // Energetic, goal-focused reminders
+    MINIMAL(R.string.reminder_style_minimal);     // Simple, unobtrusive reminders
 
     fun getDisplayName(): String {
         return when (this) {
@@ -137,9 +151,12 @@ enum class ReminderStyle {
 }
 
 @Serializable
-enum class HydrationStandard {
-    EFSA,    // European Food Safety Authority (default)
-    IOM;     // Institute of Medicine (US)
+enum class HydrationStandard(
+    @param:StringRes val labelResId: Int,
+    @param:StringRes val descriptionResId: Int
+) {
+    EFSA(R.string.hydration_standard_efsa, R.string.hydration_standard_efsa_desc),    // European Food Safety Authority (default)
+    IOM(R.string.hydration_standard_iom, R.string.hydration_standard_iom_desc);     // Institute of Medicine (US)
 
     fun getDisplayName(): String {
         return when (this) {
@@ -171,9 +188,9 @@ enum class HydrationStandard {
 }
 
 @Serializable
-enum class DayEndMode {
-    SLEEP_TIME,
-    MIDNIGHT;
+enum class DayEndMode(@param:StringRes val labelResId: Int) {
+    SLEEP_TIME(R.string.day_end_sleep_time),
+    MIDNIGHT(R.string.day_end_midnight);
 
     fun getDisplayName(): String {
         return when (this) {
@@ -184,9 +201,9 @@ enum class DayEndMode {
 }
 
 @Serializable
-enum class ReminderIntervalMode {
-    AUTOMATIC,
-    CUSTOM;
+enum class ReminderIntervalMode(@param:StringRes val labelResId: Int) {
+    AUTOMATIC(R.string.reminder_interval_mode_automatic),
+    CUSTOM(R.string.reminder_interval_mode_custom);
 
     fun getDisplayName(): String {
         return when (this) {

@@ -2,6 +2,7 @@ package com.cemcakmak.hydrotracker.presentation.onboarding
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import com.cemcakmak.hydrotracker.data.models.*
@@ -22,8 +23,8 @@ fun GenderStep(
         ) {
             Gender.entries.forEach { gender ->
                 SelectionCard(
-                    title = gender.getDisplayName(),
-                    description = gender.getPersonalizedGreeting(),
+                    title = stringResource(gender.labelResId),
+                    description = stringResource(gender.greetingResId),
                     isSelected = selectedGender == gender,
                     onClick = { onGenderSelected(gender) },
                     icon = when (gender) {
@@ -68,8 +69,8 @@ fun AgeStep(
         ) {
             AgeGroup.entries.forEach { ageGroup ->
                 SelectionCard(
-                    title = ageGroup.getDisplayName(),
-                    description = ageGroup.getMotivationalMessage(),
+                    title = stringResource(ageGroup.labelResId),
+                    description = stringResource(ageGroup.motivationResId),
                     isSelected = selectedAgeGroup == ageGroup,
                     onClick = { onAgeGroupSelected(ageGroup) },
                     icon = when (ageGroup) {
@@ -114,8 +115,8 @@ fun ActivityStep(
         ) {
             ActivityLevel.entries.forEach { activityLevel ->
                 SelectionCard(
-                    title = activityLevel.getDisplayName(),
-                    description = activityLevel.getHydrationTip(),
+                    title = stringResource(activityLevel.labelResId),
+                    description = stringResource(activityLevel.hydrationTipResId),
                     isSelected = selectedActivityLevel == activityLevel,
                     onClick = { onActivityLevelSelected(activityLevel) },
                     icon = when (activityLevel) {

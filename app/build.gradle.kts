@@ -44,6 +44,8 @@ android {
         debug {
             signingConfig = signingConfigs.findByName("release")
                 ?: signingConfigs.getByName("debug")
+            // Pseudolocale for text-expansion testing: add "English (XA)" in system languages.
+            isPseudoLocalesEnabled = true
         }
         release {
             isMinifyEnabled = false

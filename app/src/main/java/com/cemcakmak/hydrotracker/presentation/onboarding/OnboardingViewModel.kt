@@ -2,7 +2,9 @@ package com.cemcakmak.hydrotracker.presentation.onboarding
 
 import android.app.Application
 import android.util.Log
+import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
+import com.cemcakmak.hydrotracker.R
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -256,31 +258,33 @@ class OnboardingViewModel(
         }
     }
 
-    /** Get step title for current step */
-    fun getStepTitle(): String {
+    /** String resource for the current step's title. Resolved with stringResource() in the UI. */
+    @StringRes
+    fun getStepTitleRes(): Int {
         return when (_currentStep.value) {
-            OnboardingStep.WELCOME -> "Welcome to HydroTracker"
-            OnboardingStep.GENDER -> "Tell us about yourself"
-            OnboardingStep.AGE -> "What's your age group?"
-            OnboardingStep.ACTIVITY -> "How active are you?"
-            OnboardingStep.SCHEDULE -> "When are you awake?"
-            OnboardingStep.PROFILE_SETUP -> "Complete Your Profile"
-            OnboardingStep.GOAL -> "Your personalized goal"
-            OnboardingStep.COMPLETE -> "You're all set!"
+            OnboardingStep.WELCOME -> R.string.onboarding_welcome_title
+            OnboardingStep.GENDER -> R.string.onboarding_gender_title
+            OnboardingStep.AGE -> R.string.onboarding_age_title
+            OnboardingStep.ACTIVITY -> R.string.onboarding_activity_title
+            OnboardingStep.SCHEDULE -> R.string.onboarding_schedule_title
+            OnboardingStep.PROFILE_SETUP -> R.string.onboarding_profile_title
+            OnboardingStep.GOAL -> R.string.onboarding_goal_title
+            OnboardingStep.COMPLETE -> R.string.onboarding_complete_title
         }
     }
 
-    /** Get step description for current step */
-    fun getStepDescription(): String {
+    /** String resource for the current step's description. Resolved with stringResource() in the UI. */
+    @StringRes
+    fun getStepDescriptionRes(): Int {
         return when (_currentStep.value) {
-            OnboardingStep.WELCOME -> "We'll personalize the app for you."
-            OnboardingStep.GENDER -> "Choose the option that best describes you."
-            OnboardingStep.AGE -> "Select your age range."
-            OnboardingStep.ACTIVITY -> "Pick your general daily activity level."
-            OnboardingStep.SCHEDULE -> "Tell us your wake and sleep times."
-            OnboardingStep.PROFILE_SETUP -> "Add your name and a profile photo to personalize your experience."
-            OnboardingStep.GOAL -> "Review your calculated goal."
-            OnboardingStep.COMPLETE -> "Tap the button to start hydrating!"
+            OnboardingStep.WELCOME -> R.string.onboarding_welcome_description
+            OnboardingStep.GENDER -> R.string.onboarding_gender_description
+            OnboardingStep.AGE -> R.string.onboarding_age_description
+            OnboardingStep.ACTIVITY -> R.string.onboarding_activity_description
+            OnboardingStep.SCHEDULE -> R.string.onboarding_schedule_description
+            OnboardingStep.PROFILE_SETUP -> R.string.onboarding_profile_description
+            OnboardingStep.GOAL -> R.string.onboarding_goal_description
+            OnboardingStep.COMPLETE -> R.string.onboarding_complete_description
         }
     }
 }

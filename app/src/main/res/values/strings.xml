@@ -1,10 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">HydroTracker</string>
-    
-    <!-- Widget Strings -->
+
+    <!-- ============================================================================
+         Branding & non-translatable values
+         App / brand names, acronyms and platform names must NOT be translated.
+         ============================================================================ -->
+    <string name="app_name" translatable="false">HydroTracker</string>
+
+    <!-- ============================================================================
+         Common actions
+         Reused across the whole app. Do NOT create screen-specific duplicates
+         (e.g. home_cancel, dialog_cancel) — reuse these everywhere.
+         ============================================================================ -->
+    <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_add">Add</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_close">Close</string>
+    <string name="action_done">Done</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_reset">Reset</string>
+    <string name="action_continue">Continue</string>
+    <string name="action_back">Back</string>
+    <string name="action_next">Next</string>
+    <string name="action_skip">Skip</string>
+    <string name="action_got_it">Got it</string>
+    <string name="action_retry">Retry</string>
+    <string name="action_dismiss">Dismiss</string>
+
+    <!-- ============================================================================
+         Accessibility content descriptions
+         Spoken by TalkBack / screen readers. Keep concise.
+         ============================================================================ -->
+    <string name="cd_back">Back</string>
+    <string name="cd_close">Close</string>
+    <string name="cd_delete_entry">Delete entry</string>
+    <string name="cd_edit_entry">Edit entry</string>
+    <string name="cd_add_entry">Add entry</string>
+    <string name="cd_reorder">Reorder</string>
+    <string name="cd_previous">Previous</string>
+    <string name="cd_next">Next</string>
+    <string name="cd_profile_photo">Profile photo</string>
+
+    <!-- ============================================================================
+         Units & number formatting
+         Unit suffixes are kept separate from numbers so the value can be formatted
+         locale-aware (NumberFormat) and the unit swapped independently.
+         ============================================================================ -->
+    <string name="unit_milliliters_format">%1$s ml</string>
+    <string name="unit_liters_format">%1$s L</string>
+    <!-- current / goal, e.g. "1.2 L / 2.7 L" -->
+    <string name="progress_current_of_goal_format">%1$s / %2$s</string>
+    <string name="percent_format">%1$d%%</string>
+
+    <!-- ============================================================================
+         Notification channel (Android 8+)
+         Channel name/description refresh on each createNotificationChannel() call, so
+         translating these values is enough — no channel-id bump required.
+         ============================================================================ -->
+    <string name="notification_channel_name">Hydration Reminders</string>
+    <string name="notification_channel_description">Notifications to remind you to stay hydrated</string>
+
+    <!-- ============================================================================
+         Widgets
+         android:label values shown in the home-screen widget picker, plus the text
+         rendered inside the widgets and their fallback/loading states.
+         ============================================================================ -->
+    <string name="widget_compact_label">HydroTracker Compact</string>
+    <string name="widget_progress_label">HydroTracker Progress</string>
+    <string name="widget_large_label">HydroTracker Large</string>
     <string name="widget_progress_description">Shows your daily hydration progress</string>
     <string name="widget_progress_title">HydroTracker Progress</string>
     <string name="widget_tap_to_open">Tap to open HydroTracker</string>
     <string name="widget_updated_at">Updated %1$s</string>
-    <string name="widget_loading">Loading...</string>
+    <string name="widget_loading">Loading…</string>
+
+    <!-- ============================================================================
+         Settings: About
+         ============================================================================ -->
+    <string name="updates_bug_report">Updates &amp; Bug Report</string>
+
+    <!-- ============================================================================
+         Settings: Display &amp; Locale
+         ============================================================================ -->
+    <string name="screen_display_locale_title">Display &amp; Locale</string>
+    <string name="display_language_header">Language</string>
+    <string name="display_language_description">Choose the language for HydroTracker. \"System default\" follows your device language.</string>
+    <string name="display_week_start_header">Week start</string>
+    <!-- Language option that follows the device language instead of a fixed one -->
+    <string name="language_system_default">System default</string>
+
+    <!-- ============================================================================
+         Onboarding
+         Per-step title + description (shown above each step), plus step controls.
+         ============================================================================ -->
+    <string name="onboarding_welcome_title">Welcome to HydroTracker</string>
+    <string name="onboarding_welcome_description">We\'ll personalize the app for you.</string>
+    <string name="onboarding_gender_title">Tell us about yourself</string>
+    <string name="onboarding_gender_description">Choose the option that best describes you.</string>
+    <string name="onboarding_age_title">What\'s your age group?</string>
+    <string name="onboarding_age_description">Select your age range.</string>
+    <string name="onboarding_activity_title">How active are you?</string>
+    <string name="onboarding_activity_description">Pick your general daily activity level.</string>
+    <string name="onboarding_schedule_title">When are you awake?</string>
+    <string name="onboarding_schedule_description">Tell us your wake and sleep times.</string>
+    <string name="onboarding_profile_title">Complete Your Profile</string>
+    <string name="onboarding_profile_description">Add your name and a profile photo to personalize your experience.</string>
+    <string name="onboarding_goal_title">Your personalized goal</string>
+    <string name="onboarding_goal_description">Review your calculated goal.</string>
+    <string name="onboarding_complete_title">You\'re all set!</string>
+    <string name="onboarding_complete_description">Tap the button to start hydrating!</string>
+    <string name="onboarding_finish">Finish</string>
+
+    <!-- ============================================================================
+         Data-model enum labels
+         Resolved in the UI via stringResource(enum.labelResId). Grouped by enum.
+         ============================================================================ -->
+
+    <!-- Gender -->
+    <string name="gender_male">Male</string>
+    <string name="gender_female">Female</string>
+    <string name="gender_other">Prefer not to say</string>
+    <!-- Inclusive, encouraging greeting shown per gender -->
+    <string name="gender_greeting_male">Stay hydrated, champion!</string>
+    <string name="gender_greeting_female">Keep glowing with hydration!</string>
+    <string name="gender_greeting_other">You\'ve got this!</string>
+
+    <!-- Age group -->
+    <string name="age_group_young_adult">18-30 years</string>
+    <string name="age_group_adult">31-50 years</string>
+    <string name="age_group_middle_aged">51-60 years</string>
+    <string name="age_group_senior">60+ years</string>
+    <string name="age_motivation_young_adult">Your body is building its foundation - keep it hydrated!</string>
+    <string name="age_motivation_adult">Hydration is your energy source - fuel your busy life!</string>
+    <string name="age_motivation_middle_aged">Stay refreshed and vibrant with proper hydration!</string>
+    <string name="age_motivation_senior">Hydration supports your wellness journey every day!</string>
+
+    <!-- Activity level -->
+    <string name="activity_sedentary">Sedentary</string>
+    <string name="activity_light">Light Activity</string>
+    <string name="activity_moderate">Moderate Activity</string>
+    <string name="activity_active">Active</string>
+    <string name="activity_very_active">Very Active</string>
+    <string name="activity_desc_sedentary">Little to no exercise</string>
+    <string name="activity_desc_light">Light exercise 1-3 days/week</string>
+    <string name="activity_desc_moderate">Moderate exercise 3-5 days/week</string>
+    <string name="activity_desc_active">Heavy exercise 6-7 days/week</string>
+    <string name="activity_desc_very_active">Very heavy exercise or physical job</string>
+    <string name="activity_tip_sedentary">Even at rest, your body needs consistent hydration!</string>
+    <string name="activity_tip_light">Light activity still means you need extra hydration support!</string>
+    <string name="activity_tip_moderate">Regular exercise requires regular hydration - you\'re doing great!</string>
+    <string name="activity_tip_active">Your active lifestyle deserves premium hydration care!</string>
+    <string name="activity_tip_very_active">High performance demands high hydration - you\'re a champion!</string>
+
+    <!-- Reminder style -->
+    <string name="reminder_style_gentle">Gentle &amp; Caring</string>
+    <string name="reminder_style_motivating">Motivating &amp; Energetic</string>
+    <string name="reminder_style_minimal">Simple &amp; Clean</string>
+
+    <!-- Hydration standard (acronyms are not translated) -->
+    <string name="hydration_standard_efsa" translatable="false">EFSA</string>
+    <string name="hydration_standard_iom" translatable="false">IOM</string>
+    <string name="hydration_standard_efsa_desc">European Food Safety Authority standards</string>
+    <string name="hydration_standard_iom_desc">Institute of Medicine standards</string>
+
+    <!-- Day-end mode -->
+    <string name="day_end_sleep_time">Sleep time</string>
+    <string name="day_end_midnight">Midnight</string>
+
+    <!-- Reminder interval mode -->
+    <string name="reminder_interval_mode_automatic">Automatic</string>
+    <string name="reminder_interval_mode_custom">Custom</string>
+
+    <!-- Dark mode preference -->
+    <string name="dark_mode_system">System Default</string>
+    <string name="dark_mode_light">Light Mode</string>
+    <string name="dark_mode_dark">Dark Mode</string>
+    <string name="dark_mode_system_desc">Follows your device settings</string>
+    <string name="dark_mode_light_desc">Always use light theme</string>
+    <string name="dark_mode_dark_desc">Always use dark theme</string>
+
+    <!-- Color source -->
+    <string name="color_source_hydro">HydroTracker Blue</string>
+    <string name="color_source_dynamic">Dynamic Colors</string>
+    <string name="color_source_custom">Custom Colors</string>
+    <string name="color_source_hydro_desc">Beautiful water-themed blue palette</string>
+    <string name="color_source_dynamic_desc">Colors from your wallpaper</string>
+    <string name="color_source_custom_desc">Create your own color scheme</string>
+
+    <!-- Week start day -->
+    <string name="weekday_sunday">Sunday</string>
+    <string name="weekday_monday">Monday</string>
+    <string name="week_start_sunday_desc">Week starts on Sunday</string>
+    <string name="week_start_monday_desc">Week starts on Monday</string>
+
+    <!-- App font (proper-noun font names are not translated) -->
+    <string name="font_google_sans_flex" translatable="false">Google Sans Flex</string>
+    <string name="font_system">System Default</string>
+    <string name="font_outfit" translatable="false">Outfit</string>
+    <string name="font_dm_sans" translatable="false">DM Sans</string>
+    <string name="font_jetbrains_mono" translatable="false">JetBrains Mono</string>
+
+    <!-- Navigation-bar label mode -->
+    <string name="navbar_label_always">Always shown</string>
+    <string name="navbar_label_selected">Selected only</string>
+    <string name="navbar_label_none">Off</string>
+
+    <!-- Beverage types -->
+    <string name="beverage_water">Water</string>
+    <string name="beverage_coffee">Coffee</string>
+    <string name="beverage_tea">Tea</string>
+    <string name="beverage_soft_drink">Soft Drink</string>
+    <string name="beverage_energy_drink">Energy Drink</string>
+    <string name="beverage_sports_drink">Sports Drink</string>
+    <string name="beverage_ors">ORS</string>
+    <string name="beverage_milk">Milk</string>
+    <string name="beverage_fruit_juice">Fruit Juice</string>
+    <string name="beverage_desc_water">Pure water - baseline hydration</string>
+    <string name="beverage_desc_coffee">Coffee - equivalent to water</string>
+    <string name="beverage_desc_tea">Tea - equivalent to water</string>
+    <string name="beverage_desc_soft_drink">Soft drink - equivalent to water</string>
+    <string name="beverage_desc_energy_drink">Energy drink - equivalent to water</string>
+    <string name="beverage_desc_sports_drink">Sports drink - slightly enhanced hydration</string>
+    <string name="beverage_desc_ors">Oral rehydration solution - superior hydration</string>
+    <string name="beverage_desc_milk">Milk - superior hydration</string>
+    <string name="beverage_desc_fruit_juice">Fruit juice - enhanced hydration</string>
+
 </resources>

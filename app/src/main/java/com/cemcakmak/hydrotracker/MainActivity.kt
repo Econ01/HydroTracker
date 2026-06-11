@@ -2,6 +2,7 @@ package com.cemcakmak.hydrotracker
 
 import android.app.Application
 import android.app.UiModeManager
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -22,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.ExperimentalTextApi
+import com.cemcakmak.hydrotracker.utils.AppLocale
 import com.cemcakmak.hydrotracker.utils.SmartComposeHapticFeedback
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
@@ -113,6 +115,11 @@ class MainActivity : ComponentActivity() {
 
     // Listener so a system contrast change (Android 14+) re-applies the dynamic colors live
     private var contrastChangeListener: UiModeManager.ContrastChangeListener? = null
+
+    override fun attachBaseContext(newBase: Context) {
+        // Apply the user-selected per-app language before any resources are resolved.
+        super.attachBaseContext(AppLocale.wrap(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

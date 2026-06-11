@@ -1,5 +1,7 @@
 package com.cemcakmak.hydrotracker.data.models
 
+import androidx.annotation.StringRes
+import com.cemcakmak.hydrotracker.R
 import java.time.DayOfWeek
 import kotlinx.serialization.Serializable
 
@@ -20,10 +22,13 @@ data class ThemePreferences(
 )
 
 @Serializable
-enum class DarkModePreference {
-    SYSTEM,     // Follow system setting
-    LIGHT,      // Always light mode
-    DARK;       // Always dark mode
+enum class DarkModePreference(
+    @param:StringRes val labelResId: Int,
+    @param:StringRes val descriptionResId: Int
+) {
+    SYSTEM(R.string.dark_mode_system, R.string.dark_mode_system_desc),     // Follow system setting
+    LIGHT(R.string.dark_mode_light, R.string.dark_mode_light_desc),      // Always light mode
+    DARK(R.string.dark_mode_dark, R.string.dark_mode_dark_desc);       // Always dark mode
 
     fun getDisplayName(): String {
         return when (this) {
@@ -43,10 +48,13 @@ enum class DarkModePreference {
 }
 
 @Serializable
-enum class ColorSource {
-    HYDRO_THEME,    // Our default water-themed colors
-    DYNAMIC_COLOR,  // Material You dynamic colors from wallpaper
-    CUSTOM;         // Future: Custom color picker
+enum class ColorSource(
+    @param:StringRes val labelResId: Int,
+    @param:StringRes val descriptionResId: Int
+) {
+    HYDRO_THEME(R.string.color_source_hydro, R.string.color_source_hydro_desc),    // Our default water-themed colors
+    DYNAMIC_COLOR(R.string.color_source_dynamic, R.string.color_source_dynamic_desc),  // Material You dynamic colors from wallpaper
+    CUSTOM(R.string.color_source_custom, R.string.color_source_custom_desc);         // Future: Custom color picker
 
     fun getDisplayName(): String {
         return when (this) {
@@ -70,10 +78,15 @@ enum class ColorSource {
 }
 
 @Serializable
-enum class WeekStartDay(val displayName: String, val dayOfWeek: DayOfWeek) {
-    SUNDAY("Sunday", DayOfWeek.SUNDAY),
-    MONDAY("Monday", DayOfWeek.MONDAY);
-    
+enum class WeekStartDay(
+    val displayName: String,
+    val dayOfWeek: DayOfWeek,
+    @param:StringRes val labelResId: Int,
+    @param:StringRes val descriptionResId: Int
+) {
+    SUNDAY("Sunday", DayOfWeek.SUNDAY, R.string.weekday_sunday, R.string.week_start_sunday_desc),
+    MONDAY("Monday", DayOfWeek.MONDAY, R.string.weekday_monday, R.string.week_start_monday_desc);
+
     fun getDescription(): String {
         return when (this) {
             SUNDAY -> "Week starts on Sunday"
@@ -83,12 +96,12 @@ enum class WeekStartDay(val displayName: String, val dayOfWeek: DayOfWeek) {
 }
 
 @Serializable
-enum class AppFont {
-    GOOGLE_SANS_FLEX,
-    SYSTEM,
-    OUTFIT,
-    DM_SANS,
-    JETBRAINS_MONO;
+enum class AppFont(@param:StringRes val labelResId: Int) {
+    GOOGLE_SANS_FLEX(R.string.font_google_sans_flex),
+    SYSTEM(R.string.font_system),
+    OUTFIT(R.string.font_outfit),
+    DM_SANS(R.string.font_dm_sans),
+    JETBRAINS_MONO(R.string.font_jetbrains_mono);
 
     fun getDisplayName(): String {
         return when (this) {
@@ -102,10 +115,10 @@ enum class AppFont {
 }
 
 @Serializable
-enum class NavBarLabelMode {
-    ALWAYS,    // Show every tab's label
-    SELECTED,  // Show only the selected tab's label
-    NONE;      // No labels
+enum class NavBarLabelMode(@param:StringRes val labelResId: Int) {
+    ALWAYS(R.string.navbar_label_always),    // Show every tab's label
+    SELECTED(R.string.navbar_label_selected),  // Show only the selected tab's label
+    NONE(R.string.navbar_label_none);      // No labels
 
     fun getDisplayName(): String {
         return when (this) {

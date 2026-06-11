@@ -1,5 +1,6 @@
 package com.cemcakmak.hydrotracker.presentation.settings
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,7 +23,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,6 +33,7 @@ import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
+import com.cemcakmak.hydrotracker.utils.AppLocale
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -39,13 +43,68 @@ fun DisplayLocaleScreen(
     onNavigateBack: () -> Unit = {}
 ) {
     SettingsDetailScaffold(
-        title = "Display & Locale",
+        title = stringResource(R.string.screen_display_locale_title),
         onNavigateBack = onNavigateBack
     ) {
+        LanguageSection()
         WeekStartSection(
             weekStartDay = themePreferences.weekStartDay,
             onWeekStartDayChange = onWeekStartDayChange
         )
+    }
+}
+
+/**
+ * In-app language picker. The option list grows automatically as languages are added to [AppLocale.SUPPORTED_TAGS].
+ */
+@Composable
+private fun LanguageSection() {
+    val haptics = LocalHapticFeedback.current
+    val activity = LocalActivity.current
+    val context = LocalContext.current
+    val currentTag = AppLocale.currentTag(context)
+
+    // null represents "System default"; the rest are the shipped translation tags.
+    val options: List<String?> = remember { listOf(null) + AppLocale.SUPPORTED_TAGS }
+
+    Column(
+        modifier = Modifier.padding(top = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        SettingsSectionHeader(stringResource(R.string.display_language_header))
+        Text(
+            text = stringResource(R.string.display_language_description),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 4.dp)
+        )
+        Column {
+            options.forEachIndexed { index, tag ->
+                val label = if (tag == null) {
+                    stringResource(R.string.language_system_default)
+                } else {
+                    AppLocale.displayName(tag)
+                }
+                SelectableOptionCard(
+                    index = index,
+                    size = options.size,
+                    selected = currentTag == tag,
+                    onClick = {
+                        haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
+                        AppLocale.apply(context, tag)
+                        // Re-create so stringResource lookups pick up the new locale immediately
+                        // across all API levels (deterministic regardless of configChanges).
+                        activity?.recreate()
+                    }
+                ) { contentColor ->
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = contentColor
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -60,7 +119,7 @@ private fun WeekStartSection(
         modifier = Modifier.padding(top = 24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        SettingsSectionHeader("Week start")
+        SettingsSectionHeader(stringResource(R.string.display_week_start_header))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -94,10 +153,7 @@ private fun WeekStartSection(
                             )
                         }
                         Text(
-                            text = when (day) {
-                                WeekStartDay.SUNDAY -> "Sunday"
-                                WeekStartDay.MONDAY -> "Monday"
-                            },
+                            text = stringResource(day.labelResId),
                             style = MaterialTheme.typography.labelLarge
                         )
                     }

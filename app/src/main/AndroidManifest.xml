@@ -43,6 +43,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HydroTracker"
         android:enableOnBackInvokedCallback="true"
+        android:localeConfig="@xml/locales_config"
         tools:targetApi="33" >
         <activity
             android:name=".MainActivity"
@@ -101,7 +102,7 @@
             android:name=".widgets.HydroCompactWidget"
             android:enabled="true"
             android:exported="true"
-            android:label="HydroTracker Compact">
+            android:label="@string/widget_compact_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -115,7 +116,7 @@
             android:name=".widgets.HydroProgressWidget"
             android:enabled="true"
             android:exported="true"
-            android:label="HydroTracker Progress">
+            android:label="@string/widget_progress_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -129,7 +130,7 @@
             android:name=".widgets.HydroLargeWidget"
             android:enabled="true"
             android:exported="true"
-            android:label="HydroTracker Large">
+            android:label="@string/widget_large_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="com.cemcakmak.hydrotracker.QUICK_ADD" />
