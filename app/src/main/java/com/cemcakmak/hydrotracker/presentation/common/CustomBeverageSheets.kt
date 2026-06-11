@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -74,7 +75,7 @@ private fun AddCustomBeverageSheetContent(
             .padding(bottom = 32.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        BeverageSheetHeader(title = "Add Beverage", iconKey = iconKey)
+        BeverageSheetHeader(title = stringResource(R.string.beverage_add), iconKey = iconKey)
 
         BeverageFormFields(
             name = name,
@@ -121,7 +122,7 @@ private fun AddCustomBeverageSheetContent(
                 .fillMaxWidth(1f)
                 .height(56.dp)
         ) {
-            Text("Add Beverage")
+            Text(stringResource(R.string.beverage_add))
         }
     }
 }
@@ -161,7 +162,7 @@ private fun EditCustomBeverageSheetContent(
             .padding(bottom = 32.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        BeverageSheetHeader(title = "Edit Beverage", iconKey = iconKey)
+        BeverageSheetHeader(title = stringResource(R.string.beverage_edit_title), iconKey = iconKey)
 
         BeverageFormFields(
             name = name,
@@ -229,7 +230,7 @@ private fun EditCustomBeverageSheetContent(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Delete",
+                            text = stringResource(R.string.action_delete),
                             maxLines = 1,
                             softWrap = false
                         )
@@ -268,7 +269,7 @@ private fun EditCustomBeverageSheetContent(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Save",
+                            text = stringResource(R.string.action_save),
                             maxLines = 1,
                             softWrap = false
                         )
@@ -290,8 +291,8 @@ private fun EditCustomBeverageSheetContent(
                     tint = MaterialTheme.colorScheme.error
                 )
             },
-            title = { Text("Delete Beverage?") },
-            text = { Text("Are you sure you want to delete \"${name.trim()}\"? This action cannot be undone.") },
+            title = { Text(stringResource(R.string.beverage_delete_title)) },
+            text = { Text(stringResource(R.string.delete_confirm_message, name.trim())) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -303,12 +304,12 @@ private fun EditCustomBeverageSheetContent(
                         containerColor = MaterialTheme.colorScheme.error
                     )
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.action_delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteConfirmation = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.action_cancel))
                 }
             }
         )
@@ -360,11 +361,14 @@ private fun PresetBeverageSheetContent(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = type.displayName,
+                    text = stringResource(type.labelResId),
                     style = MaterialTheme.typography.titleLargeEmphasized
                 )
                 Text(
-                    text = "${(type.hydrationMultiplier * 100).toInt()}% hydration effectiveness",
+                    text = stringResource(
+                        R.string.beverage_hydration_effectiveness,
+                        (type.hydrationMultiplier * 100).toInt()
+                    ),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -386,7 +390,7 @@ private fun PresetBeverageSheetContent(
         }
 
         Text(
-            text = type.description,
+            text = stringResource(type.descriptionResId),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -418,7 +422,7 @@ private fun PresetBeverageSheetContent(
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(if (isHidden) "Show in Quick Add" else "Hide from Quick Add")
+            Text(if (isHidden) stringResource(R.string.beverage_show_in_quick_add) else stringResource(R.string.beverage_hide_from_quick_add))
         }
     }
 }
@@ -482,11 +486,11 @@ private fun BeverageFormFields(
     OutlinedTextField(
         value = name,
         onValueChange = onNameChange,
-        label = { Text("Beverage Name") },
-        placeholder = { Text("e.g., Smoothie") },
+        label = { Text(stringResource(R.string.beverage_name_label)) },
+        placeholder = { Text(stringResource(R.string.beverage_name_placeholder)) },
         isError = nameError,
         supportingText = if (nameError) {
-            { Text("Name is required") }
+            { Text(stringResource(R.string.error_name_required)) }
         } else null,
         singleLine = true,
         shape = RoundedCornerShape(50.dp),
@@ -498,14 +502,14 @@ private fun BeverageFormFields(
     OutlinedTextField(
         value = percentText,
         onValueChange = onPercentChange,
-        label = { Text("Hydration effectiveness (%)") },
-        placeholder = { Text("e.g., 100") },
+        label = { Text(stringResource(R.string.beverage_effectiveness_label)) },
+        placeholder = { Text(stringResource(R.string.beverage_effectiveness_placeholder)) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         isError = percentError,
         supportingText = if (percentError) {
-            { Text("Enter a value between $MIN_PERCENT and $MAX_PERCENT") }
+            { Text(stringResource(R.string.beverage_effectiveness_error, MIN_PERCENT, MAX_PERCENT)) }
         } else {
-            { Text("100% counts the full amount toward your goal") }
+            { Text(stringResource(R.string.beverage_effectiveness_hint)) }
         },
         singleLine = true,
         shape = RoundedCornerShape(50.dp),
@@ -515,7 +519,7 @@ private fun BeverageFormFields(
     )
 
     Text(
-        text = "Icon",
+        text = stringResource(R.string.label_icon),
         style = MaterialTheme.typography.labelLarge,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(start = 4.dp)

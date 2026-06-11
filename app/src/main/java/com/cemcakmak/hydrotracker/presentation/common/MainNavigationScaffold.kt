@@ -4,6 +4,7 @@
 package com.cemcakmak.hydrotracker.presentation.common
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -59,6 +60,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -181,12 +183,12 @@ fun MainNavigationScaffold(
                     icon = {
                         Icon(
                             imageVector = Icons.Default.Edit,
-                            contentDescription = "Add Custom Amount"
+                            contentDescription = stringResource(R.string.cd_add_custom_amount)
                         )
                     },
                     text = {
                         Text(
-                            text = "Add Custom",
+                            text = stringResource(R.string.nav_add_custom),
                             style = MaterialTheme.typography.labelLargeEmphasized
                         )
                     }
@@ -205,7 +207,7 @@ private fun HistoryTopAppBar() {
     TopAppBar(
         title = {
             Text(
-                text = "History & Statistics",
+                text = stringResource(R.string.history_title),
                 fontWeight = FontWeight.Bold
             )
         }
@@ -216,7 +218,7 @@ private fun HistoryTopAppBar() {
 @Composable
 private fun ProfileTopAppBar() {
     TopAppBar(
-        title = { Text("Profile") }
+        title = { Text(stringResource(R.string.nav_profile)) }
     )
 }
 
@@ -249,7 +251,7 @@ private fun HydroNavigationBar(
                 icon = {
                     TooltipBox(
                         positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
-                        tooltip = { PlainTooltip { Text(item.label) } },
+                        tooltip = { PlainTooltip { Text(stringResource(item.labelResId)) } },
                         state = tooltipState
                     ) {
                         if (item == NavigationItem.PROFILE) {
@@ -263,7 +265,7 @@ private fun HydroNavigationBar(
                                 imageVector = ImageVector.vectorResource(
                                     if (isSelected) item.selectedIconRes else item.iconRes
                                 ),
-                                contentDescription = item.label,
+                                contentDescription = stringResource(item.labelResId),
                                 modifier = Modifier.size(24.dp)
                             )
                         }
@@ -272,7 +274,7 @@ private fun HydroNavigationBar(
                 label = if (showLabel) {
                     {
                         Text(
-                            text = item.label,
+                            text = stringResource(item.labelResId),
                             style = MaterialTheme.typography.labelMediumEmphasized
                         )
                     }
@@ -293,31 +295,31 @@ private fun HydroNavigationBar(
 
 enum class NavigationItem(
     val key: NavigationRoutes,
-    val label: String,
+    @get:StringRes val labelResId: Int,
     @get:DrawableRes val iconRes: Int,
     @get:DrawableRes val selectedIconRes: Int
 ) {
     HOME(
         key = NavigationRoutes.Home,
-        label = "Home",
+        labelResId = R.string.nav_home,
         iconRes = R.drawable.home,
         selectedIconRes = R.drawable.home_filled
     ),
     HISTORY(
         key = NavigationRoutes.History,
-        label = "History",
+        labelResId = R.string.nav_history,
         iconRes = R.drawable.leaderboard,
         selectedIconRes = R.drawable.leaderboard_filled
     ),
     PROFILE(
         key = NavigationRoutes.Profile,
-        label = "Profile",
+        labelResId = R.string.nav_profile,
         iconRes = R.drawable.person,
         selectedIconRes = R.drawable.person_filled
     ),
     SETTINGS(
         key = NavigationRoutes.Settings,
-        label = "Settings",
+        labelResId = R.string.nav_settings,
         iconRes = R.drawable.settings,
         selectedIconRes = R.drawable.settings_filled
     )
@@ -352,7 +354,7 @@ fun ProfileIcon(
         ) {
             Image(
                 bitmap = profileBitmap!!.asImageBitmap(),
-                contentDescription = "Profile Photo",
+                contentDescription = stringResource(R.string.cd_profile_photo),
                 modifier = Modifier
                     .size(24.dp)
                     .clip(CircleShape)
@@ -371,7 +373,7 @@ fun ProfileIcon(
         // Fall back to default icon
         Icon(
             imageVector = Icons.Filled.Person,
-            contentDescription = "Profile",
+            contentDescription = stringResource(R.string.nav_profile),
             modifier = modifier
         )
     }

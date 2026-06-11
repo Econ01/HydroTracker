@@ -43,6 +43,9 @@
     <string name="cd_next">Next</string>
     <string name="cd_profile_photo">Profile photo</string>
     <string name="cd_water_drop">Water drop</string>
+    <string name="cd_add_custom_amount">Add Custom Amount</string>
+    <string name="cd_pinned">Pinned</string>
+    <string name="cd_hidden">Hidden</string>
 
     <!-- ============================================================================
          Units & number formatting
@@ -171,6 +174,53 @@
     <string name="complete_start_button">Start hydrating</string>
     <!-- Abbreviated reminder interval, e.g. "60 min"; %1$d = minutes -->
     <string name="reminder_interval_min_short">%1$d min</string>
+
+    <!-- ============================================================================
+         Beverages &amp; containers — shared bottom sheets
+         Add/edit custom beverages and container presets (presentation/common).
+         ============================================================================ -->
+    <!-- Shared -->
+    <string name="error_name_required">Name is required</string>
+    <string name="label_icon">Icon</string>
+    <!-- Delete confirmation body; %1$s = the item name being deleted -->
+    <string name="delete_confirm_message">Are you sure you want to delete \"%1$s\"? This action cannot be undone.</string>
+
+    <!-- Custom beverage sheet -->
+    <string name="beverage_add">Add Beverage</string>
+    <string name="beverage_edit_title">Edit Beverage</string>
+    <string name="beverage_delete_title">Delete Beverage?</string>
+    <string name="beverage_show_in_quick_add">Show in Quick Add</string>
+    <string name="beverage_hide_from_quick_add">Hide from Quick Add</string>
+    <!-- Preset effectiveness line, e.g. "150% hydration effectiveness"; %1$d = percent -->
+    <string name="beverage_hydration_effectiveness">%1$d%% hydration effectiveness</string>
+    <string name="beverage_name_label">Beverage Name</string>
+    <string name="beverage_name_placeholder">e.g., Smoothie</string>
+    <string name="beverage_effectiveness_label">Hydration effectiveness (%)</string>
+    <string name="beverage_effectiveness_placeholder">e.g., 100</string>
+    <!-- Validation; %1$d = min, %2$d = max -->
+    <string name="beverage_effectiveness_error">Enter a value between %1$d and %2$d</string>
+    <string name="beverage_effectiveness_hint">100% counts the full amount toward your goal</string>
+
+    <!-- Container preset sheet -->
+    <string name="container_add_title">Add Container</string>
+    <string name="container_edit_title">Edit Container</string>
+    <string name="container_name_label">Container Name</string>
+    <string name="container_name_placeholder">e.g., Coffee Mug</string>
+    <string name="container_volume_label">Volume (ml)</string>
+    <string name="container_volume_placeholder">e.g., 250</string>
+    <string name="container_volume_error">Enter a valid volume (1-5000 ml)</string>
+    <string name="container_icon_auto">Icon updates automatically based on volume</string>
+    <string name="container_delete_title">Delete Container?</string>
+
+    <!-- ============================================================================
+         Navigation &amp; top bars
+         ============================================================================ -->
+    <string name="nav_home">Home</string>
+    <string name="nav_history">History</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_add_custom">Add Custom</string>
+    <string name="history_title">History &amp; Statistics</string>
 
     <!-- ============================================================================
          Data-model enum labels

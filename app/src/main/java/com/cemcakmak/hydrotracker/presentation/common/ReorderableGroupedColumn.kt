@@ -40,6 +40,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import com.cemcakmak.hydrotracker.R
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -191,21 +192,21 @@ fun <T> ReorderableGroupedColumn(
                             when {
                                 slot.pinned -> Icon(
                                     imageVector = Icons.Default.PushPin,
-                                    contentDescription = "Pinned",
+                                    contentDescription = stringResource(R.string.cd_pinned),
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.size(24.dp)
                                 )
 
                                 slot.hidden -> Icon(
                                     imageVector = Icons.Default.VisibilityOff,
-                                    contentDescription = "Hidden",
+                                    contentDescription = stringResource(R.string.cd_hidden),
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.size(24.dp)
                                 )
 
                                 else -> Icon(
                                     imageVector = ImageVector.vectorResource(R.drawable.drag_handle_filled),
-                                    contentDescription = "Reorder",
+                                    contentDescription = stringResource(R.string.cd_reorder),
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier
                                         .size(24.dp)

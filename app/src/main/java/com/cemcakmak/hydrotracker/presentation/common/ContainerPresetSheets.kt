@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -60,7 +61,7 @@ private fun EditContainerPresetSheetContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Edit Container",
+                text = stringResource(R.string.container_edit_title),
                 style = MaterialTheme.typography.titleLargeEmphasized
             )
 
@@ -103,11 +104,11 @@ private fun EditContainerPresetSheetContent(
                 name = it
                 nameError = false
             },
-            label = { Text("Container Name") },
-            placeholder = { Text("e.g., Coffee Mug") },
+            label = { Text(stringResource(R.string.container_name_label)) },
+            placeholder = { Text(stringResource(R.string.container_name_placeholder)) },
             isError = nameError,
             supportingText = if (nameError) {
-                { Text("Name is required") }
+                { Text(stringResource(R.string.error_name_required)) }
             } else null,
             singleLine = true,
             shape = RoundedCornerShape(50.dp),
@@ -123,15 +124,15 @@ private fun EditContainerPresetSheetContent(
                 volumeText = it
                 volumeError = false
             },
-            label = { Text("Volume (ml)") },
-            placeholder = { Text("e.g., 250") },
+            label = { Text(stringResource(R.string.container_volume_label)) },
+            placeholder = { Text(stringResource(R.string.container_volume_placeholder)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             isError = volumeError,
             shape = RoundedCornerShape(50.dp),
             supportingText = if (volumeError) {
-                { Text("Enter a valid volume (1-5000 ml)") }
+                { Text(stringResource(R.string.container_volume_error)) }
             } else {
-                { Text("Icon updates automatically based on volume") }
+                { Text(stringResource(R.string.container_icon_auto)) }
             },
             singleLine = true,
             modifier = Modifier
@@ -195,7 +196,7 @@ private fun EditContainerPresetSheetContent(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Delete",
+                            text = stringResource(R.string.action_delete),
                             maxLines = 1,
                             softWrap = false
                         )
@@ -234,7 +235,7 @@ private fun EditContainerPresetSheetContent(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Save",
+                            text = stringResource(R.string.action_save),
                             maxLines = 1,
                             softWrap = false
                         )
@@ -256,9 +257,9 @@ private fun EditContainerPresetSheetContent(
                     tint = MaterialTheme.colorScheme.error
                 )
             },
-            title = { Text("Delete Container?") },
+            title = { Text(stringResource(R.string.container_delete_title)) },
             text = {
-                Text("Are you sure you want to delete \"${preset.name}\"? This action cannot be undone.")
+                Text(stringResource(R.string.delete_confirm_message, preset.name))
             },
             confirmButton = {
                 val haptics = LocalHapticFeedback.current
@@ -319,7 +320,7 @@ private fun EditContainerPresetSheetContent(
                                 }
                             ) {
                                 Text(
-                                    text = "Cancel",
+                                    text = stringResource(R.string.action_cancel),
                                     maxLines = 1,
                                     softWrap = false
                                 )
@@ -349,7 +350,7 @@ private fun EditContainerPresetSheetContent(
                                 }
                             ) {
                                 Text(
-                                    text = "Delete",
+                                    text = stringResource(R.string.action_delete),
                                     maxLines = 1,
                                     softWrap = false
                                 )
@@ -417,7 +418,7 @@ private fun AddContainerPresetSheetContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Add Container",
+                text = stringResource(R.string.container_add_title),
                 style = MaterialTheme.typography.titleLargeEmphasized
             )
 
@@ -460,12 +461,12 @@ private fun AddContainerPresetSheetContent(
                 name = it
                 nameError = false
             },
-            label = { Text("Container Name") },
-            placeholder = { Text("e.g., Coffee Mug") },
+            label = { Text(stringResource(R.string.container_name_label)) },
+            placeholder = { Text(stringResource(R.string.container_name_placeholder)) },
             isError = nameError,
             shape = RoundedCornerShape(50.dp),
             supportingText = if (nameError) {
-                { Text("Name is required") }
+                { Text(stringResource(R.string.error_name_required)) }
             } else null,
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
@@ -478,15 +479,15 @@ private fun AddContainerPresetSheetContent(
                 volumeText = it
                 volumeError = false
             },
-            label = { Text("Volume (ml)") },
-            placeholder = { Text("e.g., 250") },
+            label = { Text(stringResource(R.string.container_volume_label)) },
+            placeholder = { Text(stringResource(R.string.container_volume_placeholder)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             isError = volumeError,
             shape = RoundedCornerShape(50.dp),
             supportingText = if (volumeError) {
-                { Text("Enter a valid volume (1-5000 ml)") }
+                { Text(stringResource(R.string.container_volume_error)) }
             } else {
-                { Text("Icon is assigned automatically based on volume") }
+                { Text(stringResource(R.string.container_icon_auto)) }
             },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
@@ -518,7 +519,7 @@ private fun AddContainerPresetSheetContent(
                 .fillMaxWidth()
                 .height(56.dp)
         ) {
-            Text("Add Container")
+            Text(stringResource(R.string.container_add_title))
         }
     }
 }
