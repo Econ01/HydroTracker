@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 
 import androidx.compose.ui.tooling.preview.Preview
@@ -131,7 +132,7 @@ fun SettingsHubScreen(
             .blur(blur),
         topBar = {
             LargeFlexibleTopAppBar(
-                title = { Text("Settings") },
+                title = { Text(stringResource(R.string.nav_settings)) },
                 scrollBehavior = scrollBehavior
             )
         }
@@ -148,48 +149,48 @@ fun SettingsHubScreen(
             val categories = buildList {
                 add(
                     SettingsCategory(
-                        title = "Appearance",
-                        description = "Theme, colors and AMOLED mode",
+                        title = stringResource(R.string.screen_appearance_title),
+                        description = stringResource(R.string.settings_appearance_desc),
                         icon = { Icon(ImageVector.vectorResource(R.drawable.palette_filled), contentDescription = null) },
                         route = NavigationRoutes.SettingsAppearance
                     )
                 )
                 add(
                     SettingsCategory(
-                        title = "Display & Locale",
-                        description = "Week start day and locale",
+                        title = stringResource(R.string.screen_display_locale_title),
+                        description = stringResource(R.string.settings_display_desc),
                         icon = { Icon(ImageVector.vectorResource(R.drawable.event_filled), contentDescription = null) },
                         route = NavigationRoutes.SettingsDisplay
                     )
                 )
                 add(
                     SettingsCategory(
-                        title = "Hydration & Health",
-                        description = "Water goal calculation and Health Connect",
+                        title = stringResource(R.string.screen_hydration_title),
+                        description = stringResource(R.string.settings_hydration_desc),
                         icon = { Icon(ImageVector.vectorResource(R.drawable.water_filled), contentDescription = null) },
                         route = NavigationRoutes.SettingsHydration
                     )
                 )
                 add(
                     SettingsCategory(
-                        title = "Quick Add Customization",
-                        description = "Container presets and beverage types",
+                        title = stringResource(R.string.screen_quickadd_title),
+                        description = stringResource(R.string.settings_quickadd_desc),
                         icon = { Icon(ImageVector.vectorResource(R.drawable.checklist_filled), contentDescription = null) },
                         route = NavigationRoutes.SettingsContainers
                     )
                 )
                 add(
                     SettingsCategory(
-                        title = "Notifications",
-                        description = "Hydration reminders and permissions",
+                        title = stringResource(R.string.screen_notifications_title),
+                        description = stringResource(R.string.settings_notifications_desc),
                         icon = { Icon(ImageVector.vectorResource(R.drawable.notifications_filled), contentDescription = null) },
                         route = NavigationRoutes.SettingsNotifications
                     )
                 )
                 add(
                     SettingsCategory(
-                        title = "Support Development",
-                        description = "Donate and support the app",
+                        title = stringResource(R.string.screen_support_title),
+                        description = stringResource(R.string.settings_support_desc),
                         icon = { Icon(ImageVector.vectorResource(R.drawable.heart_smile_filled), contentDescription = null) },
                         route = NavigationRoutes.SettingsSupport
                     )
@@ -197,9 +198,9 @@ fun SettingsHubScreen(
                 val isUpdateAvailable = updateStatus is UpdateStatus.Available
                 add(
                     SettingsCategory(
-                        title = if (isUpdateAvailable) "About - Update Available" else "About",
+                        title = if (isUpdateAvailable) stringResource(R.string.settings_about_update_available) else stringResource(R.string.screen_about_title),
                         titleColor = if (isUpdateAvailable) MaterialTheme.colorScheme.tertiary else null,
-                        description = "Sources, privacy policy and license",
+                        description = stringResource(R.string.settings_about_desc),
                         icon = { Icon(ImageVector.vectorResource(R.drawable.info_filled), contentDescription = null) },
                         route = NavigationRoutes.SettingsAbout
                     )
@@ -207,8 +208,8 @@ fun SettingsHubScreen(
                 if (developerOptionsEnabled) {
                     add(
                         SettingsCategory(
-                            title = "Developer Options",
-                            description = "Debug tools and testing",
+                            title = stringResource(R.string.screen_developer_title),
+                            description = stringResource(R.string.settings_developer_desc),
                             icon = { Icon(ImageVector.vectorResource(R.drawable.code_blocks_filled), contentDescription = null) },
                             route = NavigationRoutes.SettingsDeveloper
                         )
@@ -326,28 +327,40 @@ fun SettingsHubInteractivePreview() {
     HydroTrackerTheme {
         var selectedRoute by remember { mutableStateOf<NavigationRoutes?>(null) }
 
-        val title = when (selectedRoute) {
-            NavigationRoutes.SettingsAppearance -> "Appearance"
-            NavigationRoutes.SettingsDisplay -> "Display & Locale"
-            NavigationRoutes.SettingsHydration -> "Hydration & Health"
-            NavigationRoutes.SettingsContainers -> "Quick Add Customization"
-            NavigationRoutes.SettingsNotifications -> "Notifications"
-            NavigationRoutes.SettingsSupport -> "Support Development"
-            NavigationRoutes.SettingsAbout -> "About"
-            NavigationRoutes.SettingsDeveloper -> "Developer Options"
-            else -> ""
-        }
-
         if (selectedRoute == null) {
             SettingsHubScreen(
                 developerOptionsEnabled = true,
                 onNavigateTo = { route -> selectedRoute = route }
             )
         } else {
-            PlaceholderScreen(
-                title = title,
-                onNavigateBack = { selectedRoute = null }
-            )
+            val onNavigateBack = { selectedRoute = null }
+            when (selectedRoute) {
+                NavigationRoutes.SettingsAppearance -> AppearanceScreen(onNavigateBack = onNavigateBack)
+                NavigationRoutes.SettingsDisplay -> DisplayLocaleScreen(onNavigateBack = onNavigateBack)
+                NavigationRoutes.SettingsHydration -> HydrationHealthScreen(onNavigateBack = onNavigateBack)
+                NavigationRoutes.SettingsContainers -> QuickAddCustomizationScreen(
+                    onNavigateToContainerPresets = {},
+                    onNavigateToBeverageTypes = {},
+                    onNavigateBack = onNavigateBack
+                )
+                NavigationRoutes.SettingsNotifications -> NotificationsScreen(
+                    onNavigateToReminderInterval = {},
+                    onNavigateBack = onNavigateBack
+                )
+                NavigationRoutes.SettingsSupport -> SupportDevelopmentScreen(onNavigateBack = onNavigateBack)
+                NavigationRoutes.SettingsAbout -> AboutScreen(
+                    onNavigateToUpdates = {},
+                    onNavigateBack = onNavigateBack,
+                    onNavigateToLicenses = {}
+                )
+                NavigationRoutes.SettingsDeveloper -> DeveloperOptionsScreen(
+                    onNavigateBack = onNavigateBack,
+                    onNavigateToOnboarding = {},
+                    onNavigateToHapticsTest = {},
+                    onNavigateToHapticsLab = {}
+                )
+                else -> {}
+            }
         }
     }
 }

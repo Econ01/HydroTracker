@@ -12,8 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
 import com.cemcakmak.hydrotracker.data.models.ContainerPreset
 import com.cemcakmak.hydrotracker.presentation.common.AddContainerPresetBottomSheet
@@ -35,6 +37,11 @@ fun ContainerPresetsScreen(
     val haptics = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
 
+    val containerAddedTemplate = stringResource(R.string.container_added)
+    val containerUpdatedTemplate = stringResource(R.string.container_updated)
+    val containerDeletedTemplate = stringResource(R.string.container_deleted)
+    val containerResetDone = stringResource(R.string.container_reset_done)
+
     val presets by remember(containerPresetRepository) {
         containerPresetRepository?.getAllPresets() ?: flowOf(ContainerPreset.getDefaultPresets())
     }.collectAsState(initial = emptyList())
@@ -45,7 +52,7 @@ fun ContainerPresetsScreen(
     var showResetDialog by remember { mutableStateOf(false) }
 
     SettingsDetailScaffold(
-        title = "Container Presets",
+        title = stringResource(R.string.container_presets_screen_title),
         onNavigateBack = onNavigateBack,
         paddingValues = paddingValues,
         scrollable = false
@@ -67,7 +74,7 @@ fun ContainerPresetsScreen(
             header = {
                 item(key = "container_helper") {
                     Text(
-                        text = "Quick-select containers on the home screen. Tap to edit, drag to reorder.",
+                        text = stringResource(R.string.quickadd_containers_desc),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(start = 4.dp, bottom = 12.dp)
@@ -108,7 +115,7 @@ fun ContainerPresetsScreen(
                 containerPresetRepository?.let { repo ->
                     coroutineScope.launch {
                         repo.addPreset(name, volume)
-                        snackbarHostState?.showSuccessSnackbar(message = "Added \"$name\" container")
+                        snackbarHostState?.showSuccessSnackbar(message = containerAddedTemplate.format(name))
                     }
                 }
             }
@@ -129,7 +136,7 @@ fun ContainerPresetsScreen(
                     containerPresetRepository?.let { repo ->
                         coroutineScope.launch {
                             repo.updatePreset(target.id, name, volume)
-                            snackbarHostState?.showSuccessSnackbar(message = "Updated \"$name\" container")
+                            snackbarHostState?.showSuccessSnackbar(message = containerUpdatedTemplate.format(name))
                         }
                     }
                 },
@@ -139,7 +146,7 @@ fun ContainerPresetsScreen(
                     containerPresetRepository?.let { repo ->
                         coroutineScope.launch {
                             repo.deletePreset(target.id)
-                            snackbarHostState?.showSuccessSnackbar(message = "Deleted \"${target.name}\" container")
+                            snackbarHostState?.showSuccessSnackbar(message = containerDeletedTemplate.format(target.name))
                         }
                     }
                 }
@@ -157,8 +164,8 @@ fun ContainerPresetsScreen(
                     tint = MaterialTheme.colorScheme.primary
                 )
             },
-            title = { Text("Reset Container Presets?") },
-            text = { Text("This will remove all custom containers and restore the default presets. This action cannot be undone.") },
+            title = { Text(stringResource(R.string.container_reset_title)) },
+            text = { Text(stringResource(R.string.container_reset_message)) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -167,17 +174,17 @@ fun ContainerPresetsScreen(
                         containerPresetRepository?.let { repo ->
                             coroutineScope.launch {
                                 repo.resetToDefaults()
-                                snackbarHostState?.showSuccessSnackbar(message = "Container presets reset to defaults")
+                                snackbarHostState?.showSuccessSnackbar(message = containerResetDone)
                             }
                         }
                     }
                 ) {
-                    Text("Reset")
+                    Text(stringResource(R.string.action_reset))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showResetDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.action_cancel))
                 }
             }
         )
@@ -236,7 +243,7 @@ private fun ContainerActionButtons(
                             .animateWidth(interactionSource = resetInteractionSource)
                     }
                 ) {
-                    Text(text = "Reset Defaults", maxLines = 1, softWrap = false)
+                    Text(text = stringResource(R.string.container_reset_defaults_button), maxLines = 1, softWrap = false)
                 }
             },
             menuContent = {}
@@ -254,7 +261,7 @@ private fun ContainerActionButtons(
                             .animateWidth(interactionSource = addInteractionSource)
                     }
                 ) {
-                    Text(text = "Add Container", maxLines = 1, softWrap = false)
+                    Text(text = stringResource(R.string.container_add_title), maxLines = 1, softWrap = false)
                 }
             },
             menuContent = {}

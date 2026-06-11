@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,34 +51,34 @@ fun SupportDevelopmentScreen(
     val isDark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
 
     SettingsDetailScaffold(
-        title = "Support Development",
+        title = stringResource(R.string.screen_support_title),
         onNavigateBack = onNavigateBack
     ) {
         SupportHeroCard()
 
         // Donation links — brand-colored icons, order GitHub → PayPal → Buy Me a Coffee.
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SettingsSectionHeader("Support development")
+            SettingsSectionHeader(stringResource(R.string.support_section_support))
             val links = listOf(
                 SupportLink(
                     iconRes = R.drawable.github_sponsors,
                     tint = if (isDark) Color(0xFFDB61A2) else Color(0xFFBF3989),
-                    title = "GitHub Sponsors",
-                    blurb = "Support ongoing development",
+                    title = stringResource(R.string.support_github_sponsors),
+                    blurb = stringResource(R.string.support_github_sponsors_blurb),
                     url = URL_GITHUB_SPONSORS
                 ),
                 SupportLink(
                     iconRes = R.drawable.paypal,
                     tint = if (isDark) Color(0xFF009CDE) else Color(0xFF003087),
-                    title = "PayPal",
-                    blurb = "Send a quick donation",
+                    title = stringResource(R.string.support_paypal),
+                    blurb = stringResource(R.string.support_paypal_blurb),
                     url = URL_PAYPAL
                 ),
                 SupportLink(
                     iconRes = R.drawable.coffee_filled,
                     tint = if (isDark) Color(0xFFFFDD00) else Color(0xFF8D6E00),
-                    title = "Buy Me a Coffee",
-                    blurb = "Treat me to a coffee",
+                    title = stringResource(R.string.support_buymeacoffee),
+                    blurb = stringResource(R.string.support_buymeacoffee_blurb),
                     url = URL_BUYMEACOFFEE
                 )
             )
@@ -105,7 +106,7 @@ fun SupportDevelopmentScreen(
 
         // Free, non-monetary actions — standard primary-colored icons.
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SettingsSectionHeader("Other ways to help")
+            SettingsSectionHeader(stringResource(R.string.support_section_other_ways))
             val helpSize = 3
             Column {
                 SettingsGroupCard(
@@ -119,8 +120,8 @@ fun SupportDevelopmentScreen(
                     SupportRowContent(
                         icon = ImageVector.vectorResource(R.drawable.star_rate_filled),
                         iconTint = MaterialTheme.colorScheme.primary,
-                        title = "Rate on Google Play",
-                        blurb = "Leave a rating on the Play Store",
+                        title = stringResource(R.string.support_rate_play_store),
+                        blurb = stringResource(R.string.support_rate_play_store_desc),
                         trailing = null
                     )
                 }
@@ -135,8 +136,8 @@ fun SupportDevelopmentScreen(
                     SupportRowContent(
                         icon = ImageVector.vectorResource(R.drawable.share_filled),
                         iconTint = MaterialTheme.colorScheme.primary,
-                        title = "Share the app",
-                        blurb = "Tell a friend about HydroTracker",
+                        title = stringResource(R.string.support_share_app),
+                        blurb = stringResource(R.string.support_share_app_desc),
                         trailing = null
                     )
                 }
@@ -151,8 +152,8 @@ fun SupportDevelopmentScreen(
                     SupportRowContent(
                         icon = ImageVector.vectorResource(R.drawable.github),
                         iconTint = MaterialTheme.colorScheme.primary,
-                        title = "Star on GitHub",
-                        blurb = "Star the project on GitHub",
+                        title = stringResource(R.string.support_star_github),
+                        blurb = stringResource(R.string.support_star_github_desc),
                         trailing = ImageVector.vectorResource(R.drawable.open_in_new_filled)
                     )
                 }
@@ -184,9 +185,7 @@ private fun SupportHeroCard() {
                 modifier = Modifier.size(40.dp)
             )
             Text(
-                text = "HydroTracker is built and maintained by one person, with no ads and no " +
-                    "tracking. If it has helped you drink more water, anything you chip in keeps it " +
-                    "growing.",
+                text = stringResource(R.string.support_development_hero),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
@@ -249,7 +248,7 @@ fun launchInAppReview(context: Context) {
     request.addOnCompleteListener { task ->
         if (task.isSuccessful) {
             // Success Message
-            Toast.makeText(context, "Review is successful", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.toast_review_successful), Toast.LENGTH_SHORT).show()
 
             val reviewInfo = task.result
             // The reviewInfo object is only valid for a limited amount of time
@@ -260,7 +259,7 @@ fun launchInAppReview(context: Context) {
             }
         } else {
             // Fail Message
-            Toast.makeText(context, "Review failed", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.toast_review_failed), Toast.LENGTH_SHORT).show()
         }
     }
 }
@@ -269,7 +268,7 @@ private fun openUrl(context: Context, url: String) {
     try {
         context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
     } catch (_: ActivityNotFoundException) {
-        Toast.makeText(context, "No app found to open this link", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.toast_no_app_to_open_link), Toast.LENGTH_SHORT).show()
     }
 }
 
@@ -283,9 +282,9 @@ private fun shareApp(context: Context) {
         )
     }
     try {
-        context.startActivity(Intent.createChooser(intent, "Share HydroTracker"))
+        context.startActivity(Intent.createChooser(intent, context.getString(R.string.share_chooser_title)))
     } catch (_: ActivityNotFoundException) {
-        Toast.makeText(context, "No app found to share", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.toast_no_app_to_share), Toast.LENGTH_SHORT).show()
     }
 }
 

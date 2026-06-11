@@ -11,8 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.entities.CustomBeverageEntity
 import com.cemcakmak.hydrotracker.data.database.repository.CustomBeverageRepository
 import com.cemcakmak.hydrotracker.data.models.BeveragePreferences
@@ -108,7 +110,7 @@ fun BeverageTypesEditScreen(
     }
 
     SettingsDetailScaffold(
-        title = "Beverage Types",
+        title = stringResource(R.string.screen_beverage_types_title),
         onNavigateBack = onNavigateBack,
         paddingValues = paddingValues,
         scrollable = false
@@ -130,7 +132,7 @@ fun BeverageTypesEditScreen(
             header = {
                 item(key = "beverage_helper") {
                     Text(
-                        text = "Beverages offered in quick add. Tap to edit, drag to reorder.",
+                        text = stringResource(R.string.beverage_types_helper),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(start = 4.dp, bottom = 12.dp)
@@ -152,7 +154,7 @@ fun BeverageTypesEditScreen(
                 is BeverageItem.Custom -> BeverageIcons.resFor(item.entity.iconKey)
             }
             val name = when (item) {
-                is BeverageItem.Preset -> item.type.displayName
+                is BeverageItem.Preset -> stringResource(item.type.labelResId)
                 is BeverageItem.Custom -> item.entity.name
             }
             val multiplier = when (item) {
@@ -172,7 +174,7 @@ fun BeverageTypesEditScreen(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "${(multiplier * 100).toInt()}% hydration",
+                    text = stringResource(R.string.beverage_hydration_short, (multiplier * 100).toInt()),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -253,8 +255,8 @@ fun BeverageTypesEditScreen(
                     tint = MaterialTheme.colorScheme.primary
                 )
             },
-            title = { Text("Reset Beverages?") },
-            text = { Text("This restores the default beverage order, unhides all presets, and removes all custom beverages. This action cannot be undone.") },
+            title = { Text(stringResource(R.string.beverage_reset_title)) },
+            text = { Text(stringResource(R.string.beverage_reset_message)) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -266,12 +268,12 @@ fun BeverageTypesEditScreen(
                         }
                     }
                 ) {
-                    Text("Reset")
+                    Text(stringResource(R.string.action_reset))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showResetDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.action_cancel))
                 }
             }
         )
@@ -330,7 +332,7 @@ private fun BeverageActionButtons(
                             .animateWidth(interactionSource = resetInteractionSource)
                     }
                 ) {
-                    Text(text = "Reset Defaults", maxLines = 1, softWrap = false)
+                    Text(text = stringResource(R.string.container_reset_defaults_button), maxLines = 1, softWrap = false)
                 }
             },
             menuContent = {}
@@ -348,7 +350,7 @@ private fun BeverageActionButtons(
                             .animateWidth(interactionSource = addInteractionSource)
                     }
                 ) {
-                    Text(text = "Add Beverage", maxLines = 1, softWrap = false)
+                    Text(text = stringResource(R.string.beverage_add), maxLines = 1, softWrap = false)
                 }
             },
             menuContent = {}

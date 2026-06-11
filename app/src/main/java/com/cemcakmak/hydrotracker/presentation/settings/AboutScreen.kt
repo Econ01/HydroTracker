@@ -50,6 +50,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.annotation.StringRes
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -107,20 +108,20 @@ fun AboutScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxSize().blur(blur)) {
             SettingsDetailScaffold(
-                title = "About",
+                title = stringResource(R.string.screen_about_title),
                 onNavigateBack = onNavigateBack
             ) {
                 VersionHero()
 
                 // Contributors
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    SettingsSectionHeader("Contributors")
+                    SettingsSectionHeader(stringResource(R.string.about_section_contributors))
                     SettingsGroupCard(index = 0, size = 1) {
                         ContributorRow(
                             avatar = R.drawable.econ01,
-                            name = "Ali Cem Çakmak",
-                            role = "Creator & maintainer",
-                            bio = "Indie Android developer focused on clean, privacy-respecting apps.",
+                            name = stringResource(R.string.about_contributor_name),
+                            role = stringResource(R.string.about_contributor_role),
+                            bio = stringResource(R.string.about_contributor_bio),
                             onOpenGitHub = {
                                 haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
                                 openUrl(context, URL_GITHUB_PROFILE)
@@ -138,9 +139,9 @@ fun AboutScreen(
                             index = 0,
                             size = 1,
                             icon = ImageVector.vectorResource(R.drawable.update_filled),
-                            title = if (isUpdateAvailable) "Update Available" else "Updates",
+                            title = if (isUpdateAvailable) stringResource(R.string.updates_available_title) else stringResource(R.string.screen_updates_title),
                             titleColor = if (isUpdateAvailable) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurface,
-                            description = "Updates and bug reports",
+                            description = stringResource(R.string.updates_status_check_now),
                             onClick = onNavigateToUpdates
                         )
                     }
@@ -148,46 +149,46 @@ fun AboutScreen(
 
                 // Information
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    SettingsSectionHeader("Information")
+                    SettingsSectionHeader(stringResource(R.string.about_section_information))
                     Column {
                         AboutRow(
                             index = 0,
                             size = 5,
                             icon = ImageVector.vectorResource(R.drawable.article_filled),
-                            title = "Changelog",
-                            description = "What's new in each version",
-                            onClick = { openSheet(DocSheet("Changelog", "CHANGELOG.md")) }
+                            title = stringResource(R.string.about_changelog),
+                            description = stringResource(R.string.about_changelog_desc),
+                            onClick = { openSheet(DocSheet(R.string.about_changelog, "CHANGELOG.md")) }
                         )
                         AboutRow(
                             index = 1,
                             size = 5,
                             icon = ImageVector.vectorResource(R.drawable.science_filled),
-                            title = "Sources & Research",
-                            description = "Scientific sources behind the app",
-                            onClick = { openSheet(DocSheet("Sources & Research", "sources.md")) }
+                            title = stringResource(R.string.about_sources),
+                            description = stringResource(R.string.about_sources_desc),
+                            onClick = { openSheet(DocSheet(R.string.about_sources, "sources.md")) }
                         )
                         AboutRow(
                             index = 2,
                             size = 5,
                             icon = ImageVector.vectorResource(R.drawable.security_filled),
-                            title = "Privacy Policy",
-                            description = "How your data is handled",
-                            onClick = { openSheet(DocSheet("Privacy Policy", "privacy-policy.md")) }
+                            title = stringResource(R.string.about_privacy_policy),
+                            description = stringResource(R.string.about_privacy_policy_desc),
+                            onClick = { openSheet(DocSheet(R.string.about_privacy_policy, "privacy-policy.md")) }
                         )
                         AboutRow(
                             index = 3,
                             size = 5,
                             icon = ImageVector.vectorResource(R.drawable.license_filled),
-                            title = "License",
-                            description = "HydroTracker's open-source license",
-                            onClick = { openSheet(DocSheet("License", "LICENSE.md")) }
+                            title = stringResource(R.string.about_license),
+                            description = stringResource(R.string.about_license_desc),
+                            onClick = { openSheet(DocSheet(R.string.about_license, "LICENSE.md")) }
                         )
                         AboutRow(
                             index = 4,
                             size = 5,
                             icon = ImageVector.vectorResource(R.drawable.signature_filled),
-                            title = "Third-party licenses",
-                            description = "Open-source libraries we depend on",
+                            title = stringResource(R.string.about_third_party_licenses),
+                            description = stringResource(R.string.about_third_party_licenses_desc),
                             showChevron = true,
                             onClick = {
                                 haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
@@ -211,7 +212,7 @@ fun AboutScreen(
 
     openDoc?.let { doc ->
         MarkdownBottomSheet(
-            title = doc.title,
+            title = stringResource(doc.titleResId),
             assetFileName = doc.asset,
             onDismiss = { openDoc = null }
         )
@@ -235,12 +236,12 @@ private fun VersionHero() {
         ) {
             Column(modifier = Modifier.padding(start = 6.dp)) {
                 Text(
-                    text = "HydroTracker",
+                    text = stringResource(R.string.app_name),
                     style = MaterialTheme.typography.headlineLargeEmphasized
                 )
 
                 Text(
-                    text = "Open source water intake tracker.",
+                    text = stringResource(R.string.app_tagline),
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -256,7 +257,7 @@ private fun VersionHero() {
                 ) {
                     Text(
                         modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
-                        text = "Version: ${BuildConfig.VERSION_NAME}",
+                        text = stringResource(R.string.label_version, BuildConfig.VERSION_NAME),
                         style = MaterialTheme.typography.bodyMediumEmphasized,
                     )
                 }
@@ -267,7 +268,7 @@ private fun VersionHero() {
                 ) {
                     Text(
                         modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
-                        text = "Build Number: ${BuildConfig.VERSION_CODE}",
+                        text = stringResource(R.string.label_build_number, BuildConfig.VERSION_CODE),
                         style = MaterialTheme.typography.bodyMediumEmphasized,
                     )
                 }
@@ -318,7 +319,7 @@ private fun ContributorRow(
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.github),
-                contentDescription = "Open GitHub profile",
+                contentDescription = stringResource(R.string.cd_open_github_profile),
                 tint = MaterialTheme.colorScheme.primary
             )
         }
@@ -373,14 +374,14 @@ private fun AboutRow(
     }
 }
 
-private data class DocSheet(val title: String, val asset: String)
+private data class DocSheet(@param:StringRes val titleResId: Int, val asset: String)
 
 @Suppress("SameParameterValue")
 private fun openUrl(context: Context, url: String) {
     try {
         context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
     } catch (_: ActivityNotFoundException) {
-        Toast.makeText(context, "No app found to open this link", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.toast_no_app_to_open_link), Toast.LENGTH_SHORT).show()
     }
 }
 

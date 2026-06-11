@@ -47,6 +47,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -77,7 +79,7 @@ fun ReminderIntervalScreen(
     val haptics = LocalHapticFeedback.current
 
     SettingsDetailScaffold(
-        title = "Reminder Schedule",
+        title = stringResource(R.string.screen_reminder_schedule_title),
         onNavigateBack = onNavigateBack
     ) {
         if (userProfile != null) {
@@ -103,7 +105,7 @@ fun ReminderIntervalScreen(
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                SettingsSectionHeader("Mode")
+                SettingsSectionHeader(stringResource(R.string.reminder_mode_header))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -138,7 +140,7 @@ fun ReminderIntervalScreen(
                                 Crossfade(
                                     targetState = isSelected,
                                     animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
-                                    label = "modeIcon_${mode.getDisplayName()}"
+                                    label = "modeIcon_${mode.name}"
                                 ) { selected ->
                                     Icon(
                                         imageVector = when (mode) {
@@ -156,7 +158,7 @@ fun ReminderIntervalScreen(
                                 }
 
                                 Text(
-                                    text = mode.getDisplayName(),
+                                    text = stringResource(mode.labelResId),
                                     style = if (isSelected) {
                                         MaterialTheme.typography.labelLargeEmphasized
                                     } else {
@@ -215,13 +217,13 @@ private fun ReminderSchedulePreviewCard(
     }
 
     val modeExplanation = when (reminderIntervalMode) {
-        ReminderIntervalMode.AUTOMATIC -> "Reminders are spaced automatically based on your daily goal and active hours."
-        ReminderIntervalMode.CUSTOM -> "Reminders are sent at your chosen fixed interval between wake-up and sleep."
+        ReminderIntervalMode.AUTOMATIC -> stringResource(R.string.reminder_mode_auto_explain)
+        ReminderIntervalMode.CUSTOM -> stringResource(R.string.reminder_mode_custom_explain)
     }
 
     val dayEndExplanation = when (dayEndMode) {
-        DayEndMode.SLEEP_TIME -> "Your day ends at sleep time. Daily progress resets then."
-        DayEndMode.MIDNIGHT -> "Your day ends at midnight, matching the calendar day."
+        DayEndMode.SLEEP_TIME -> stringResource(R.string.reminder_dayend_sleep_explain)
+        DayEndMode.MIDNIGHT -> stringResource(R.string.reminder_dayend_midnight_explain)
     }
 
     Surface(
@@ -257,7 +259,7 @@ private fun ReminderSchedulePreviewCard(
                 HorizontalDivider(modifier = Modifier.weight(1f))
 
                 Text(
-                    text = "Mode",
+                    text = stringResource(R.string.reminder_mode_header),
                     modifier = Modifier.padding(horizontal = 16.dp),
                     style = MaterialTheme.typography.labelMediumEmphasized,
                     color = MaterialTheme.colorScheme.primary
@@ -284,7 +286,7 @@ private fun ReminderSchedulePreviewCard(
                 HorizontalDivider(modifier = Modifier.weight(1f))
 
                 Text(
-                    text = "Day End",
+                    text = stringResource(R.string.reminder_day_end_divider),
                     modifier = Modifier.padding(horizontal = 16.dp),
                     style = MaterialTheme.typography.labelMediumEmphasized,
                     color = MaterialTheme.colorScheme.primary
@@ -318,7 +320,7 @@ private fun DayEndSection(
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        SettingsSectionHeader("Day end")
+        SettingsSectionHeader(stringResource(R.string.reminder_day_end_header))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -359,7 +361,7 @@ private fun DayEndSection(
                         }
 
                         Text(
-                            text = mode.getDisplayName(),
+                            text = stringResource(mode.labelResId),
                             style = if (isSelected) {
                                 MaterialTheme.typography.labelLargeEmphasized
                             } else {
@@ -476,12 +478,12 @@ private fun CustomIntervalPicker(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "1 min",
+                text = stringResource(R.string.reminder_slider_min),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "8 hours",
+                text = stringResource(R.string.reminder_slider_max),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -489,6 +491,7 @@ private fun CustomIntervalPicker(
     }
 }
 
+@Composable
 private fun buildPreviewText(userProfile: UserProfile): String {
     return when (userProfile.reminderIntervalMode) {
         ReminderIntervalMode.AUTOMATIC -> {
@@ -497,28 +500,30 @@ private fun buildPreviewText(userProfile: UserProfile): String {
                 userProfile.sleepTime
             )
             val glasses = (userProfile.dailyWaterGoal / 300.0).toInt()
-            val interval = userProfile.reminderInterval
-            "Based on your ${WaterCalculator.formatWaterAmount(userProfile.dailyWaterGoal)} goal, " +
-                "you'll get about $glasses reminders (one per glass) spread across your " +
-                "${awakeHours.toInt()} active hours. Roughly every $interval minutes."
+            stringResource(
+                R.string.reminder_preview_auto,
+                WaterCalculator.formatWaterAmount(userProfile.dailyWaterGoal),
+                glasses,
+                awakeHours.toInt(),
+                userProfile.reminderInterval
+            )
         }
-        ReminderIntervalMode.CUSTOM -> {
-            "You'll receive a reminder ${formatInterval(userProfile.customReminderInterval)} " +
-                "between ${userProfile.wakeUpTime} and ${userProfile.sleepTime}."
-        }
+        ReminderIntervalMode.CUSTOM -> stringResource(
+            R.string.reminder_preview_custom,
+            formatInterval(userProfile.customReminderInterval),
+            userProfile.wakeUpTime,
+            userProfile.sleepTime
+        )
     }
 }
 
+@Composable
 private fun formatInterval(minutes: Int): String {
     return when {
-        minutes < 60 -> "every $minutes minutes"
-        minutes == 60 -> "every hour"
-        minutes % 60 == 0 -> "every ${minutes / 60} hours"
-        else -> {
-            val h = minutes / 60
-            val m = minutes % 60
-            "every ${h}h ${m}m"
-        }
+        minutes < 60 -> pluralStringResource(R.plurals.interval_every_minutes, minutes, minutes)
+        minutes == 60 -> stringResource(R.string.interval_every_hour)
+        minutes % 60 == 0 -> pluralStringResource(R.plurals.interval_every_hours, minutes / 60, minutes / 60)
+        else -> stringResource(R.string.interval_every_h_m, minutes / 60, minutes % 60)
     }
 }
 

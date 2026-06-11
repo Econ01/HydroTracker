@@ -158,20 +158,6 @@ enum class HydrationStandard(
     EFSA(R.string.hydration_standard_efsa, R.string.hydration_standard_efsa_desc),    // European Food Safety Authority (default)
     IOM(R.string.hydration_standard_iom, R.string.hydration_standard_iom_desc);     // Institute of Medicine (US)
 
-    fun getDisplayName(): String {
-        return when (this) {
-            EFSA -> "EFSA"
-            IOM -> "IOM"
-        }
-    }
-
-    fun getDescription(): String {
-        return when (this) {
-            EFSA -> "European Food Safety Authority standards"
-            IOM -> "Institute of Medicine standards"
-        }
-    }
-
     fun getMaleIntake(): Double {
         return when (this) {
             EFSA -> 2500.0  // 2.5L

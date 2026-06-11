@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -53,7 +54,7 @@ fun LicensesScreen(
     }
 
     SettingsDetailScaffold(
-        title = "Third-party licenses",
+        title = stringResource(R.string.screen_licenses_title),
         onNavigateBack = onNavigateBack,
         scrollable = false
     ) {
@@ -67,7 +68,7 @@ fun LicensesScreen(
             list.isEmpty() -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
-                        text = "No license information available.",
+                        text = stringResource(R.string.licenses_empty),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

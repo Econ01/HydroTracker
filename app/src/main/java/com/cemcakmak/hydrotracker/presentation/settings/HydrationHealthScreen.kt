@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,7 +62,7 @@ fun HydrationHealthScreen(
     onNavigateBack: () -> Unit = {}
 ) {
     SettingsDetailScaffold(
-        title = "Hydration & Health",
+        title = stringResource(R.string.screen_hydration_title),
         onNavigateBack = onNavigateBack
     ) {
         CalculationStandardSection(
@@ -142,13 +143,13 @@ private fun CalculationStandardSection(
                         ) {
                             // Hydration standard name
                             Text(
-                                text = standard.getDisplayName(),
+                                text = stringResource(standard.labelResId),
                                 style = MaterialTheme.typography.headlineSmall
                             )
 
                             // Hydration standard description
                             Text(
-                                text = "(" + standard.getDescription() + ")",
+                                text = "(" + stringResource(standard.descriptionResId) + ")",
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
@@ -162,20 +163,20 @@ private fun CalculationStandardSection(
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Text(
-                            text = "Daily baseline intake",
+                            text = stringResource(R.string.hydration_baseline_intake),
                             style = MaterialTheme.typography.bodyMedium
                         )
- 
+
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             HydrationStatChip(
-                                label = "Male",
+                                label = stringResource(R.string.gender_male),
                                 value = profile.hydrationStandard.getMaleIntake().toInt() / 1000.0
                             )
                             HydrationStatChip(
-                                label = "Female",
+                                label = stringResource(R.string.gender_female),
                                 value = profile.hydrationStandard.getFemaleIntake().toInt() / 1000.0
                             )
                         }
@@ -184,7 +185,7 @@ private fun CalculationStandardSection(
             }
         }
 
-        SettingsSectionHeader("Calculation standard")
+        SettingsSectionHeader(stringResource(R.string.hydration_calc_standard_header))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -205,17 +206,21 @@ private fun CalculationStandardSection(
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Text(
-                            text = when (standard) {
-                                HydrationStandard.EFSA -> standard.getDisplayName() + " (European)"
-                                HydrationStandard.IOM -> standard.getDisplayName() + " (US)"
-                            },
+                            text = stringResource(standard.labelResId) + " " + stringResource(
+                                when (standard) {
+                                    HydrationStandard.EFSA -> R.string.hydration_region_european
+                                    HydrationStandard.IOM -> R.string.hydration_region_us
+                                }
+                            ),
                             style = if (isSelected) MaterialTheme.typography.labelLargeEmphasized else MaterialTheme.typography.labelLarge
                         )
                         Text(
-                            text = when (standard) {
-                                HydrationStandard.EFSA -> "Conservative"
-                                HydrationStandard.IOM -> "Higher intake"
-                            },
+                            text = stringResource(
+                                when (standard) {
+                                    HydrationStandard.EFSA -> R.string.hydration_efsa_tag
+                                    HydrationStandard.IOM -> R.string.hydration_iom_tag
+                                }
+                            ),
                             style = MaterialTheme.typography.labelSmall,
                             color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -263,8 +268,13 @@ private fun HealthConnectSection(
     val manager = HealthConnectManager
     val inPreview = LocalInspectionMode.current
 
+    val hcStatusErrorTemplate = stringResource(R.string.hc_status_error)
+    val hcRestoredTemplate = stringResource(R.string.hc_restored_snackbar)
+
     var isHealthConnectEnabled by remember { mutableStateOf(false) }
-    var healthConnectStatus by remember { mutableStateOf("Checking...") }
+    var isHealthConnectAvailable by remember { mutableStateOf(false) }
+    var hasHcPermissions by remember { mutableStateOf(false) }
+    var healthConnectStatus by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(true) }
     var refreshTrigger by remember { mutableIntStateOf(0) }
 
@@ -277,11 +287,12 @@ private fun HealthConnectSection(
     LaunchedEffect(refreshTrigger) {
         if (inPreview) return@LaunchedEffect
         try {
-            val status = manager.getStatusMessage(context)
-            healthConnectStatus = status
-            isHealthConnectEnabled = status == "Health Connect is ready"
+            isHealthConnectAvailable = manager.isAvailable(context)
+            hasHcPermissions = manager.hasPermissions(context)
+            healthConnectStatus = manager.getStatusMessage(context)
+            isHealthConnectEnabled = isHealthConnectAvailable && hasHcPermissions
         } catch (e: Exception) {
-            healthConnectStatus = "Error: ${e.message}"
+            healthConnectStatus = hcStatusErrorTemplate.format(e.message)
         } finally {
             isLoading = false
         }
@@ -309,7 +320,7 @@ private fun HealthConnectSection(
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        SettingsSectionHeader("Health Connect")
+        SettingsSectionHeader(stringResource(R.string.hc_section_header))
         val haptics = LocalHapticFeedback.current
 
         if (isHealthConnectEnabled || inPreview) {
@@ -338,12 +349,12 @@ private fun HealthConnectSection(
 
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Sync with Health Connect",
+                                text = stringResource(R.string.hc_sync_title),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                text = "Share hydration data with other health apps",
+                                text = stringResource(R.string.hc_sync_desc),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -392,12 +403,12 @@ private fun HealthConnectSection(
                         )
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Health Connect Data",
+                                text = stringResource(R.string.hc_data_title),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                text = "View your synced intake history",
+                                text = stringResource(R.string.hc_data_desc),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -436,28 +447,26 @@ private fun HealthConnectSection(
                     )
                 } else {
                     Text(
-                        text = "Restore from Health Connect",
+                        text = stringResource(R.string.hc_restore),
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
             }
-        } else if (!isLoading &&
-            (healthConnectStatus.contains("Permissions") || healthConnectStatus.contains("Missing permissions"))
-        ) {
+        } else if (!isLoading && isHealthConnectAvailable && !hasHcPermissions) {
             Button(
                 onClick = {
                     if (healthConnectPermissionLauncher != null) {
                         coroutineScope.launch {
                             manager.checkPermissionsAndRun(context, healthConnectPermissionLauncher) {
-                                healthConnectStatus = "Health Connect is ready"
                                 isHealthConnectEnabled = true
+                                refreshTrigger++
                             }
                         }
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(if (healthConnectStatus.contains("Missing")) "Try Again" else "Grant Permissions")
+                Text(stringResource(R.string.hc_grant_permissions))
             }
         }
     }
@@ -492,7 +501,7 @@ private fun HealthConnectSection(
                         isRestoring = false
                         showRestoreDialog = false
                         snackbarHostState?.showSnackbar(
-                            "Restored $imported entries, skipped $skipped duplicates"
+                            hcRestoredTemplate.format(imported, skipped)
                         )
                     }
                 }
@@ -515,13 +524,13 @@ private fun RestoreHealthConnectDialog(
     val haptics = LocalHapticFeedback.current
     AlertDialog(
         onDismissRequest = { if (!isRestoring) onDismiss() },
-        title = { Text("Restore from Health Connect") },
+        title = { Text(stringResource(R.string.hc_restore)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("Import your past HydroTracker entries from Health Connect. Choose a time range:")
+                Text(stringResource(R.string.hc_restore_message))
                 val options = listOf(
-                    "all" to "All history",
-                    "90days" to "Last 90 days"
+                    "all" to stringResource(R.string.hc_restore_all),
+                    "90days" to stringResource(R.string.hc_restore_90days)
                 )
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     options.forEachIndexed { index, (value, label) ->
@@ -566,7 +575,7 @@ private fun RestoreHealthConnectDialog(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {
-                    Text("Restore")
+                    Text(stringResource(R.string.hc_restore_confirm))
                 }
             }
         },
@@ -580,7 +589,7 @@ private fun RestoreHealthConnectDialog(
                 },
                 enabled = !isRestoring
             ) {
-                Text("Cancel")
+                Text(stringResource(R.string.action_cancel))
             }
         }
     )
@@ -637,7 +646,7 @@ private fun HealthConnectHistoryContent(
             .padding(horizontal = 16.dp)
     ) {
         Text(
-            text = "Health Connect Data",
+            text = stringResource(R.string.hc_data_title),
             style = MaterialTheme.typography.titleMediumEmphasized,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(bottom = 12.dp, start = 4.dp)
@@ -668,12 +677,12 @@ private fun HealthConnectHistoryContent(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "No Water Intake Data",
+                        text = stringResource(R.string.hc_no_data_title),
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center
                     )
                     Text(
-                        text = "No water intake entries found in the database.",
+                        text = stringResource(R.string.hc_no_data_desc),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
@@ -758,23 +767,24 @@ private fun HealthConnectHistoryItem(
                     ) {
                         if (entry.containerType.isNotEmpty()) {
                             Text(
-                                text = "Amount: ${entry.containerVolume.toInt()} ml (${entry.containerType})",
+                                text = stringResource(R.string.hc_amount_line, entry.containerVolume.toInt(), entry.containerType),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.secondary
                             )
                         }
 
-                        val beverageName = entry.getBeverageDisplayName()
+                        val beverageType = entry.getBeverageType()
+                        val beverageName = stringResource(beverageType.labelResId)
                         val effectiveAmount = entry.getEffectiveHydrationAmount().toInt()
                         if (entry.amount.toInt() != effectiveAmount) {
                             Text(
-                                text = "Beverage: $beverageName (${effectiveAmount}ml eff.)",
+                                text = stringResource(R.string.hc_beverage_eff, beverageName, effectiveAmount),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.secondary
                             )
                         } else {
                             Text(
-                                text = "Beverage: $beverageName",
+                                text = stringResource(R.string.hc_beverage, beverageName),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.secondary
                             )
@@ -793,7 +803,7 @@ private fun HealthConnectHistoryItem(
                                     modifier = Modifier
                                         .padding(vertical = 4.dp)
                                         .padding(horizontal = 10.dp),
-                                    text = "Hidden",
+                                    text = stringResource(R.string.hc_badge_hidden),
                                     style = MaterialTheme.typography.labelMedium,
                                 )
                             }
@@ -807,7 +817,7 @@ private fun HealthConnectHistoryItem(
                                     modifier = Modifier
                                         .padding(vertical = 4.dp)
                                         .padding(horizontal = 10.dp),
-                                    text = "External",
+                                    text = stringResource(R.string.hc_badge_external),
                                     style = MaterialTheme.typography.labelMedium,
                                 )
                             }
@@ -818,7 +828,7 @@ private fun HealthConnectHistoryItem(
 
             if (!entry.healthConnectRecordId.isNullOrEmpty()) {
                 Text(
-                    text = "Health Connect ID: ${entry.healthConnectRecordId}",
+                    text = stringResource(R.string.hc_record_id, entry.healthConnectRecordId),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.secondary
                 )
@@ -846,7 +856,7 @@ private fun HealthConnectHistoryItem(
                     )
                 ) {
                     Text(
-                        text = "Unhide Entry",
+                        text = stringResource(R.string.hc_unhide_entry),
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }

@@ -36,9 +36,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
+import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,7 +88,7 @@ fun QuickAddCustomizationScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxSize().blur(blur)) {
             SettingsDetailScaffold(
-                title = "Quick Add Customization",
+                title = stringResource(R.string.screen_quickadd_title),
                 onNavigateBack = onNavigateBack
             ) {
                 Column(
@@ -94,9 +96,9 @@ fun QuickAddCustomizationScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        SettingsSectionHeader("Container presets")
+                        SettingsSectionHeader(stringResource(R.string.quickadd_containers_header))
                         Text(
-                            text = "Quick-select containers on the home screen. Tap to edit, drag to reorder.",
+                            text = stringResource(R.string.quickadd_containers_desc),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(start = 4.dp)
@@ -104,16 +106,16 @@ fun QuickAddCustomizationScreen(
                     }
                     QuickAddNavRow(
                         icon = Icons.Default.LocalDrink,
-                        label = "Edit container presets",
+                        label = stringResource(R.string.quickadd_edit_containers),
                         onClick = onNavigateToContainerPresets
                     )
                 }
 
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        SettingsSectionHeader("Beverage types")
+                        SettingsSectionHeader(stringResource(R.string.quickadd_beverages_header))
                         Text(
-                            text = "Beverages offered in quick add. Drag to reorder, drag into Hidden to hide.",
+                            text = stringResource(R.string.quickadd_beverages_desc),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(start = 4.dp)
@@ -121,7 +123,7 @@ fun QuickAddCustomizationScreen(
                     }
                     QuickAddNavRow(
                         icon = Icons.Default.EmojiFoodBeverage,
-                        label = "Edit beverage presets",
+                        label = stringResource(R.string.quickadd_edit_beverages),
                         onClick = onNavigateToBeverageTypes
                     )
                 }

@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -36,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 
 /**
@@ -56,7 +58,9 @@ internal fun MarkdownBottomSheet(
 ) {
     val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState()
-    var content by remember { mutableStateOf("Loading…") }
+    val loadingText = stringResource(R.string.widget_loading)
+    val errorTemplate = stringResource(R.string.markdown_error_loading)
+    var content by remember { mutableStateOf(loadingText) }
 
     LaunchedEffect(assetFileName) {
         content = try {
@@ -64,7 +68,7 @@ internal fun MarkdownBottomSheet(
                 context.assets.open(assetFileName).bufferedReader().use { it.readText() }
             }
         } catch (e: Exception) {
-            "Error loading $assetFileName: ${e.message}"
+            errorTemplate.format(assetFileName, e.message)
         }
     }
 
@@ -126,7 +130,7 @@ internal fun MarkdownText(
                     }
                     versionCount++
                     Text(
-                        text = "Version ${trimmed.removeSurrounding("[", "]")}",
+                        text = stringResource(R.string.markdown_version_prefix, trimmed.removeSurrounding("[", "]")),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary

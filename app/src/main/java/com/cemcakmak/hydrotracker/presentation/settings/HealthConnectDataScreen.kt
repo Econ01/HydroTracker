@@ -10,9 +10,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
 import kotlinx.coroutines.launch
@@ -57,7 +59,7 @@ fun HealthConnectDataScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Health Connect Data",
+                        text = stringResource(R.string.hc_data_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -66,7 +68,7 @@ fun HealthConnectDataScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.cd_back)
                         )
                     }
                 }
@@ -98,12 +100,12 @@ fun HealthConnectDataScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "No Water Intake Data",
+                        text = stringResource(R.string.hc_no_data_title),
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center
                     )
                     Text(
-                        text = "No water intake entries found in the database.",
+                        text = stringResource(R.string.hc_no_data_desc),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
@@ -188,7 +190,7 @@ private fun HealthConnectDataItem(
                     if (isHidden) {
                         AssistChip(
                             onClick = { },
-                            label = { Text("Hidden", style = MaterialTheme.typography.labelSmall) },
+                            label = { Text(stringResource(R.string.hc_badge_hidden), style = MaterialTheme.typography.labelSmall) },
                             colors = AssistChipDefaults.assistChipColors(
                                 containerColor = MaterialTheme.colorScheme.errorContainer
                             ),
@@ -199,7 +201,7 @@ private fun HealthConnectDataItem(
                     if (isExternal) {
                         AssistChip(
                             onClick = { },
-                            label = { Text("External", style = MaterialTheme.typography.labelSmall) },
+                            label = { Text(stringResource(R.string.hc_badge_external), style = MaterialTheme.typography.labelSmall) },
                             colors = AssistChipDefaults.assistChipColors(
                                 containerColor = MaterialTheme.colorScheme.secondaryContainer
                             ),
@@ -233,7 +235,7 @@ private fun HealthConnectDataItem(
                 val effectiveAmount = entry.getEffectiveHydrationAmount().toInt()
 
                 Text(
-                    text = "Container: ${entry.containerType} (${entry.containerVolume.toInt()} ml)",
+                    text = stringResource(R.string.hc_container_line, entry.containerType, entry.containerVolume.toInt()),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -241,13 +243,13 @@ private fun HealthConnectDataItem(
                 // Show beverage type and effective amount info
                 if (beverageType.hydrationMultiplier != 1.0) {
                     Text(
-                        text = "${beverageType.displayName} • ${rawAmount}ml raw → ${effectiveAmount}ml effective",
+                        text = stringResource(R.string.hc_beverage_detail_eff, stringResource(beverageType.labelResId), rawAmount, effectiveAmount),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary
                     )
                 } else {
                     Text(
-                        text = "${beverageType.displayName} • ${rawAmount}ml effective",
+                        text = stringResource(R.string.hc_beverage_detail, stringResource(beverageType.labelResId), rawAmount),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -257,7 +259,7 @@ private fun HealthConnectDataItem(
             // Note
             if (!entry.note.isNullOrEmpty()) {
                 Text(
-                    text = "Note: ${entry.note}",
+                    text = stringResource(R.string.hc_note_label, entry.note),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -266,7 +268,7 @@ private fun HealthConnectDataItem(
             // Health Connect record ID
             if (!entry.healthConnectRecordId.isNullOrEmpty()) {
                 Text(
-                    text = "Health Connect ID: ${entry.healthConnectRecordId}",
+                    text = stringResource(R.string.hc_record_id, entry.healthConnectRecordId),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -297,7 +299,7 @@ private fun HealthConnectDataItem(
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Unhide Entry")
+                    Text(stringResource(R.string.hc_unhide_entry))
                 }
             }
         }

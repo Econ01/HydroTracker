@@ -72,6 +72,8 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -193,7 +195,7 @@ fun NotificationsScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxSize().blur(blur)) {
             SettingsDetailScaffold(
-                title = "Notifications",
+                title = stringResource(R.string.screen_notifications_title),
                 onNavigateBack = onNavigateBack
             ) {
                 // Permission status banner
@@ -219,7 +221,7 @@ fun NotificationsScreen(
                 // Reminders toggle
                 if (userProfile != null) {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        SettingsSectionHeader("Reminders")
+                        SettingsSectionHeader(stringResource(R.string.notif_reminders_header))
                         SettingsGroupCard(index = 0, size = 1) {
                             Row(
                                 modifier = Modifier
@@ -246,12 +248,12 @@ fun NotificationsScreen(
                                 }
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = "Hydration reminders",
+                                        text = stringResource(R.string.notif_hydration_reminders),
                                         style = MaterialTheme.typography.titleMedium,
                                         color = MaterialTheme.colorScheme.onSurface
                                     )
                                     Text(
-                                        text = if (isRemindersEnabled) "Reminders are active" else "Reminders are paused",
+                                        text = if (isRemindersEnabled) stringResource(R.string.notif_reminders_active) else stringResource(R.string.notif_reminders_paused),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -345,7 +347,7 @@ fun NotificationsScreen(
     // Time pickers
     if (showWakeUpPicker && userProfile != null) {
         TimePickerBottomSheet(
-            title = "Wake up time",
+            title = stringResource(R.string.notif_wake_up_time),
             initialTime = userProfile.wakeUpTime,
             onConfirm = { newTime ->
                 if (newTime != userProfile.wakeUpTime) {
@@ -373,7 +375,7 @@ fun NotificationsScreen(
 
     if (showSleepPicker && userProfile != null) {
         TimePickerBottomSheet(
-            title = "Sleep time",
+            title = stringResource(R.string.notif_sleep_time),
             initialTime = userProfile.sleepTime,
             onConfirm = { newTime ->
                 if (newTime != userProfile.sleepTime) {
@@ -441,16 +443,16 @@ private fun NotificationPreviewCard(
                 ) {
                     // Style name
                     Text(
-                        text = style.getDisplayName(),
+                        text = stringResource(style.labelResId),
                         style = MaterialTheme.typography.headlineSmall
                     )
 
                     // Style description
                     Text(
                         text = when (style) {
-                            ReminderStyle.GENTLE -> "Soft, encouraging reminders"
-                            ReminderStyle.MOTIVATING -> "Energetic, goal-focused reminders"
-                            ReminderStyle.MINIMAL -> "Simple, unobtrusive reminders"
+                            ReminderStyle.GENTLE -> stringResource(R.string.notif_style_gentle_desc)
+                            ReminderStyle.MOTIVATING -> stringResource(R.string.notif_style_motivating_desc)
+                            ReminderStyle.MINIMAL -> stringResource(R.string.notif_style_minimal_desc)
                         },
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -464,7 +466,7 @@ private fun NotificationPreviewCard(
                 HorizontalDivider(modifier = Modifier.weight(1f))
 
                 Text(
-                    text = "Sample notification",
+                    text = stringResource(R.string.notif_sample_notification),
                     modifier = Modifier.padding(horizontal = 16.dp),
                     style = MaterialTheme.typography.labelMediumEmphasized,
                     color = MaterialTheme.colorScheme.primary
@@ -505,7 +507,7 @@ private fun NotificationPreviewCard(
                 HorizontalDivider(modifier = Modifier.weight(1f))
 
                 Text(
-                    text = "Fun Fact",
+                    text = stringResource(R.string.notif_fun_fact),
                     modifier = Modifier.padding(horizontal = 16.dp),
                     style = MaterialTheme.typography.labelMediumEmphasized,
                     color = MaterialTheme.colorScheme.primary
@@ -550,7 +552,7 @@ private fun PermissionStatusBanner(
         modifier = Modifier.padding(top = 24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        SettingsSectionHeader("Permissions")
+        SettingsSectionHeader(stringResource(R.string.notif_permissions_header))
         Column {
             if (!hasNotificationPermission) {
                 SettingsGroupCard(index = 0, size = if (!hasExactAlarmPermission) 2 else 1) {
@@ -569,12 +571,12 @@ private fun PermissionStatusBanner(
                         )
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Notification permission",
+                                text = stringResource(R.string.notif_permission_title),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                text = "Required to send hydration reminders",
+                                text = stringResource(R.string.notif_permission_desc),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -588,7 +590,7 @@ private fun PermissionStatusBanner(
                                 containerColor = MaterialTheme.colorScheme.error
                             )
                         ) {
-                            Text("Allow")
+                            Text(stringResource(R.string.action_allow))
                         }
                     }
                 }
@@ -613,12 +615,12 @@ private fun PermissionStatusBanner(
                         )
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Exact alarm permission",
+                                text = stringResource(R.string.notif_exact_alarm_title),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                text = "Required for precise reminder timing",
+                                text = stringResource(R.string.notif_exact_alarm_desc),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -632,7 +634,7 @@ private fun PermissionStatusBanner(
                                 containerColor = MaterialTheme.colorScheme.error
                             )
                         ) {
-                            Text("Allow")
+                            Text(stringResource(R.string.action_allow))
                         }
                     }
                 }
@@ -652,7 +654,7 @@ private fun ReminderStyleSection(
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        SettingsSectionHeader("Reminder style")
+        SettingsSectionHeader(stringResource(R.string.notif_reminder_style_header))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -690,9 +692,9 @@ private fun ReminderStyleSection(
 
                         Text(
                             text = when (style) {
-                                ReminderStyle.GENTLE -> "Gentle"
-                                ReminderStyle.MOTIVATING -> "Energetic"
-                                ReminderStyle.MINIMAL -> "Simple"
+                                ReminderStyle.GENTLE -> stringResource(R.string.notif_style_gentle_short)
+                                ReminderStyle.MOTIVATING -> stringResource(R.string.notif_style_motivating_short)
+                                ReminderStyle.MINIMAL -> stringResource(R.string.notif_style_minimal_short)
                             },
                             style = if (isSelected) {
                                 MaterialTheme.typography.labelLargeEmphasized
@@ -719,7 +721,7 @@ private fun ActiveHoursSection(
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        SettingsSectionHeader("Active hours")
+        SettingsSectionHeader(stringResource(R.string.notif_active_hours_header))
         Column {
             SettingsGroupCard(
                 index = 0,
@@ -744,7 +746,7 @@ private fun ActiveHoursSection(
                     )
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Wake up",
+                            text = stringResource(R.string.notif_wake_up),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface
                         )
@@ -784,7 +786,7 @@ private fun ActiveHoursSection(
                     )
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Sleep",
+                            text = stringResource(R.string.notif_sleep),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface
                         )
@@ -816,7 +818,7 @@ private fun ScheduleSection(
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        SettingsSectionHeader("Schedule")
+        SettingsSectionHeader(stringResource(R.string.notif_schedule_header))
         Column {
             val totalSize = if (nextTime != null) 3 else 2
 
@@ -843,12 +845,12 @@ private fun ScheduleSection(
                     )
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Configure schedule",
+                            text = stringResource(R.string.notif_configure_schedule),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "Change reminder mode or set a custom interval",
+                            text = stringResource(R.string.notif_configure_schedule_desc),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -877,12 +879,12 @@ private fun ScheduleSection(
                     )
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Reminder interval",
+                            text = stringResource(R.string.notif_reminder_interval),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "Every $intervalMinutes minutes",
+                            text = pluralStringResource(R.plurals.every_x_minutes, intervalMinutes, intervalMinutes),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -907,7 +909,7 @@ private fun ScheduleSection(
                         )
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Scheduled for",
+                                text = stringResource(R.string.notif_scheduled_for),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
@@ -1051,7 +1053,7 @@ private fun TimePickerSheetContent(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Cancel",
+                            text = stringResource(R.string.action_cancel),
                             maxLines = 1,
                             softWrap = false
                         )
@@ -1088,7 +1090,7 @@ private fun TimePickerSheetContent(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Save",
+                            text = stringResource(R.string.action_save),
                             maxLines = 1,
                             softWrap = false
                         )

@@ -223,6 +223,182 @@
     <string name="history_title">History &amp; Statistics</string>
 
     <!-- ============================================================================
+         Settings — hub
+         Screen titles are reused as both the hub row title and the screen's app-bar title.
+         ============================================================================ -->
+    <string name="screen_appearance_title">Appearance</string>
+    <string name="screen_hydration_title">Hydration &amp; Health</string>
+    <string name="screen_quickadd_title">Quick Add Customization</string>
+    <string name="screen_notifications_title">Notifications</string>
+    <string name="screen_support_title">Support Development</string>
+    <string name="screen_about_title">About</string>
+    <string name="screen_developer_title">Developer Options</string>
+    <string name="settings_about_update_available">About - Update Available</string>
+    <string name="settings_appearance_desc">Theme, colors and AMOLED mode</string>
+    <string name="settings_display_desc">Week start day and locale</string>
+    <string name="settings_hydration_desc">Water goal calculation and Health Connect</string>
+    <string name="settings_quickadd_desc">Container presets and beverage types</string>
+    <string name="settings_notifications_desc">Hydration reminders and permissions</string>
+    <string name="settings_support_desc">Donate and support the app</string>
+    <string name="settings_about_desc">Sources, privacy policy and license</string>
+    <string name="settings_developer_desc">Debug tools and testing</string>
+
+    <!-- ============================================================================
+         Settings — Appearance
+         ============================================================================ -->
+    <string name="appearance_theme_header">Theme</string>
+    <string name="appearance_theme_system">System</string>
+    <string name="appearance_theme_light">Light</string>
+    <string name="appearance_theme_dark">Dark</string>
+    <string name="appearance_color_header">Color</string>
+    <string name="appearance_amoled_title">AMOLED Mode</string>
+    <string name="appearance_amoled_desc">True black backgrounds in dark mode</string>
+    <string name="appearance_font_header">Font</string>
+    <string name="appearance_navbar_header">Navigation bar</string>
+    <string name="appearance_autohide_title">Auto-hide on scroll</string>
+    <string name="appearance_autohide_desc">Hide the bar when scrolling down</string>
+    <string name="appearance_labels_title">Labels</string>
+    <!-- Sample data shown in the theme preview card -->
+    <string name="appearance_preview_amount">1,250 / 2,500 ml</string>
+    <string name="appearance_preview_entries">Entries</string>
+    <string name="appearance_preview_first">First</string>
+    <string name="appearance_preview_latest">Latest</string>
+
+    <!-- ============================================================================
+         Settings — Notifications
+         ============================================================================ -->
+    <string name="action_allow">Allow</string>
+    <string name="notif_reminders_header">Reminders</string>
+    <string name="notif_hydration_reminders">Hydration reminders</string>
+    <string name="notif_reminders_active">Reminders are active</string>
+    <string name="notif_reminders_paused">Reminders are paused</string>
+    <string name="notif_sample_notification">Sample notification</string>
+    <string name="notif_fun_fact">Fun Fact</string>
+    <!-- Reminder-style descriptions shown in the preview card -->
+    <string name="notif_style_gentle_desc">Soft, encouraging reminders</string>
+    <string name="notif_style_motivating_desc">Energetic, goal-focused reminders</string>
+    <string name="notif_style_minimal_desc">Simple, unobtrusive reminders</string>
+    <string name="notif_permissions_header">Permissions</string>
+    <string name="notif_permission_title">Notification permission</string>
+    <string name="notif_permission_desc">Required to send hydration reminders</string>
+    <string name="notif_exact_alarm_title">Exact alarm permission</string>
+    <string name="notif_exact_alarm_desc">Required for precise reminder timing</string>
+    <string name="notif_reminder_style_header">Reminder style</string>
+    <!-- Short reminder-style labels shown on the toggle buttons -->
+    <string name="notif_style_gentle_short">Gentle</string>
+    <string name="notif_style_motivating_short">Energetic</string>
+    <string name="notif_style_minimal_short">Simple</string>
+    <string name="notif_active_hours_header">Active hours</string>
+    <string name="notif_wake_up">Wake up</string>
+    <string name="notif_sleep">Sleep</string>
+    <string name="notif_wake_up_time">Wake up time</string>
+    <string name="notif_sleep_time">Sleep time</string>
+    <string name="notif_schedule_header">Schedule</string>
+    <string name="notif_configure_schedule">Configure schedule</string>
+    <string name="notif_configure_schedule_desc">Change reminder mode or set a custom interval</string>
+    <string name="notif_reminder_interval">Reminder interval</string>
+    <string name="notif_scheduled_for">Scheduled for</string>
+    <!-- Reminder cadence, e.g. "Every 60 minutes"; %1$d = minutes -->
+    <plurals name="every_x_minutes">
+        <item quantity="one">Every %1$d minute</item>
+        <item quantity="other">Every %1$d minutes</item>
+    </plurals>
+
+    <!-- ============================================================================
+         Settings — Reminder Schedule
+         ============================================================================ -->
+    <string name="screen_reminder_schedule_title">Reminder Schedule</string>
+    <string name="reminder_mode_header">Mode</string>
+    <string name="reminder_day_end_header">Day end</string>
+    <string name="reminder_day_end_divider">Day End</string>
+    <string name="reminder_mode_auto_explain">Reminders are spaced automatically based on your daily goal and active hours.</string>
+    <string name="reminder_mode_custom_explain">Reminders are sent at your chosen fixed interval between wake-up and sleep.</string>
+    <string name="reminder_dayend_sleep_explain">Your day ends at sleep time. Daily progress resets then.</string>
+    <string name="reminder_dayend_midnight_explain">Your day ends at midnight, matching the calendar day.</string>
+    <string name="reminder_slider_min">1 min</string>
+    <string name="reminder_slider_max">8 hours</string>
+    <!-- Cadence phrases used mid-sentence and standalone -->
+    <string name="interval_every_hour">every hour</string>
+    <string name="interval_every_h_m">every %1$dh %2$dm</string>
+    <plurals name="interval_every_minutes">
+        <item quantity="one">every %1$d minute</item>
+        <item quantity="other">every %1$d minutes</item>
+    </plurals>
+    <plurals name="interval_every_hours">
+        <item quantity="one">every %1$d hour</item>
+        <item quantity="other">every %1$d hours</item>
+    </plurals>
+    <!-- Schedule preview sentences; auto: %1$s=goal, %2$d=glasses, %3$d=hours, %4$d=minutes -->
+    <string name="reminder_preview_auto">Based on your %1$s goal, you\'ll get about %2$d reminders (one per glass) spread across your %3$d active hours. Roughly every %4$d minutes.</string>
+    <!-- custom: %1$s=cadence phrase, %2$s=wake time, %3$s=sleep time -->
+    <string name="reminder_preview_custom">You\'ll receive a reminder %1$s between %2$s and %3$s.</string>
+
+    <!-- ============================================================================
+         Settings — Quick Add customization
+         ============================================================================ -->
+    <string name="quickadd_containers_header">Container presets</string>
+    <string name="quickadd_containers_desc">Quick-select containers on the home screen. Tap to edit, drag to reorder.</string>
+    <string name="quickadd_edit_containers">Edit container presets</string>
+    <string name="quickadd_beverages_header">Beverage types</string>
+    <string name="quickadd_beverages_desc">Beverages offered in quick add. Drag to reorder, drag into Hidden to hide.</string>
+    <string name="quickadd_edit_beverages">Edit beverage presets</string>
+
+    <!-- Container presets list/editor -->
+    <string name="container_presets_screen_title">Container Presets</string>
+    <string name="container_reset_defaults_button">Reset Defaults</string>
+    <string name="container_reset_title">Reset Container Presets?</string>
+    <string name="container_reset_message">This will remove all custom containers and restore the default presets. This action cannot be undone.</string>
+    <!-- Snackbars; %1$s = container name -->
+    <string name="container_added">Added \"%1$s\" container</string>
+    <string name="container_updated">Updated \"%1$s\" container</string>
+    <string name="container_deleted">Deleted \"%1$s\" container</string>
+    <string name="container_reset_done">Container presets reset to defaults</string>
+
+    <!-- Beverage types list/editor -->
+    <string name="screen_beverage_types_title">Beverage Types</string>
+    <string name="beverage_types_helper">Beverages offered in quick add. Tap to edit, drag to reorder.</string>
+    <!-- e.g. "150% hydration"; %1$d = percent -->
+    <string name="beverage_hydration_short">%1$d%% hydration</string>
+    <string name="beverage_reset_title">Reset Beverages?</string>
+    <string name="beverage_reset_message">This restores the default beverage order, unhides all presets, and removes all custom beverages. This action cannot be undone.</string>
+
+    <!-- ============================================================================
+         Settings — Hydration &amp; Health
+         ============================================================================ -->
+    <string name="hydration_baseline_intake">Daily baseline intake</string>
+    <string name="hydration_calc_standard_header">Calculation standard</string>
+    <string name="hydration_region_european">(European)</string>
+    <string name="hydration_region_us">(US)</string>
+    <string name="hydration_efsa_tag">Conservative</string>
+    <string name="hydration_iom_tag">Higher intake</string>
+    <!-- Health Connect -->
+    <string name="hc_section_header">Health Connect</string>
+    <string name="hc_sync_title">Sync with Health Connect</string>
+    <string name="hc_sync_desc">Share hydration data with other health apps</string>
+    <string name="hc_data_title">Health Connect Data</string>
+    <string name="hc_data_desc">View your synced intake history</string>
+    <string name="hc_restore">Restore from Health Connect</string>
+    <string name="hc_restore_confirm">Restore</string>
+    <string name="hc_try_again">Try Again</string>
+    <string name="hc_grant_permissions">Grant Permissions</string>
+    <string name="hc_restore_message">Import your past HydroTracker entries from Health Connect. Choose a time range:</string>
+    <string name="hc_restore_all">All history</string>
+    <string name="hc_restore_90days">Last 90 days</string>
+    <!-- %1$d = imported count, %2$d = skipped duplicates -->
+    <string name="hc_restored_snackbar">Restored %1$d entries, skipped %2$d duplicates</string>
+    <string name="hc_no_data_title">No Water Intake Data</string>
+    <string name="hc_no_data_desc">No water intake entries found in the database.</string>
+    <string name="hc_amount_ml">%1$d ml</string>
+    <!-- %1$d = volume, %2$s = container label -->
+    <string name="hc_amount_line">Amount: %1$d ml (%2$s)</string>
+    <!-- %1$s = beverage name, %2$d = effective ml -->
+    <string name="hc_beverage_eff">Beverage: %1$s (%2$dml eff.)</string>
+    <string name="hc_beverage">Beverage: %1$s</string>
+    <string name="hc_badge_external">External</string>
+    <string name="hc_record_id">Health Connect ID: %1$s</string>
+    <string name="hc_unhide_entry">Unhide Entry</string>
+
+    <!-- ============================================================================
          Data-model enum labels
          Resolved in the UI via stringResource(enum.labelResId). Grouped by enum.
          ============================================================================ -->
@@ -335,5 +511,133 @@
     <string name="beverage_desc_ors">Oral rehydration solution - superior hydration</string>
     <string name="beverage_desc_milk">Milk - superior hydration</string>
     <string name="beverage_desc_fruit_juice">Fruit juice - enhanced hydration</string>
+
+    <!-- ============================================================================
+         Health Connect status & badges
+         ============================================================================ -->
+    <string name="hc_status_checking">Checking…</string>
+    <string name="hc_status_error">Error: %1$s</string>
+    <string name="hc_badge_hidden">Hidden</string>
+
+    <!-- ============================================================================
+         About
+         ============================================================================ -->
+    <string name="app_tagline">Open source water intake tracker.</string>
+    <string name="label_version">Version: %1$s</string>
+    <string name="label_build_number">Build Number: %1$d</string>
+    <string name="about_section_contributors">Contributors</string>
+    <string name="about_contributor_name" translatable="false">Ali Cem Çakmak</string>
+    <string name="about_contributor_role">Creator &amp; maintainer</string>
+    <string name="about_contributor_bio">Indie Android developer focused on clean, privacy-respecting apps.</string>
+    <string name="cd_open_github_profile">Open GitHub profile</string>
+    <string name="about_section_information">Information</string>
+    <string name="about_changelog">Changelog</string>
+    <string name="about_changelog_desc">What\'s new in each version</string>
+    <string name="about_sources">Sources &amp; Research</string>
+    <string name="about_sources_desc">Scientific sources behind the app</string>
+    <string name="about_privacy_policy">Privacy Policy</string>
+    <string name="about_privacy_policy_desc">How your data is handled</string>
+    <string name="about_license">License</string>
+    <string name="about_license_desc">HydroTracker\'s open-source license</string>
+    <string name="about_third_party_licenses">Third-party licenses</string>
+    <string name="about_third_party_licenses_desc">Open-source libraries we depend on</string>
+    <string name="toast_no_app_to_open_link">No app found to open this link</string>
+
+    <!-- ============================================================================
+         Support Development
+         ============================================================================ -->
+    <string name="support_development_hero">HydroTracker is built and maintained by one person, with no ads and no tracking. If it has helped you drink more water, anything you chip in keeps it growing.</string>
+    <string name="support_section_support">Support development</string>
+    <string name="support_github_sponsors" translatable="false">GitHub Sponsors</string>
+    <string name="support_github_sponsors_blurb">Support ongoing development</string>
+    <string name="support_paypal" translatable="false">PayPal</string>
+    <string name="support_paypal_blurb">Send a quick donation</string>
+    <string name="support_buymeacoffee" translatable="false">Buy Me a Coffee</string>
+    <string name="support_buymeacoffee_blurb">Treat me to a coffee</string>
+    <string name="support_section_other_ways">Other ways to help</string>
+    <string name="support_rate_play_store">Rate on Google Play</string>
+    <string name="support_rate_play_store_desc">Leave a rating on the Play Store</string>
+    <string name="support_share_app">Share the app</string>
+    <string name="support_share_app_desc">Tell a friend about HydroTracker</string>
+    <string name="support_star_github">Star on GitHub</string>
+    <string name="support_star_github_desc">Star the project on GitHub</string>
+    <string name="share_chooser_title">Share HydroTracker</string>
+    <string name="toast_review_successful">Review is successful</string>
+    <string name="toast_review_failed">Review failed</string>
+    <string name="toast_no_app_to_share">No app found to share</string>
+
+    <!-- ============================================================================
+         Updates
+         ============================================================================ -->
+    <string name="screen_updates_title">Updates</string>
+    <string name="updates_section_auto_update">Auto Update</string>
+    <string name="updates_toggle_auto_check">Check automatically</string>
+    <string name="updates_toggle_auto_check_desc">Look for updates about once a day</string>
+    <string name="updates_section_status">Status</string>
+    <string name="updates_status_checking">Checking for updates…</string>
+    <string name="updates_status_failed">Couldn\'t check for updates</string>
+    <string name="updates_status_f_droid">Updates are handled by F-Droid</string>
+    <string name="updates_status_f_droid_desc">Open the F-Droid app to update HydroTracker.</string>
+    <string name="updates_status_up_to_date">You\'re on the latest version</string>
+    <string name="updates_status_check_now">Check for updates</string>
+    <string name="updates_last_checked_never">Not checked yet</string>
+    <string name="updates_last_checked">Last checked %1$s</string>
+    <string name="updates_button_check_now">Check now</string>
+    <string name="updates_button_checking">Checking…</string>
+    <string name="updates_button_restart_install">Restart to install</string>
+    <string name="updates_available_title">Update available</string>
+    <string name="updates_available_play_desc">A new version is available on Google Play</string>
+    <string name="updates_available_version">Version %1$s</string>
+    <string name="updates_button_update">Update</string>
+    <string name="updates_button_download">Download update</string>
+    <string name="label_version_simple">Version</string>
+    <string name="label_build_simple">Build</string>
+    <string name="label_install_method">Install Method</string>
+    <string name="label_source">Source</string>
+    <string name="install_source_google_play" translatable="false">Google Play</string>
+    <string name="install_source_f_droid" translatable="false">F-Droid</string>
+    <string name="install_source_manual">Manual</string>
+    <string name="install_source_debug">Debug</string>
+    <string name="install_source_github">GitHub</string>
+    <string name="toast_could_not_start_update">Couldn\'t start the update</string>
+
+    <!-- ============================================================================
+         Licenses
+         ============================================================================ -->
+    <string name="screen_licenses_title">Third-party licenses</string>
+    <string name="licenses_empty">No license information available.</string>
+
+    <!-- ============================================================================
+         What\'s New / Update Dialog
+         ============================================================================ -->
+    <string name="whats_new_title">What\'s New</string>
+    <string name="whats_new_version">Version %1$s</string>
+    <string name="update_dialog_title">Update Available</string>
+    <string name="update_dialog_current_version">Current version</string>
+    <string name="update_dialog_new_version">New version</string>
+    <string name="update_dialog_action_play">Open Google Play to update HydroTracker.</string>
+    <string name="update_dialog_action_f_droid">Open the F-Droid app to update HydroTracker.</string>
+    <string name="update_dialog_action_github">Download the latest APK from GitHub.</string>
+    <string name="update_button_later">Later</string>
+    <string name="update_button_update">Update</string>
+
+    <!-- ============================================================================
+         Markdown components
+         ============================================================================ -->
+    <string name="markdown_error_loading">Error loading %1$s: %2$s</string>
+    <string name="markdown_version_prefix">Version %1$s</string>
+
+    <!-- ============================================================================
+         Placeholder
+         ============================================================================ -->
+    <string name="placeholder_coming_soon">Coming soon</string>
+
+    <!-- ============================================================================
+         Health Connect Data screen
+         ============================================================================ -->
+    <string name="hc_container_line">Container: %1$s (%2$d ml)</string>
+    <string name="hc_beverage_detail">%1$s • %2$dml effective</string>
+    <string name="hc_beverage_detail_eff">%1$s • %2$dml raw → %3$dml effective</string>
+    <string name="hc_note_label">Note: %1$s</string>
 
 </resources>

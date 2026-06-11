@@ -52,6 +52,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
@@ -164,10 +165,13 @@ private fun UpdateAvailableDialogContent(
     } ?: 30.dp
 
     val actionContext = when (installSource) {
-        InstallSource.PLAY_STORE -> "Open Google Play to update HydroTracker."
-        InstallSource.F_DROID -> "Open the F-Droid app to update HydroTracker."
-        InstallSource.OTHER -> "Download the latest APK from GitHub."
+        InstallSource.PLAY_STORE -> stringResource(R.string.update_dialog_action_play)
+        InstallSource.F_DROID -> stringResource(R.string.update_dialog_action_f_droid)
+        InstallSource.OTHER -> stringResource(R.string.update_dialog_action_github)
     }
+
+    val couldNotStartUpdate = stringResource(R.string.toast_could_not_start_update)
+    val noAppToOpenLink = stringResource(R.string.toast_no_app_to_open_link)
 
     val currentVersionLabel = if (installSource == InstallSource.PLAY_STORE) {
         BuildConfig.VERSION_CODE.toString()
@@ -189,14 +193,14 @@ private fun UpdateAvailableDialogContent(
                         AppUpdateOptions.defaultOptions(status.playUpdateType)
                     )
                 } catch (_: Exception) {
-                    Toast.makeText(context, "Couldn't start the update", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, couldNotStartUpdate, Toast.LENGTH_SHORT).show()
                 }
             }
             status.downloadUrl != null -> {
                 try {
                     context.startActivity(Intent(Intent.ACTION_VIEW, status.downloadUrl.toUri()))
                 } catch (_: ActivityNotFoundException) {
-                    Toast.makeText(context, "No app found to open this link", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, noAppToOpenLink, Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -227,7 +231,7 @@ private fun UpdateAvailableDialogContent(
                     modifier = Modifier.size(28.dp)
                 )
                 Text(
-                    text = "Update Available",
+                    text = stringResource(R.string.update_dialog_title),
                     style = MaterialTheme.typography.headlineMediumEmphasized
                 )
             }
@@ -252,7 +256,7 @@ private fun UpdateAvailableDialogContent(
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Text(
-                            text = "Current version",
+                            text = stringResource(R.string.update_dialog_current_version),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.secondary
                         )
@@ -319,7 +323,7 @@ private fun UpdateAvailableDialogContent(
                             verticalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text = "New version",
+                                text = stringResource(R.string.update_dialog_new_version),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             Text(
@@ -386,7 +390,7 @@ private fun UpdateAvailableDialogContent(
                                     modifier = Modifier.size(20.dp)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Later", maxLines = 1, softWrap = false)
+                                Text(stringResource(R.string.update_button_later), maxLines = 1, softWrap = false)
                             }
                         },
                         menuContent = {}
@@ -410,7 +414,7 @@ private fun UpdateAvailableDialogContent(
                                     modifier = Modifier.size(20.dp)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Update", maxLines = 1, softWrap = false)
+                                Text(stringResource(R.string.update_button_update), maxLines = 1, softWrap = false)
                             }
                         },
                         menuContent = {}

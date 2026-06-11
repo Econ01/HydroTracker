@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -67,7 +68,7 @@ fun AppearanceScreen(
     var showLabelSheet by remember { mutableStateOf(false) }
 
     SettingsDetailScaffold(
-        title = "Appearance",
+        title = stringResource(R.string.screen_appearance_title),
         onNavigateBack = onNavigateBack
     ) {
         ThemePreviewCard(themePreferences = themePreferences)
@@ -154,7 +155,7 @@ private fun ThemePreviewCard(themePreferences: ThemePreferences) {
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             Text(
-                text = "1,250 / 2,500 ml",
+                text = stringResource(R.string.appearance_preview_amount),
                 style = MaterialTheme.typography.headlineMedium
             )
 
@@ -174,9 +175,9 @@ private fun ThemePreviewCard(themePreferences: ThemePreferences) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                PreviewStatChip(label = "Entries", value = "5")
-                PreviewStatChip(label = "First", value = "08:30")
-                PreviewStatChip(label = "Latest", value = "14:45")
+                PreviewStatChip(label = stringResource(R.string.appearance_preview_entries), value = "5")
+                PreviewStatChip(label = stringResource(R.string.appearance_preview_first), value = "08:30")
+                PreviewStatChip(label = stringResource(R.string.appearance_preview_latest), value = "14:45")
             }
         }
     }
@@ -189,7 +190,7 @@ private fun DarkModeSection(
     onDarkModeChange: (DarkModePreference) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        SettingsSectionHeader("Theme")
+        SettingsSectionHeader(stringResource(R.string.appearance_theme_header))
         val haptics = LocalHapticFeedback.current
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -233,9 +234,9 @@ private fun DarkModeSection(
                         }
                         Text(
                             text = when (preference) {
-                                DarkModePreference.SYSTEM -> "System"
-                                DarkModePreference.LIGHT -> "Light"
-                                DarkModePreference.DARK -> "Dark"
+                                DarkModePreference.SYSTEM -> stringResource(R.string.appearance_theme_system)
+                                DarkModePreference.LIGHT -> stringResource(R.string.appearance_theme_light)
+                                DarkModePreference.DARK -> stringResource(R.string.appearance_theme_dark)
                             },
                             style = MaterialTheme.typography.labelLarge
                         )
@@ -254,7 +255,7 @@ private fun ColorSection(
     onPureBlackChange: (Boolean) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        SettingsSectionHeader("Color")
+        SettingsSectionHeader(stringResource(R.string.appearance_color_header))
         Column {
             // Build the rows for this section; add another entry here to grow the list.
             val rows = buildList<@Composable () -> Unit> {
@@ -311,12 +312,12 @@ private fun DynamicColorsRow(
             modifier = Modifier.weight(1f)
         ) {
             Text(
-                text = "Dynamic Colors",
+                text = stringResource(R.string.color_source_dynamic),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = "Colors from your wallpaper",
+                text = stringResource(R.string.color_source_dynamic_desc),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -373,12 +374,12 @@ private fun AmoledRow(
             modifier = Modifier.weight(1f)
         ) {
             Text(
-                text = "AMOLED Mode",
+                text = stringResource(R.string.appearance_amoled_title),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = "True black backgrounds in dark mode",
+                text = stringResource(R.string.appearance_amoled_desc),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -411,7 +412,7 @@ private fun FontSection(
 ) {
     val haptics = LocalHapticFeedback.current
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        SettingsSectionHeader("Font")
+        SettingsSectionHeader(stringResource(R.string.appearance_font_header))
         SettingsGroupCard(
             index = 0,
             size = 1,
@@ -434,7 +435,7 @@ private fun FontSection(
                     modifier = Modifier.size(24.dp)
                 )
                 Text(
-                    text = selectedFont.getDisplayName(),
+                    text = stringResource(selectedFont.labelResId),
                     style = MaterialTheme.typography.titleMedium,
                     fontFamily = fontFamilyFor(selectedFont),
                     color = MaterialTheme.colorScheme.onSurface,
@@ -482,7 +483,7 @@ private fun FontBottomSheet(
                     }
                 ) { contentColor ->
                     Text(
-                        text = font.getDisplayName(),
+                        text = stringResource(font.labelResId),
                         style = MaterialTheme.typography.bodyLarge,
                         fontFamily = fontFamilyFor(font),
                         color = contentColor
@@ -502,7 +503,7 @@ private fun NavigationBarSection(
 ) {
     val haptics = LocalHapticFeedback.current
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        SettingsSectionHeader("Navigation bar")
+        SettingsSectionHeader(stringResource(R.string.appearance_navbar_header))
         Column {
             // Auto-hide on scroll (switch row)
             SettingsGroupCard(index = 0, size = 2) {
@@ -527,12 +528,12 @@ private fun NavigationBarSection(
                     }
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Auto-hide on scroll",
+                            text = stringResource(R.string.appearance_autohide_title),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "Hide the bar when scrolling down",
+                            text = stringResource(R.string.appearance_autohide_desc),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -587,12 +588,12 @@ private fun NavigationBarSection(
                     )
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Labels",
+                            text = stringResource(R.string.appearance_labels_title),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = labelMode.getDisplayName(),
+                            text = stringResource(labelMode.labelResId),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -640,7 +641,7 @@ private fun NavLabelBottomSheet(
                     }
                 ) { contentColor ->
                     Text(
-                        text = mode.getDisplayName(),
+                        text = stringResource(mode.labelResId),
                         style = MaterialTheme.typography.bodyLarge,
                         color = contentColor
                     )

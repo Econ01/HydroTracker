@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -72,6 +73,7 @@ fun UpdatesScreen(
     val context = LocalContext.current
     val haptics = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
+    val couldNotStartUpdate = stringResource(R.string.toast_could_not_start_update)
 
     val status by updateRepository.updateStatus.collectAsState()
     val autoCheckEnabled by updateRepository.autoCheckEnabled.collectAsState()
@@ -125,7 +127,7 @@ fun UpdatesScreen(
                         AppUpdateOptions.defaultOptions(available.playUpdateType)
                     )
                 } catch (_: Exception) {
-                    Toast.makeText(context, "Couldn't start the update", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, couldNotStartUpdate, Toast.LENGTH_SHORT).show()
                 }
             } else if (available.downloadUrl != null) {
                 openUrl(context, available.downloadUrl)
@@ -148,7 +150,7 @@ private fun UpdatesContent(
     onCompleteInstall: () -> Unit,
     onPrimaryAction: (UpdateStatus.Available) -> Unit
 ) {
-    SettingsDetailScaffold(title = "Updates", onNavigateBack = onNavigateBack) {
+    SettingsDetailScaffold(title = stringResource(R.string.screen_updates_title), onNavigateBack = onNavigateBack) {
         VersionInfo(
             themePreferences = themePreferences,
             installSource = installSource
@@ -157,7 +159,7 @@ private fun UpdatesContent(
         val haptics = LocalHapticFeedback.current
 
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SettingsSectionHeader("Auto Update")
+            SettingsSectionHeader(stringResource(R.string.updates_section_auto_update))
             SettingsGroupCard(index = 0, size = 1) {
                 val haptics = LocalHapticFeedback.current
                 Row(
@@ -177,12 +179,12 @@ private fun UpdatesContent(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = "Check automatically",
+                            text = stringResource(R.string.updates_toggle_auto_check),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "Look for updates about once a day",
+                            text = stringResource(R.string.updates_toggle_auto_check_desc),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -212,7 +214,7 @@ private fun UpdatesContent(
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SettingsSectionHeader("Status")
+            SettingsSectionHeader(stringResource(R.string.updates_section_status))
             UpdateStatusCard(
                 status = status,
                 lastCheckTime = lastCheckTime,
@@ -239,7 +241,7 @@ private fun UpdatesContent(
                     modifier = Modifier
                         .fillMaxWidth()
                 ) {
-                    Text(if (checking) "Checking…" else "Check now")
+                    Text(if (checking) stringResource(R.string.updates_button_checking) else stringResource(R.string.updates_button_check_now))
                 }
             }
         }
@@ -264,13 +266,9 @@ private fun VersionInfo(
     }
 
     val sourceLabel = when (installSource) {
-        InstallSource.PLAY_STORE -> "Google Play"
-        InstallSource.F_DROID -> "F-Droid"
-        InstallSource.OTHER -> if (BuildConfig.DEBUG) {
-            "Manual"
-        } else {
-            "Manual"
-        }
+        InstallSource.PLAY_STORE -> stringResource(R.string.install_source_google_play)
+        InstallSource.F_DROID -> stringResource(R.string.install_source_f_droid)
+        InstallSource.OTHER -> stringResource(R.string.install_source_manual)
     }
 
     Surface(
@@ -288,15 +286,15 @@ private fun VersionInfo(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            InfoRow("Version", BuildConfig.VERSION_NAME)
+            InfoRow(stringResource(R.string.label_version_simple), BuildConfig.VERSION_NAME)
             HorizontalDivider()
-            InfoRow("Build", BuildConfig.VERSION_CODE.toString())
+            InfoRow(stringResource(R.string.label_build_simple), BuildConfig.VERSION_CODE.toString())
             HorizontalDivider()
-            InfoRow("Install Method", sourceLabel)
+            InfoRow(stringResource(R.string.label_install_method), sourceLabel)
             if (installSource == InstallSource.OTHER) {
                 HorizontalDivider()
-                val sourceValue = if (BuildConfig.DEBUG) "Debug" else "GitHub"
-                InfoRow("Source", sourceValue)
+                val sourceValue = if (BuildConfig.DEBUG) stringResource(R.string.install_source_debug) else stringResource(R.string.install_source_github)
+                InfoRow(stringResource(R.string.label_source), sourceValue)
             }
         }
     }
@@ -341,35 +339,35 @@ private fun UpdateStatusCard(
                 is UpdateStatus.Available -> AvailableContent(status, onPrimaryAction)
                 is UpdateStatus.Checking -> StatusLine(
                     icon = null,
-                    title = "Checking for updates…",
+                    title = stringResource(R.string.updates_status_checking),
                     subtitle = null,
                     showSpinner = true
                 )
                 is UpdateStatus.Failed -> StatusLine(
                     icon = R.drawable.cancel_filled,
-                    title = "Couldn't check for updates",
+                    title = stringResource(R.string.updates_status_failed),
                     subtitle = status.message
                 )
                 UpdateStatus.Unsupported -> StatusLine(
                     icon = R.drawable.info_filled,
-                    title = "Updates are handled by F-Droid",
-                    subtitle = "Open the F-Droid app to update HydroTracker."
+                    title = stringResource(R.string.updates_status_f_droid),
+                    subtitle = stringResource(R.string.updates_status_f_droid_desc)
                 )
                 UpdateStatus.UpToDate -> StatusLine(
                     icon = R.drawable.check_filled,
-                    title = "You're on the latest version",
+                    title = stringResource(R.string.updates_status_up_to_date),
                     subtitle = lastCheckedText(lastCheckTime)
                 )
                 UpdateStatus.Idle -> StatusLine(
                     icon = R.drawable.info_filled,
-                    title = "Check for updates",
+                    title = stringResource(R.string.updates_status_check_now),
                     subtitle = lastCheckedText(lastCheckTime)
                 )
             }
 
             if (downloaded) {
                 Button(onClick = onCompleteInstall, modifier = Modifier.fillMaxWidth()) {
-                    Text("Restart to install")
+                    Text(stringResource(R.string.updates_button_restart_install))
                 }
             }
         }
@@ -389,10 +387,10 @@ private fun AvailableContent(
         verticalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Update available", style = MaterialTheme.typography.titleLarge)
+        Text(stringResource(R.string.updates_available_title), style = MaterialTheme.typography.titleLarge)
         Text(
-            text = if (isPlay) "A new version is available on Google Play"
-            else "Version ${status.versionName}",
+            text = if (isPlay) stringResource(R.string.updates_available_play_desc)
+            else stringResource(R.string.updates_available_version, status.versionName),
             style = MaterialTheme.typography.bodyMediumEmphasized,
             color = MaterialTheme.colorScheme.primary
         )
@@ -414,7 +412,7 @@ private fun AvailableContent(
         modifier = Modifier
             .fillMaxWidth()
     ) {
-        Text(if (isPlay) "Update" else "Download update")
+        Text(if (isPlay) stringResource(R.string.updates_button_update) else stringResource(R.string.updates_button_download))
     }
 }
 
@@ -453,21 +451,22 @@ private fun StatusLine(
     }
 }
 
+@Composable
 private fun lastCheckedText(time: Long): String {
-    if (time <= 0L) return "Not checked yet"
+    if (time <= 0L) return stringResource(R.string.updates_last_checked_never)
     val relative = DateUtils.getRelativeTimeSpanString(
         time,
         System.currentTimeMillis(),
         DateUtils.MINUTE_IN_MILLIS
     )
-    return "Last checked $relative"
+    return stringResource(R.string.updates_last_checked, relative.toString())
 }
 
 private fun openUrl(context: Context, url: String) {
     try {
         context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
     } catch (_: ActivityNotFoundException) {
-        Toast.makeText(context, "No app found to open this link", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.toast_no_app_to_open_link), Toast.LENGTH_SHORT).show()
     }
 }
 
