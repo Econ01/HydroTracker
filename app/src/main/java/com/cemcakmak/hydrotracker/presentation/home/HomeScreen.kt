@@ -28,12 +28,14 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.launch
+import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.models.ContainerPreset
 import com.cemcakmak.hydrotracker.data.models.BeverageType
@@ -103,9 +105,9 @@ fun HomeScreen(
 
     // Coroutine scope for database operations
     val coroutineScope = rememberCoroutineScope()
-    // Custom entry dialog state managed by parent for FAB hoisting
+    // Custom entry dialogue state managed by parent for FAB hoisting
 
-    // Edit entry dialog state
+    // Edit entry dialogue state
     var showEditDialog by remember { mutableStateOf(false) }
     var entryToEdit by remember { mutableStateOf<WaterIntakeEntry?>(null) }
 
@@ -122,12 +124,32 @@ fun HomeScreen(
     var isRefreshing by remember { mutableStateOf(false) }
     val pullToRefreshState = rememberPullToRefreshState()
 
+    // Resolved message templates for snackbars launched from coroutines.
+    val selectedBeverageLabel = if (selectedBeverage.hasLabelRes) {
+        stringResource(selectedBeverage.labelResId)
+    } else {
+        selectedBeverage.displayName
+    }
+    val addedMessageTemplate = stringResource(R.string.home_snackbar_added)
+    val addFailedMessageTemplate = stringResource(R.string.home_snackbar_add_failed)
+    val deletedMessageTemplate = stringResource(R.string.home_snackbar_deleted)
+    val deleteFailedMessageTemplate = stringResource(R.string.home_snackbar_delete_failed)
+    val updatedMessageTemplate = stringResource(R.string.home_snackbar_updated)
+    val updateFailedMessageTemplate = stringResource(R.string.home_snackbar_update_failed)
+    val syncedMessageTemplate = stringResource(R.string.home_snackbar_synced)
+    val syncErrorsMessageTemplate = stringResource(R.string.home_snackbar_sync_errors)
+    val upToDateMessage = stringResource(R.string.home_snackbar_up_to_date)
+    val syncFailedMessageTemplate = stringResource(R.string.home_snackbar_sync_failed)
+    val containerAddedTemplate = stringResource(R.string.home_snackbar_container_added)
+    val containerUpdatedTemplate = stringResource(R.string.home_snackbar_container_updated)
+    val containerDeletedTemplate = stringResource(R.string.home_snackbar_container_deleted)
+
     // Function to add water intake to database
     fun addWaterIntake(amount: Double, containerName: String) {
         coroutineScope.launch {
             val containerPreset = ContainerPreset.getDefaultPresets()
                 .find { it.name == containerName }
-                ?: ContainerPreset(name = "Custom", volume = amount)
+                ?: ContainerPreset(name = containerName, volume = amount)
 
             val result = waterIntakeRepository.addWaterIntake(
                 amount = amount,
@@ -138,16 +160,19 @@ fun HomeScreen(
 
             result.onSuccess {
                 val beverageInfo = if (!selectedBeverage.isWater) {
-                    " ${selectedBeverage.displayName}"
+                    " $selectedBeverageLabel"
                 } else {
                     ""
                 }
                 snackbarHostState.showSuccessSnackbar(
-                    message = "Added ${WaterCalculator.formatWaterAmount(amount)}$beverageInfo!"
+                    message = addedMessageTemplate.format(
+                        WaterCalculator.formatWaterAmount(amount),
+                        beverageInfo
+                    )
                 )
             }.onFailure { error ->
                 snackbarHostState.showErrorSnackbar(
-                    message = "Failed to add water: ${error.message}"
+                    message = addFailedMessageTemplate.format(error.message ?: "")
                 )
             }
         }
@@ -160,11 +185,11 @@ fun HomeScreen(
             
             result.onSuccess {
                 snackbarHostState.showSuccessSnackbar(
-                    message = "Deleted ${entry.getFormattedAmount()} entry"
+                    message = deletedMessageTemplate.format(entry.getFormattedAmount())
                 )
             }.onFailure { error ->
                 snackbarHostState.showErrorSnackbar(
-                    message = "Failed to delete entry: ${error.message}"
+                    message = deleteFailedMessageTemplate.format(error.message ?: "")
                 )
             }
         }
@@ -177,11 +202,11 @@ fun HomeScreen(
 
             result.onSuccess {
                 snackbarHostState.showSuccessSnackbar(
-                    message = "Updated entry to ${newEntry.getFormattedAmount()}"
+                    message = updatedMessageTemplate.format(newEntry.getFormattedAmount())
                 )
             }.onFailure { error ->
                 snackbarHostState.showErrorSnackbar(
-                    message = "Failed to update entry: ${error.message}"
+                    message = updateFailedMessageTemplate.format(error.message ?: "")
                 )
             }
         }
@@ -204,17 +229,17 @@ fun HomeScreen(
                             when {
                                 imported > 0 -> {
                                     snackbarHostState.showSuccessSnackbar(
-                                        message = "Synced $imported entries from Health Connect"
+                                        message = syncedMessageTemplate.format(imported)
                                     )
                                 }
                                 errors > 0 -> {
                                     snackbarHostState.showErrorSnackbar(
-                                        message = "Sync completed with $errors errors"
+                                        message = syncErrorsMessageTemplate.format(errors)
                                     )
                                 }
                                 else -> {
                                     snackbarHostState.showSuccessSnackbar(
-                                        message = "Data is up to date"
+                                        message = upToDateMessage
                                     )
                                 }
                             }
@@ -225,7 +250,7 @@ fun HomeScreen(
                     // Show loading for at least 1.5 seconds even on error
                     kotlinx.coroutines.delay(1500.milliseconds)
                     snackbarHostState.showErrorSnackbar(
-                        message = "Sync failed: ${e.message}"
+                        message = syncFailedMessageTemplate.format(e.message ?: "")
                     )
                     isRefreshing = false
                 }
@@ -282,14 +307,18 @@ fun HomeScreen(
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
                     Text(
-                        text = "Daily Progress",
+                        text = stringResource(R.string.home_label_daily_progress),
                         style = MaterialTheme.typography.headlineLargeEmphasized,
                         color = MaterialTheme.colorScheme.onSurface
                     )
 
                     // Progress amount display
                     Text(
-                        text = "${todayProgress.getFormattedCurrent()} / ${todayProgress.getFormattedGoal()}",
+                        text = stringResource(
+                            R.string.progress_current_of_goal_format,
+                            todayProgress.getFormattedCurrent(),
+                            todayProgress.getFormattedGoal()
+                        ),
                         style = MaterialTheme.typography.headlineMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -322,18 +351,18 @@ fun HomeScreen(
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             StatChip(
-                                label = "Entries",
+                                label = stringResource(R.string.home_label_entries),
                                 value = "${todayStatistics.entryCount}"
                             )
                             if (todayStatistics.firstIntakeTime != null) {
                                 StatChip(
-                                    label = "First",
+                                    label = stringResource(R.string.home_label_first_intake),
                                     value = todayStatistics.firstIntakeTime!!
                                 )
                             }
                             if (todayStatistics.lastIntakeTime != null && todayStatistics.entryCount > 1) {
                                 StatChip(
-                                    label = "Latest",
+                                    label = stringResource(R.string.home_label_latest_intake),
                                     value = todayStatistics.lastIntakeTime!!
                                 )
                             }
@@ -363,7 +392,7 @@ fun HomeScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "Quick Select",
+                        text = stringResource(R.string.home_section_quick_select),
                         style = MaterialTheme.typography.titleLargeEmphasized,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
@@ -432,7 +461,7 @@ fun HomeScreen(
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             Text(
-                                text = "Recent Entries",
+                                text = stringResource(R.string.home_section_recent_entries),
                                 style = MaterialTheme.typography.titleLargeEmphasized,
                                 color = MaterialTheme.colorScheme.onSurface,
                             )
@@ -462,7 +491,7 @@ fun HomeScreen(
             }
         }
 
-    // Custom Water Entry Dialog
+    // Custom Water Entry Dialogue
     if (showCustomDialog) {
         CustomWaterDialog(
             onDismiss = { onCustomDialogChange(false) },
@@ -478,7 +507,7 @@ fun HomeScreen(
         )
     }
 
-    // Edit Water Entry Dialog
+    // Edit Water Entry Dialogue
     if (showEditDialog && entryToEdit != null) {
         EditWaterDialog(
             entry = entryToEdit!!,
@@ -504,7 +533,7 @@ fun HomeScreen(
                     containerPresetRepository.addPreset(name, volume)
                     showAddPresetSheet = false
                     snackbarHostState.showSuccessSnackbar(
-                        message = "Added \"$name\" container"
+                        message = containerAddedTemplate.format(name)
                     )
                 }
             }
@@ -525,7 +554,7 @@ fun HomeScreen(
                     showEditPresetSheet = false
                     presetToEdit = null
                     snackbarHostState.showSuccessSnackbar(
-                        message = "Updated \"$name\" container"
+                        message = containerUpdatedTemplate.format(name)
                     )
                 }
             },
@@ -536,7 +565,7 @@ fun HomeScreen(
                     showEditPresetSheet = false
                     presetToEdit = null
                     snackbarHostState.showSuccessSnackbar(
-                        message = "Deleted \"$deletedName\" container"
+                        message = containerDeletedTemplate.format(deletedName)
                     )
                 }
             }
@@ -561,7 +590,13 @@ fun CarouselWaterCard(
                 onLongClick = onLongPress
             ),
         contentAlignment = Alignment.Center,
-    ) {
+) {
+        val presetLabel = if (preset.labelResId != 0) {
+            stringResource(preset.labelResId)
+        } else {
+            preset.name
+        }
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly,
@@ -573,7 +608,7 @@ fun CarouselWaterCard(
                 preset.iconRes != null -> {
                     Icon(
                         painter = painterResource(preset.iconRes),
-                        contentDescription = preset.name,
+                        contentDescription = presetLabel,
                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.size(32.dp)
                     )
@@ -581,7 +616,7 @@ fun CarouselWaterCard(
                 preset.icon != null -> {
                     Icon(
                         imageVector = preset.icon,
-                        contentDescription = preset.name,
+                        contentDescription = presetLabel,
                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.size(32.dp)
                     )
@@ -589,7 +624,7 @@ fun CarouselWaterCard(
                 else -> {
                     Icon(
                         imageVector = Icons.Default.WaterDrop,
-                        contentDescription = preset.name,
+                        contentDescription = presetLabel,
                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.size(32.dp)
                     )
@@ -597,7 +632,7 @@ fun CarouselWaterCard(
             }
 
             Text(
-                text = preset.name,
+                text = presetLabel,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 textAlign = TextAlign.Center,
@@ -634,7 +669,7 @@ fun AddContainerCard(
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = "Add container",
+                contentDescription = stringResource(R.string.cd_add_container),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(32.dp)
             )
@@ -642,7 +677,7 @@ fun AddContainerCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Add",
+                text = stringResource(R.string.home_add_container_label),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
@@ -676,7 +711,7 @@ private fun CustomWaterDialog(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "Add Custom Amount",
+                    text = stringResource(R.string.home_dialog_add_custom_amount),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
@@ -689,10 +724,14 @@ private fun CustomWaterDialog(
                     onExpandedChange = { beverageExpanded = !beverageExpanded }
                 ) {
                     OutlinedTextField(
-                        value = selectedBeverage.displayName,
+                        value = if (selectedBeverage.hasLabelRes) {
+                            stringResource(selectedBeverage.labelResId)
+                        } else {
+                            selectedBeverage.displayName
+                        },
                         onValueChange = { },
                         readOnly = true,
-                        label = { Text("Beverage Type") },
+                        label = { Text(stringResource(R.string.home_label_beverage_type)) },
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(selectedBeverage.iconRes),
@@ -726,11 +765,18 @@ private fun CustomWaterDialog(
                                         )
                                         Column {
                                             Text(
-                                                text = beverage.displayName,
+                                                text = if (beverage.hasLabelRes) {
+                                                    stringResource(beverage.labelResId)
+                                                } else {
+                                                    beverage.displayName
+                                                },
                                                 style = MaterialTheme.typography.bodyLarge
                                             )
                                             Text(
-                                                text = "${(beverage.hydrationMultiplier * 100).toInt()}% hydration",
+                                                text = stringResource(
+                                                    R.string.home_label_hydration_percentage,
+                                                    (beverage.hydrationMultiplier * 100).toInt()
+                                                ),
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
@@ -759,19 +805,34 @@ private fun CustomWaterDialog(
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             Text(
-                                text = "Selected: ${selectedBeverage.displayName}",
+                                text = stringResource(
+                                    R.string.home_label_selected_beverage,
+                                    if (selectedBeverage.hasLabelRes) {
+                                        stringResource(selectedBeverage.labelResId)
+                                    } else {
+                                        selectedBeverage.displayName
+                                    }
+                                ),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Medium
                             )
                             selectedBeverage.description?.let { description ->
+                                val resolvedDescription = if (selectedBeverage.hasDescriptionRes) {
+                                    stringResource(selectedBeverage.descriptionResId)
+                                } else {
+                                    description
+                                }
                                 Text(
-                                    text = description,
+                                    text = resolvedDescription,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                             Text(
-                                text = "Hydration effectiveness: ${(selectedBeverage.hydrationMultiplier * 100).toInt()}%",
+                                text = stringResource(
+                                    R.string.home_label_hydration_effectiveness,
+                                    (selectedBeverage.hydrationMultiplier * 100).toInt()
+                                ),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Medium
@@ -786,11 +847,11 @@ private fun CustomWaterDialog(
                         amountText = it
                         isError = false
                     },
-                    label = { Text("Amount (ml)") },
+                    label = { Text(stringResource(R.string.home_label_amount_ml)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = isError,
                     supportingText = if (isError) {
-                        { Text("Please enter a valid amount (1-5000 ml)") }
+                        { Text(stringResource(R.string.home_error_amount_invalid)) }
                     } else null,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -800,7 +861,7 @@ private fun CustomWaterDialog(
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.action_cancel))
                     }
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -816,7 +877,7 @@ private fun CustomWaterDialog(
                             }
                         }
                     ) {
-                        Text("Add")
+                        Text(stringResource(R.string.action_add))
                     }
                 }
             }
@@ -875,7 +936,10 @@ private fun EditWaterDialog(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = if (isExternalEntry) "External Water Entry" else "Edit Water Entry",
+                    text = stringResource(
+                        if (isExternalEntry) R.string.home_dialog_external_entry_title
+                        else R.string.home_dialog_edit_entry_title
+                    ),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
@@ -900,13 +964,13 @@ private fun EditWaterDialog(
                             )
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = "Entry from another app",
+                                    text = stringResource(R.string.home_external_entry_title),
                                     style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.Medium,
                                     color = MaterialTheme.colorScheme.onErrorContainer
                                 )
                                 Text(
-                                    text = "This entry was imported from another health app and cannot be edited. You can only view its details.",
+                                    text = stringResource(R.string.home_external_entry_message),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onErrorContainer
                                 )
@@ -918,16 +982,23 @@ private fun EditWaterDialog(
                 // Container type dropdown (disabled for external entries)
                 var expanded by remember { mutableStateOf(false) }
 
+                val customContainerKey = "Custom"
+                val displayContainerType = if (containerType == customContainerKey) {
+                    stringResource(R.string.home_option_custom)
+                } else {
+                    containerType
+                }
+
                 ExposedDropdownMenuBox(
                     expanded = expanded && !isExternalEntry,
                     onExpandedChange = { if (!isExternalEntry) expanded = !expanded }
                 ) {
                     OutlinedTextField(
-                        value = containerType,
+                        value = displayContainerType,
                         onValueChange = { },
                         readOnly = true,
                         enabled = !isExternalEntry,
-                        label = { Text("Container Type") },
+                        label = { Text(stringResource(R.string.home_label_container_type)) },
                         trailingIcon = {
                             if (!isExternalEntry) {
                                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
@@ -945,7 +1016,15 @@ private fun EditWaterDialog(
                         ) {
                             presets.forEach { preset ->
                                 DropdownMenuItem(
-                                    text = { Text(preset.name) },
+                                    text = {
+                                        Text(
+                                            if (preset.labelResId != 0) {
+                                                stringResource(preset.labelResId)
+                                            } else {
+                                                preset.name
+                                            }
+                                        )
+                                    },
                                     onClick = {
                                         containerType = preset.name
                                         amountText = preset.volume.toString()
@@ -954,9 +1033,9 @@ private fun EditWaterDialog(
                                 )
                             }
                             DropdownMenuItem(
-                                text = { Text("Custom") },
+                                text = { Text(stringResource(R.string.home_option_custom)) },
                                 onClick = {
-                                    containerType = "Custom"
+                                    containerType = customContainerKey
                                     expanded = false
                                 }
                             )
@@ -973,10 +1052,14 @@ private fun EditWaterDialog(
                         onExpandedChange = { beverageExpanded = !beverageExpanded }
                     ) {
                         OutlinedTextField(
-                            value = selectedBeverage.displayName,
+                            value = if (selectedBeverage.hasLabelRes) {
+                                stringResource(selectedBeverage.labelResId)
+                            } else {
+                                selectedBeverage.displayName
+                            },
                             onValueChange = { },
                             readOnly = true,
-                            label = { Text("Beverage Type") },
+                            label = { Text(stringResource(R.string.home_label_beverage_type)) },
                             leadingIcon = {
                                 Icon(
                                     painter = painterResource(selectedBeverage.iconRes),
@@ -1010,11 +1093,18 @@ private fun EditWaterDialog(
                                             )
                                             Column {
                                                 Text(
-                                                    text = beverage.displayName,
+                                                    text = if (beverage.hasLabelRes) {
+                                                        stringResource(beverage.labelResId)
+                                                    } else {
+                                                        beverage.displayName
+                                                    },
                                                     style = MaterialTheme.typography.bodyLarge
                                                 )
                                                 Text(
-                                                    text = "${(beverage.hydrationMultiplier * 100).toInt()}% hydration",
+                                                    text = stringResource(
+                                                        R.string.home_label_hydration_percentage,
+                                                        (beverage.hydrationMultiplier * 100).toInt()
+                                                    ),
                                                     style = MaterialTheme.typography.bodySmall,
                                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                                 )
@@ -1040,7 +1130,7 @@ private fun EditWaterDialog(
                         onValueChange = { },
                         readOnly = true,
                         enabled = !isExternalEntry,
-                        label = { Text("Time") },
+                        label = { Text(stringResource(R.string.home_label_time)) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Schedule,
@@ -1070,11 +1160,11 @@ private fun EditWaterDialog(
                         }
                     },
                     enabled = !isExternalEntry,
-                    label = { Text("Amount (ml)") },
+                    label = { Text(stringResource(R.string.home_label_amount_ml)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = isError && !isExternalEntry,
                     supportingText = if (isError && !isExternalEntry) {
-                        { Text("Please enter a valid amount (1-5000 ml)") }
+                        { Text(stringResource(R.string.home_error_amount_invalid)) }
                     } else null,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -1084,7 +1174,11 @@ private fun EditWaterDialog(
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text(if (isExternalEntry) "Close" else "Cancel")
+                        Text(
+                            stringResource(
+                                if (isExternalEntry) R.string.action_close else R.string.action_cancel
+                            )
+                        )
                     }
 
                     if (!isExternalEntry) {
@@ -1117,7 +1211,7 @@ private fun EditWaterDialog(
                                 }
                             }
                         ) {
-                            Text("Update")
+                            Text(stringResource(R.string.action_save))
                         }
                     }
                 }
@@ -1125,7 +1219,7 @@ private fun EditWaterDialog(
         }
     }
 
-    // Time Picker Dialog
+    // Time Picker Dialogue
     if (showTimePicker) {
         Dialog(onDismissRequest = { showTimePicker = false }) {
             Card(
@@ -1141,7 +1235,7 @@ private fun EditWaterDialog(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = "Select Time",
+                        text = stringResource(R.string.home_dialog_select_time),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold
                     )
@@ -1156,7 +1250,7 @@ private fun EditWaterDialog(
                         horizontalArrangement = Arrangement.End
                     ) {
                         TextButton(onClick = { showTimePicker = false }) {
-                            Text("Cancel")
+                            Text(stringResource(R.string.action_cancel))
                         }
 
                         Spacer(modifier = Modifier.width(8.dp))
@@ -1169,7 +1263,7 @@ private fun EditWaterDialog(
                                 showTimePicker = false
                             }
                         ) {
-                            Text("OK")
+                            Text(stringResource(R.string.action_confirm))
                         }
                     }
                 }
@@ -1218,6 +1312,19 @@ private fun RecentEntryItem(
         ContainerPreset.getDefaultPresets()
             .firstOrNull { it.name == entry.containerType }
     }
+    val containerLabel = when {
+        preset?.labelResId != 0 && preset?.labelResId != null -> stringResource(preset.labelResId)
+        entry.containerType == "Custom" -> stringResource(R.string.home_option_custom)
+        else -> entry.containerType
+    }
+    val beverageEnum = remember(entry.beverageType) {
+        BeverageType.entries.find { it.name == entry.beverageType }
+    }
+    val beverageLabel = if (beverageEnum != null) {
+        stringResource(beverageEnum.labelResId)
+    } else {
+        entry.beverageType
+    }
 
     var showDeleteDialog by remember { mutableStateOf(false) }
     val hapticFeedback = LocalHapticFeedback.current
@@ -1234,7 +1341,7 @@ private fun RecentEntryItem(
                 // Right swipe - Edit
                 hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onEdit(entry)
-                // Reset to center after action
+                // Reset to centre after action
                 kotlinx.coroutines.delay(100.milliseconds)
                 dismissState.snapTo(SwipeToDismissBoxValue.Settled)
             }
@@ -1242,7 +1349,7 @@ private fun RecentEntryItem(
                 // Left swipe - Show delete confirmation
                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                 showDeleteDialog = true
-                // Reset to center after showing dialog
+                // Reset to centre after showing dialogue
                 kotlinx.coroutines.delay(100.milliseconds)
                 dismissState.snapTo(SwipeToDismissBoxValue.Settled)
             }
@@ -1286,12 +1393,12 @@ private fun RecentEntryItem(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
-                                contentDescription = "Edit entry",
+                                contentDescription = stringResource(R.string.cd_edit_entry),
                                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier = Modifier.size(24.dp)
                             )
                             Text(
-                                text = "Edit",
+                                text = stringResource(R.string.action_edit),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 fontWeight = FontWeight.Medium
@@ -1305,14 +1412,14 @@ private fun RecentEntryItem(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Text(
-                                text = "Delete",
+                                text = stringResource(R.string.action_delete),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onErrorContainer,
                                 fontWeight = FontWeight.Medium
                             )
                             Icon(
                                 imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete entry",
+                                contentDescription = stringResource(R.string.cd_delete_entry),
                                 tint = MaterialTheme.colorScheme.onErrorContainer,
                                 modifier = Modifier.size(24.dp)
                             )
@@ -1353,7 +1460,7 @@ private fun RecentEntryItem(
                                 preset?.iconRes != null -> {
                                     Icon(
                                         painter = painterResource(preset.iconRes),
-                                        contentDescription = preset.name,
+                                        contentDescription = containerLabel,
                                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                         modifier = Modifier.size(24.dp)
                                     )
@@ -1361,7 +1468,7 @@ private fun RecentEntryItem(
                                 preset?.icon != null -> {
                                     Icon(
                                         imageVector = preset.icon,
-                                        contentDescription = preset.name,
+                                        contentDescription = containerLabel,
                                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                         modifier = Modifier.size(24.dp)
                                     )
@@ -1369,7 +1476,7 @@ private fun RecentEntryItem(
                                 else -> {
                                     Icon(
                                         imageVector = Icons.Default.WaterDrop,
-                                        contentDescription = entry.containerType,
+                                        contentDescription = containerLabel,
                                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                         modifier = Modifier.size(24.dp)
                                     )
@@ -1380,7 +1487,7 @@ private fun RecentEntryItem(
                 },
                 headlineContent = {
                     Text(
-                        text = entry.containerType,
+                        text = containerLabel,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -1397,7 +1504,11 @@ private fun RecentEntryItem(
                         )
                         if (entry.beverageType != BeverageType.WATER.name) {
                             Text(
-                                text = "${entry.getBeverageDisplayName()} • ${entry.getFormattedEffectiveAmount()} effective",
+                                text = stringResource(
+                                    R.string.home_beverage_effective_format,
+                                    beverageLabel,
+                                    entry.getFormattedEffectiveAmount()
+                                ),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -1415,7 +1526,7 @@ private fun RecentEntryItem(
                             color = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            text = "Edit → • ← Delete",
+                            text = stringResource(R.string.home_swipe_hint),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.outline,
                             modifier = Modifier.padding(top = 2.dp)
@@ -1426,7 +1537,7 @@ private fun RecentEntryItem(
         }
     }
 
-    // Delete confirmation dialog
+    // Delete confirmation dialogue
     if (showDeleteDialog) {
         DeleteConfirmationDialog(
             entry = entry,
@@ -1447,6 +1558,16 @@ private fun DeleteConfirmationDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
+    val preset = remember(entry.containerType) {
+        ContainerPreset.getDefaultPresets()
+            .firstOrNull { it.name == entry.containerType }
+    }
+    val containerLabel = when {
+        preset?.labelResId != 0 && preset?.labelResId != null -> stringResource(preset.labelResId)
+        entry.containerType == "Custom" -> stringResource(R.string.home_option_custom)
+        else -> entry.containerType
+    }
+
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -1465,12 +1586,12 @@ private fun DeleteConfirmationDialog(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete",
+                        contentDescription = stringResource(R.string.action_delete),
                         tint = MaterialTheme.colorScheme.error,
                         modifier = Modifier.size(24.dp)
                     )
                     Text(
-                        text = "Delete Entry",
+                        text = stringResource(R.string.home_dialog_delete_title),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -1478,13 +1599,17 @@ private fun DeleteConfirmationDialog(
                 }
 
                 Text(
-                    text = "Are you sure you want to delete this ${entry.getFormattedAmount()} ${entry.containerType} entry?",
+                    text = stringResource(
+                        R.string.home_dialog_delete_message,
+                        entry.getFormattedAmount(),
+                        containerLabel
+                    ),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Text(
-                    text = "This action cannot be undone.",
+                    text = stringResource(R.string.home_dialog_delete_warning),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
@@ -1494,7 +1619,7 @@ private fun DeleteConfirmationDialog(
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.action_cancel))
                     }
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -1507,7 +1632,7 @@ private fun DeleteConfirmationDialog(
                         shapes = ButtonDefaults.shapes()
                     ) {
                         Text(
-                            text = "Delete",
+                            text = stringResource(R.string.action_delete),
                             color = MaterialTheme.colorScheme.onError
                         )
                     }
@@ -1517,13 +1642,14 @@ private fun DeleteConfirmationDialog(
     }
 }
 
+@Composable
 private fun getMotivationalMessage(progress: Float, userProfile: UserProfile, isGoalAchieved: Boolean): String {
     return when {
-        isGoalAchieved -> "🎉 Amazing! You've reached your daily goal!"
-        progress >= 0.75f -> "💪 You're doing great! Almost there!"
-        progress >= 0.5f -> "🌟 Halfway there! Keep up the good work!"
-        progress >= 0.25f -> "👍 Good start! Stay consistent!"
-        else -> userProfile.activityLevel.getHydrationTip()
+        isGoalAchieved -> stringResource(R.string.home_motivation_goal_achieved)
+        progress >= 0.75f -> stringResource(R.string.home_motivation_almost_there)
+        progress >= 0.5f -> stringResource(R.string.home_motivation_halfway)
+        progress >= 0.25f -> stringResource(R.string.home_motivation_good_start)
+        else -> stringResource(userProfile.activityLevel.hydrationTipResId)
     }
 }
 
@@ -1567,15 +1693,20 @@ private fun BeverageSelectionSection(
                         onBeverageChange(beverage)
                     },
                     label = {
+                        val labelText = if (beverage.hasLabelRes) {
+                            stringResource(beverage.labelResId)
+                        } else {
+                            beverage.displayName
+                        }
                         if (isSelected){
                             Text(
-                                text = beverage.displayName,
+                                text = labelText,
                                 style = MaterialTheme.typography.labelMediumEmphasized,
                                 textAlign = TextAlign.Center
                             )
                         } else {
                             Text(
-                                text = beverage.displayName,
+                                text = labelText,
                                 style = MaterialTheme.typography.labelMedium,
                                 textAlign = TextAlign.Center
                             )
@@ -1654,10 +1785,6 @@ private fun BeverageSelectionSection(
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "Effective Hydration: ",
-                            style = MaterialTheme.typography.titleSmall,
-                        )
                         AnimatedContent(
                             targetState = (safeSelected.hydrationMultiplier * 100).toInt(),
                             transitionSpec = {
@@ -1667,7 +1794,10 @@ private fun BeverageSelectionSection(
                             label = "hydration_percentage"
                         ) { percentage ->
                             Text(
-                                text = "$percentage%",
+                                text = stringResource(
+                                    R.string.home_label_effective_hydration,
+                                    percentage
+                                ),
                                 style = MaterialTheme.typography.titleSmall,
                             )
                         }

@@ -1,6 +1,7 @@
 package com.cemcakmak.hydrotracker.presentation.common
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.cemcakmak.hydrotracker.data.database.entities.CustomBeverageEntity
 import com.cemcakmak.hydrotracker.data.models.BeveragePreferences
 import com.cemcakmak.hydrotracker.data.models.BeverageType
@@ -8,6 +9,10 @@ import com.cemcakmak.hydrotracker.data.models.BeverageType
 /**
  * Unified beverage shown in the Home pickers — either a preset ([BeverageType]) or a
  * user-defined custom beverage. Lets the pickers list both behind one type.
+ *
+ * Preset beverages expose their [labelResId]/[descriptionResId] so callers can resolve
+ * localized strings with stringResource(). Custom beverages keep these as 0 and use
+ * [displayName]/[description] directly.
  */
 data class BeverageOption(
     val storageKey: String,   // BeverageType.name for presets; the custom's name for customs
@@ -16,12 +21,20 @@ data class BeverageOption(
     @param:DrawableRes val iconResFilled: Int,
     val hydrationMultiplier: Double,
     val description: String?,
-    val isCustom: Boolean
+    val isCustom: Boolean,
+    @param:StringRes val labelResId: Int = 0,
+    @param:StringRes val descriptionResId: Int = 0
 ) {
     val isWater: Boolean get() = storageKey == BeverageType.WATER.name
 
     /** Multiplier persisted on a logged entry: customs store theirs; presets stay enum-driven (null). */
     val storedMultiplier: Double? get() = if (isCustom) hydrationMultiplier else null
+
+    /** Whether the preset label can be resolved from string resources. */
+    val hasLabelRes: Boolean get() = labelResId != 0
+
+    /** Whether the preset description can be resolved from string resources. */
+    val hasDescriptionRes: Boolean get() = descriptionResId != 0
 }
 
 fun BeverageType.toOption(): BeverageOption = BeverageOption(
@@ -31,7 +44,9 @@ fun BeverageType.toOption(): BeverageOption = BeverageOption(
     iconResFilled = iconResFilled,
     hydrationMultiplier = hydrationMultiplier,
     description = description,
-    isCustom = false
+    isCustom = false,
+    labelResId = labelResId,
+    descriptionResId = descriptionResId
 )
 
 fun CustomBeverageEntity.toOption(): BeverageOption {

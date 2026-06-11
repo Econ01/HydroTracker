@@ -34,7 +34,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.health.HealthConnectManager
@@ -67,7 +69,7 @@ internal fun HomeTopAppBar(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "HydroTracker",
+                        text = stringResource(R.string.app_name),
                         style = MaterialTheme.typography.headlineLargeEmphasized,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
@@ -131,14 +133,14 @@ internal fun HealthConnectSyncIcon(
                 if (syncing) {
                     Icon(
                         imageVector = Icons.Outlined.Cloud,
-                        contentDescription = "Health Connect syncing",
+                        contentDescription = stringResource(R.string.cd_health_connect_syncing),
                         modifier = Modifier.fillMaxSize(),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 } else {
                     Icon(
                         imageVector = Icons.Rounded.Cloud,
-                        contentDescription = "Health Connect synced",
+                        contentDescription = stringResource(R.string.cd_health_connect_synced),
                         modifier = Modifier.fillMaxSize(),
                         tint = MaterialTheme.colorScheme.onSurface
                     )
@@ -150,7 +152,7 @@ internal fun HealthConnectSyncIcon(
             HealthConnectSyncManager.SyncStatus.NO_PERMISSIONS -> {
                 Icon(
                     imageVector = Icons.Default.CloudOff,
-                    contentDescription = "Health Connect not available",
+                    contentDescription = stringResource(R.string.cd_health_connect_unavailable),
                     modifier = Modifier.fillMaxSize(),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -158,7 +160,7 @@ internal fun HealthConnectSyncIcon(
             HealthConnectSyncManager.SyncStatus.ERROR -> {
                 Icon(
                     imageVector = Icons.Default.ErrorOutline,
-                    contentDescription = "Health Connect error",
+                    contentDescription = stringResource(R.string.cd_health_connect_error),
                     modifier = Modifier.fillMaxSize(),
                     tint = MaterialTheme.colorScheme.error
                 )

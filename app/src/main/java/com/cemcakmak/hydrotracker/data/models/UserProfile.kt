@@ -21,8 +21,8 @@ data class UserProfile(
     val dailyWaterGoal: Double, // calculated target in milliliters
     val reminderInterval: Int, // reminder frequency in minutes
     val isOnboardingCompleted: Boolean = false,
-    val preferredThemeColor: String? = null, // For custom color themes
-    val useSystemTheme: Boolean = true, // Material 3 dynamic color
+    val preferredThemeColor: String? = null, // For custom colour themes
+    val useSystemTheme: Boolean = true, // Material 3 dynamic colour
     val reminderStyle: ReminderStyle = ReminderStyle.GENTLE,
     val hydrationStandard: HydrationStandard = HydrationStandard.EFSA, // Default to EFSA
     val healthConnectSyncEnabled: Boolean = false, // Health Connect data sync setting
@@ -122,16 +122,7 @@ enum class ActivityLevel(
         }
     }
 
-    // Activity-specific encouragement
-    fun getHydrationTip(): String {
-        return when (this) {
-            SEDENTARY -> "Even at rest, your body needs consistent hydration!"
-            LIGHT -> "Light activity still means you need extra hydration support!"
-            MODERATE -> "Regular exercise requires regular hydration - you're doing great!"
-            ACTIVE -> "Your active lifestyle deserves premium hydration care!"
-            VERY_ACTIVE -> "High performance demands high hydration - you're a champion!"
-        }
-    }
+    // Activity-specific encouragement (resolve hydrationTipResId with stringResource() in UI).
 }
 
 // Compassionate reminder styles

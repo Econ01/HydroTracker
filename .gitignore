@@ -80,9 +80,6 @@ lint/tmp/
 Thumbs.db
 ehthumbs.db
 
-# Logs
-*.log
-
 # Coverage directory
 coverage/
 
@@ -112,3 +109,6 @@ AGENTS.md
 # Research papers and documentation
 Hydration Effects of Common Beverages in Healthy Adults.pdf
 F-DROID-UPDATES.md
+
+# Crowdin configuration
+crowdin.yml

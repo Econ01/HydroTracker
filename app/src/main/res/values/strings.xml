@@ -640,4 +640,82 @@
     <string name="hc_beverage_detail_eff">%1$s • %2$dml raw → %3$dml effective</string>
     <string name="hc_note_label">Note: %1$s</string>
 
+    <!-- ============================================================================
+         Home
+         ============================================================================ -->
+    <!-- Snackbars -->
+    <string name="home_snackbar_added">Added %1$s%2$s</string>
+    <string name="home_snackbar_add_failed">Failed to add water: %1$s</string>
+    <string name="home_snackbar_deleted">Deleted %1$s entry</string>
+    <string name="home_snackbar_delete_failed">Failed to delete entry: %1$s</string>
+    <string name="home_snackbar_updated">Updated entry to %1$s</string>
+    <string name="home_snackbar_update_failed">Failed to update entry: %1$s</string>
+    <string name="home_snackbar_synced">Synced %1$d entries from Health Connect</string>
+    <string name="home_snackbar_sync_errors">Sync completed with %1$d errors</string>
+    <string name="home_snackbar_up_to_date">Data is up to date</string>
+    <string name="home_snackbar_sync_failed">Sync failed: %1$s</string>
+    <string name="home_snackbar_container_added">Added "%1$s" container</string>
+    <string name="home_snackbar_container_updated">Updated "%1$s" container</string>
+    <string name="home_snackbar_container_deleted">Deleted "%1$s" container</string>
+
+    <!-- Dialog labels -->
+    <string name="home_label_beverage_type">Beverage Type</string>
+    <string name="home_label_amount_ml">Amount (ml)</string>
+    <string name="home_label_container_type">Container Type</string>
+    <string name="home_label_time">Time</string>
+    <string name="home_error_amount_invalid">Please enter a valid amount (1–5000 ml)</string>
+    <string name="home_label_selected_beverage">Selected: %1$s</string>
+    <string name="home_label_hydration_effectiveness">Hydration effectiveness: %1$d%%</string>
+    <string name="home_label_effective_hydration">Effective Hydration: %1$d%%</string>
+    <string name="home_option_custom">Custom</string>
+    <string name="home_beverage_effective_format">%1$s • %2$s effective</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_add_container">Add container</string>
+    <string name="cd_health_connect_syncing">Health Connect syncing</string>
+    <string name="cd_health_connect_synced">Health Connect synced</string>
+    <string name="cd_health_connect_unavailable">Health Connect not available</string>
+    <string name="cd_health_connect_error">Health Connect error</string>
+
+    <!-- Stats labels -->
+    <string name="home_label_daily_progress">Daily Progress</string>
+    <string name="home_label_entries">Entries</string>
+    <string name="home_label_first_intake">First</string>
+    <string name="home_label_latest_intake">Latest</string>
+    <string name="home_section_recent_entries">Recent Entries</string>
+    <string name="home_section_quick_select">Quick Select</string>
+
+    <!-- Dialog titles -->
+    <string name="home_dialog_add_custom_amount">Add Custom Amount</string>
+    <string name="home_dialog_edit_entry_title">Edit Water Entry</string>
+    <string name="home_dialog_external_entry_title">External Water Entry</string>
+    <string name="home_dialog_select_time">Select Time</string>
+    <string name="home_dialog_delete_title">Delete Entry</string>
+    <string name="home_dialog_delete_message">Are you sure you want to delete this %1$s %2$s entry?</string>
+    <string name="home_dialog_delete_warning">This action cannot be undone.</string>
+    <string name="home_external_entry_title">Entry from another app</string>
+    <string name="home_external_entry_message">This entry was imported from another health app and cannot be edited. You can only view its details.</string>
+
+    <!-- Add Container Card -->
+    <string name="home_add_container_label">Add</string>
+    <string name="home_swipe_hint">Edit → • ← Delete</string>
+
+    <!-- Container preset names (stable English key kept for storage; these are display strings) -->
+    <string name="container_coffee_cup">Coffee Cup</string>
+    <string name="container_tea_cup">Tea Cup</string>
+    <string name="container_small_cup">Small Cup</string>
+    <string name="container_medium_glass">Medium Glass</string>
+    <string name="container_large_glass">Large Glass</string>
+    <string name="container_water_bottle">Water Bottle</string>
+    <string name="container_large_bottle">Large Bottle</string>
+
+    <!-- Hydration percentage label, e.g. "80% hydration" -->
+    <string name="home_label_hydration_percentage">%1$d%% hydration</string>
+
+    <!-- Motivational messages -->
+    <string name="home_motivation_goal_achieved">🎉 Amazing! You\'ve reached your daily goal!</string>
+    <string name="home_motivation_almost_there">💪 You\'re doing great! Almost there!</string>
+    <string name="home_motivation_halfway">🌟 Halfway there! Keep up the good work!</string>
+    <string name="home_motivation_good_start">👍 Good start! Stay consistent!</string>
+
 </resources>
