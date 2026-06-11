@@ -803,4 +803,69 @@
     <!-- Generic OK button for time pickers and similar dialogs -->
     <string name="action_ok">OK</string>
 
+    <!-- ============================================================================
+         History &amp; Analytics
+         ============================================================================ -->
+    <string name="history_period_weekly">Weekly</string>
+    <string name="history_period_monthly">Monthly</string>
+    <string name="history_period_yearly">Yearly</string>
+
+    <!-- %1$s = period name, e.g. "Weekly" -->
+    <string name="cd_previous_period">Previous %1$s</string>
+    <string name="cd_next_period">Next %1$s</string>
+
+    <string name="history_this_week">This Week</string>
+    <string name="history_last_week">Last Week</string>
+    <string name="history_this_month">This Month</string>
+    <string name="history_last_month">Last Month</string>
+    <string name="history_this_year">This Year</string>
+    <string name="history_last_year">Last Year</string>
+
+    <string name="history_weekly_overview">Weekly Overview</string>
+    <string name="history_monthly_overview">Monthly Overview</string>
+    <string name="history_yearly_overview">Yearly Overview</string>
+
+    <string name="history_stat_total">Total</string>
+    <string name="history_stat_average">Average</string>
+    <string name="history_stat_best_day">Best Day</string>
+    <string name="history_stat_days_tracked">Days Tracked</string>
+    <string name="history_stat_goals_met">Goals Met</string>
+    <string name="history_stat_success_rate">Success Rate</string>
+    <string name="history_stat_total_intake">Total Intake</string>
+    <string name="history_stat_current_streak">Current Streak</string>
+    <string name="history_stat_daily_average">Daily Average</string>
+
+    <plurals name="history_streak_days">
+        <item quantity="one">day</item>
+        <item quantity="other">days</item>
+    </plurals>
+    <string name="unit_liters">liters</string>
+
+    <string name="history_section_statistics">Statistics</string>
+    <string name="history_section_goal_achievement">Goal Achievement</string>
+    <string name="history_goal_achievement_subtitle">of days you met your goal</string>
+    <string name="history_empty_goal_achievement">Start tracking your water intake to see your goal achievement rate!</string>
+    <string name="history_empty_week">No data available for this week</string>
+    <string name="history_empty_month">No data available for the last 30 days</string>
+    <string name="history_empty_year">No data available for this year</string>
+    <string name="history_empty_generic">No data available</string>
+
+    <string name="history_legend_less">Less</string>
+    <string name="history_legend_more">More</string>
+
+    <string name="history_detail_water_intake">Water Intake</string>
+    <!-- %1$s = formatted goal amount -->
+    <string name="history_detail_goal">Goal: %1$s</string>
+    <!-- %1$d = percentage -->
+    <string name="history_detail_progress">Progress: %1$d%%</string>
+
+    <!-- Short weekday names for the monthly calendar header -->
+    <string name="weekday_short_sun">Sun</string>
+    <string name="weekday_short_mon">Mon</string>
+    <string name="weekday_short_tue">Tue</string>
+    <string name="weekday_short_wed">Wed</string>
+    <string name="weekday_short_thu">Thu</string>
+    <string name="weekday_short_fri">Fri</string>
+    <string name="weekday_short_sat">Sat</string>
+
 </resources>

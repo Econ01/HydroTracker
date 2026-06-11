@@ -26,9 +26,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.annotation.StringRes
+import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
 import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
@@ -149,10 +153,10 @@ fun HistoryScreen(
         }
 }
 
-enum class TimePeriod(val displayName: String, val description: String) {
-    WEEKLY("Weekly", "Week view"),
-    MONTHLY("Monthly", "Month view"),
-    YEARLY("Yearly", "Year view")
+enum class TimePeriod(@param:StringRes val displayNameResId: Int) {
+    WEEKLY(R.string.history_period_weekly),
+    MONTHLY(R.string.history_period_monthly),
+    YEARLY(R.string.history_period_yearly)
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -199,7 +203,7 @@ private fun PeriodSelector(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = period.displayName,
+                                text = stringResource(period.displayNameResId),
                                 style = MaterialTheme.typography.labelLargeEmphasized
                             )
                         }
@@ -230,7 +234,10 @@ private fun PeriodSelector(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Previous ${selectedPeriod.displayName.lowercase()}"
+                        contentDescription = stringResource(
+                            R.string.cd_previous_period,
+                            stringResource(selectedPeriod.displayNameResId)
+                        )
                     )
                 }
                 
@@ -260,7 +267,10 @@ private fun PeriodSelector(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = "Next ${selectedPeriod.displayName.lowercase()}"
+                        contentDescription = stringResource(
+                            R.string.cd_next_period,
+                            stringResource(selectedPeriod.displayNameResId)
+                        )
                     )
                 }
             }
@@ -360,15 +370,15 @@ private fun WeeklyChartSection(
                     val bestAmount = filteredDailyTotals.maxOfOrNull { it.totalAmount } ?: 0.0
                     
                     WeeklyStatItem(
-                        label = "Total",
+                        label = stringResource(R.string.history_stat_total),
                         value = WaterCalculator.formatWaterAmount(totalAmount)
                     )
                     WeeklyStatItem(
-                        label = "Average",
+                        label = stringResource(R.string.history_stat_average),
                         value = WaterCalculator.formatWaterAmount(avgAmount)
                     )
                     WeeklyStatItem(
-                        label = "Best Day",
+                        label = stringResource(R.string.history_stat_best_day),
                         value = WaterCalculator.formatWaterAmount(bestAmount)
                     )
                 }
@@ -380,7 +390,7 @@ private fun WeeklyChartSection(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No data available for this week",
+                        text = stringResource(R.string.history_empty_week),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
@@ -404,7 +414,7 @@ private fun WeeklyBarChart(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "No data available",
+                text = stringResource(R.string.history_empty_generic),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -540,16 +550,19 @@ private fun YearlyChartSection(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     WeeklyStatItem(
-                        label = "Days Tracked",
+                        label = stringResource(R.string.history_stat_days_tracked),
                         value = "$totalDays"
                     )
                     WeeklyStatItem(
-                        label = "Goals Met",
+                        label = stringResource(R.string.history_stat_goals_met),
                         value = "$goalAchievedDays"
                     )
                     WeeklyStatItem(
-                        label = "Total Intake",
-                        value = "${(totalIntake / 1000).toInt()}L"
+                        label = stringResource(R.string.history_stat_total_intake),
+                        value = stringResource(
+                            R.string.unit_liters_format,
+                            (totalIntake / 1000).toInt().toString()
+                        )
                     )
                 }
             } else {
@@ -560,7 +573,7 @@ private fun YearlyChartSection(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No data available for this year",
+                        text = stringResource(R.string.history_empty_year),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
@@ -642,7 +655,7 @@ private fun YearlyHeatmap(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Less",
+                text = stringResource(R.string.history_legend_less),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -659,7 +672,7 @@ private fun YearlyHeatmap(
                 }
             }
             Text(
-                text = "More",
+                text = stringResource(R.string.history_legend_more),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -740,16 +753,19 @@ private fun MonthlyChartSection(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     WeeklyStatItem(
-                        label = "Days Tracked",
+                        label = stringResource(R.string.history_stat_days_tracked),
                         value = "$totalDays"
                     )
                     WeeklyStatItem(
-                        label = "Goals Met",
+                        label = stringResource(R.string.history_stat_goals_met),
                         value = "$goalAchievedDays"
                     )
                     WeeklyStatItem(
-                        label = "Success Rate",
-                        value = "${((goalAchievedDays.toFloat() / totalDays) * 100).toInt()}%"
+                        label = stringResource(R.string.history_stat_success_rate),
+                        value = stringResource(
+                            R.string.percent_format,
+                            ((goalAchievedDays.toFloat() / totalDays) * 100).toInt()
+                        )
                     )
                 }
             } else {
@@ -760,7 +776,7 @@ private fun MonthlyChartSection(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No data available for the last 30 days",
+                        text = stringResource(R.string.history_empty_month),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
@@ -809,7 +825,7 @@ private fun MonthlyHeatmap(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Less",
+                text = stringResource(R.string.history_legend_less),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -826,7 +842,7 @@ private fun MonthlyHeatmap(
                 }
             }
             Text(
-                text = "More",
+                text = stringResource(R.string.history_legend_more),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -875,14 +891,30 @@ private fun MonthlyCalendarGrid(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             val dayHeaders = if (weekStartDay == WeekStartDay.SUNDAY) {
-                listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
+                listOf(
+                    R.string.weekday_short_sun,
+                    R.string.weekday_short_mon,
+                    R.string.weekday_short_tue,
+                    R.string.weekday_short_wed,
+                    R.string.weekday_short_thu,
+                    R.string.weekday_short_fri,
+                    R.string.weekday_short_sat
+                )
             } else {
-                listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+                listOf(
+                    R.string.weekday_short_mon,
+                    R.string.weekday_short_tue,
+                    R.string.weekday_short_wed,
+                    R.string.weekday_short_thu,
+                    R.string.weekday_short_fri,
+                    R.string.weekday_short_sat,
+                    R.string.weekday_short_sun
+                )
             }
-            
-            dayHeaders.forEach { dayName ->
+
+            dayHeaders.forEach { dayNameResId ->
                 Text(
-                    text = dayName,
+                    text = stringResource(dayNameResId),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f),
@@ -957,7 +989,7 @@ private fun StatisticsGrid(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = "Statistics",
+            text = stringResource(R.string.history_section_statistics),
             style = MaterialTheme.typography.titleLargeEmphasized
         )
 
@@ -981,16 +1013,20 @@ private fun StatisticsGrid(
                 StatCard(
                     modifier = Modifier.weight(1f),
                     icon = Icons.Default.LocalFireDepartment,
-                    title = "Current Streak",
+                    title = stringResource(R.string.history_stat_current_streak),
                     value = currentStreak.toString(),
-                    subtitle = "days",
+                    subtitle = pluralStringResource(
+                        R.plurals.history_streak_days,
+                        currentStreak,
+                        currentStreak
+                    ),
                     color = MaterialTheme.colorScheme.error,
                 )
 
                 StatCard(
                     modifier = Modifier.weight(1f),
                     icon = Icons.Default.Stars,
-                    title = "Daily Average",
+                    title = stringResource(R.string.history_stat_daily_average),
                     value = WaterCalculator.formatWaterAmount(dailyAverage).split(" ")[0],
                     subtitle = WaterCalculator.formatWaterAmount(dailyAverage).split(" ")[1],
                     color = MaterialTheme.colorScheme.secondary
@@ -999,9 +1035,9 @@ private fun StatisticsGrid(
                 StatCard(
                     modifier = Modifier.weight(1f),
                     icon = Icons.Default.WaterDrop,
-                    title = "Total Intake",
+                    title = stringResource(R.string.history_stat_total_intake),
                     value = "${(totalIntake / 1000).toInt()}",
-                    subtitle = "liters",
+                    subtitle = stringResource(R.string.unit_liters),
                     color = MaterialTheme.colorScheme.tertiary,
                 )
             }
@@ -1093,7 +1129,7 @@ private fun GoalAchievementSection(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Goal Achievement",
+                text = stringResource(R.string.history_section_goal_achievement),
                 style = MaterialTheme.typography.titleLargeEmphasized,
             )
 
@@ -1108,14 +1144,17 @@ private fun GoalAchievementSection(
                 ) {
                     // Large achievement percentage
                     Text(
-                        text = "${(achievementRate * 100).toInt()}%",
+                        text = stringResource(
+                            R.string.percent_format,
+                            (achievementRate * 100).toInt()
+                        ),
                         style = MaterialTheme.typography.displayMedium,
                         fontWeight = FontWeight.ExtraBold,
                         color = MaterialTheme.colorScheme.primary
                     )
 
                     Text(
-                        text = "of days you met your goal",
+                        text = stringResource(R.string.history_goal_achievement_subtitle),
                         style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.colorScheme.onSurface
@@ -1136,7 +1175,7 @@ private fun GoalAchievementSection(
                 }
             } else {
                 Text(
-                    text = "Start tracking your water intake to see your goal achievement rate!",
+                    text = stringResource(R.string.history_empty_goal_achievement),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSecondaryContainer
@@ -1213,7 +1252,7 @@ private fun InlineDetailPanel(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Close",
+                            contentDescription = stringResource(R.string.action_close),
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -1230,7 +1269,7 @@ private fun InlineDetailPanel(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Water Intake",
+                            text = stringResource(R.string.history_detail_water_intake),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -1252,12 +1291,18 @@ private fun InlineDetailPanel(
                             ) {
                                 Column {
                                     Text(
-                                        text = "Goal: ${WaterCalculator.formatWaterAmount(goal)}",
+                                        text = stringResource(
+                                            R.string.history_detail_goal,
+                                            WaterCalculator.formatWaterAmount(goal)
+                                        ),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer
                                     )
                                     Text(
-                                        text = "Progress: ${(percentage * 100).toInt()}%",
+                                        text = stringResource(
+                                            R.string.history_detail_progress,
+                                            (percentage * 100).toInt()
+                                        ),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer
                                     )
@@ -1294,49 +1339,51 @@ private fun formatDisplayDate(dateString: String): String {
 
 
 
+@Composable
 private fun getCurrentPeriodText(
-    period: TimePeriod, 
-    weekOffset: Int, 
-    monthOffset: Int, 
+    period: TimePeriod,
+    weekOffset: Int,
+    monthOffset: Int,
     yearOffset: Int,
     weekStartDay: WeekStartDay = WeekStartDay.MONDAY
 ): String {
     return when (period) {
         TimePeriod.WEEKLY -> {
             val (startOfWeek, endOfWeek) = getWeekDateRange(weekOffset, weekStartDay)
-            
+
             when (weekOffset) {
-                0 -> "This Week"
-                -1 -> "Last Week"
-                else -> "${startOfWeek.format(DateTimeFormatter.ofPattern("MMM d"))} - ${endOfWeek.format(DateTimeFormatter.ofPattern("MMM d"))}"
+                0 -> stringResource(R.string.history_this_week)
+                -1 -> stringResource(R.string.history_last_week)
+                else -> "${startOfWeek.format(DateTimeFormatter.ofPattern("MMM d", Locale.getDefault()))} - ${endOfWeek.format(DateTimeFormatter.ofPattern("MMM d", Locale.getDefault()))}"
             }
         }
         TimePeriod.MONTHLY -> {
             val today = LocalDate.now()
             val targetMonth = today.plusMonths(monthOffset.toLong())
             when (monthOffset) {
-                0 -> "This Month"
-                -1 -> "Last Month"
-                else -> targetMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy"))
+                0 -> stringResource(R.string.history_this_month)
+                -1 -> stringResource(R.string.history_last_month)
+                else -> targetMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault()))
             }
         }
         TimePeriod.YEARLY -> {
             val today = LocalDate.now()
             val targetYear = today.plusYears(yearOffset.toLong())
             when (yearOffset) {
-                0 -> "This Year"
-                -1 -> "Last Year"
-                else -> targetYear.format(DateTimeFormatter.ofPattern("yyyy"))
+                0 -> stringResource(R.string.history_this_year)
+                -1 -> stringResource(R.string.history_last_year)
+                else -> targetYear.format(DateTimeFormatter.ofPattern("yyyy", Locale.getDefault()))
             }
         }
     }
 }
 
+@Composable
 private fun getPeriodTitle(period: TimePeriod): String {
     return when (period) {
-        TimePeriod.WEEKLY -> "Weekly Overview"
-        TimePeriod.MONTHLY -> "Monthly Overview"
-        TimePeriod.YEARLY -> "Yearly Overview"
+        TimePeriod.WEEKLY -> stringResource(R.string.history_weekly_overview)
+        TimePeriod.MONTHLY -> stringResource(R.string.history_monthly_overview)
+        TimePeriod.YEARLY -> stringResource(R.string.history_yearly_overview)
     }
 }
 
