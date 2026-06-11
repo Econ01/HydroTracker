@@ -117,7 +117,7 @@ class HydroLargeWidget : AppWidgetProvider() {
                 
                 // Update last updated time
                 val timeFormat = android.text.format.DateFormat.getTimeFormat(context)
-                val lastUpdated = "Updated ${timeFormat.format(Date())}"
+                val lastUpdated = context.getString(R.string.widget_updated_at, timeFormat.format(Date()))
                 views.setTextViewText(R.id.widget_last_updated, lastUpdated)
                 
                 // Set progress bar
@@ -158,6 +158,24 @@ class HydroLargeWidget : AppWidgetProvider() {
     }
     
     private fun setupQuickAddButtons(context: Context, views: RemoteViews) {
+        // Set quick-add button labels from unit-format strings
+        views.setTextViewText(
+            R.id.widget_btn_250_text,
+            context.getString(R.string.unit_milliliters_format, "250")
+        )
+        views.setTextViewText(
+            R.id.widget_btn_300_text,
+            context.getString(R.string.unit_milliliters_format, "300")
+        )
+        views.setTextViewText(
+            R.id.widget_btn_500_text,
+            context.getString(R.string.unit_milliliters_format, "500")
+        )
+        views.setTextViewText(
+            R.id.widget_btn_1l_text,
+            context.getString(R.string.unit_liters_format, "1")
+        )
+
         // 250ml button
         val btn250Intent = Intent(context, HydroLargeWidget::class.java).apply {
             action = ACTION_QUICK_ADD
@@ -214,9 +232,12 @@ class HydroLargeWidget : AppWidgetProvider() {
     ) {
         val views = RemoteViews(context.packageName, R.layout.widget_hydro_large)
         
-        views.setTextViewText(R.id.widget_progress_text, "0ml / 2700ml")
+        views.setTextViewText(
+            R.id.widget_progress_text,
+            "${WaterCalculator.formatWaterAmount(0.0)} / ${WaterCalculator.formatWaterAmount(2700.0)}"
+        )
         views.setTextViewText(R.id.widget_progress_percent, "0%")
-        views.setTextViewText(R.id.widget_last_updated, "Tap to open HydroTracker")
+        views.setTextViewText(R.id.widget_last_updated, context.getString(R.string.widget_tap_to_open))
         views.setProgressBar(R.id.widget_progress_bar, 100, 0, false)
         
         val intent = Intent(context, MainActivity::class.java)

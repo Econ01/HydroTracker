@@ -79,7 +79,7 @@ class HydroProgressWidget : AppWidgetProvider() {
 
                 // Update last updated time
                 val timeFormat = android.text.format.DateFormat.getTimeFormat(context)
-                val lastUpdated = "Updated ${timeFormat.format(Date())}"
+                val lastUpdated = context.getString(R.string.widget_updated_at, timeFormat.format(Date()))
                 views.setTextViewText(R.id.widget_last_updated, lastUpdated)
 
                 // Set progress bar
@@ -120,9 +120,12 @@ class HydroProgressWidget : AppWidgetProvider() {
         val views = RemoteViews(context.packageName, R.layout.widget_hydro_progress)
         
         // Set default values
-        views.setTextViewText(R.id.widget_progress_text, "0ml / 2700ml")
+        views.setTextViewText(
+            R.id.widget_progress_text,
+            "${WaterCalculator.formatWaterAmount(0.0)} / ${WaterCalculator.formatWaterAmount(2700.0)}"
+        )
         views.setTextViewText(R.id.widget_progress_percent, "0%")
-        views.setTextViewText(R.id.widget_last_updated, "Tap to open HydroTracker")
+        views.setTextViewText(R.id.widget_last_updated, context.getString(R.string.widget_tap_to_open))
         views.setProgressBar(R.id.widget_progress_bar, 100, 0, false)
         
         // Set click intent

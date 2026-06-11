@@ -26,7 +26,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="HydroTracker"
+                android:text="@string/app_name"
                 android:textSize="16sp"
                 android:fontFamily="sans-serif-medium"
                 android:maxLines="1"
@@ -37,7 +37,7 @@
                 android:id="@+id/widget_progress_percent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0%"
+                android:text="@string/widget_loading"
                 android:textSize="22sp"
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-medium" />
@@ -57,7 +57,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="0ml / 2,700ml"
+                android:text="@string/widget_loading"
                 android:textSize="14sp"
                 android:fontFamily="sans-serif" />
 
@@ -66,7 +66,7 @@
                 android:id="@+id/widget_last_updated"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Updated 15:35"
+                android:text="@string/widget_tap_to_open"
                 android:textSize="12sp"
                 android:fontFamily="sans-serif"
                 android:alpha="0.7"
