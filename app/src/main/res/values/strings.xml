@@ -93,7 +93,6 @@
          ============================================================================ -->
     <string name="screen_display_locale_title">Display &amp; Locale</string>
     <string name="display_language_header">Language</string>
-    <string name="display_language_description">Choose the language for HydroTracker. \"System default\" follows your device language.</string>
     <string name="display_week_start_header">Week start</string>
     <!-- Language option that follows the device language instead of a fixed one -->
     <string name="language_system_default">System default</string>
@@ -478,8 +477,20 @@
     <!-- Week start day -->
     <string name="weekday_sunday">Sunday</string>
     <string name="weekday_monday">Monday</string>
+    <string name="weekday_tuesday">Tuesday</string>
+    <string name="weekday_wednesday">Wednesday</string>
+    <string name="weekday_thursday">Thursday</string>
+    <string name="weekday_friday">Friday</string>
+    <string name="weekday_saturday">Saturday</string>
+    <string name="week_start_system">System</string>
+    <string name="week_start_system_desc">Follows your device locale</string>
     <string name="week_start_sunday_desc">Week starts on Sunday</string>
     <string name="week_start_monday_desc">Week starts on Monday</string>
+    <string name="week_start_tuesday_desc">Week starts on Tuesday</string>
+    <string name="week_start_wednesday_desc">Week starts on Wednesday</string>
+    <string name="week_start_thursday_desc">Week starts on Thursday</string>
+    <string name="week_start_friday_desc">Week starts on Friday</string>
+    <string name="week_start_saturday_desc">Week starts on Saturday</string>
 
     <!-- App font (proper-noun font names are not translated) -->
     <string name="font_google_sans_flex" translatable="false">Google Sans Flex</string>

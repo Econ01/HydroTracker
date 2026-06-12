@@ -3,6 +3,8 @@ package com.cemcakmak.hydrotracker.data.models
 import androidx.annotation.StringRes
 import com.cemcakmak.hydrotracker.R
 import java.time.DayOfWeek
+import java.util.Calendar
+import java.util.Locale
 import kotlinx.serialization.Serializable
 
 /**
@@ -14,7 +16,7 @@ data class ThemePreferences(
     val useDynamicColor: Boolean = true, // Default to dynamic colors
     val darkMode: DarkModePreference = DarkModePreference.SYSTEM,
     val colorSource: ColorSource = ColorSource.DYNAMIC_COLOR,
-    val weekStartDay: WeekStartDay = WeekStartDay.MONDAY,
+    val weekStartDay: WeekStartDay = WeekStartDay.SYSTEM,
     val usePureBlack: Boolean = false, // Pure black backgrounds in dark mode
     val appFont: AppFont = AppFont.GOOGLE_SANS_FLEX, // App-wide typeface
     val autoHideNavBar: Boolean = false, // Hide the bottom nav bar when scrolling down
@@ -80,17 +82,53 @@ enum class ColorSource(
 @Serializable
 enum class WeekStartDay(
     val displayName: String,
-    val dayOfWeek: DayOfWeek,
+    val dayOfWeek: DayOfWeek?,
     @param:StringRes val labelResId: Int,
     @param:StringRes val descriptionResId: Int
 ) {
+    SYSTEM("System", null, R.string.week_start_system, R.string.week_start_system_desc),
     SUNDAY("Sunday", DayOfWeek.SUNDAY, R.string.weekday_sunday, R.string.week_start_sunday_desc),
-    MONDAY("Monday", DayOfWeek.MONDAY, R.string.weekday_monday, R.string.week_start_monday_desc);
+    MONDAY("Monday", DayOfWeek.MONDAY, R.string.weekday_monday, R.string.week_start_monday_desc),
+    TUESDAY("Tuesday", DayOfWeek.TUESDAY, R.string.weekday_tuesday, R.string.week_start_tuesday_desc),
+    WEDNESDAY("Wednesday", DayOfWeek.WEDNESDAY, R.string.weekday_wednesday, R.string.week_start_wednesday_desc),
+    THURSDAY("Thursday", DayOfWeek.THURSDAY, R.string.weekday_thursday, R.string.week_start_thursday_desc),
+    FRIDAY("Friday", DayOfWeek.FRIDAY, R.string.weekday_friday, R.string.week_start_friday_desc),
+    SATURDAY("Saturday", DayOfWeek.SATURDAY, R.string.weekday_saturday, R.string.week_start_saturday_desc);
+
+    /**
+     * Returns the concrete first day of the week.
+     * For [SYSTEM], this is derived from the provided [locale] using the device's calendar data.
+     */
+    fun resolve(locale: Locale = Locale.getDefault()): DayOfWeek {
+        return dayOfWeek ?: Calendar.getInstance(locale).firstDayOfWeek.toDayOfWeek()
+    }
 
     fun getDescription(): String {
         return when (this) {
+            SYSTEM -> "Follows your device locale"
             SUNDAY -> "Week starts on Sunday"
             MONDAY -> "Week starts on Monday"
+            TUESDAY -> "Week starts on Tuesday"
+            WEDNESDAY -> "Week starts on Wednesday"
+            THURSDAY -> "Week starts on Thursday"
+            FRIDAY -> "Week starts on Friday"
+            SATURDAY -> "Week starts on Saturday"
+        }
+    }
+
+    companion object {
+        /** Maps a [Calendar] weekday constant to the Java 8 [DayOfWeek]. */
+        private fun Int.toDayOfWeek(): DayOfWeek {
+            return when (this) {
+                Calendar.SUNDAY -> DayOfWeek.SUNDAY
+                Calendar.MONDAY -> DayOfWeek.MONDAY
+                Calendar.TUESDAY -> DayOfWeek.TUESDAY
+                Calendar.WEDNESDAY -> DayOfWeek.WEDNESDAY
+                Calendar.THURSDAY -> DayOfWeek.THURSDAY
+                Calendar.FRIDAY -> DayOfWeek.FRIDAY
+                Calendar.SATURDAY -> DayOfWeek.SATURDAY
+                else -> DayOfWeek.MONDAY
+            }
         }
     }
 }

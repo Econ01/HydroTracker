@@ -101,7 +101,7 @@ internal fun mapLegacyPrefs(prefs: SharedPreferences, current: AppPreferences): 
         useDynamicColor = prefs.getBoolean("use_dynamic_color", true),
         darkMode = prefs.getString("dark_mode", null).toEnumOrDefault(DarkModePreference.SYSTEM),
         colorSource = prefs.getString("color_source", null).toEnumOrDefault(ColorSource.DYNAMIC_COLOR),
-        weekStartDay = prefs.getString("week_start_day", null).toEnumOrDefault(WeekStartDay.MONDAY),
+        weekStartDay = prefs.getString("week_start_day", null).toEnumOrDefault(WeekStartDay.SYSTEM),
         usePureBlack = prefs.getBoolean("use_pure_black", false),
         appFont = prefs.getString("app_font", null).toEnumOrDefault(AppFont.GOOGLE_SANS_FLEX),
         autoHideNavBar = prefs.getBoolean("auto_hide_nav_bar", false),

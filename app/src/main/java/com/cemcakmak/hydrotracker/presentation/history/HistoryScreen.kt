@@ -283,7 +283,7 @@ private fun WeeklyChartSection(
     selectedPeriod: TimePeriod,
     weekOffset: Int,
     summaries: List<DailySummary> = emptyList(),
-    weekStartDay: WeekStartDay = WeekStartDay.MONDAY
+    weekStartDay: WeekStartDay = WeekStartDay.SYSTEM
 ) {
     var selectedDayData by remember { mutableStateOf<com.cemcakmak.hydrotracker.data.database.dao.DailyTotal?>(null) }
     Card(
@@ -686,7 +686,7 @@ private fun MonthlyChartSection(
     summaries: List<DailySummary>,
     selectedPeriod: TimePeriod,
     monthOffset: Int,
-    weekStartDay: WeekStartDay = WeekStartDay.MONDAY
+    weekStartDay: WeekStartDay = WeekStartDay.SYSTEM
 ) {
     var selectedSummary by remember { mutableStateOf<DailySummary?>(null) }
     Card(
@@ -791,7 +791,7 @@ private fun MonthlyChartSection(
 private fun MonthlyHeatmap(
     summaries: List<DailySummary>,
     onCellClick: (DailySummary) -> Unit,
-    weekStartDay: WeekStartDay = WeekStartDay.MONDAY
+    weekStartDay: WeekStartDay = WeekStartDay.SYSTEM
 ) {
     // Create a map for quick lookup and determine the month being displayed
     val summaryMap = summaries.associateBy { it.date }
@@ -855,10 +855,10 @@ private fun MonthlyCalendarGrid(
     monthYear: LocalDate,
     summaryMap: Map<String, DailySummary>,
     onCellClick: (DailySummary) -> Unit,
-    weekStartDay: WeekStartDay = WeekStartDay.MONDAY
+    weekStartDay: WeekStartDay = WeekStartDay.SYSTEM
 ) {
-    // Use the user's preferred week start day
-    val weekFields = WeekFields.of(weekStartDay.dayOfWeek, 1)
+    // Use the user's preferred week start day (resolve SYSTEM to the device locale)
+    val weekFields = WeekFields.of(weekStartDay.resolve(), 1)
     
     // Get first day of month and its day of week
     val firstDayOfMonth = monthYear.withDayOfMonth(1)
@@ -890,7 +890,7 @@ private fun MonthlyCalendarGrid(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            val dayHeaders = if (weekStartDay == WeekStartDay.SUNDAY) {
+            val dayHeaders = if (weekStartDay.resolve() == java.time.DayOfWeek.SUNDAY) {
                 listOf(
                     R.string.weekday_short_sun,
                     R.string.weekday_short_mon,
@@ -1116,7 +1116,7 @@ private fun GoalAchievementSection(
     weekOffset: Int,
     monthOffset: Int,
     yearOffset: Int,
-    weekStartDay: WeekStartDay = WeekStartDay.MONDAY
+    weekStartDay: WeekStartDay = WeekStartDay.SYSTEM
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -1345,7 +1345,7 @@ private fun getCurrentPeriodText(
     weekOffset: Int,
     monthOffset: Int,
     yearOffset: Int,
-    weekStartDay: WeekStartDay = WeekStartDay.MONDAY
+    weekStartDay: WeekStartDay = WeekStartDay.SYSTEM
 ): String {
     return when (period) {
         TimePeriod.WEEKLY -> {
@@ -1388,9 +1388,9 @@ private fun getPeriodTitle(period: TimePeriod): String {
 }
 
 
-private fun getWeekDateRange(weekOffset: Int, weekStartDay: WeekStartDay = WeekStartDay.MONDAY): Pair<LocalDate, LocalDate> {
+private fun getWeekDateRange(weekOffset: Int, weekStartDay: WeekStartDay = WeekStartDay.SYSTEM): Pair<LocalDate, LocalDate> {
     val today = LocalDate.now()
-    val weekFields = WeekFields.of(weekStartDay.dayOfWeek, 1)
+    val weekFields = WeekFields.of(weekStartDay.resolve(), 1)
     
     // Get the start of current week first
     val currentWeekStart = today.with(weekFields.dayOfWeek(), 1)
@@ -1424,7 +1424,7 @@ private fun filterSummariesByPeriod(
     weekOffset: Int,
     monthOffset: Int,
     yearOffset: Int = 0,
-    weekStartDay: WeekStartDay = WeekStartDay.MONDAY
+    weekStartDay: WeekStartDay = WeekStartDay.SYSTEM
 ): List<DailySummary> {
     val (startDate, endDate) = when (period) {
         TimePeriod.WEEKLY -> getWeekDateRange(weekOffset, weekStartDay)
