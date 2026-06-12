@@ -627,6 +627,8 @@
          ============================================================================ -->
     <string name="markdown_error_loading">Error loading %1$s: %2$s</string>
     <string name="markdown_version_prefix">Version %1$s</string>
+    <string name="markdown_section_added">Added</string>
+    <string name="markdown_section_fixed">Fixed</string>
 
     <!-- ============================================================================
          Placeholder
@@ -640,6 +642,11 @@
     <string name="hc_beverage_detail">%1$s • %2$dml effective</string>
     <string name="hc_beverage_detail_eff">%1$s • %2$dml raw → %3$dml effective</string>
     <string name="hc_note_label">Note: %1$s</string>
+    <string name="health_connect_status_unavailable">Health Connect is not available on this device</string>
+    <string name="health_connect_status_update_required">Health Connect app needs to be updated</string>
+    <string name="health_connect_status_no_permissions">Permissions not granted for Health Connect</string>
+    <string name="health_connect_status_ready">Health Connect is ready</string>
+    <string name="health_connect_imported_from">Imported from %1$s</string>
 
     <!-- ============================================================================
          Home
@@ -880,6 +887,8 @@
     <string name="notification_quick_add_title">💧 Water Added!</string>
     <!-- %1$d = amount added in ml -->
     <string name="notification_quick_add_text">Added %1$d ml to your daily intake</string>
+    <string name="notification_quick_add_preset_name">Quick Add</string>
+    <string name="notification_quick_add_note">Added from notification</string>
 
     <!-- Gentle reminder titles -->
     <string-array name="notification_gentle_titles">

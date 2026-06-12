@@ -240,7 +240,7 @@ private fun HydrationStatChip(label: String, value: Double) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "%.1f L".format(animatedValue),
+            text = stringResource(R.string.unit_liters_format, "%.1f".format(animatedValue)),
             style = MaterialTheme.typography.headlineMediumEmphasized,
             color = MaterialTheme.colorScheme.tertiary,
             maxLines = 1
@@ -751,7 +751,10 @@ private fun HealthConnectHistoryItem(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = "${entry.getEffectiveHydrationAmount().toInt()} ml",
+                            text = stringResource(
+                                R.string.unit_milliliters_format,
+                                entry.getEffectiveHydrationAmount().toInt().toString()
+                            ),
                             style = MaterialTheme.typography.titleSmallEmphasized,
                         )
 

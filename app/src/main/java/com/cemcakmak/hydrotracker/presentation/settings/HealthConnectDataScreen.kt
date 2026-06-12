@@ -177,7 +177,10 @@ private fun HealthConnectDataItem(
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
-                        text = "${entry.getEffectiveHydrationAmount().toInt()} ml",
+                        text = stringResource(
+                            R.string.unit_milliliters_format,
+                            entry.getEffectiveHydrationAmount().toInt().toString()
+                        ),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )

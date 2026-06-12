@@ -150,6 +150,7 @@ object HealthConnectSyncManager {
                 externalRecords.forEach { record ->
                     try {
                         val waterIntakeEntry = HealthConnectManager.hydrationRecordToWaterIntakeEntry(
+                            context,
                             record,
                             record.metadata.dataOrigin.toString(),
                             wakeUpTime,
@@ -307,6 +308,7 @@ object HealthConnectSyncManager {
                         val recordIdForLocalStorage = record.metadata.clientRecordId ?: record.metadata.id
 
                         val waterIntakeEntry = HealthConnectManager.hydrationRecordToWaterIntakeEntry(
+                            context,
                             record,
                             record.metadata.dataOrigin.toString(),
                             wakeUpTime,

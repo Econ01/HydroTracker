@@ -69,7 +69,10 @@ class HydroCompactWidget : AppWidgetProvider() {
                 
                 // Update progress percentage
                 val progressPercent = (progress.progress * 100).toInt()
-                views.setTextViewText(R.id.widget_progress_percent, "$progressPercent%")
+                views.setTextViewText(
+                    R.id.widget_progress_percent,
+                    context.getString(R.string.percent_format, progressPercent)
+                )
                 
                 // Update time - compact format
                 val timeFormat = android.text.format.DateFormat.getTimeFormat(context)
@@ -116,7 +119,10 @@ class HydroCompactWidget : AppWidgetProvider() {
             R.id.widget_progress_text,
             "${formatCompact(0.0)} / ${formatCompact(2700.0)}"
         )
-        views.setTextViewText(R.id.widget_progress_percent, "0%")
+        views.setTextViewText(
+            R.id.widget_progress_percent,
+            context.getString(R.string.percent_format, 0)
+        )
         views.setTextViewText(R.id.widget_last_updated, context.getString(R.string.widget_tap_to_open))
         views.setProgressBar(R.id.widget_progress_circle, 100, 0, false)
         

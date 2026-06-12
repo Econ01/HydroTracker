@@ -41,7 +41,7 @@ import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 
 /**
- * Shared building blocks for the settings document sheets (Changelog, Sources, Privacy, License).
+ * Shared building blocks for the settings document sheets (Changelog, Sources, Privacy, Licence).
  *
  * A small in-house Markdown renderer — no external libraries. Handles `#` through `#####` headers,
  * `- ` bullets (with double / triple indent), numbered lists, fully-bold `**…**` lines,
@@ -139,7 +139,7 @@ internal fun MarkdownText(
                 trimmed == "Added" -> {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Added",
+                        text = stringResource(R.string.markdown_section_added),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.tertiary
@@ -148,7 +148,7 @@ internal fun MarkdownText(
                 trimmed == "Fixed" -> {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Fixed",
+                        text = stringResource(R.string.markdown_section_fixed),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.secondary

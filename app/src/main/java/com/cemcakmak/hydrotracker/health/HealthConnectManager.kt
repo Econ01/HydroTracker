@@ -13,6 +13,7 @@ import androidx.health.connect.client.records.metadata.Device
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.health.connect.client.units.Volume
+import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
 import java.time.Instant
 import java.time.ZoneOffset
@@ -341,6 +342,7 @@ object HealthConnectManager {
      * Convert HydrationRecord to WaterIntakeEntry format
      */
     fun hydrationRecordToWaterIntakeEntry(
+        context: Context,
         record: HydrationRecord,
         sourceName: String?,
         wakeUpTime: String = "07:00",
@@ -373,7 +375,7 @@ object HealthConnectManager {
             date = date,
             containerType = friendlySourceName, // Use the actual source app name
             containerVolume = volumeInML, // Use same as amount for external data
-            note = "Imported from $friendlySourceName",
+            note = context.getString(R.string.health_connect_imported_from, friendlySourceName),
             healthConnectRecordId = recordId // Store the Health Connect record ID for deletion
         )
     }
@@ -514,13 +516,13 @@ object HealthConnectManager {
         return when {
             !isAvailable(context) -> {
                 when (HealthConnectClient.getSdkStatus(context)) {
-                    HealthConnectClient.SDK_UNAVAILABLE -> "Health Connect is not available on this device"
-                    HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED -> "Health Connect app needs to be updated"
-                    else -> "Health Connect is not available"
+                    HealthConnectClient.SDK_UNAVAILABLE -> context.getString(R.string.health_connect_status_unavailable)
+                    HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED -> context.getString(R.string.health_connect_status_update_required)
+                    else -> context.getString(R.string.health_connect_status_unavailable)
                 }
             }
-            !hasPermissions(context) -> "Permissions not granted for Health Connect"
-            else -> "Health Connect is ready"
+            !hasPermissions(context) -> context.getString(R.string.health_connect_status_no_permissions)
+            else -> context.getString(R.string.health_connect_status_ready)
         }
     }
 }

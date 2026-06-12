@@ -46,7 +46,7 @@ class QuickAddWaterReceiver : BroadcastReceiver() {
 
                 // Create a preset for quick add
                 val quickAddPreset = ContainerPreset(
-                    name = "Quick Add",
+                    name = context.getString(R.string.notification_quick_add_preset_name),
                     volume = QUICK_ADD_AMOUNT,
                     isDefault = false
                 )
@@ -55,7 +55,7 @@ class QuickAddWaterReceiver : BroadcastReceiver() {
                 val result = waterIntakeRepository.addWaterIntake(
                     amount = QUICK_ADD_AMOUNT,
                     containerPreset = quickAddPreset,
-                    note = "Added from notification"
+                    note = context.getString(R.string.notification_quick_add_note)
                 )
 
                 result.onSuccess {
