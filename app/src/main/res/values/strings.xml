@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- ============================================================================
          Branding & non-translatable values
@@ -10,7 +10,7 @@
     <!-- ============================================================================
          Common actions
          Reused across the whole app. Do NOT create screen-specific duplicates
-         (e.g. home_cancel, dialog_cancel) — reuse these everywhere.
+         (e.g. home_cancel, dialogue_cancel) — reuse these everywhere.
          ============================================================================ -->
     <string name="action_cancel">Cancel</string>
     <string name="action_save">Save</string>
@@ -209,7 +209,7 @@
     <string name="container_name_placeholder">e.g., Coffee Mug</string>
     <string name="container_volume_label">Volume (ml)</string>
     <string name="container_volume_placeholder">e.g., 250</string>
-    <string name="container_volume_error">Enter a valid volume (1-5000 ml)</string>
+    <string name="container_volume_error">Enter a valid volume (1–5000 ml)</string>
     <string name="container_icon_auto">Icon updates automatically based on volume</string>
     <string name="container_delete_title">Delete Container?</string>
 
@@ -235,7 +235,7 @@
     <string name="screen_about_title">About</string>
     <string name="screen_developer_title">Developer Options</string>
     <string name="settings_about_update_available">About - Update Available</string>
-    <string name="settings_appearance_desc">Theme, colors and AMOLED mode</string>
+    <string name="settings_appearance_desc">Theme, colours and AMOLED mode</string>
     <string name="settings_display_desc">Week start day and locale</string>
     <string name="settings_hydration_desc">Water goal calculation and Health Connect</string>
     <string name="settings_quickadd_desc">Container presets and beverage types</string>
@@ -358,7 +358,7 @@
     <!-- Beverage types list/editor -->
     <string name="screen_beverage_types_title">Beverage Types</string>
     <string name="beverage_types_helper">Beverages offered in quick add. Tap to edit, drag to reorder.</string>
-    <!-- e.g. "150% hydration"; %1$d = percent -->
+    <!-- e.g. "150% hydration"; %1$d = per cent -->
     <string name="beverage_hydration_short">%1$d%% hydration</string>
     <string name="beverage_reset_title">Reset Beverages?</string>
     <string name="beverage_reset_message">This restores the default beverage order, unhides all presets, and removes all custom beverages. This action cannot be undone.</string>
@@ -414,9 +414,9 @@
     <string name="gender_greeting_other">You\'ve got this!</string>
 
     <!-- Age group -->
-    <string name="age_group_young_adult">18-30 years</string>
-    <string name="age_group_adult">31-50 years</string>
-    <string name="age_group_middle_aged">51-60 years</string>
+    <string name="age_group_young_adult">18–30 years</string>
+    <string name="age_group_adult">31–50 years</string>
+    <string name="age_group_middle_aged">51–60 years</string>
     <string name="age_group_senior">60+ years</string>
     <string name="age_motivation_young_adult">Your body is building its foundation - keep it hydrated!</string>
     <string name="age_motivation_adult">Hydration is your energy source - fuel your busy life!</string>
@@ -430,9 +430,9 @@
     <string name="activity_active">Active</string>
     <string name="activity_very_active">Very Active</string>
     <string name="activity_desc_sedentary">Little to no exercise</string>
-    <string name="activity_desc_light">Light exercise 1-3 days/week</string>
-    <string name="activity_desc_moderate">Moderate exercise 3-5 days/week</string>
-    <string name="activity_desc_active">Heavy exercise 6-7 days/week</string>
+    <string name="activity_desc_light">Light exercise 1–3 days/week</string>
+    <string name="activity_desc_moderate" tools:ignore="TypographyDashes">Moderate exercise 3–5 days/week</string>
+    <string name="activity_desc_active">Heavy exercise 6–7 days/week</string>
     <string name="activity_desc_very_active">Very heavy exercise or physical job</string>
     <string name="activity_tip_sedentary">Even at rest, your body needs consistent hydration!</string>
     <string name="activity_tip_light">Light activity still means you need extra hydration support!</string>
@@ -467,13 +467,13 @@
     <string name="dark_mode_light_desc">Always use light theme</string>
     <string name="dark_mode_dark_desc">Always use dark theme</string>
 
-    <!-- Color source -->
+    <!-- Colour source -->
     <string name="color_source_hydro">HydroTracker Blue</string>
     <string name="color_source_dynamic">Dynamic Colors</string>
     <string name="color_source_custom">Custom Colors</string>
     <string name="color_source_hydro_desc">Beautiful water-themed blue palette</string>
     <string name="color_source_dynamic_desc">Colors from your wallpaper</string>
-    <string name="color_source_custom_desc">Create your own color scheme</string>
+    <string name="color_source_custom_desc">Create your own colour scheme</string>
 
     <!-- Week start day -->
     <string name="weekday_sunday">Sunday</string>
@@ -606,7 +606,7 @@
          Licenses
          ============================================================================ -->
     <string name="screen_licenses_title">Third-party licenses</string>
-    <string name="licenses_empty">No license information available.</string>
+    <string name="licenses_empty">No licence information available.</string>
 
     <!-- ============================================================================
          What\'s New / Update Dialog
@@ -666,7 +666,7 @@
     <string name="home_snackbar_container_updated">Updated "%1$s" container</string>
     <string name="home_snackbar_container_deleted">Deleted "%1$s" container</string>
 
-    <!-- Dialog labels -->
+    <!-- Dialogue labels -->
     <string name="home_label_beverage_type">Beverage Type</string>
     <string name="home_label_amount_ml">Amount (ml)</string>
     <string name="home_label_container_type">Container Type</string>
@@ -693,7 +693,7 @@
     <string name="home_section_recent_entries">Recent Entries</string>
     <string name="home_section_quick_select">Quick Select</string>
 
-    <!-- Dialog titles -->
+    <!-- Dialogue titles -->
     <string name="home_dialog_add_custom_amount">Add Custom Amount</string>
     <string name="home_dialog_edit_entry_title">Edit Water Entry</string>
     <string name="home_dialog_external_entry_title">External Water Entry</string>
@@ -731,7 +731,7 @@
          ============================================================================ -->
     <string name="profile_snackbar_updated">Profile updated successfully!</string>
 
-    <!-- Time-based greeting shown above the user name; keep the trailing comma if the
+    <!-- Time-based greeting shown above the username; keep the trailing comma if the
          language separates greeting and name with a comma. -->
     <string name="profile_greeting_morning">Good morning,</string>
     <string name="profile_greeting_afternoon">Good afternoon,</string>
@@ -767,7 +767,7 @@
     <string name="profile_photo_sheet_title">Update Profile Photo</string>
     <string name="profile_remove_photo_desc">Use default avatar</string>
 
-    <!-- Name edit dialog -->
+    <!-- Name edit dialogue -->
     <string name="profile_name_dialog_title">Edit Name</string>
     <string name="profile_name_error_empty">Name cannot be empty</string>
     <string name="profile_name_error_too_long">Name is too long</string>
@@ -775,12 +775,12 @@
     <!-- Daily goal bottom sheet -->
     <string name="profile_goal_edit_title">Edit Daily Goal</string>
     <string name="profile_goal_edit_description">Set your daily water intake goal. This will be used to track your progress and calculate reminders.</string>
-    <!-- %1$s = formatted liters such as "2.50" -->
+    <!-- %1$s = formatted litres such as "2.50" -->
     <string name="profile_goal_slider_label">Use slider to adjust: %1$s L</string>
     <string name="profile_goal_manual_label">Or enter manually:</string>
-    <string name="profile_goal_input_label">Daily Goal (Liters)</string>
+    <string name="profile_goal_input_label">Daily Goal (Litres)</string>
     <string name="profile_goal_input_error">Please enter a valid amount (0.5–10 L)</string>
-    <string name="profile_goal_input_hint">Recommended: 1.5 - 4.0 liters per day</string>
+    <string name="profile_goal_input_hint">Recommended: 1.5 – 4.0 litres per day</string>
 
     <!-- Activity level bottom sheet -->
     <string name="profile_activity_title">Activity Level</string>
@@ -807,7 +807,7 @@
     <string name="profile_weight_input_error">Please enter a valid weight (30–300 kg)</string>
     <string name="profile_weight_input_hint">Leave empty if you prefer not to share</string>
 
-    <!-- Generic OK button for time pickers and similar dialogs -->
+    <!-- Generic OK button for time pickers and similar dialogues -->
     <string name="action_ok">OK</string>
 
     <!-- ============================================================================
@@ -913,7 +913,7 @@
         <item>Your cells are asking for a little attention.</item>
     </string-array>
 
-    <!-- Gentle reminder messages: mid progress (25–50%) -->
+    <!-- Gentle reminder messages: mid-progress (25–50%) -->
     <string-array name="notification_gentle_messages_mid">
         <item>You\'re making great progress! Keep it flowing.</item>
         <item>Halfway there! Your body appreciates every drop.</item>
