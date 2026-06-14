@@ -4,6 +4,8 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,6 +33,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.cemcakmak.hydrotracker.R
+import com.cemcakmak.hydrotracker.data.models.DarkModePreference
+import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.google.android.play.core.review.ReviewManagerFactory
 
@@ -44,6 +48,7 @@ private const val URL_GITHUB_REPO = "https://github.com/Econ01/HydroTracker"
  */
 @Composable
 fun SupportDevelopmentScreen(
+    themePreferences: ThemePreferences = ThemePreferences(),
     onNavigateBack: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -54,9 +59,9 @@ fun SupportDevelopmentScreen(
         title = stringResource(R.string.screen_support_title),
         onNavigateBack = onNavigateBack
     ) {
-        SupportHeroCard()
+        SupportHeroCard(themePreferences = themePreferences)
 
-        // Donation links — brand-colored icons, order GitHub → PayPal → Buy Me a Coffee.
+        // Donation links — brand-coloured icons, order GitHub → PayPal → Buy Me a Coffee.
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsSectionHeader(stringResource(R.string.support_section_support))
             val links = listOf(
@@ -104,7 +109,7 @@ fun SupportDevelopmentScreen(
             }
         }
 
-        // Free, non-monetary actions — standard primary-colored icons.
+        // Free, non-monetary actions — standard primary-coloured icons.
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsSectionHeader(stringResource(R.string.support_section_other_ways))
             val helpSize = 3
@@ -163,13 +168,26 @@ fun SupportDevelopmentScreen(
 }
 
 @Composable
-private fun SupportHeroCard() {
+private fun SupportHeroCard(themePreferences: ThemePreferences) {
+    val isDark = when (themePreferences.darkMode) {
+        DarkModePreference.DARK -> true
+        DarkModePreference.LIGHT -> false
+        DarkModePreference.SYSTEM -> isSystemInDarkTheme()
+    }
+
+    val border = if (themePreferences.usePureBlack && isDark) {
+        BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+    } else {
+        null
+    }
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 24.dp),
         shape = RoundedCornerShape(30.dp),
-        tonalElevation = 2.dp
+        tonalElevation = 2.dp,
+        border = border
     ) {
         Column(
             modifier = Modifier

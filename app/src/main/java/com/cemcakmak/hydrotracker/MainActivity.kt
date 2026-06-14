@@ -608,10 +608,14 @@ fun HydroTrackerApp(
                             )
                         }
                         entry<NavigationRoutes.SettingsSupport> {
-                            SupportDevelopmentScreen(onNavigateBack = popBackStack)
+                            SupportDevelopmentScreen(
+                                themePreferences = themePreferences,
+                                onNavigateBack = popBackStack
+                            )
                         }
                         entry<NavigationRoutes.SettingsAbout> {
                             AboutScreen(
+                                themePreferences = themePreferences,
                                 wasPop = aboutWasPop,
                                 updateStatus = updateStatus,
                                 onNavigateToUpdates = {

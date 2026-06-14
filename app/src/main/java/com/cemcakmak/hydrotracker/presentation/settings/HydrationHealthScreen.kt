@@ -7,6 +7,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
@@ -38,6 +40,7 @@ import com.cemcakmak.hydrotracker.data.models.ActivityLevel
 import com.cemcakmak.hydrotracker.data.models.AgeGroup
 import com.cemcakmak.hydrotracker.data.models.Gender
 import com.cemcakmak.hydrotracker.data.models.BeverageType
+import com.cemcakmak.hydrotracker.data.models.DarkModePreference
 import com.cemcakmak.hydrotracker.data.models.HydrationStandard
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.UserProfile
@@ -71,6 +74,7 @@ fun HydrationHealthScreen(
     ) {
         CalculationStandardSection(
             userProfile = userProfile,
+            themePreferences = themePreferences,
             onHydrationStandardChange = onHydrationStandardChange
         )
 
@@ -117,9 +121,23 @@ fun HealthConnectHistoryEmptyPreview() {
 @Composable
 private fun CalculationStandardSection(
     userProfile: UserProfile?,
+    themePreferences: ThemePreferences,
     onHydrationStandardChange: (HydrationStandard) -> Unit
 ) {
     val haptics = LocalHapticFeedback.current
+
+    val isDark = when (themePreferences.darkMode) {
+        DarkModePreference.DARK -> true
+        DarkModePreference.LIGHT -> false
+        DarkModePreference.SYSTEM -> isSystemInDarkTheme()
+    }
+
+    val border = if (themePreferences.usePureBlack && isDark) {
+        BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+    } else {
+        null
+    }
+
     Column(
         modifier = Modifier.padding(top = 24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -130,7 +148,8 @@ private fun CalculationStandardSection(
                     .fillMaxWidth()
                     .padding(bottom = 12.dp),
                 shape = RoundedCornerShape(30.dp),
-                tonalElevation = 2.dp
+                tonalElevation = 2.dp,
+                border = border
             ) {
                 Column(
                     modifier = Modifier

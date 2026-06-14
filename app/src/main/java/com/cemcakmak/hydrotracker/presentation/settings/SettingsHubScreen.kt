@@ -132,7 +132,10 @@ fun SettingsHubScreen(
         topBar = {
             LargeFlexibleTopAppBar(
                 title = { Text(stringResource(R.string.nav_settings)) },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface
+                )
             )
         }
     ) { innerPadding ->

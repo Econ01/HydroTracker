@@ -51,18 +51,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.annotation.StringRes
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.cemcakmak.hydrotracker.BuildConfig
 import com.cemcakmak.hydrotracker.R
+import com.cemcakmak.hydrotracker.data.models.DarkModePreference
+import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 
 private const val URL_GITHUB_PROFILE = "https://github.com/Econ01"
 
 @Composable
 fun AboutScreen(
+    themePreferences: ThemePreferences = ThemePreferences(),
     wasPop: Boolean = false,
     updateStatus: UpdateStatus = UpdateStatus.Idle,
     onNavigateToUpdates: () -> Unit = {},
@@ -111,7 +116,7 @@ fun AboutScreen(
                 title = stringResource(R.string.screen_about_title),
                 onNavigateBack = onNavigateBack
             ) {
-                VersionHero()
+                VersionHero(themePreferences = themePreferences)
 
                 // Contributors
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -142,7 +147,11 @@ fun AboutScreen(
                             title = if (isUpdateAvailable) stringResource(R.string.updates_available_title) else stringResource(R.string.screen_updates_title),
                             titleColor = if (isUpdateAvailable) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurface,
                             description = stringResource(R.string.updates_status_check_now),
-                            onClick = onNavigateToUpdates
+                            showChevron = true,
+                            onClick = {
+                                haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                onNavigateToUpdates()
+                            }
                         )
                     }
                 }
@@ -220,13 +229,26 @@ fun AboutScreen(
 }
 
 @Composable
-private fun VersionHero() {
+private fun VersionHero(themePreferences: ThemePreferences) {
+    val isDark = when (themePreferences.darkMode) {
+        DarkModePreference.DARK -> true
+        DarkModePreference.LIGHT -> false
+        DarkModePreference.SYSTEM -> isSystemInDarkTheme()
+    }
+
+    val border = if (themePreferences.usePureBlack && isDark) {
+        BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+    } else {
+        null
+    }
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 24.dp),
         shape = RoundedCornerShape(30.dp),
-        tonalElevation = 2.dp
+        tonalElevation = 2.dp,
+        border = border
     ) {
         Column(
             modifier = Modifier

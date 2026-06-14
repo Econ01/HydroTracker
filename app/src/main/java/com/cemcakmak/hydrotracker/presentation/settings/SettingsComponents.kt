@@ -200,7 +200,7 @@ internal fun SettingsGroupCard(
     }
 }
 
-/** A grouped card whose selection animates to a primary-colored pill. */
+/** A grouped card whose selection animates to a primary-coloured pill. */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun SelectableOptionCard(
