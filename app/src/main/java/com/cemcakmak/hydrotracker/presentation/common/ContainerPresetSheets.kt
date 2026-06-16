@@ -1,10 +1,7 @@
 package com.cemcakmak.hydrotracker.presentation.common
 
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -269,6 +266,7 @@ private fun EditContainerPresetSheetContent(
     // Delete confirmation dialogue
     if (showDeleteConfirmation) {
         AlertDialog(
+            modifier = Modifier.fillMaxWidth(0.9f),
             onDismissRequest = { showDeleteConfirmation = false },
             icon = {
                 Icon(
@@ -285,19 +283,6 @@ private fun EditContainerPresetSheetContent(
                 val haptics = LocalHapticFeedback.current
                 val cancelInteractionSource = remember { MutableInteractionSource() }
                 val confirmDeleteInteractionSource = remember { MutableInteractionSource() }
-                val isCancelPressed by cancelInteractionSource.collectIsPressedAsState()
-                val isConfirmDeletePressed by confirmDeleteInteractionSource.collectIsPressedAsState()
-
-                val cancelCornerRadius by animateDpAsState(
-                    targetValue = if (isCancelPressed) 16.dp else 50.dp,
-                    animationSpec = spring(),
-                    label = "cancelCornerRadius"
-                )
-                val confirmDeleteCornerRadius by animateDpAsState(
-                    targetValue = if (isConfirmDeletePressed) 16.dp else 50.dp,
-                    animationSpec = spring(),
-                    label = "confirmDeleteCornerRadius"
-                )
 
                 LaunchedEffect(cancelInteractionSource) {
                     cancelInteractionSource.interactions.collect { interaction ->
@@ -330,7 +315,7 @@ private fun EditContainerPresetSheetContent(
                                 onClick = {
                                     showDeleteConfirmation = false
                                 },
-                                shape = RoundedCornerShape(cancelCornerRadius),
+                                shapes = ButtonDefaults.shapes(),
                                 interactionSource = cancelInteractionSource,
                                 modifier = with(scope) {
                                     Modifier
@@ -360,7 +345,7 @@ private fun EditContainerPresetSheetContent(
                                     containerColor = MaterialTheme.colorScheme.error,
                                     contentColor = MaterialTheme.colorScheme.onError
                                 ),
-                                shape = RoundedCornerShape(confirmDeleteCornerRadius),
+                                shapes = ButtonDefaults.shapes(),
                                 interactionSource = confirmDeleteInteractionSource,
                                 modifier = with(scope) {
                                     Modifier

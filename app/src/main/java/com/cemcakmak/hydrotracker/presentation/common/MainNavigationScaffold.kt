@@ -15,15 +15,10 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -44,22 +39,15 @@ import androidx.compose.material3.rememberTooltipState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -74,15 +62,12 @@ import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
 import com.cemcakmak.hydrotracker.data.models.NavBarLabelMode
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.presentation.home.HomeTopAppBar
-import com.cemcakmak.hydrotracker.utils.ImageUtils
-import java.io.File
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavigationScaffold(
     backStack: NavBackStack<NavKey>,
     currentKey: NavigationRoutes,
-    userProfileImagePath: String? = null,
     userProfile: UserProfile? = null,
     waterIntakeRepository: WaterIntakeRepository? = null,
     snackbarHostState: SnackbarHostState,
@@ -96,7 +81,6 @@ fun MainNavigationScaffold(
     val shouldShowBottomBar = currentKey in setOf(
         NavigationRoutes.Home,
         NavigationRoutes.History,
-        NavigationRoutes.Profile,
         NavigationRoutes.Settings
     )
 
@@ -113,7 +97,7 @@ fun MainNavigationScaffold(
         }
     }
 
-    // Scroll behaviors remembered per route so collapsed state survives tab switches
+    // Scroll behaviours remembered per route so collapsed state survives tab switches
     val homeScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     val nestedScrollModifier = run {
@@ -144,7 +128,6 @@ fun MainNavigationScaffold(
                         waterIntakeRepository = waterIntakeRepository
                     )
                     NavigationRoutes.History -> HistoryTopAppBar()
-                    NavigationRoutes.Profile -> ProfileTopAppBar()
                     else -> {}
                 }
             }
@@ -157,7 +140,6 @@ fun MainNavigationScaffold(
             ) {
                 HydroNavigationBar(
                     currentKey = currentKey,
-                    userProfileImagePath = userProfileImagePath,
                     labelMode = navBarLabelMode,
                     onTabSwitch = onTabSwitch,
                     onTabSelected = { key ->
@@ -217,17 +199,8 @@ private fun HistoryTopAppBar() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ProfileTopAppBar() {
-    TopAppBar(
-        title = { Text(stringResource(R.string.nav_profile)) }
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
 private fun HydroNavigationBar(
     currentKey: NavigationRoutes,
-    userProfileImagePath: String? = null,
     labelMode: NavBarLabelMode = NavBarLabelMode.ALWAYS,
     onTabSelected: (NavigationRoutes) -> Unit = {},
     onTabSwitch: () -> Unit = {}
@@ -255,21 +228,13 @@ private fun HydroNavigationBar(
                         tooltip = { PlainTooltip { Text(stringResource(item.labelResId)) } },
                         state = tooltipState
                     ) {
-                        if (item == NavigationItem.PROFILE) {
-                            ProfileIcon(
-                                profileImagePath = userProfileImagePath,
-                                isSelected = isSelected,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        } else {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(
-                                    if (isSelected) item.selectedIconRes else item.iconRes
-                                ),
-                                contentDescription = stringResource(item.labelResId),
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
+                        Icon(
+                            imageVector = ImageVector.vectorResource(
+                                if (isSelected) item.selectedIconRes else item.iconRes
+                            ),
+                            contentDescription = stringResource(item.labelResId),
+                            modifier = Modifier.size(24.dp)
+                        )
                     }
                 },
                 label = if (showLabel) {
@@ -312,72 +277,12 @@ enum class NavigationItem(
         iconRes = R.drawable.leaderboard,
         selectedIconRes = R.drawable.leaderboard_filled
     ),
-    PROFILE(
-        key = NavigationRoutes.Profile,
-        labelResId = R.string.nav_profile,
-        iconRes = R.drawable.person,
-        selectedIconRes = R.drawable.person_filled
-    ),
     SETTINGS(
         key = NavigationRoutes.Settings,
         labelResId = R.string.nav_settings,
         iconRes = R.drawable.settings,
         selectedIconRes = R.drawable.settings_filled
     )
-}
-
-/**
- * Profile Icon that shows user's profile picture or default icon
- */
-@Composable
-fun ProfileIcon(
-    profileImagePath: String?,
-    isSelected: Boolean,
-    modifier: Modifier = Modifier
-) {
-    val context = LocalContext.current
-    var profileBitmap by remember(profileImagePath) { mutableStateOf<android.graphics.Bitmap?>(null) }
-
-    // Load the image when profileImagePath changes
-    LaunchedEffect(profileImagePath) {
-        profileBitmap = if (profileImagePath != null && File(profileImagePath).exists()) {
-            ImageUtils.loadProfileImageBitmap(context)
-        } else {
-            null
-        }
-    }
-
-    if (profileBitmap != null) {
-        // Show profile picture
-        Box(
-            modifier = modifier,
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                bitmap = profileBitmap!!.asImageBitmap(),
-                contentDescription = stringResource(R.string.cd_profile_photo),
-                modifier = Modifier
-                    .size(24.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (isSelected) {
-                            MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.1f)
-                        } else {
-                            MaterialTheme.colorScheme.surface
-                        },
-                        CircleShape
-                    ),
-                contentScale = ContentScale.Crop
-            )
-        }
-    } else {
-        // Fall back to default icon
-        Icon(
-            imageVector = Icons.Filled.Person,
-            contentDescription = stringResource(R.string.nav_profile),
-            modifier = modifier
-        )
-    }
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

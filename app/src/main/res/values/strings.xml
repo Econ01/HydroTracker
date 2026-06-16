@@ -795,6 +795,7 @@
     <string name="profile_section_details">Profile Details</string>
     <string name="profile_section_daily_goals">Daily Goals</string>
     <string name="profile_section_active_schedule">Active Schedule</string>
+    <string name="profile_section_personal">Personal</string>
 
     <!-- Info-row labels -->
     <string name="profile_label_gender">Gender</string>
@@ -1066,6 +1067,10 @@
     <string name="notification_minimal_message_mid">Continue hydrating</string>
     <string name="date_format_title">Date Format</string>
     <string name="week_start_format_title">Week Start</string>
+    <string name="profile_photo_sheet_gallery_title">Choose from Gallery</string>
+    <string name="profile_photo_sheet_gallery_subtitle">Select an existing file</string>
+    <string name="profile_photo_sheet_camera_title">Take a photo</string>
+    <string name="profile_photo_sheet_delete">Remove profile photo</string>
 
     <!-- Water facts shown with gentle reminders -->
     <string-array name="notification_facts">

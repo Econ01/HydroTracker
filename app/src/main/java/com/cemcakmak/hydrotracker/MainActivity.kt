@@ -52,7 +52,6 @@ import com.cemcakmak.hydrotracker.data.database.repository.CustomBeverageReposit
 import com.cemcakmak.hydrotracker.presentation.common.*
 import com.cemcakmak.hydrotracker.presentation.home.HomeScreen
 import com.cemcakmak.hydrotracker.presentation.history.HistoryScreen
-import com.cemcakmak.hydrotracker.presentation.profile.ProfileScreen
 import com.cemcakmak.hydrotracker.presentation.settings.SettingsHubScreen
 import com.cemcakmak.hydrotracker.presentation.settings.AboutScreen
 import com.cemcakmak.hydrotracker.presentation.settings.UpdatesScreen
@@ -72,6 +71,7 @@ import com.cemcakmak.hydrotracker.presentation.settings.HapticsTestScreen
 import com.cemcakmak.hydrotracker.presentation.settings.LicensesScreen
 import com.cemcakmak.hydrotracker.presentation.settings.SupportDevelopmentScreen
 import com.cemcakmak.hydrotracker.presentation.settings.HealthConnectDataScreen
+import com.cemcakmak.hydrotracker.presentation.settings.profile.ProfileSettingsScreen
 import com.cemcakmak.hydrotracker.presentation.onboarding.*
 import com.cemcakmak.hydrotracker.notifications.*
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
@@ -83,7 +83,6 @@ private const val TAB_SWITCH_DURATION = 400
 private val TOP_LEVEL_TAB_KEYS: Set<NavigationRoutes> = setOf(
     NavigationRoutes.Home,
     NavigationRoutes.History,
-    NavigationRoutes.Profile,
     NavigationRoutes.Settings,
 )
 
@@ -334,7 +333,6 @@ fun HydroTrackerApp(
             MainNavigationScaffold(
                 backStack = backStack,
                 currentKey = currentKey,
-                userProfileImagePath = userProfile?.profileImagePath,
                 userProfile = userProfile,
                 waterIntakeRepository = waterIntakeRepository,
                 snackbarHostState = snackbarHostState,
@@ -455,21 +453,9 @@ fun HydroTrackerApp(
                             )
                         }
 
-                        entry<NavigationRoutes.Profile> {
-                            userProfile?.let {
-                                ProfileScreen(
-                                    userProfile = it,
-                                    themePreferences = themePreferences,
-                                    userRepository = userRepository,
-                                    waterIntakeRepository = waterIntakeRepository,
-                                    paddingValues = paddingValues,
-                                    snackbarHostState = snackbarHostState
-                                )
-                            } ?: LoadingScreen()
-                        }
-
                         entry<NavigationRoutes.Settings> {
                             SettingsHubScreen(
+                                userProfile = userProfile,
                                 wasPop = wasPop,
                                 developerOptionsEnabled = BuildConfig.DEBUG,
                                 updateStatus = updateStatus,
@@ -675,6 +661,29 @@ fun HydroTrackerApp(
                                 themePreferences = themePreferences,
                                 onNavigateBack = popBackStack
                             )
+                        }
+
+                        entry<NavigationRoutes.SettingsProfile> {
+                            userProfile?.let { profile ->
+                                val todayStatistics by waterIntakeRepository.getTodayStatistics().collectAsState(
+                                    initial = com.cemcakmak.hydrotracker.data.database.repository.TodayStatistics(
+                                        0.0, 0f, 0, 0.0, 0.0, null, null, false, 0.0
+                                    )
+                                )
+                                val last30DaysEntries by waterIntakeRepository.getLast30DaysEntries().collectAsState(
+                                    initial = emptyList()
+                                )
+
+                                ProfileSettingsScreen(
+                                    userProfile = profile,
+                                    themePreferences = themePreferences,
+                                    userRepository = userRepository,
+                                    todayEntryCount = todayStatistics.entryCount,
+                                    daysTracked = last30DaysEntries.groupBy { it.date }.size,
+                                    todayGoalProgress = todayStatistics.goalProgress,
+                                    onNavigateBack = popBackStack
+                                )
+                            } ?: LoadingScreen()
                         }
 
                         entry<NavigationRoutes.HealthConnectData> {

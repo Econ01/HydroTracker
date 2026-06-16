@@ -37,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.graphics.Color
@@ -51,13 +52,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.R
+import com.cemcakmak.hydrotracker.data.models.ActivityLevel
+import com.cemcakmak.hydrotracker.data.models.AgeGroup
+import com.cemcakmak.hydrotracker.data.models.Gender
+import com.cemcakmak.hydrotracker.data.models.ThemePreferences
+import com.cemcakmak.hydrotracker.data.models.UserProfile
+import com.cemcakmak.hydrotracker.data.repository.UserRepository
 import com.cemcakmak.hydrotracker.data.update.UpdateStatus
 import com.cemcakmak.hydrotracker.presentation.common.NavigationRoutes
+import com.cemcakmak.hydrotracker.presentation.settings.profile.ProfileAvatar
+import com.cemcakmak.hydrotracker.presentation.settings.profile.ProfileSettingsScreen
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsHubScreen(
+    userProfile: UserProfile? = null,
     wasPop: Boolean = false,
     developerOptionsEnabled: Boolean = false,
     updateStatus: UpdateStatus = UpdateStatus.Idle,
@@ -148,6 +158,13 @@ fun SettingsHubScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            if (userProfile != null) {
+                ProfileSettingsCategoryCard(
+                    userProfile = userProfile,
+                    onNavigateTo = { onNavigateTo(NavigationRoutes.SettingsProfile) }
+                )
+            }
+
             val categories = buildList {
                 add(
                     SettingsCategory(
@@ -247,6 +264,35 @@ fun SettingsHubScreen(
 }
 
 @Composable
+private fun ProfileSettingsCategoryCard(
+    userProfile: UserProfile,
+    onNavigateTo: () -> Unit
+) {
+    val haptics = LocalHapticFeedback.current
+
+    SettingsGroupCard(
+        index = 0,
+        size = 1,
+        onClick = {
+            haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+            onNavigateTo()
+        }
+    ) {
+        ListItem(
+            headlineContent = { Text(text = stringResource(R.string.nav_profile)) },
+            supportingContent = { Text(text = userProfile.name) },
+            leadingContent = {
+                    ProfileAvatar(
+                    profileImagePath = userProfile.profileImagePath,
+                    name = userProfile.name,
+                    size = 44.dp
+                )
+            }
+        )
+    }
+}
+
+@Composable
 private fun SettingsCategoryCard(
     index: Int,
     category: SettingsCategory,
@@ -324,6 +370,16 @@ fun SettingsHubInteractivePreview() {
 
         if (selectedRoute == null) {
             SettingsHubScreen(
+                userProfile = UserProfile(
+                    name = "Preview User",
+                    gender = Gender.OTHER,
+                    ageGroup = AgeGroup.YOUNG_ADULT_18_30,
+                    activityLevel = ActivityLevel.MODERATE,
+                    wakeUpTime = "07:00",
+                    sleepTime = "23:00",
+                    dailyWaterGoal = 2500.0,
+                    reminderInterval = 120
+                ),
                 developerOptionsEnabled = true,
                 onNavigateTo = { route -> selectedRoute = route }
             )
@@ -353,6 +409,24 @@ fun SettingsHubInteractivePreview() {
                     onNavigateToOnboarding = {},
                     onNavigateToHapticsTest = {},
                     onNavigateToHapticsLab = {}
+                )
+                NavigationRoutes.SettingsProfile -> ProfileSettingsScreen(
+                    userProfile = UserProfile(
+                        name = "Preview User",
+                        gender = Gender.OTHER,
+                        ageGroup = AgeGroup.YOUNG_ADULT_18_30,
+                        activityLevel = ActivityLevel.MODERATE,
+                        wakeUpTime = "07:00",
+                        sleepTime = "23:00",
+                        dailyWaterGoal = 2500.0,
+                        reminderInterval = 120
+                    ),
+                    themePreferences = ThemePreferences(),
+                    userRepository = UserRepository(LocalContext.current),
+                    todayEntryCount = 5,
+                    daysTracked = 12,
+                    todayGoalProgress = 0.65f,
+                    onNavigateBack = onNavigateBack
                 )
                 else -> {}
             }
