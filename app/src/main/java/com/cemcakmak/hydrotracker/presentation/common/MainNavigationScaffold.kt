@@ -206,7 +206,7 @@ private fun HydroNavigationBar(
     onTabSwitch: () -> Unit = {}
 ) {
     ShortNavigationBar(
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
     ) {
         NavigationItem.entries.forEach { item ->
             val isSelected = currentKey == item.key

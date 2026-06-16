@@ -15,6 +15,7 @@ import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.scale
 import androidx.compose.material3.Icon
@@ -70,6 +71,7 @@ fun SettingsHubScreen(
     userProfile: UserProfile? = null,
     wasPop: Boolean = false,
     developerOptionsEnabled: Boolean = false,
+    paddingValues: PaddingValues = PaddingValues(0.dp),
     updateStatus: UpdateStatus = UpdateStatus.Idle,
     onNavigateTo: (NavigationRoutes) -> Unit = {}
 ) {
@@ -152,8 +154,8 @@ fun SettingsHubScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(top = 16.dp)
+                .padding(paddingValues)
+                .padding(top = 16.dp + innerPadding.calculateTopPadding())
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)

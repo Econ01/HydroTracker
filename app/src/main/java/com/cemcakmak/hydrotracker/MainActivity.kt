@@ -458,6 +458,7 @@ fun HydroTrackerApp(
                                 userProfile = userProfile,
                                 wasPop = wasPop,
                                 developerOptionsEnabled = BuildConfig.DEBUG,
+                                paddingValues = paddingValues,
                                 updateStatus = updateStatus,
                                 onNavigateTo = { key ->
                                     wasPop = true
