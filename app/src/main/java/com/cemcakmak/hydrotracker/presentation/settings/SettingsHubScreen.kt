@@ -9,8 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.animation.EnterExitState
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
@@ -60,6 +61,8 @@ import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
 import com.cemcakmak.hydrotracker.data.update.UpdateStatus
+import com.cemcakmak.hydrotracker.presentation.common.LocalNavAnimatedVisibilityScope
+import com.cemcakmak.hydrotracker.presentation.common.LocalSharedTransitionScope
 import com.cemcakmak.hydrotracker.presentation.common.NavigationRoutes
 import com.cemcakmak.hydrotracker.presentation.settings.profile.ProfileAvatar
 import com.cemcakmak.hydrotracker.presentation.settings.profile.ProfileSettingsScreen
@@ -271,6 +274,20 @@ private fun ProfileSettingsCategoryCard(
     onNavigateTo: () -> Unit
 ) {
     val haptics = LocalHapticFeedback.current
+    val sharedTransitionScope = LocalSharedTransitionScope.current
+    val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
+
+    val nameModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+        with(sharedTransitionScope) {
+            Modifier.sharedBounds(
+                rememberSharedContentState(key = "profile-name-${userProfile.name}"),
+                animatedVisibilityScope = animatedVisibilityScope,
+                resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
+            )
+        }
+    } else {
+        Modifier
+    }
 
     SettingsGroupCard(
         index = 0,
@@ -282,7 +299,7 @@ private fun ProfileSettingsCategoryCard(
     ) {
         ListItem(
             headlineContent = { Text(text = stringResource(R.string.nav_profile)) },
-            supportingContent = { Text(text = userProfile.name) },
+            supportingContent = { Text(text = userProfile.name, modifier = nameModifier) },
             leadingContent = {
                     ProfileAvatar(
                     profileImagePath = userProfile.profileImagePath,

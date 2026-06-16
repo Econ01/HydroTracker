@@ -11,6 +11,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -35,6 +36,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.navigation3.ui.NavDisplay
 import com.cemcakmak.hydrotracker.data.repository.*
 import com.cemcakmak.hydrotracker.data.update.UpdateRepository
@@ -347,8 +349,9 @@ fun HydroTrackerApp(
                     if (backStack.size > 1) backStack.removeLastOrNull()
                 }
 
-                NavDisplay(
-                    backStack = backStack,
+                SharedTransitionLayout {
+                    NavDisplay(
+                        backStack = backStack,
                     onBack = popBackStack,
                     transitionSpec = {
                         // We have to get explicitly string. Nav3 converts NavigationRoutes data objects into
@@ -454,18 +457,23 @@ fun HydroTrackerApp(
                         }
 
                         entry<NavigationRoutes.Settings> {
-                            SettingsHubScreen(
-                                userProfile = userProfile,
-                                wasPop = wasPop,
-                                developerOptionsEnabled = BuildConfig.DEBUG,
-                                paddingValues = paddingValues,
-                                updateStatus = updateStatus,
-                                onNavigateTo = { key ->
-                                    wasPop = true
-                                    quickAddWasPop = false
-                                    backStack.add(key)
-                                }
-                            )
+                            CompositionLocalProvider(
+                                LocalSharedTransitionScope provides this@SharedTransitionLayout,
+                                LocalNavAnimatedVisibilityScope provides LocalNavAnimatedContentScope.current
+                            ) {
+                                SettingsHubScreen(
+                                    userProfile = userProfile,
+                                    wasPop = wasPop,
+                                    developerOptionsEnabled = BuildConfig.DEBUG,
+                                    paddingValues = paddingValues,
+                                    updateStatus = updateStatus,
+                                    onNavigateTo = { key ->
+                                        wasPop = true
+                                        quickAddWasPop = false
+                                        backStack.add(key)
+                                    }
+                                )
+                            }
                         }
 
                         entry<NavigationRoutes.SettingsAppearance> {
@@ -665,26 +673,31 @@ fun HydroTrackerApp(
                         }
 
                         entry<NavigationRoutes.SettingsProfile> {
-                            userProfile?.let { profile ->
-                                val todayStatistics by waterIntakeRepository.getTodayStatistics().collectAsState(
-                                    initial = com.cemcakmak.hydrotracker.data.database.repository.TodayStatistics(
-                                        0.0, 0f, 0, 0.0, 0.0, null, null, false, 0.0
+                            CompositionLocalProvider(
+                                LocalSharedTransitionScope provides this@SharedTransitionLayout,
+                                LocalNavAnimatedVisibilityScope provides LocalNavAnimatedContentScope.current
+                            ) {
+                                userProfile?.let { profile ->
+                                    val todayStatistics by waterIntakeRepository.getTodayStatistics().collectAsState(
+                                        initial = com.cemcakmak.hydrotracker.data.database.repository.TodayStatistics(
+                                            0.0, 0f, 0, 0.0, 0.0, null, null, false, 0.0
+                                        )
                                     )
-                                )
-                                val last30DaysEntries by waterIntakeRepository.getLast30DaysEntries().collectAsState(
-                                    initial = emptyList()
-                                )
+                                    val last30DaysEntries by waterIntakeRepository.getLast30DaysEntries().collectAsState(
+                                        initial = emptyList()
+                                    )
 
-                                ProfileSettingsScreen(
-                                    userProfile = profile,
-                                    themePreferences = themePreferences,
-                                    userRepository = userRepository,
-                                    todayEntryCount = todayStatistics.entryCount,
-                                    daysTracked = last30DaysEntries.groupBy { it.date }.size,
-                                    todayGoalProgress = todayStatistics.goalProgress,
-                                    onNavigateBack = popBackStack
-                                )
-                            } ?: LoadingScreen()
+                                    ProfileSettingsScreen(
+                                        userProfile = profile,
+                                        themePreferences = themePreferences,
+                                        userRepository = userRepository,
+                                        todayEntryCount = todayStatistics.entryCount,
+                                        daysTracked = last30DaysEntries.groupBy { it.date }.size,
+                                        todayGoalProgress = todayStatistics.goalProgress,
+                                        onNavigateBack = popBackStack
+                                    )
+                                } ?: LoadingScreen()
+                            }
                         }
 
                         entry<NavigationRoutes.HealthConnectData> {
@@ -697,6 +710,7 @@ fun HydroTrackerApp(
                         }
                     }
                 )
+                }
             }
         }
     }

@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -91,6 +92,8 @@ import com.cemcakmak.hydrotracker.data.models.Gender
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
+import com.cemcakmak.hydrotracker.presentation.common.LocalNavAnimatedVisibilityScope
+import com.cemcakmak.hydrotracker.presentation.common.LocalSharedTransitionScope
 import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
 import com.cemcakmak.hydrotracker.presentation.settings.SelectableOptionCard
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
@@ -123,6 +126,21 @@ internal fun ProfileHeroPreview(
     onEditProfilePicture: () -> Unit,
     onEditUsername: () -> Unit
 ) {
+    val sharedTransitionScope = LocalSharedTransitionScope.current
+    val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
+
+    val nameModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+        with(sharedTransitionScope) {
+            Modifier.sharedBounds(
+                rememberSharedContentState(key = "profile-name-${userProfile.name}"),
+                animatedVisibilityScope = animatedVisibilityScope,
+                resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
+            )
+        }
+    } else {
+        Modifier
+    }
+
     val isDark = when (themePreferences.darkMode) {
         DarkModePreference.DARK -> true
         DarkModePreference.LIGHT -> false
@@ -184,6 +202,7 @@ internal fun ProfileHeroPreview(
                     )
                     Text(
                         text = userProfile.name,
+                        modifier = nameModifier,
                         style = MaterialTheme.typography.headlineSmallEmphasized,
                         color = MaterialTheme.colorScheme.tertiary
                     )
@@ -231,6 +250,9 @@ fun ProfileAvatar(
     onClick: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
+    val sharedTransitionScope = LocalSharedTransitionScope.current
+    val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
+
     var profileBitmap by remember(profileImagePath) { mutableStateOf<ImageBitmap?>(null) }
 
     // Load the image when profileImagePath changes
@@ -242,8 +264,20 @@ fun ProfileAvatar(
         }
     }
 
+    val sharedElementModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+        with(sharedTransitionScope) {
+            Modifier.sharedElement(
+                rememberSharedContentState(key = "profile-avatar-$name"),
+                animatedVisibilityScope = animatedVisibilityScope
+            )
+        }
+    } else {
+        Modifier
+    }
+
     Surface(
         modifier = modifier
+            .then(sharedElementModifier)
             .size(size)
             .let { mod ->
                 onClick?.let { mod.clickable { it() } } ?: mod
@@ -266,7 +300,7 @@ fun ProfileAvatar(
                     bitmap = bitmap,
                     contentDescription = stringResource(R.string.cd_profile_photo),
                     modifier = Modifier
-                        .size(size)
+                        .fillMaxSize()
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
