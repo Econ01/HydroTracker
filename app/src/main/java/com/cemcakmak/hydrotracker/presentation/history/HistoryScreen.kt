@@ -20,16 +20,8 @@
 
 package com.cemcakmak.hydrotracker.presentation.history
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -39,12 +31,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -55,9 +44,11 @@ import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
 import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
+import com.cemcakmak.hydrotracker.data.models.DateFormatPattern
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
+import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 import java.time.LocalDate
@@ -73,7 +64,7 @@ fun HistoryScreen(
     userProfile: UserProfile? = null,
     paddingValues: PaddingValues
 ) {
-    // Collect ALL historical data from repository (not just last 30 days)
+    // Collect ALL historical data from repository
     val allSummaries by waterIntakeRepository.getAllSummaries().collectAsState(
         initial = emptyList()
     )
@@ -94,7 +85,7 @@ private fun HistoryScreenContent(
     userProfile: UserProfile? = null,
     paddingValues: PaddingValues
 ) {
-    val volumeUnit = userProfile?.volumeUnit ?: com.cemcakmak.hydrotracker.data.models.VolumeUnit.MILLILITRES
+    val volumeUnit = userProfile?.volumeUnit ?: VolumeUnit.MILLILITRES
     // State for different time periods
     var selectedPeriod by remember { mutableStateOf(TimePeriod.WEEKLY) }
 
@@ -136,7 +127,6 @@ private fun HistoryScreenContent(
             when (selectedPeriod) {
                 TimePeriod.WEEKLY -> {
                     WeeklyChartSection(
-                        selectedPeriod = selectedPeriod,
                         weekOffset = currentWeekOffset,
                         summaries = summaries,
                         weekStartDay = themePreferences.weekStartDay,
@@ -147,7 +137,6 @@ private fun HistoryScreenContent(
                 TimePeriod.MONTHLY -> {
                     MonthlyChartSection(
                         summaries = summaries,
-                        selectedPeriod = selectedPeriod,
                         monthOffset = currentMonthOffset,
                         weekStartDay = themePreferences.weekStartDay,
                         volumeUnit = volumeUnit,
@@ -157,41 +146,11 @@ private fun HistoryScreenContent(
                 TimePeriod.YEARLY -> {
                     YearlyChartSection(
                         summaries = summaries,
-                        selectedPeriod = selectedPeriod,
                         yearOffset = currentYearOffset,
                         volumeUnit = volumeUnit
                     )
                 }
             }
-        }
-
-        // Statistics Overview
-        item {
-            StatisticsGrid(
-                summaries = summaries,
-                volumeUnit = volumeUnit
-            )
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        // Goal Achievement
-        item {
-            GoalAchievementSection(
-                summaries = summaries,
-                selectedPeriod = selectedPeriod,
-                weekOffset = currentWeekOffset,
-                monthOffset = currentMonthOffset,
-                yearOffset = currentYearOffset,
-                weekStartDay = themePreferences.weekStartDay
-            )
-        }
-
-        // Bottom spacer for navigation bar
-        item {
-            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }
@@ -214,7 +173,7 @@ private fun PeriodSelector(
     onMonthOffsetChanged: (Int) -> Unit,
     onYearOffsetChanged: (Int) -> Unit,
     weekStartDay: WeekStartDay,
-    dateFormat: com.cemcakmak.hydrotracker.data.models.DateFormatPattern
+    dateFormat: DateFormatPattern
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -330,223 +289,7 @@ private fun PeriodSelector(
 }
 
 @Composable
-private fun WeeklyChartSection(
-    selectedPeriod: TimePeriod,
-    weekOffset: Int,
-    summaries: List<DailySummary> = emptyList(),
-    weekStartDay: WeekStartDay = WeekStartDay.SYSTEM,
-    volumeUnit: com.cemcakmak.hydrotracker.data.models.VolumeUnit,
-    dateFormat: com.cemcakmak.hydrotracker.data.models.DateFormatPattern = com.cemcakmak.hydrotracker.data.models.DateFormatPattern.SYSTEM
-) {
-    val context = LocalContext.current
-    var selectedDayData by remember { mutableStateOf<com.cemcakmak.hydrotracker.data.database.dao.DailyTotal?>(null) }
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text(
-                text = getCurrentPeriodText(selectedPeriod, weekOffset, 0, 0, weekStartDay, dateFormat),
-                style = MaterialTheme.typography.titleLargeEmphasized
-            )
-
-            // Filter summaries for the selected week and convert to DailyTotal format
-            val filteredSummaries = filterSummariesByPeriod(summaries, selectedPeriod, weekOffset, 0, 0, weekStartDay)
-            
-            // Create a complete week with all 7 days, filling in missing days with 0 data
-            val (startOfWeek) = getWeekDateRange(weekOffset, weekStartDay)
-            val filteredDailyTotals = mutableListOf<com.cemcakmak.hydrotracker.data.database.dao.DailyTotal>()
-            
-            for (i in 0..6) {
-                val currentDate = startOfWeek.plusDays(i.toLong())
-                val dateString = currentDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                val summary = filteredSummaries.find { it.date == dateString }
-                
-                filteredDailyTotals.add(
-                    com.cemcakmak.hydrotracker.data.database.dao.DailyTotal(
-                        date = dateString,
-                        totalAmount = summary?.totalIntake ?: 0.0,
-                        entryCount = summary?.entryCount ?: 0
-                    )
-                )
-            }
-            
-            if (filteredDailyTotals.isNotEmpty()) {
-                val haptics = LocalHapticFeedback.current
-                // Simple bar chart representation
-                WeeklyBarChart(
-                    dailyTotals = filteredDailyTotals,
-                    onBarClick = { dayTotal -> selectedDayData = dayTotal
-                        haptics.performHapticFeedback(HapticFeedbackType.ContextClick)},
-                    volumeUnit = volumeUnit
-                )
-                
-                // Inline detail panel with animation
-                AnimatedVisibility(
-                    visible = selectedDayData != null,
-                    enter = slideInVertically(
-                        initialOffsetY = { -it / 2 },
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessMedium
-                        )
-                    ) + fadeIn(animationSpec = tween(300)),
-                    exit = slideOutVertically(
-                        targetOffsetY = { -it / 2 },
-                        animationSpec = tween(200)
-                    ) + fadeOut(animationSpec = tween(200))
-                ) {
-                    selectedDayData?.let { dayData ->
-                        InlineDetailPanel(
-                            data = ChartDetailData(
-                                date = dayData.date,
-                                amount = dayData.totalAmount,
-                                goal = null,
-                                goalPercentage = null
-                            ),
-                            onDismiss = { selectedDayData = null },
-                            volumeUnit = volumeUnit,
-                            dateFormat = dateFormat
-                        )
-                    }
-                }
-
-                // Period-specific summary
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    val totalAmount = filteredDailyTotals.sumOf { it.totalAmount }
-                    val daysWithData = filteredDailyTotals.count { it.totalAmount > 0.0 }
-                    val avgAmount = if (daysWithData > 0) totalAmount / daysWithData else 0.0
-                    val bestAmount = filteredDailyTotals.maxOfOrNull { it.totalAmount } ?: 0.0
-                    
-                    WeeklyStatItem(
-                        label = stringResource(R.string.history_stat_total),
-                        value = VolumeUnitConverter.format(context, totalAmount, volumeUnit)
-                    )
-                    WeeklyStatItem(
-                        label = stringResource(R.string.history_stat_average),
-                        value = VolumeUnitConverter.format(context, avgAmount, volumeUnit)
-                    )
-                    WeeklyStatItem(
-                        label = stringResource(R.string.history_stat_best_day),
-                        value = VolumeUnitConverter.format(context, bestAmount, volumeUnit)
-                    )
-                }
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.history_empty_week),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun WeeklyBarChart(
-    dailyTotals: List<com.cemcakmak.hydrotracker.data.database.dao.DailyTotal>,
-    onBarClick: (com.cemcakmak.hydrotracker.data.database.dao.DailyTotal) -> Unit,
-    volumeUnit: com.cemcakmak.hydrotracker.data.models.VolumeUnit
-) {
-    val context = LocalContext.current
-    if (dailyTotals.isEmpty()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = stringResource(R.string.history_empty_generic),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        return
-    }
-
-    val maxAmount = dailyTotals.maxOfOrNull { it.totalAmount } ?: 1.0
-
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        // Bar chart
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(120.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.Bottom
-        ) {
-            dailyTotals.forEach { dayTotal ->
-                val height = ((dayTotal.totalAmount / maxAmount) * 120).dp
-
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(height)
-                            .clip(MaterialTheme.shapes.small)
-                            .clickable { onBarClick(dayTotal) }
-                            .background(
-                                color = MaterialTheme.colorScheme.primary
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (height > 30.dp) {
-                            Text(
-                                text = VolumeUnitConverter.format(context, dayTotal.totalAmount, volumeUnit),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                }
-            }
-        }
-        
-        Spacer(modifier = Modifier.height(2.dp))
-
-        // Day labels
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            dailyTotals.forEach { dayTotal ->
-                Text(
-                    text = dayTotal.date.takeLast(2), // Show day number
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun WeeklyStatItem(
+internal fun ChartStatItem(
     label: String,
     value: String
 ) {
@@ -567,710 +310,6 @@ private fun WeeklyStatItem(
     }
 }
 
-@Composable
-private fun YearlyChartSection(
-    summaries: List<DailySummary>,
-    selectedPeriod: TimePeriod,
-    yearOffset: Int,
-    volumeUnit: com.cemcakmak.hydrotracker.data.models.VolumeUnit
-) {
-    val context = LocalContext.current
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text(
-                text = getPeriodTitle(selectedPeriod),
-                style = MaterialTheme.typography.titleLargeEmphasized
-            )
-
-            val filteredSummaries = filterSummariesByPeriod(summaries, selectedPeriod, weekOffset = 0, monthOffset = 0, yearOffset = yearOffset)
-            
-            if (filteredSummaries.isNotEmpty()) {
-                // Yearly visualization - all days of the year
-                YearlyHeatmap(
-                    summaries = filteredSummaries,
-                    onCellClick = { _ -> 
-                        // Cell click handler for future use
-                    }
-                )
-
-                // Yearly stats
-                val totalDays = filteredSummaries.size
-                val goalAchievedDays = filteredSummaries.count { it.goalAchieved }
-                val totalIntake = filteredSummaries.sumOf { it.totalIntake }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    WeeklyStatItem(
-                        label = stringResource(R.string.history_stat_days_tracked),
-                        value = "$totalDays"
-                    )
-                    WeeklyStatItem(
-                        label = stringResource(R.string.history_stat_goals_met),
-                        value = "$goalAchievedDays"
-                    )
-                    WeeklyStatItem(
-                        label = stringResource(R.string.history_stat_total_intake),
-                        value = VolumeUnitConverter.format(context, totalIntake, volumeUnit)
-                    )
-                }
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.history_empty_year),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun YearlyHeatmap(
-    summaries: List<DailySummary>,
-    onCellClick: (DailySummary) -> Unit
-) {
-    // Create a map for quick lookup of summaries by date
-    val summaryMap = summaries.associateBy { it.date }
-    
-    // Generate all days of the year
-    val yearToShow = if (summaries.isNotEmpty()) {
-        LocalDate.parse(summaries.first().date).year
-    } else {
-        LocalDate.now().year
-    }
-    
-    val startOfYear = LocalDate.of(yearToShow, 1, 1)
-    val daysInYear = if (startOfYear.isLeapYear) 366 else 365
-    
-    // Generate all dates in the year
-    val allDates = (0 until daysInYear).map { dayIndex ->
-        startOfYear.plusDays(dayIndex.toLong())
-    }
-
-    Column(
-        verticalArrangement = Arrangement.spacedBy(3.dp),
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Dynamic grid layout
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 12.dp),
-            contentPadding = PaddingValues(4.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
-            modifier = Modifier.heightIn(max = 400.dp)
-        ) {
-            items(allDates) { date ->
-                val dateString = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                val summary = summaryMap[dateString]
-
-                Box(
-                    modifier = Modifier
-                        .size(12.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .clickable(enabled = summary != null) { 
-                            summary?.let { onCellClick(it) }
-                        }
-                        .background(
-                            when {
-                                summary == null -> MaterialTheme.colorScheme.surfaceVariant
-                                summary.goalAchieved -> MaterialTheme.colorScheme.primary
-                                summary.goalPercentage >= 0.8f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                                summary.goalPercentage >= 0.6f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                                summary.goalPercentage >= 0.4f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
-                                summary.goalPercentage >= 0.2f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
-                                else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                            }
-                        )
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Legend
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(R.string.history_legend_less),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(3.dp)
-            ) {
-                listOf(0.1f, 0.25f, 0.4f, 0.6f, 0.8f, 1.0f).forEach { alpha ->
-                    Box(
-                        modifier = Modifier
-                            .size(12.dp)
-                            .clip(MaterialTheme.shapes.small)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = alpha))
-                    )
-                }
-            }
-            Text(
-                text = stringResource(R.string.history_legend_more),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-
-@Composable
-private fun MonthlyChartSection(
-    summaries: List<DailySummary>,
-    selectedPeriod: TimePeriod,
-    monthOffset: Int,
-    weekStartDay: WeekStartDay = WeekStartDay.SYSTEM,
-    volumeUnit: com.cemcakmak.hydrotracker.data.models.VolumeUnit,
-    dateFormat: com.cemcakmak.hydrotracker.data.models.DateFormatPattern = com.cemcakmak.hydrotracker.data.models.DateFormatPattern.SYSTEM
-) {
-    var selectedSummary by remember { mutableStateOf<DailySummary?>(null) }
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text(
-                text = getPeriodTitle(selectedPeriod),
-                style = MaterialTheme.typography.titleLargeEmphasized
-            )
-
-            val filteredSummaries = filterSummariesByPeriod(summaries, selectedPeriod, weekOffset = 0, monthOffset, 0)
-            
-            if (filteredSummaries.isNotEmpty()) {
-                val haptics = LocalHapticFeedback.current
-                // Monthly heatmap-style visualization
-                MonthlyHeatmap(
-                    summaries = filteredSummaries,
-                    onCellClick = { summary -> selectedSummary = summary
-                        haptics.performHapticFeedback(HapticFeedbackType.ContextClick)},
-                    weekStartDay = weekStartDay
-                )
-                
-                // Inline detail panel with animation
-                AnimatedVisibility(
-                    visible = selectedSummary != null,
-                    enter = slideInVertically(
-                        initialOffsetY = { -it / 2 },
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessMedium
-                        )
-                    ) + fadeIn(animationSpec = tween(300)),
-                    exit = slideOutVertically(
-                        targetOffsetY = { -it / 2 },
-                        animationSpec = tween(200)
-                    ) + fadeOut(animationSpec = tween(200))
-                ) {
-                    selectedSummary?.let { summary ->
-                        InlineDetailPanel(
-                            data = ChartDetailData(
-                                date = summary.date,
-                                amount = summary.totalIntake,
-                                goal = summary.dailyGoal,
-                                goalPercentage = summary.goalPercentage
-                            ),
-                            onDismiss = { selectedSummary = null },
-                            volumeUnit = volumeUnit,
-                            dateFormat = dateFormat
-                        )
-                    }
-                }
-
-                // Monthly stats
-                val totalDays = filteredSummaries.size
-                val goalAchievedDays = filteredSummaries.count { it.goalAchieved }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    WeeklyStatItem(
-                        label = stringResource(R.string.history_stat_days_tracked),
-                        value = "$totalDays"
-                    )
-                    WeeklyStatItem(
-                        label = stringResource(R.string.history_stat_goals_met),
-                        value = "$goalAchievedDays"
-                    )
-                    WeeklyStatItem(
-                        label = stringResource(R.string.history_stat_success_rate),
-                        value = stringResource(
-                            R.string.percent_format,
-                            ((goalAchievedDays.toFloat() / totalDays) * 100).toInt()
-                        )
-                    )
-                }
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.history_empty_month),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun MonthlyHeatmap(
-    summaries: List<DailySummary>,
-    onCellClick: (DailySummary) -> Unit,
-    weekStartDay: WeekStartDay = WeekStartDay.SYSTEM
-) {
-    // Create a map for quick lookup and determine the month being displayed
-    val summaryMap = summaries.associateBy { it.date }
-    
-    // Get the month/year being displayed
-    val monthYear = if (summaries.isNotEmpty()) {
-        val firstDate = LocalDate.parse(summaries.first().date)
-        firstDate.withDayOfMonth(1)
-    } else {
-        LocalDate.now().withDayOfMonth(1)
-    }
-
-    Column(
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        MonthlyCalendarGrid(
-            monthYear = monthYear,
-            summaryMap = summaryMap,
-            onCellClick = onCellClick,
-            weekStartDay = weekStartDay
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        // Legend
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(R.string.history_legend_less),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(3.dp)
-            ) {
-                listOf(0.1f, 0.25f, 0.4f, 0.6f, 0.8f, 1.0f).forEach { alpha ->
-                    Box(
-                        modifier = Modifier
-                            .size(18.dp)
-                            .clip(MaterialTheme.shapes.small)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = alpha))
-                    )
-                }
-            }
-            Text(
-                text = stringResource(R.string.history_legend_more),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-@Composable
-private fun MonthlyCalendarGrid(
-    monthYear: LocalDate,
-    summaryMap: Map<String, DailySummary>,
-    onCellClick: (DailySummary) -> Unit,
-    weekStartDay: WeekStartDay = WeekStartDay.SYSTEM
-) {
-    // Use the user's preferred week start day (resolve SYSTEM to the device locale)
-    val weekFields = WeekFields.of(weekStartDay.resolve(), 1)
-    
-    // Get first day of month and its day of week
-    val firstDayOfMonth = monthYear.withDayOfMonth(1)
-    val lastDayOfMonth = monthYear.withDayOfMonth(monthYear.lengthOfMonth())
-    
-    // Find the first day to display (might be from previous month)
-    val startOfCalendar = firstDayOfMonth.with(weekFields.dayOfWeek(), 1)
-    
-    // Find the last day to display (might be from next month)
-    val endOfCalendar = lastDayOfMonth.with(weekFields.dayOfWeek(), 7)
-    
-    // Generate all days for the calendar grid
-    val calendarDays = mutableListOf<LocalDate>()
-    var currentDate = startOfCalendar
-    while (!currentDate.isAfter(endOfCalendar)) {
-        calendarDays.add(currentDate)
-        currentDate = currentDate.plusDays(1)
-    }
-    
-    // Group into weeks
-    val weeks = calendarDays.chunked(7)
-
-    Column(
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        // Day headers based on week start day
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            val dayHeaders = if (weekStartDay.resolve() == java.time.DayOfWeek.SUNDAY) {
-                listOf(
-                    R.string.weekday_short_sun,
-                    R.string.weekday_short_mon,
-                    R.string.weekday_short_tue,
-                    R.string.weekday_short_wed,
-                    R.string.weekday_short_thu,
-                    R.string.weekday_short_fri,
-                    R.string.weekday_short_sat
-                )
-            } else {
-                listOf(
-                    R.string.weekday_short_mon,
-                    R.string.weekday_short_tue,
-                    R.string.weekday_short_wed,
-                    R.string.weekday_short_thu,
-                    R.string.weekday_short_fri,
-                    R.string.weekday_short_sat,
-                    R.string.weekday_short_sun
-                )
-            }
-
-            dayHeaders.forEach { dayNameResId ->
-                Text(
-                    text = stringResource(dayNameResId),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-        
-        // Calendar weeks
-        weeks.forEach { week ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                week.forEach { date ->
-                    val dateString = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                    val summary = summaryMap[dateString]
-                    val isCurrentMonth = date.month == monthYear.month
-                    
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .aspectRatio(1f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(28.dp)
-                                .clip(MaterialTheme.shapes.small)
-                                .clickable(enabled = summary != null && isCurrentMonth) { 
-                                    summary?.let { onCellClick(it) }
-                                }
-                                .background(
-                                    when {
-                                        !isCurrentMonth -> Color.Transparent
-                                        summary == null -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                                        summary.goalAchieved -> MaterialTheme.colorScheme.primary
-                                        summary.goalPercentage >= 0.8f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                                        summary.goalPercentage >= 0.6f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                                        summary.goalPercentage >= 0.4f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
-                                        summary.goalPercentage >= 0.2f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
-                                        else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                                    }
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            if (isCurrentMonth) {
-                                Text(
-                                    text = date.dayOfMonth.toString(),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = when {
-                                        summary == null -> MaterialTheme.colorScheme.onSurfaceVariant
-                                        summary.goalPercentage > 0.5f -> MaterialTheme.colorScheme.onPrimary
-                                        else -> MaterialTheme.colorScheme.onSurfaceVariant
-                                    },
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun StatisticsGrid(
-    summaries: List<DailySummary>,
-    volumeUnit: com.cemcakmak.hydrotracker.data.models.VolumeUnit
-) {
-    val context = LocalContext.current
-    Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.history_section_statistics),
-            style = MaterialTheme.typography.titleLargeEmphasized
-        )
-
-        // Calculate statistics from ALL data (not filtered)
-        val currentStreak = calculateStreak(summaries.sortedByDescending { it.date })
-        val totalIntake = summaries.sumOf { it.totalIntake }
-        val totalDays = summaries.size
-        
-        // Calculate daily average from all data
-        val dailyAverage = if (totalDays > 0) totalIntake / totalDays else 0.0
-        
-        
-        // Grid of stat cards - consistent across all periods
-        Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                StatCard(
-                    modifier = Modifier.weight(1f),
-                    icon = Icons.Default.LocalFireDepartment,
-                    title = stringResource(R.string.history_stat_current_streak),
-                    value = currentStreak.toString(),
-                    subtitle = pluralStringResource(
-                        R.plurals.history_streak_days,
-                        currentStreak,
-                        currentStreak
-                    ),
-                    color = MaterialTheme.colorScheme.error,
-                )
-
-                val dailyAverageFormatted = VolumeUnitConverter.format(context, dailyAverage, volumeUnit)
-                val dailyAverageParts = dailyAverageFormatted.split(" ", limit = 2)
-                StatCard(
-                    modifier = Modifier.weight(1f),
-                    icon = Icons.Default.Stars,
-                    title = stringResource(R.string.history_stat_daily_average),
-                    value = dailyAverageParts.getOrElse(0) { "" },
-                    subtitle = dailyAverageParts.getOrElse(1) { "" },
-                    color = MaterialTheme.colorScheme.secondary
-                )
-
-                val totalIntakeFormatted = VolumeUnitConverter.format(context, totalIntake, volumeUnit)
-                val totalIntakeParts = totalIntakeFormatted.split(" ", limit = 2)
-                StatCard(
-                    modifier = Modifier.weight(1f),
-                    icon = Icons.Default.WaterDrop,
-                    title = stringResource(R.string.history_stat_total_intake),
-                    value = totalIntakeParts.getOrElse(0) { "" },
-                    subtitle = totalIntakeParts.getOrElse(1) { "" },
-                    color = MaterialTheme.colorScheme.tertiary,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun StatCard(
-    modifier: Modifier = Modifier,
-    icon: ImageVector,
-    title: String,
-    value: String,
-    subtitle: String,
-    color: Color,
-) {
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = color,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = value,
-                    style = MaterialTheme.typography.headlineMediumEmphasized,
-                    color = color
-                )
-
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.labelMediumEmphasized,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun GoalAchievementSection(
-    summaries: List<DailySummary>,
-    selectedPeriod: TimePeriod,
-    weekOffset: Int,
-    monthOffset: Int,
-    yearOffset: Int,
-    weekStartDay: WeekStartDay = WeekStartDay.SYSTEM
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.history_section_goal_achievement),
-                style = MaterialTheme.typography.titleLargeEmphasized,
-            )
-
-            val filteredSummaries = filterSummariesByPeriod(summaries, selectedPeriod, weekOffset, monthOffset, yearOffset, weekStartDay)
-            
-            if (filteredSummaries.isNotEmpty()) {
-                val achievementRate = filteredSummaries.count { it.goalAchieved }.toFloat() / filteredSummaries.size
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    // Large achievement percentage
-                    Text(
-                        text = stringResource(
-                            R.string.percent_format,
-                            (achievementRate * 100).toInt()
-                        ),
-                        style = MaterialTheme.typography.displayMedium,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-
-                    Text(
-                        text = stringResource(R.string.history_goal_achievement_subtitle),
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-
-                    // Achievement progress bar
-                    LinearWavyProgressIndicator(
-                        progress = { achievementRate },
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.primary,
-                        trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-                        stroke = WavyProgressIndicatorDefaults.linearIndicatorStroke,
-                        trackStroke = WavyProgressIndicatorDefaults.linearTrackStroke,
-                        amplitude = WavyProgressIndicatorDefaults.indicatorAmplitude,
-                        wavelength = WavyProgressIndicatorDefaults.LinearDeterminateWavelength,
-                        waveSpeed = WavyProgressIndicatorDefaults.LinearDeterminateWavelength
-                    )
-                }
-            } else {
-                Text(
-                    text = stringResource(R.string.history_empty_goal_achievement),
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-            }
-        }
-    }
-}
-
-// Helper functions
-private fun calculateStreak(summaries: List<DailySummary>): Int {
-    var streak = 0
-    val sortedSummaries = summaries.sortedByDescending { it.date }
-
-    for (summary in sortedSummaries) {
-        if (summary.goalAchieved) {
-            streak++
-        } else {
-            break
-        }
-    }
-    return streak
-}
-
-
-
-
 data class ChartDetailData(
     val date: String,
     val amount: Double,
@@ -1278,135 +317,132 @@ data class ChartDetailData(
     val goalPercentage: Float?
 )
 
-
 @Composable
-private fun InlineDetailPanel(
+internal fun InlineDetailPanel(
     data: ChartDetailData,
     onDismiss: () -> Unit,
-    volumeUnit: com.cemcakmak.hydrotracker.data.models.VolumeUnit,
-    dateFormat: com.cemcakmak.hydrotracker.data.models.DateFormatPattern
+    volumeUnit: VolumeUnit,
+    dateFormat: DateFormatPattern
 ) {
     val context = LocalContext.current
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            // Header with close button
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Header with close button
+                Text(
+                    text = DateTimeFormatters.formatDate(LocalDate.parse(data.date), dateFormat),
+                    style = MaterialTheme.typography.titleMediumEmphasized,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                val haptics = LocalHapticFeedback.current
+                FilledIconButton(
+                    onClick = {
+                        haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                        onDismiss()
+                    },
+                    colors = IconButtonDefaults.filledIconButtonColors(),
+                    shapes = IconButtonDefaults.shapes(),
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = stringResource(R.string.action_close),
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
+
+            // Content in a more compact layout
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Water amount - prominent display
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = DateTimeFormatters.formatDate(LocalDate.parse(data.date), dateFormat),
-                        style = MaterialTheme.typography.titleMediumEmphasized,
+                        text = stringResource(R.string.history_detail_water_intake),
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
-                    val haptics = LocalHapticFeedback.current
-                    FilledIconButton(
-                        onClick = {
-                            haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                            onDismiss()
-                        },
-                        colors = IconButtonDefaults.filledIconButtonColors(),
-                        shapes = IconButtonDefaults.shapes(),
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = stringResource(R.string.action_close),
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
+                    Text(
+                        text = VolumeUnitConverter.format(context, data.amount, volumeUnit),
+                        style = MaterialTheme.typography.titleLargeEmphasized,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
-                
-                // Content in a more compact layout
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // Water amount - prominent display
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(R.string.history_detail_water_intake),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                        Text(
-                            text = VolumeUnitConverter.format(context, data.amount, volumeUnit),
-                            style = MaterialTheme.typography.titleLargeEmphasized,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    
-                    // Goal information (if available)
-                    data.goal?.let { goal ->
-                        data.goalPercentage?.let { percentage ->
-                            // Compact progress display
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column {
-                                    Text(
-                                        text = stringResource(
-                                            R.string.history_detail_goal,
-                                            VolumeUnitConverter.format(context, goal, volumeUnit)
-                                        ),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                                    )
-                                    Text(
-                                        text = stringResource(
-                                            R.string.history_detail_progress,
-                                            (percentage * 100).toInt()
-                                        ),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                                    )
-                                }
+
+                // Goal information (if available)
+                data.goal?.let { goal ->
+                    data.goalPercentage?.let { percentage ->
+                        // Compact progress display
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(
+                                    text = stringResource(
+                                        R.string.history_detail_goal,
+                                        VolumeUnitConverter.format(context, goal, volumeUnit)
+                                    ),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                                Text(
+                                    text = stringResource(
+                                        R.string.history_detail_progress,
+                                        (percentage * 100).toInt()
+                                    ),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
                             }
-                            
-                            // Compact progress bar
-                            LinearProgressIndicator(
-                                progress = { percentage.coerceAtMost(1.0f) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(6.dp)
-                                    .clip(MaterialTheme.shapes.small),
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                trackColor = MaterialTheme.colorScheme.surfaceVariant
-                            )
                         }
+
+                        // Compact progress bar
+                        LinearProgressIndicator(
+                            progress = { percentage.coerceAtMost(1.0f) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(6.dp)
+                                .clip(MaterialTheme.shapes.small),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
                     }
                 }
             }
         }
     }
-
-
+}
 
 @Composable
-private fun getCurrentPeriodText(
+internal fun getCurrentPeriodText(
     period: TimePeriod,
     weekOffset: Int,
     monthOffset: Int,
     yearOffset: Int,
     weekStartDay: WeekStartDay = WeekStartDay.SYSTEM,
-    dateFormat: com.cemcakmak.hydrotracker.data.models.DateFormatPattern = com.cemcakmak.hydrotracker.data.models.DateFormatPattern.SYSTEM
+    dateFormat: DateFormatPattern = DateFormatPattern.SYSTEM
 ): String {
     return when (period) {
         TimePeriod.WEEKLY -> {
@@ -1440,7 +476,7 @@ private fun getCurrentPeriodText(
 }
 
 @Composable
-private fun getPeriodTitle(period: TimePeriod): String {
+internal fun getPeriodTitle(period: TimePeriod): String {
     return when (period) {
         TimePeriod.WEEKLY -> stringResource(R.string.history_weekly_overview)
         TimePeriod.MONTHLY -> stringResource(R.string.history_monthly_overview)
@@ -1449,17 +485,17 @@ private fun getPeriodTitle(period: TimePeriod): String {
 }
 
 
-private fun getWeekDateRange(weekOffset: Int, weekStartDay: WeekStartDay = WeekStartDay.SYSTEM): Pair<LocalDate, LocalDate> {
+internal fun getWeekDateRange(weekOffset: Int, weekStartDay: WeekStartDay = WeekStartDay.SYSTEM): Pair<LocalDate, LocalDate> {
     val today = LocalDate.now()
     val weekFields = WeekFields.of(weekStartDay.resolve(), 1)
-    
+
     // Get the start of current week first
     val currentWeekStart = today.with(weekFields.dayOfWeek(), 1)
-    
+
     // Then apply the offset to get the target week
     val targetWeekStart = currentWeekStart.plusWeeks(weekOffset.toLong())
     val targetWeekEnd = targetWeekStart.plusDays(6)
-    
+
     return Pair(targetWeekStart, targetWeekEnd)
 }
 
@@ -1479,7 +515,7 @@ private fun getYearDateRange(yearOffset: Int): Pair<LocalDate, LocalDate> {
     return Pair(startOfYear, endOfYear)
 }
 
-private fun filterSummariesByPeriod(
+internal fun filterSummariesByPeriod(
     summaries: List<DailySummary>,
     period: TimePeriod,
     weekOffset: Int,
