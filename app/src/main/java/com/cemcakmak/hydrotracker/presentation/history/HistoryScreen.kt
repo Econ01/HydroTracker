@@ -31,9 +31,11 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.annotation.StringRes
 import com.cemcakmak.hydrotracker.R
+import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
 import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
 import com.cemcakmak.hydrotracker.data.models.UserProfile
@@ -54,21 +56,35 @@ fun HistoryScreen(
     userProfile: UserProfile? = null,
     paddingValues: PaddingValues
 ) {
-    val volumeUnit = userProfile?.volumeUnit ?: com.cemcakmak.hydrotracker.data.models.VolumeUnit.MILLILITRES
-    // State for different time periods
-    var selectedPeriod by remember { mutableStateOf(TimePeriod.WEEKLY) }
-    
-    // Navigation state for current week/month/year
-    var currentWeekOffset by remember { mutableIntStateOf(0) } // 0 = current week, -1 = previous week, etc.
-    var currentMonthOffset by remember { mutableIntStateOf(0) } // 0 = current month, -1 = previous month, etc.
-    var currentYearOffset by remember { mutableIntStateOf(0) } // 0 = current year, -1 = previous year, etc.
-
     // Collect ALL historical data from repository (not just last 30 days)
     val allSummaries by waterIntakeRepository.getAllSummaries().collectAsState(
         initial = emptyList()
     )
 
+    HistoryScreenContent(
+        summaries = allSummaries,
+        themePreferences = themePreferences,
+        userProfile = userProfile,
+        paddingValues = paddingValues
+    )
+}
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun HistoryScreenContent(
+    summaries: List<DailySummary>,
+    themePreferences: ThemePreferences = ThemePreferences(),
+    userProfile: UserProfile? = null,
+    paddingValues: PaddingValues
+) {
+    val volumeUnit = userProfile?.volumeUnit ?: com.cemcakmak.hydrotracker.data.models.VolumeUnit.MILLILITRES
+    // State for different time periods
+    var selectedPeriod by remember { mutableStateOf(TimePeriod.WEEKLY) }
+
+    // Navigation state for current week/month/year
+    var currentWeekOffset by remember { mutableIntStateOf(0) } // 0 = current week, -1 = previous week, etc.
+    var currentMonthOffset by remember { mutableIntStateOf(0) } // 0 = current month, -1 = previous month, etc.
+    var currentYearOffset by remember { mutableIntStateOf(0) } // 0 = current year, -1 = previous year, etc.
 
     LazyColumn(
         modifier = Modifier
@@ -76,91 +92,91 @@ fun HistoryScreen(
             .padding(paddingValues),
         contentPadding = PaddingValues(16.dp),
     ) {
-            // Period Selector
-            item {
-                PeriodSelector(
-                    selectedPeriod = selectedPeriod,
-                    onPeriodSelected = {
-                        selectedPeriod = it
-                        // Reset navigation when switching between periods
-                        currentWeekOffset = 0
-                        currentMonthOffset = 0
-                        currentYearOffset = 0
-                    },
-                    currentWeekOffset = currentWeekOffset,
-                    currentMonthOffset = currentMonthOffset,
-                    currentYearOffset = currentYearOffset,
-                    onWeekOffsetChanged = { currentWeekOffset = it },
-                    onMonthOffsetChanged = { currentMonthOffset = it },
-                    onYearOffsetChanged = { currentYearOffset = it },
-                    weekStartDay = themePreferences.weekStartDay,
-                    dateFormat = themePreferences.dateFormat
-                )
-            }
+        // Period Selector
+        item {
+            PeriodSelector(
+                selectedPeriod = selectedPeriod,
+                onPeriodSelected = {
+                    selectedPeriod = it
+                    // Reset navigation when switching between periods
+                    currentWeekOffset = 0
+                    currentMonthOffset = 0
+                    currentYearOffset = 0
+                },
+                currentWeekOffset = currentWeekOffset,
+                currentMonthOffset = currentMonthOffset,
+                currentYearOffset = currentYearOffset,
+                onWeekOffsetChanged = { currentWeekOffset = it },
+                onMonthOffsetChanged = { currentMonthOffset = it },
+                onYearOffsetChanged = { currentYearOffset = it },
+                weekStartDay = themePreferences.weekStartDay,
+                dateFormat = themePreferences.dateFormat
+            )
+        }
 
-            // Main Chart Section
-            item {
-                when (selectedPeriod) {
-                    TimePeriod.WEEKLY -> {
-                        WeeklyChartSection(
-                            selectedPeriod = selectedPeriod,
-                            weekOffset = currentWeekOffset,
-                            summaries = allSummaries,
-                            weekStartDay = themePreferences.weekStartDay,
-                            volumeUnit = volumeUnit,
-                            dateFormat = themePreferences.dateFormat
-                        )
-                    }
-                    TimePeriod.MONTHLY -> {
-                        MonthlyChartSection(
-                            summaries = allSummaries,
-                            selectedPeriod = selectedPeriod,
-                            monthOffset = currentMonthOffset,
-                            weekStartDay = themePreferences.weekStartDay,
-                            volumeUnit = volumeUnit,
-                            dateFormat = themePreferences.dateFormat
-                        )
-                    }
-                    TimePeriod.YEARLY -> {
-                        YearlyChartSection(
-                            summaries = allSummaries,
-                            selectedPeriod = selectedPeriod,
-                            yearOffset = currentYearOffset,
-                            volumeUnit = volumeUnit
-                        )
-                    }
+        // Main Chart Section
+        item {
+            when (selectedPeriod) {
+                TimePeriod.WEEKLY -> {
+                    WeeklyChartSection(
+                        selectedPeriod = selectedPeriod,
+                        weekOffset = currentWeekOffset,
+                        summaries = summaries,
+                        weekStartDay = themePreferences.weekStartDay,
+                        volumeUnit = volumeUnit,
+                        dateFormat = themePreferences.dateFormat
+                    )
+                }
+                TimePeriod.MONTHLY -> {
+                    MonthlyChartSection(
+                        summaries = summaries,
+                        selectedPeriod = selectedPeriod,
+                        monthOffset = currentMonthOffset,
+                        weekStartDay = themePreferences.weekStartDay,
+                        volumeUnit = volumeUnit,
+                        dateFormat = themePreferences.dateFormat
+                    )
+                }
+                TimePeriod.YEARLY -> {
+                    YearlyChartSection(
+                        summaries = summaries,
+                        selectedPeriod = selectedPeriod,
+                        yearOffset = currentYearOffset,
+                        volumeUnit = volumeUnit
+                    )
                 }
             }
-
-            // Statistics Overview
-            item {
-                StatisticsGrid(
-                    summaries = allSummaries,
-                    volumeUnit = volumeUnit
-                )
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            // Goal Achievement
-            item {
-                GoalAchievementSection(
-                    summaries = allSummaries,
-                    selectedPeriod = selectedPeriod,
-                    weekOffset = currentWeekOffset,
-                    monthOffset = currentMonthOffset,
-                    yearOffset = currentYearOffset,
-                    weekStartDay = themePreferences.weekStartDay
-                )
-            }
-
-            // Bottom spacer for navigation bar
-            item {
-                Spacer(modifier = Modifier.height(80.dp))
-            }
         }
+
+        // Statistics Overview
+        item {
+            StatisticsGrid(
+                summaries = summaries,
+                volumeUnit = volumeUnit
+            )
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        // Goal Achievement
+        item {
+            GoalAchievementSection(
+                summaries = summaries,
+                selectedPeriod = selectedPeriod,
+                weekOffset = currentWeekOffset,
+                monthOffset = currentMonthOffset,
+                yearOffset = currentYearOffset,
+                weekStartDay = themePreferences.weekStartDay
+            )
+        }
+
+        // Bottom spacer for navigation bar
+        item {
+            Spacer(modifier = Modifier.height(80.dp))
+        }
+    }
 }
 
 enum class TimePeriod(@param:StringRes val displayNameResId: Int) {
@@ -1459,10 +1475,49 @@ private fun filterSummariesByPeriod(
         TimePeriod.MONTHLY -> getMonthDateRange(monthOffset)
         TimePeriod.YEARLY -> getYearDateRange(yearOffset)
     }
-    
+
     return summaries.filter { summary ->
         val summaryDate = LocalDate.parse(summary.date)
         summaryDate in startDate..endDate
+    }
+}
+
+@Preview(showBackground = true, name = "History Screen")
+@Composable
+private fun HistoryScreenContentPreview() {
+    val today = LocalDate.now()
+    val dailyGoal = 2700.0
+    val sampleSummaries = List(35) { index ->
+        val date = today.minusDays(index.toLong())
+        val totalIntake = when (index % 7) {
+            0 -> dailyGoal * 1.10
+            1 -> dailyGoal * 0.95
+            2 -> dailyGoal * 0.75
+            3 -> dailyGoal * 1.05
+            4 -> dailyGoal * 0.50
+            5 -> dailyGoal * 0.85
+            else -> dailyGoal * 1.20
+        }
+        val entryCount = 4 + (index % 5)
+        DailySummary(
+            date = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+            totalIntake = totalIntake,
+            dailyGoal = dailyGoal,
+            goalAchieved = totalIntake >= dailyGoal,
+            goalPercentage = (totalIntake / dailyGoal).toFloat(),
+            entryCount = entryCount,
+            firstIntakeTime = null,
+            lastIntakeTime = null,
+            largestIntake = totalIntake * 0.4,
+            averageIntake = totalIntake / entryCount
+        )
+    }
+
+    HydroTrackerTheme {
+        HistoryScreenContent(
+            summaries = sampleSummaries,
+            paddingValues = PaddingValues(0.dp)
+        )
     }
 }
 
