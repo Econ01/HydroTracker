@@ -49,6 +49,7 @@ import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
+import com.cemcakmak.hydrotracker.presentation.common.BlurMorph
 import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 import java.time.LocalDate
@@ -256,18 +257,35 @@ private fun PeriodSelector(
                 )
             }
 
-            Text(
-                text = getCurrentPeriodText(
+            data class PeriodTitleState(
+                val period: TimePeriod,
+                val weekOffset: Int,
+                val monthOffset: Int,
+                val yearOffset: Int
+            )
+
+            BlurMorph(
+                targetState = PeriodTitleState(
                     selectedPeriod,
                     currentWeekOffset,
                     currentMonthOffset,
-                    currentYearOffset,
-                    weekStartDay,
-                    dateFormat
-                ),
-                style = MaterialTheme.typography.titleMediumEmphasized,
-                textAlign = TextAlign.Center
-            )
+                    currentYearOffset
+                )
+            ) { state, blurModifier ->
+                Text(
+                    modifier = Modifier.then(blurModifier),
+                    text = getCurrentPeriodText(
+                        state.period,
+                        state.weekOffset,
+                        state.monthOffset,
+                        state.yearOffset,
+                        weekStartDay,
+                        dateFormat
+                    ),
+                    style = MaterialTheme.typography.titleMediumEmphasized,
+                    textAlign = TextAlign.Center
+                )
+            }
 
             IconButton(
                 onClick = {

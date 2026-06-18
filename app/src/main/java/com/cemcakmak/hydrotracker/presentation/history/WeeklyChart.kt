@@ -21,6 +21,8 @@
 package com.cemcakmak.hydrotracker.presentation.history
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -36,10 +38,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,9 +64,12 @@ import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
 import com.cemcakmak.hydrotracker.data.models.DateFormatPattern
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
+import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlin.math.max
 
 @Composable
 internal fun WeeklyChartSection(
@@ -85,6 +92,7 @@ internal fun WeeklyChartSection(
 
         // Filter summaries for the selected week and convert to DailyTotal format
         val filteredSummaries = filterSummariesByPeriod(summaries, TimePeriod.WEEKLY, weekOffset, 0, 0, weekStartDay)
+        val dailyGoal = filteredSummaries.firstOrNull()?.dailyGoal ?: 2700.0
 
         // Create a complete week with all 7 days, filling in missing days with 0 data
         val (startOfWeek) = getWeekDateRange(weekOffset, weekStartDay)
@@ -108,6 +116,7 @@ internal fun WeeklyChartSection(
             // Simple bar chart representation
             WeeklyBarChart(
                 dailyTotals = filteredDailyTotals,
+                dailyGoal = dailyGoal,
                 onBarClick = { dayTotal -> selectedDayData = dayTotal
                     haptics.performHapticFeedback(HapticFeedbackType.ContextClick)},
                 volumeUnit = volumeUnit
@@ -153,17 +162,30 @@ internal fun WeeklyChartSection(
                 val avgAmount = if (daysWithData > 0) totalAmount / daysWithData else 0.0
                 val bestAmount = filteredDailyTotals.maxOfOrNull { it.totalAmount } ?: 0.0
 
+                val animatedTotal = rememberAnimatedDouble(
+                    targetValue = totalAmount,
+                    hapticsEnabled = false
+                )
+                val animatedAverage = rememberAnimatedDouble(
+                    targetValue = avgAmount,
+                    hapticsEnabled = false
+                )
+                val animatedBest = rememberAnimatedDouble(
+                    targetValue = bestAmount,
+                    hapticsEnabled = false
+                )
+
                 ChartStatItem(
                     label = stringResource(R.string.history_stat_total),
-                    value = VolumeUnitConverter.format(context, totalAmount, volumeUnit)
+                    value = VolumeUnitConverter.format(context, animatedTotal.toDouble(), volumeUnit)
                 )
                 ChartStatItem(
                     label = stringResource(R.string.history_stat_average),
-                    value = VolumeUnitConverter.format(context, avgAmount, volumeUnit)
+                    value = VolumeUnitConverter.format(context, animatedAverage.toDouble(), volumeUnit)
                 )
                 ChartStatItem(
                     label = stringResource(R.string.history_stat_best_day),
-                    value = VolumeUnitConverter.format(context, bestAmount, volumeUnit)
+                    value = VolumeUnitConverter.format(context, animatedBest.toDouble(), volumeUnit)
                 )
             }
         } else {
@@ -187,6 +209,7 @@ internal fun WeeklyChartSection(
 @Composable
 private fun WeeklyBarChart(
     dailyTotals: List<DailyTotal>,
+    dailyGoal: Double,
     onBarClick: (DailyTotal) -> Unit,
     volumeUnit: VolumeUnit
 ) {
@@ -207,48 +230,100 @@ private fun WeeklyBarChart(
         return
     }
 
-    val maxAmount = dailyTotals.maxOfOrNull { it.totalAmount } ?: 1.0
+    val todayString = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+    val weekMax = dailyTotals.maxOfOrNull { it.totalAmount } ?: 0.0
+    val maxAmount = max(dailyGoal, weekMax)
     val barMaxHeight = 180
+    val minBarHeight = 8
+    val minTextHeight = 30
+
+    val goalLineOffset = (dailyGoal / maxAmount) * barMaxHeight
+    val animatedGoalLineOffset = rememberAnimatedBar(
+        targetValue = goalLineOffset
+    )
 
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Bar chart
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(barMaxHeight.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.Bottom
+                .height(barMaxHeight.dp)
         ) {
-            dailyTotals.forEach { dayTotal ->
-                val height = ((dayTotal.totalAmount / maxAmount) * barMaxHeight).dp
+            // Bar chart
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(barMaxHeight.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.Bottom
+            ) {
+                dailyTotals.forEachIndexed { _, dayTotal ->
+                    val isEmpty = dayTotal.totalAmount == 0.0
+                    val isToday = dayTotal.date == todayString
+                    val isGoalMet = !isEmpty && dayTotal.totalAmount >= dailyGoal
 
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(height)
-                            .clip(MaterialTheme.shapes.extraExtraLarge)
-                            .clickable { onBarClick(dayTotal) }
-                            .background(
-                                color = MaterialTheme.colorScheme.tertiary
-                            ),
-                        contentAlignment = Alignment.Center
+                    val barColor = when {
+                        isToday -> MaterialTheme.colorScheme.primary
+                        isEmpty -> MaterialTheme.colorScheme.surfaceContainerHighest
+                        isGoalMet -> MaterialTheme.colorScheme.tertiary
+                        else -> MaterialTheme.colorScheme.secondary
+                    }
+
+                    val rawHeight = if (isEmpty) {
+                        minBarHeight.toDouble()
+                    } else {
+                        (dayTotal.totalAmount / maxAmount) * barMaxHeight
+                    }
+                    val targetHeight = rawHeight.dp
+                    val animatedHeight = rememberAnimatedBar(
+                        targetValue = rawHeight
+                    )
+
+                    val textColor = when {
+                        isToday -> MaterialTheme.colorScheme.onPrimary
+                        isEmpty -> MaterialTheme.colorScheme.onSecondary
+                        isGoalMet -> MaterialTheme.colorScheme.onTertiary
+                        else -> MaterialTheme.colorScheme.onSecondary
+                    }
+
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        if (height > 30.dp) {
-                            Text(
-                                text = VolumeUnitConverter.format(context, dayTotal.totalAmount, volumeUnit),
-                                style = MaterialTheme.typography.labelSmallEmphasized,
-                                color = MaterialTheme.colorScheme.onTertiary,
-                            )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(animatedHeight.dp)
+                                .clip(MaterialTheme.shapes.extraExtraLarge)
+                                .clickable { onBarClick(dayTotal) }
+                                .background(color = barColor),
+                            contentAlignment = Alignment.BottomCenter
+                        ) {
+                            if (targetHeight > minTextHeight.dp) {
+                                Text(
+                                    text = VolumeUnitConverter.format(context, dayTotal.totalAmount, volumeUnit),
+                                    style = MaterialTheme.typography.labelSmallEmphasized,
+                                    color = textColor,
+                                    modifier = Modifier.padding(bottom = 6.dp)
+                                )
+                            }
                         }
                     }
                 }
             }
+
+            // Goal line
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(2.dp)
+                    .align(Alignment.BottomStart)
+                    .offset(y = (-animatedGoalLineOffset).dp)
+                    .clip(MaterialTheme.shapes.extraExtraLarge)
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+
+            )
         }
 
         // Day labels
@@ -269,6 +344,23 @@ private fun WeeklyBarChart(
     }
 }
 
+@Composable
+fun rememberAnimatedBar(
+    targetValue: Double,
+    animationSpec: AnimationSpec<Float> = MaterialTheme.motionScheme.slowSpatialSpec()
+): Float {
+    val animatable = remember { Animatable(0f) }
+
+    LaunchedEffect(targetValue) {
+        animatable.animateTo(
+            targetValue = targetValue.toFloat(),
+            animationSpec = animationSpec
+        )
+    }
+
+    return animatable.value
+}
+
 @Preview(showBackground = true, name = "Weekly Chart")
 @Composable
 private fun WeeklyChartSectionPreview() {
@@ -279,7 +371,7 @@ private fun WeeklyChartSectionPreview() {
         val totalIntake = when (dayIndex) {
             0 -> dailyGoal * 1.10
             1 -> dailyGoal * 0.95
-            2 -> dailyGoal * 0.75
+            2 -> dailyGoal * 0
             3 -> dailyGoal * 1.05
             4 -> dailyGoal * 0.50
             5 -> dailyGoal * 0.85
