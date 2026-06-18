@@ -461,13 +461,14 @@ private fun NotificationPreviewCard(
                 .fillMaxWidth()
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             BlurMorph(targetState = currentStyle) { style, blurModifier ->
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .then(blurModifier),
+                        .then(blurModifier)
+                        .padding(vertical = 8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // Style name
@@ -512,7 +513,8 @@ private fun NotificationPreviewCard(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .then(blurModifier),
+                        .then(blurModifier)
+                        .padding(vertical = 8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
@@ -553,7 +555,8 @@ private fun NotificationPreviewCard(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .then(blurModifier),
+                        .then(blurModifier)
+                        .padding(vertical = 8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(

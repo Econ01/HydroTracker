@@ -273,7 +273,10 @@ private fun PeriodSelector(
                 )
             ) { state, blurModifier ->
                 Text(
-                    modifier = Modifier.then(blurModifier),
+                    modifier = Modifier
+                        .then(blurModifier)
+                        .padding(horizontal = 12.dp)
+                        .padding(vertical = 8.dp),
                     text = getCurrentPeriodText(
                         state.period,
                         state.weekOffset,

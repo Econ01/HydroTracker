@@ -21,6 +21,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Dp
 import com.cemcakmak.hydrotracker.utils.SmartHaptics
@@ -35,7 +36,7 @@ fun <T> BlurMorph(
     val fadeSpec = tween<Float>(durationMillis = 600, delayMillis = 100, easing = EaseInOut)
     val blurSpec = tween<Dp>(durationMillis = 800, easing = EaseInOut)
     AnimatedContent(
-        modifier = modifier,
+        modifier = modifier.graphicsLayer(clip = false),
         targetState = targetState,
         transitionSpec = {
             (fadeIn(fadeSpec) togetherWith fadeOut(fadeSpec)) using SizeTransform(clip = false)
