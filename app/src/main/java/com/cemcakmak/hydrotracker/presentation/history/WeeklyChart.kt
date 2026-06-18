@@ -56,6 +56,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.dao.DailyTotal
@@ -63,6 +64,7 @@ import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
 import com.cemcakmak.hydrotracker.data.models.DateFormatPattern
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
+import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 import java.time.format.DateTimeFormatter
 
@@ -278,5 +280,46 @@ private fun WeeklyBarChart(
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true, name = "Weekly Chart")
+@Composable
+private fun WeeklyChartSectionPreview() {
+    val dailyGoal = 2700.0
+    val startOfWeek = getWeekDateRange(0, WeekStartDay.SYSTEM).first
+    val sampleSummaries = (0..6).map { dayIndex ->
+        val date = startOfWeek.plusDays(dayIndex.toLong())
+        val totalIntake = when (dayIndex) {
+            0 -> dailyGoal * 1.10
+            1 -> dailyGoal * 0.95
+            2 -> dailyGoal * 0.75
+            3 -> dailyGoal * 1.05
+            4 -> dailyGoal * 0.50
+            5 -> dailyGoal * 0.85
+            else -> dailyGoal * 1.20
+        }
+        val entryCount = 4 + (dayIndex % 3)
+        DailySummary(
+            date = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+            totalIntake = totalIntake,
+            dailyGoal = dailyGoal,
+            goalAchieved = totalIntake >= dailyGoal,
+            goalPercentage = (totalIntake / dailyGoal).toFloat(),
+            entryCount = entryCount,
+            firstIntakeTime = null,
+            lastIntakeTime = null,
+            largestIntake = totalIntake * 0.4,
+            averageIntake = totalIntake / entryCount
+        )
+    }
+
+    HydroTrackerTheme {
+        WeeklyChartSection(
+            weekOffset = 0,
+            summaries = sampleSummaries,
+            volumeUnit = VolumeUnit.MILLILITRES,
+            dateFormat = DateFormatPattern.SYSTEM
+        )
     }
 }

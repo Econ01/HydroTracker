@@ -47,10 +47,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
+import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -222,5 +224,46 @@ private fun YearlyHeatmap(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
+}
+
+@Preview(showBackground = true, name = "Yearly Chart")
+@Composable
+private fun YearlyChartSectionPreview() {
+    val startOfYear = LocalDate.now().withDayOfYear(1)
+    val dailyGoal = 2700.0
+    val sampleSummaries = (0 until 365 step 7).map { dayIndex ->
+        val date = startOfYear.plusDays(dayIndex.toLong())
+        val weekIndex = dayIndex / 7
+        val totalIntake = when (weekIndex % 7) {
+            0 -> dailyGoal * 1.10
+            1 -> dailyGoal * 0.95
+            2 -> dailyGoal * 0.75
+            3 -> dailyGoal * 1.05
+            4 -> dailyGoal * 0.50
+            5 -> dailyGoal * 0.85
+            else -> dailyGoal * 1.20
+        }
+        val entryCount = 4 + (weekIndex % 3)
+        DailySummary(
+            date = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+            totalIntake = totalIntake,
+            dailyGoal = dailyGoal,
+            goalAchieved = totalIntake >= dailyGoal,
+            goalPercentage = (totalIntake / dailyGoal).toFloat(),
+            entryCount = entryCount,
+            firstIntakeTime = null,
+            lastIntakeTime = null,
+            largestIntake = totalIntake * 0.4,
+            averageIntake = totalIntake / entryCount
+        )
+    }
+
+    HydroTrackerTheme {
+        YearlyChartSection(
+            summaries = sampleSummaries,
+            yearOffset = 0,
+            volumeUnit = VolumeUnit.MILLILITRES
+        )
     }
 }
