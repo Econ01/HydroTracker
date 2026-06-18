@@ -67,9 +67,11 @@ import com.cemcakmak.hydrotracker.data.models.WeekStartDay
 import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
+import kotlinx.coroutines.delay
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.math.max
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 internal fun WeeklyChartSection(
@@ -239,7 +241,8 @@ private fun WeeklyBarChart(
 
     val goalLineOffset = (dailyGoal / maxAmount) * barMaxHeight
     val animatedGoalLineOffset = rememberAnimatedBar(
-        targetValue = goalLineOffset
+        targetValue = goalLineOffset,
+        launchDelayMillis = dailyTotals.size * 50
     )
 
     Column(
@@ -258,7 +261,7 @@ private fun WeeklyBarChart(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.Bottom
             ) {
-                dailyTotals.forEachIndexed { _, dayTotal ->
+                dailyTotals.forEachIndexed { index, dayTotal ->
                     val isEmpty = dayTotal.totalAmount == 0.0
                     val isToday = dayTotal.date == todayString
                     val isGoalMet = !isEmpty && dayTotal.totalAmount >= dailyGoal
@@ -277,7 +280,8 @@ private fun WeeklyBarChart(
                     }
                     val targetHeight = rawHeight.dp
                     val animatedHeight = rememberAnimatedBar(
-                        targetValue = rawHeight
+                        targetValue = rawHeight,
+                        launchDelayMillis = index * 50
                     )
 
                     val textColor = when {
@@ -347,15 +351,22 @@ private fun WeeklyBarChart(
 @Composable
 fun rememberAnimatedBar(
     targetValue: Double,
-    animationSpec: AnimationSpec<Float> = MaterialTheme.motionScheme.slowSpatialSpec()
+    animationSpec: AnimationSpec<Float> = MaterialTheme.motionScheme.slowSpatialSpec(),
+    launchDelayMillis: Int = 0
 ): Float {
     val animatable = remember { Animatable(0f) }
+    var hasAnimated by remember { mutableStateOf(false) }
 
     LaunchedEffect(targetValue) {
+        if (!hasAnimated && launchDelayMillis > 0) {
+            delay(launchDelayMillis.toLong().milliseconds)
+        }
+
         animatable.animateTo(
             targetValue = targetValue.toFloat(),
             animationSpec = animationSpec
         )
+        hasAnimated = true
     }
 
     return animatable.value
