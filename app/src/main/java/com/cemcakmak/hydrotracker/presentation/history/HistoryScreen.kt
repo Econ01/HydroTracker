@@ -49,6 +49,7 @@ import com.cemcakmak.hydrotracker.data.models.WeekStartDay
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.presentation.common.BlurMorph
+import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
 import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 import java.time.LocalDate
@@ -316,6 +317,23 @@ private fun PeriodSelector(
             }
         }
     }
+}
+
+@Composable
+internal fun AnimatedStatItem(
+    label: String,
+    targetValue: Double,
+    hapticsEnabled: Boolean = false,
+    formatValue: @Composable (Float) -> String
+) {
+    val animatedValue = rememberAnimatedDouble(
+        targetValue = targetValue,
+        hapticsEnabled = hapticsEnabled
+    )
+    ChartStatItem(
+        label = label,
+        value = formatValue(animatedValue)
+    )
 }
 
 @Composable

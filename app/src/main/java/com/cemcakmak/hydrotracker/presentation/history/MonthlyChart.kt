@@ -34,16 +34,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -80,101 +79,108 @@ internal fun MonthlyChartSection(
     dateFormat: DateFormatPattern = DateFormatPattern.SYSTEM
 ) {
     var selectedSummary by remember { mutableStateOf<DailySummary?>(null) }
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
+
+    Column(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text(
-                text = getPeriodTitle(TimePeriod.MONTHLY),
-                style = MaterialTheme.typography.titleLargeEmphasized
+        val filteredSummaries = filterSummariesByPeriod(summaries, TimePeriod.MONTHLY, weekOffset = 0, monthOffset, 0)
+
+        if (filteredSummaries.isNotEmpty()) {
+            val haptics = LocalHapticFeedback.current
+            // Monthly heatmap-style visualization
+            MonthlyHeatmap(
+                summaries = filteredSummaries,
+                onCellClick = { summary -> selectedSummary = summary
+                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)},
+                weekStartDay = weekStartDay
             )
 
-            val filteredSummaries = filterSummariesByPeriod(summaries, TimePeriod.MONTHLY, weekOffset = 0, monthOffset, 0)
+            // Inline detail panel with animation
+            AnimatedVisibility(
+                visible = selectedSummary != null,
+                enter = slideInVertically(
+                    initialOffsetY = { -it / 2 },
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    )
+                ) + fadeIn(animationSpec = tween(300)),
+                exit = slideOutVertically(
+                    targetOffsetY = { -it / 2 },
+                    animationSpec = tween(200)
+                ) + fadeOut(animationSpec = tween(200))
+            ) {
+                selectedSummary?.let { summary ->
+                    InlineDetailPanel(
+                        data = ChartDetailData(
+                            date = summary.date,
+                            amount = summary.totalIntake,
+                            goal = summary.dailyGoal,
+                            goalPercentage = summary.goalPercentage
+                        ),
+                        onDismiss = { selectedSummary = null },
+                        volumeUnit = volumeUnit,
+                        dateFormat = dateFormat
+                    )
+                }
+            }
 
-            if (filteredSummaries.isNotEmpty()) {
-                val haptics = LocalHapticFeedback.current
-                // Monthly heatmap-style visualization
-                MonthlyHeatmap(
-                    summaries = filteredSummaries,
-                    onCellClick = { summary -> selectedSummary = summary
-                        haptics.performHapticFeedback(HapticFeedbackType.ContextClick)},
-                    weekStartDay = weekStartDay
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val totalDays = filteredSummaries.size.toDouble()
+                val goalAchievedDays = filteredSummaries.count { it.goalAchieved }
+                val successRate = (goalAchievedDays / totalDays) * 100.0
+
+                AnimatedStatItem(
+                    label = stringResource(R.string.history_stat_days_tracked),
+                    targetValue = totalDays,
+                    formatValue = { it.toInt().toString() }
                 )
 
-                // Inline detail panel with animation
-                AnimatedVisibility(
-                    visible = selectedSummary != null,
-                    enter = slideInVertically(
-                        initialOffsetY = { -it / 2 },
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessMedium
-                        )
-                    ) + fadeIn(animationSpec = tween(300)),
-                    exit = slideOutVertically(
-                        targetOffsetY = { -it / 2 },
-                        animationSpec = tween(200)
-                    ) + fadeOut(animationSpec = tween(200))
-                ) {
-                    selectedSummary?.let { summary ->
-                        InlineDetailPanel(
-                            data = ChartDetailData(
-                                date = summary.date,
-                                amount = summary.totalIntake,
-                                goal = summary.dailyGoal,
-                                goalPercentage = summary.goalPercentage
-                            ),
-                            onDismiss = { selectedSummary = null },
-                            volumeUnit = volumeUnit,
-                            dateFormat = dateFormat
-                        )
-                    }
-                }
-
-                // Monthly stats
-                val totalDays = filteredSummaries.size
-                val goalAchievedDays = filteredSummaries.count { it.goalAchieved }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    ChartStatItem(
-                        label = stringResource(R.string.history_stat_days_tracked),
-                        value = "$totalDays"
-                    )
-                    ChartStatItem(
-                        label = stringResource(R.string.history_stat_goals_met),
-                        value = "$goalAchievedDays"
-                    )
-                    ChartStatItem(
-                        label = stringResource(R.string.history_stat_success_rate),
-                        value = stringResource(
-                            R.string.percent_format,
-                            ((goalAchievedDays.toFloat() / totalDays) * 100).toInt()
-                        )
-                    )
-                }
-            } else {
-                Box(
+                VerticalDivider(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.history_empty_month),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center
-                    )
-                }
+                        .height(34.dp)
+                        .width(2.dp)
+                )
+
+                AnimatedStatItem(
+                    label = stringResource(R.string.history_stat_goals_met),
+                    targetValue = goalAchievedDays.toDouble(),
+                    hapticsEnabled = true,
+                    formatValue = { it.toInt().toString() }
+                )
+
+                VerticalDivider(
+                    modifier = Modifier
+                        .height(34.dp)
+                        .width(2.dp)
+                )
+
+                AnimatedStatItem(
+                    label = stringResource(R.string.history_stat_success_rate),
+                    targetValue = successRate,
+                    formatValue = { stringResource(R.string.percent_format, it.toInt()) }
+                )
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.history_empty_month),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }
@@ -198,7 +204,6 @@ private fun MonthlyHeatmap(
     }
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(6.dp),
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -208,38 +213,6 @@ private fun MonthlyHeatmap(
             onCellClick = onCellClick,
             weekStartDay = weekStartDay
         )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        // Legend
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(R.string.history_legend_less),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(3.dp)
-            ) {
-                listOf(0.1f, 0.25f, 0.4f, 0.6f, 0.8f, 1.0f).forEach { alpha ->
-                    Box(
-                        modifier = Modifier
-                            .size(18.dp)
-                            .clip(MaterialTheme.shapes.small)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = alpha))
-                    )
-                }
-            }
-            Text(
-                text = stringResource(R.string.history_legend_more),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
     }
 }
 
@@ -274,98 +247,93 @@ private fun MonthlyCalendarGrid(
     // Group into weeks
     val weeks = calendarDays.chunked(7)
 
-    Column(
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier.fillMaxWidth()
+    // Day headers based on week start day
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        // Day headers based on week start day
+        val dayHeaders = if (weekStartDay.resolve() == DayOfWeek.SUNDAY) {
+            listOf(
+                R.string.weekday_short_sun,
+                R.string.weekday_short_mon,
+                R.string.weekday_short_tue,
+                R.string.weekday_short_wed,
+                R.string.weekday_short_thu,
+                R.string.weekday_short_fri,
+                R.string.weekday_short_sat
+            )
+        } else {
+            listOf(
+                R.string.weekday_short_mon,
+                R.string.weekday_short_tue,
+                R.string.weekday_short_wed,
+                R.string.weekday_short_thu,
+                R.string.weekday_short_fri,
+                R.string.weekday_short_sat,
+                R.string.weekday_short_sun
+            )
+        }
+
+        dayHeaders.forEach { dayNameResId ->
+            Text(
+                text = stringResource(dayNameResId),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+
+    // Calendar weeks
+    weeks.forEach { week ->
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            val dayHeaders = if (weekStartDay.resolve() == DayOfWeek.SUNDAY) {
-                listOf(
-                    R.string.weekday_short_sun,
-                    R.string.weekday_short_mon,
-                    R.string.weekday_short_tue,
-                    R.string.weekday_short_wed,
-                    R.string.weekday_short_thu,
-                    R.string.weekday_short_fri,
-                    R.string.weekday_short_sat
-                )
-            } else {
-                listOf(
-                    R.string.weekday_short_mon,
-                    R.string.weekday_short_tue,
-                    R.string.weekday_short_wed,
-                    R.string.weekday_short_thu,
-                    R.string.weekday_short_fri,
-                    R.string.weekday_short_sat,
-                    R.string.weekday_short_sun
-                )
-            }
+            week.forEach { date ->
+                val dateString = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                val summary = summaryMap[dateString]
+                val isCurrentMonth = date.month == monthYear.month
 
-            dayHeaders.forEach { dayNameResId ->
-                Text(
-                    text = stringResource(dayNameResId),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-
-        // Calendar weeks
-        weeks.forEach { week ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                week.forEach { date ->
-                    val dateString = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                    val summary = summaryMap[dateString]
-                    val isCurrentMonth = date.month == monthYear.month
-
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .aspectRatio(1f),
+                    contentAlignment = Alignment.Center
+                ) {
                     Box(
                         modifier = Modifier
-                            .weight(1f)
-                            .aspectRatio(1f),
+                            .size(28.dp)
+                            .clip(MaterialTheme.shapes.small)
+                            .clickable(enabled = summary != null && isCurrentMonth) {
+                                summary?.let { onCellClick(it) }
+                            }
+                            .background(
+                                when {
+                                    !isCurrentMonth -> Color.Transparent
+                                    summary == null -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                                    summary.goalAchieved -> MaterialTheme.colorScheme.primary
+                                    summary.goalPercentage >= 0.8f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                                    summary.goalPercentage >= 0.6f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                                    summary.goalPercentage >= 0.4f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                                    summary.goalPercentage >= 0.2f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
+                                    else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                                }
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(28.dp)
-                                .clip(MaterialTheme.shapes.small)
-                                .clickable(enabled = summary != null && isCurrentMonth) {
-                                    summary?.let { onCellClick(it) }
-                                }
-                                .background(
-                                    when {
-                                        !isCurrentMonth -> Color.Transparent
-                                        summary == null -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                                        summary.goalAchieved -> MaterialTheme.colorScheme.primary
-                                        summary.goalPercentage >= 0.8f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                                        summary.goalPercentage >= 0.6f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                                        summary.goalPercentage >= 0.4f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
-                                        summary.goalPercentage >= 0.2f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
-                                        else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                                    }
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            if (isCurrentMonth) {
-                                Text(
-                                    text = date.dayOfMonth.toString(),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = when {
-                                        summary == null -> MaterialTheme.colorScheme.onSurfaceVariant
-                                        summary.goalPercentage > 0.5f -> MaterialTheme.colorScheme.onPrimary
-                                        else -> MaterialTheme.colorScheme.onSurfaceVariant
-                                    },
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
+                        if (isCurrentMonth) {
+                            Text(
+                                text = date.dayOfMonth.toString(),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = when {
+                                    summary == null -> MaterialTheme.colorScheme.onSurfaceVariant
+                                    summary.goalPercentage > 0.5f -> MaterialTheme.colorScheme.onPrimary
+                                    else -> MaterialTheme.colorScheme.onSurfaceVariant
+                                },
+                                fontWeight = FontWeight.Medium
+                            )
                         }
                     }
                 }

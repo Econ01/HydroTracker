@@ -85,7 +85,6 @@ import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
 import com.cemcakmak.hydrotracker.data.models.DateFormatPattern
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
-import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.ui.theme.extendedColorScheme
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
@@ -189,22 +188,10 @@ internal fun WeeklyChartSection(
                 val avgAmount = if (daysWithData > 0) totalAmount / daysWithData else 0.0
                 val bestAmount = filteredDailyTotals.maxOfOrNull { it.totalAmount } ?: 0.0
 
-                val animatedTotal = rememberAnimatedDouble(
-                    targetValue = totalAmount / 1000,   // Convert to litres to not trigger too frequent haptics
-                    hapticsEnabled = true
-                )
-                val animatedAverage = rememberAnimatedDouble(
-                    targetValue = avgAmount / 1000,   // Convert to litres to not trigger too frequent haptics
-                    hapticsEnabled = true
-                )
-                val animatedBest = rememberAnimatedDouble(
-                    targetValue = bestAmount / 1000,   // Convert to litres to not trigger too frequent haptics
-                    hapticsEnabled = true
-                )
-
-                ChartStatItem(
+                AnimatedStatItem(
                     label = stringResource(R.string.history_stat_total),
-                    value = VolumeUnitConverter.format(context, animatedTotal.toDouble() * 1000, volumeUnit)   // Convert back to milliliters
+                    targetValue = totalAmount / 1000.0,
+                    formatValue = { VolumeUnitConverter.format(context, it.toDouble() * 1000.0, volumeUnit) }
                 )
 
                 VerticalDivider(
@@ -213,9 +200,11 @@ internal fun WeeklyChartSection(
                         .width(2.dp)
                 )
 
-                ChartStatItem(
+                AnimatedStatItem(
                     label = stringResource(R.string.history_stat_average),
-                    value = VolumeUnitConverter.format(context, animatedAverage.toDouble() * 1000, volumeUnit)   // Convert back to milliliters
+                    targetValue = avgAmount / 1000.0,
+                    hapticsEnabled = true,
+                    formatValue = { VolumeUnitConverter.format(context, it.toDouble() * 1000.0, volumeUnit) }
                 )
 
                 VerticalDivider(
@@ -224,9 +213,10 @@ internal fun WeeklyChartSection(
                         .width(2.dp)
                 )
 
-                ChartStatItem(
+                AnimatedStatItem(
                     label = stringResource(R.string.history_stat_best_day),
-                    value = VolumeUnitConverter.format(context, animatedBest.toDouble() * 1000, volumeUnit)   // Convert back to milliliters
+                    targetValue = bestAmount / 1000.0,
+                    formatValue = { VolumeUnitConverter.format(context, it.toDouble() * 1000.0, volumeUnit) }
                 )
             }
         } else {
