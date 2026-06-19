@@ -282,6 +282,39 @@ private fun WeeklyBarChart(
                 .fillMaxWidth()
                 .height(barMaxHeight.dp)
         ) {
+            // Dashed line values
+            val strokeWidth = 3.dp
+            val dashLength = 6.dp
+            val gapLength = 6.dp
+            val density = LocalDensity.current
+            val strokePx = with(density) { strokeWidth.toPx() }
+            val dashPx = with(density) { dashLength.toPx() }
+            val gapPx = with(density) { gapLength.toPx() }
+
+            val dashColor = MaterialTheme.colorScheme.inverseOnSurface
+
+            // Goal line
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(strokeWidth)
+                    .align(Alignment.BottomStart)
+                    .offset(y = (-animatedGoalLineOffset).dp)
+                    .drawBehind {
+                        drawLine(
+                            color = dashColor,
+                            start = Offset(0f, size.height / 2),
+                            end = Offset(size.width, size.height / 2),
+                            strokeWidth = strokePx,
+                            cap = StrokeCap.Round,
+                            pathEffect = PathEffect.dashPathEffect(
+                                intervals = floatArrayOf(dashPx, gapPx)
+                            )
+                        )
+                    }
+
+            )
+
             // Bar chart
             Row(
                 modifier = Modifier
@@ -356,39 +389,6 @@ private fun WeeklyBarChart(
                     }
                 }
             }
-
-            // Dashed line values
-            val strokeWidth = 3.dp
-            val dashLength = 6.dp
-            val gapLength = 6.dp
-            val density = LocalDensity.current
-            val strokePx = with(density) { strokeWidth.toPx() }
-            val dashPx = with(density) { dashLength.toPx() }
-            val gapPx = with(density) { gapLength.toPx() }
-
-            val dashColor = MaterialTheme.colorScheme.inverseOnSurface
-
-            // Goal line
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(strokeWidth)
-                    .align(Alignment.BottomStart)
-                    .offset(y = (-animatedGoalLineOffset).dp)
-                    .drawBehind {
-                        drawLine(
-                            color = dashColor,
-                            start = Offset(0f, size.height / 2),
-                            end = Offset(size.width, size.height / 2),
-                            strokeWidth = strokePx,
-                            cap = StrokeCap.Round,
-                            pathEffect = PathEffect.dashPathEffect(
-                                intervals = floatArrayOf(dashPx, gapPx)
-                            )
-                        )
-                    }
-
-            )
         }
 
         // Day labels

@@ -236,27 +236,10 @@ private fun MonthlyHeatmap(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            val dayHeaders = if (weekStartDay.resolve() == DayOfWeek.SUNDAY) {
-                listOf(
-                    R.string.weekday_short_sun,
-                    R.string.weekday_short_mon,
-                    R.string.weekday_short_tue,
-                    R.string.weekday_short_wed,
-                    R.string.weekday_short_thu,
-                    R.string.weekday_short_fri,
-                    R.string.weekday_short_sat
-                )
-            } else {
-                listOf(
-                    R.string.weekday_short_mon,
-                    R.string.weekday_short_tue,
-                    R.string.weekday_short_wed,
-                    R.string.weekday_short_thu,
-                    R.string.weekday_short_fri,
-                    R.string.weekday_short_sat,
-                    R.string.weekday_short_sun
-                )
-            }
+            val startDay = weekStartDay.resolve()
+            val startIndex = orderedWeekDays.indexOf(startDay)
+            val dayHeaders = (orderedWeekDays.drop(startIndex) + orderedWeekDays.take(startIndex))
+                .map { shortDayNameResIds.getValue(it) }
 
             dayHeaders.forEach { dayNameResId ->
                 Text(
@@ -326,6 +309,26 @@ private fun MonthlyHeatmap(
         }
     }
 }
+
+private val orderedWeekDays = listOf(
+    DayOfWeek.SUNDAY,
+    DayOfWeek.MONDAY,
+    DayOfWeek.TUESDAY,
+    DayOfWeek.WEDNESDAY,
+    DayOfWeek.THURSDAY,
+    DayOfWeek.FRIDAY,
+    DayOfWeek.SATURDAY
+)
+
+private val shortDayNameResIds = mapOf(
+    DayOfWeek.SUNDAY to R.string.weekday_short_sun,
+    DayOfWeek.MONDAY to R.string.weekday_short_mon,
+    DayOfWeek.TUESDAY to R.string.weekday_short_tue,
+    DayOfWeek.WEDNESDAY to R.string.weekday_short_wed,
+    DayOfWeek.THURSDAY to R.string.weekday_short_thu,
+    DayOfWeek.FRIDAY to R.string.weekday_short_fri,
+    DayOfWeek.SATURDAY to R.string.weekday_short_sat
+)
 
 @Preview(showBackground = true, name = "Monthly Chart")
 @Composable
