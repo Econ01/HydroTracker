@@ -207,133 +207,118 @@ private fun MonthlyHeatmap(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        MonthlyCalendarGrid(
-            monthYear = monthYear,
-            summaryMap = summaryMap,
-            onCellClick = onCellClick,
-            weekStartDay = weekStartDay
-        )
-    }
-}
+        // Use the user's preferred week start day (resolve SYSTEM to the device locale)
+        val weekFields = WeekFields.of(weekStartDay.resolve(), 1)
 
-@Composable
-private fun MonthlyCalendarGrid(
-    monthYear: LocalDate,
-    summaryMap: Map<String, DailySummary>,
-    onCellClick: (DailySummary) -> Unit,
-    weekStartDay: WeekStartDay = WeekStartDay.SYSTEM
-) {
-    // Use the user's preferred week start day (resolve SYSTEM to the device locale)
-    val weekFields = WeekFields.of(weekStartDay.resolve(), 1)
+        // Get first day of month and its day of week
+        val firstDayOfMonth = monthYear.withDayOfMonth(1)
+        val lastDayOfMonth = monthYear.withDayOfMonth(monthYear.lengthOfMonth())
 
-    // Get first day of month and its day of week
-    val firstDayOfMonth = monthYear.withDayOfMonth(1)
-    val lastDayOfMonth = monthYear.withDayOfMonth(monthYear.lengthOfMonth())
+        // Find the first day to display (might be from previous month)
+        val startOfCalendar = firstDayOfMonth.with(weekFields.dayOfWeek(), 1)
 
-    // Find the first day to display (might be from previous month)
-    val startOfCalendar = firstDayOfMonth.with(weekFields.dayOfWeek(), 1)
+        // Find the last day to display (might be from next month)
+        val endOfCalendar = lastDayOfMonth.with(weekFields.dayOfWeek(), 7)
 
-    // Find the last day to display (might be from next month)
-    val endOfCalendar = lastDayOfMonth.with(weekFields.dayOfWeek(), 7)
-
-    // Generate all days for the calendar grid
-    val calendarDays = mutableListOf<LocalDate>()
-    var currentDate = startOfCalendar
-    while (!currentDate.isAfter(endOfCalendar)) {
-        calendarDays.add(currentDate)
-        currentDate = currentDate.plusDays(1)
-    }
-
-    // Group into weeks
-    val weeks = calendarDays.chunked(7)
-
-    // Day headers based on week start day
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-        val dayHeaders = if (weekStartDay.resolve() == DayOfWeek.SUNDAY) {
-            listOf(
-                R.string.weekday_short_sun,
-                R.string.weekday_short_mon,
-                R.string.weekday_short_tue,
-                R.string.weekday_short_wed,
-                R.string.weekday_short_thu,
-                R.string.weekday_short_fri,
-                R.string.weekday_short_sat
-            )
-        } else {
-            listOf(
-                R.string.weekday_short_mon,
-                R.string.weekday_short_tue,
-                R.string.weekday_short_wed,
-                R.string.weekday_short_thu,
-                R.string.weekday_short_fri,
-                R.string.weekday_short_sat,
-                R.string.weekday_short_sun
-            )
+        // Generate all days for the calendar grid
+        val calendarDays = mutableListOf<LocalDate>()
+        var currentDate = startOfCalendar
+        while (!currentDate.isAfter(endOfCalendar)) {
+            calendarDays.add(currentDate)
+            currentDate = currentDate.plusDays(1)
         }
 
-        dayHeaders.forEach { dayNameResId ->
-            Text(
-                text = stringResource(dayNameResId),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.weight(1f),
-                textAlign = TextAlign.Center
-            )
-        }
-    }
+        // Group into weeks
+        val weeks = calendarDays.chunked(7)
 
-    // Calendar weeks
-    weeks.forEach { week ->
+        // Day headers based on week start day
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            week.forEach { date ->
-                val dateString = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                val summary = summaryMap[dateString]
-                val isCurrentMonth = date.month == monthYear.month
+            val dayHeaders = if (weekStartDay.resolve() == DayOfWeek.SUNDAY) {
+                listOf(
+                    R.string.weekday_short_sun,
+                    R.string.weekday_short_mon,
+                    R.string.weekday_short_tue,
+                    R.string.weekday_short_wed,
+                    R.string.weekday_short_thu,
+                    R.string.weekday_short_fri,
+                    R.string.weekday_short_sat
+                )
+            } else {
+                listOf(
+                    R.string.weekday_short_mon,
+                    R.string.weekday_short_tue,
+                    R.string.weekday_short_wed,
+                    R.string.weekday_short_thu,
+                    R.string.weekday_short_fri,
+                    R.string.weekday_short_sat,
+                    R.string.weekday_short_sun
+                )
+            }
 
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .aspectRatio(1f),
-                    contentAlignment = Alignment.Center
-                ) {
+            dayHeaders.forEach { dayNameResId ->
+                Text(
+                    text = stringResource(dayNameResId),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+
+        // Calendar weeks
+        weeks.forEach { week ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                week.forEach { date ->
+                    val dateString = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                    val summary = summaryMap[dateString]
+                    val isCurrentMonth = date.month == monthYear.month
+
                     Box(
                         modifier = Modifier
-                            .size(28.dp)
-                            .clip(MaterialTheme.shapes.small)
-                            .clickable(enabled = summary != null && isCurrentMonth) {
-                                summary?.let { onCellClick(it) }
-                            }
-                            .background(
-                                when {
-                                    !isCurrentMonth -> Color.Transparent
-                                    summary == null -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                                    summary.goalAchieved -> MaterialTheme.colorScheme.primary
-                                    summary.goalPercentage >= 0.8f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                                    summary.goalPercentage >= 0.6f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                                    summary.goalPercentage >= 0.4f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
-                                    summary.goalPercentage >= 0.2f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
-                                    else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                                }
-                            ),
+                            .weight(1f)
+                            .aspectRatio(1f),
                         contentAlignment = Alignment.Center
                     ) {
-                        if (isCurrentMonth) {
-                            Text(
-                                text = date.dayOfMonth.toString(),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = when {
-                                    summary == null -> MaterialTheme.colorScheme.onSurfaceVariant
-                                    summary.goalPercentage > 0.5f -> MaterialTheme.colorScheme.onPrimary
-                                    else -> MaterialTheme.colorScheme.onSurfaceVariant
-                                },
-                                fontWeight = FontWeight.Medium
-                            )
+                        Box(
+                            modifier = Modifier
+                                .size(28.dp)
+                                .clip(MaterialTheme.shapes.small)
+                                .clickable(enabled = summary != null && isCurrentMonth) {
+                                    summary?.let { onCellClick(it) }
+                                }
+                                .background(
+                                    when {
+                                        !isCurrentMonth -> Color.Transparent
+                                        summary == null -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                                        summary.goalAchieved -> MaterialTheme.colorScheme.primary
+                                        summary.goalPercentage >= 0.8f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                                        summary.goalPercentage >= 0.6f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                                        summary.goalPercentage >= 0.4f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                                        summary.goalPercentage >= 0.2f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
+                                        else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                                    }
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (isCurrentMonth) {
+                                Text(
+                                    text = date.dayOfMonth.toString(),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = when {
+                                        summary == null -> MaterialTheme.colorScheme.onSurfaceVariant
+                                        summary.goalPercentage > 0.5f -> MaterialTheme.colorScheme.onPrimary
+                                        else -> MaterialTheme.colorScheme.onSurfaceVariant
+                                    },
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
                         }
                     }
                 }
