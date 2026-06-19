@@ -23,14 +23,18 @@ package com.cemcakmak.hydrotracker.presentation.history
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,6 +49,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.toShape
@@ -56,14 +61,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -221,15 +225,11 @@ private fun MonthlyHeatmap(
         // Use the user's preferred week start day (resolve SYSTEM to the device locale)
         val weekFields = WeekFields.of(weekStartDay.resolve(), 1)
 
-        // Get first day of month and its day of week
+        // Get first day of month
         val firstDayOfMonth = monthYear.withDayOfMonth(1)
-        val lastDayOfMonth = monthYear.withDayOfMonth(monthYear.lengthOfMonth())
 
         // Find the first day to display (might be from previous month)
         val startOfCalendar = firstDayOfMonth.with(weekFields.dayOfWeek(), 1)
-
-        // Find the last day to display (might be from next month)
-        val endOfCalendar = lastDayOfMonth.with(weekFields.dayOfWeek(), 7)
 
         // Generate all days for the calendar grid
         val calendarDays = mutableListOf<LocalDate>()
@@ -280,51 +280,72 @@ private fun MonthlyHeatmap(
                         targetSummary = summary
                     )
 
+                    val infiniteTransition = rememberInfiniteTransition(label = "cellRotation")
+                    val rotation by infiniteTransition.animateFloat(
+                        initialValue = 0f,
+                        targetValue = 360f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(durationMillis = 30000, easing = LinearEasing),
+                            repeatMode = RepeatMode.Restart
+                        ),
+                        label = "rotation"
+                    )
+
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .aspectRatio(1f)
-                            .padding(6.dp)
+                            .padding(4.dp)
                             .scale(animatedScale)
-                            .clip(MaterialShapes.Cookie9Sided.toShape())
                             .clickable(enabled = cellData.summary != null && cellData.isCurrentMonth) {
                                 cellData.summary?.let { onCellClick(it) }
-                            }
-                            .background(
-                                when {
-                                    !cellData.isCurrentMonth -> Color.Transparent
-                                    cellData.summary == null -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                                    cellData.summary.goalAchieved -> MaterialTheme.extendedColorScheme.success
-                                    cellData.summary.goalPercentage >= 0.8f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
-                                    cellData.summary.goalPercentage >= 0.6f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
-                                    cellData.summary.goalPercentage >= 0.4f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                                    cellData.summary.goalPercentage >= 0.2f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
-                                    else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                                }
-                            ),
+                            },
                         contentAlignment = Alignment.Center
                     ) {
-                        if (cellData.isCurrentMonth) {
-                            if (cellData.summary?.goalAchieved == true) {
-                                Icon(
-                                    painter = painterResource(R.drawable.trophy_filled),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .padding(8.dp)
-                                        .fillMaxSize(),
-                                    tint = MaterialTheme.extendedColorScheme.onSuccess
-                                )
-                            } else {
-                                Text(
-                                    text = cellData.date.dayOfMonth.toString(),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = when {
-                                        cellData.summary == null -> MaterialTheme.colorScheme.onSurface
-                                        cellData.summary.goalPercentage > 0.4f -> MaterialTheme.colorScheme.onPrimary
-                                        else -> MaterialTheme.colorScheme.onSurface
-                                    },
-                                    fontWeight = FontWeight.Medium
-                                )
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .then(if (cellData.summary?.goalAchieved == true) Modifier.rotate(rotation) else Modifier),
+                            shape = MaterialShapes.Cookie9Sided.toShape(),
+                            color = when {
+                                !cellData.isCurrentMonth -> Color.Transparent
+                                cellData.summary == null -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                                cellData.summary.goalAchieved -> MaterialTheme.extendedColorScheme.success
+                                cellData.summary.goalPercentage >= 0.8f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
+                                cellData.summary.goalPercentage >= 0.6f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                                cellData.summary.goalPercentage >= 0.4f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                                cellData.summary.goalPercentage >= 0.2f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
+                                else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                            },
+
+                        ) {
+                            // Inner box is used to align childeren
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (cellData.isCurrentMonth && cellData.summary?.goalAchieved == true) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.trophy_filled),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .padding(8.dp)
+                                            .fillMaxSize()
+                                            .rotate(-rotation),
+                                        tint = MaterialTheme.extendedColorScheme.onSuccess
+                                    )
+                                } else {
+                                    Text(
+                                        text = cellData.date.dayOfMonth.toString(),
+                                        style = if (cellData.isCurrentMonth) MaterialTheme.typography.labelSmallEmphasized else MaterialTheme.typography.labelSmall,
+                                        color = when {
+                                            !cellData.isCurrentMonth -> MaterialTheme.colorScheme.onSurfaceVariant.copy(0.6f)
+                                            cellData.summary == null -> MaterialTheme.colorScheme.onSurface
+                                            cellData.summary.goalPercentage > 0.4f -> MaterialTheme.colorScheme.onPrimary
+                                            else -> MaterialTheme.colorScheme.onSurface
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
