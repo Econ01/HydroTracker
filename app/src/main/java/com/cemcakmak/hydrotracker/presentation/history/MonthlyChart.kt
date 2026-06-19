@@ -21,6 +21,8 @@
 package com.cemcakmak.hydrotracker.presentation.history
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -47,6 +49,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,12 +57,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -71,10 +74,12 @@ import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.ui.theme.extendedColorScheme
+import kotlinx.coroutines.delay
 import java.time.LocalDate
 import java.time.DayOfWeek
 import java.time.format.DateTimeFormatter
 import java.time.temporal.WeekFields
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 internal fun MonthlyChartSection(
@@ -229,7 +234,7 @@ private fun MonthlyHeatmap(
         // Generate all days for the calendar grid
         val calendarDays = mutableListOf<LocalDate>()
         var currentDate = startOfCalendar
-        while (!currentDate.isAfter(endOfCalendar)) {
+        repeat(42) {
             calendarDays.add(currentDate)
             currentDate = currentDate.plusDays(1)
         }
@@ -269,33 +274,40 @@ private fun MonthlyHeatmap(
                     val summary = summaryMap[dateString]
                     val isCurrentMonth = date.month == monthYear.month
 
+                    val (animatedScale, cellData) = rememberAnimatedCell(
+                        targetDate = date,
+                        targetIsCurrentMonth = isCurrentMonth,
+                        targetSummary = summary
+                    )
+
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .aspectRatio(1f)
                             .padding(6.dp)
+                            .scale(animatedScale)
                             .clip(MaterialShapes.Cookie9Sided.toShape())
-                            .clickable(enabled = summary != null && isCurrentMonth) {
-                                summary?.let { onCellClick(it) }
+                            .clickable(enabled = cellData.summary != null && cellData.isCurrentMonth) {
+                                cellData.summary?.let { onCellClick(it) }
                             }
                             .background(
                                 when {
-                                    !isCurrentMonth -> Color.Transparent
-                                    summary == null -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                                    summary.goalAchieved -> MaterialTheme.extendedColorScheme.success
-                                    summary.goalPercentage >= 0.8f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
-                                    summary.goalPercentage >= 0.6f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
-                                    summary.goalPercentage >= 0.4f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                                    summary.goalPercentage >= 0.2f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
+                                    !cellData.isCurrentMonth -> Color.Transparent
+                                    cellData.summary == null -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                                    cellData.summary.goalAchieved -> MaterialTheme.extendedColorScheme.success
+                                    cellData.summary.goalPercentage >= 0.8f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
+                                    cellData.summary.goalPercentage >= 0.6f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                                    cellData.summary.goalPercentage >= 0.4f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                                    cellData.summary.goalPercentage >= 0.2f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
                                     else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                                 }
                             ),
                         contentAlignment = Alignment.Center
                     ) {
-                        if (isCurrentMonth) {
-                            if (summary?.goalAchieved == true) {
+                        if (cellData.isCurrentMonth) {
+                            if (cellData.summary?.goalAchieved == true) {
                                 Icon(
-                                    imageVector = ImageVector.vectorResource(R.drawable.trophy_filled),
+                                    painter = painterResource(R.drawable.trophy_filled),
                                     contentDescription = null,
                                     modifier = Modifier
                                         .padding(8.dp)
@@ -304,11 +316,11 @@ private fun MonthlyHeatmap(
                                 )
                             } else {
                                 Text(
-                                    text = date.dayOfMonth.toString(),
+                                    text = cellData.date.dayOfMonth.toString(),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = when {
-                                        summary == null -> MaterialTheme.colorScheme.onSurface
-                                        summary.goalPercentage > 0.4f -> MaterialTheme.colorScheme.onPrimary
+                                        cellData.summary == null -> MaterialTheme.colorScheme.onSurface
+                                        cellData.summary.goalPercentage > 0.4f -> MaterialTheme.colorScheme.onPrimary
                                         else -> MaterialTheme.colorScheme.onSurface
                                     },
                                     fontWeight = FontWeight.Medium
@@ -320,6 +332,50 @@ private fun MonthlyHeatmap(
             }
         }
     }
+}
+
+data class CellData(
+    val date: LocalDate,
+    val isCurrentMonth: Boolean,
+    val summary: DailySummary?
+)
+
+@Composable
+fun rememberAnimatedCell(
+    targetDate: LocalDate,
+    targetIsCurrentMonth: Boolean,
+    targetSummary: DailySummary?,
+    animationSpec: AnimationSpec<Float> = MaterialTheme.motionScheme.slowSpatialSpec()
+): Pair<Float, CellData> {
+    var displayData by remember {
+        mutableStateOf(CellData(targetDate, targetIsCurrentMonth, targetSummary))
+    }
+
+    var hasAnimated by remember { mutableStateOf(false) }
+    val animatable = remember { Animatable(0f) }
+
+    LaunchedEffect(targetDate) {
+        if (!hasAnimated) {
+            val enterDelay = (targetDate.dayOfMonth - 1) * 20L
+            if (enterDelay > 0) delay(enterDelay.milliseconds)
+        }
+
+        if (displayData.date != targetDate && animatable.value > 0f) {
+            animatable.animateTo(0f, animationSpec = animationSpec)
+
+            // Swap data safely
+            displayData = CellData(targetDate, targetIsCurrentMonth, targetSummary)
+        }
+
+        animatable.animateTo(
+            targetValue = 1f,
+            animationSpec = animationSpec
+        )
+
+        hasAnimated = true
+    }
+
+    return Pair(animatable.value, displayData)
 }
 
 private val orderedWeekDays = listOf(
