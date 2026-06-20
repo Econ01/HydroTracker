@@ -78,7 +78,9 @@ internal fun YearlyChartSection(
     val context = LocalContext.current
 
     Column(
-        modifier = Modifier.padding(horizontal = 16.dp),
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .padding(top = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         val filteredSummaries = filterSummariesByPeriod(summaries, TimePeriod.YEARLY, weekOffset = 0, monthOffset = 0, yearOffset = yearOffset)

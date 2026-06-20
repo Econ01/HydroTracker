@@ -20,6 +20,16 @@
 
 package com.cemcakmak.hydrotracker.presentation.history
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.EnterExitState
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -28,6 +38,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
@@ -37,6 +49,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.annotation.StringRes
+import androidx.compose.animation.core.EaseOutCubic
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.vectorResource
@@ -142,31 +155,68 @@ fun HistoryScreen(
 
                 // Main Chart Section
                 item {
-                    when (selectedPeriod) {
-                        TimePeriod.WEEKLY -> {
-                            WeeklyChartSection(
-                                weekOffset = currentWeekOffset,
-                                summaries = summaries,
-                                weekStartDay = themePreferences.weekStartDay,
-                                volumeUnit = volumeUnit,
-                                dateFormat = themePreferences.dateFormat
-                            )
+                    AnimatedContent(
+                        targetState = selectedPeriod,
+                        modifier = Modifier.fillMaxWidth(),
+                        transitionSpec = {
+                            val direction = when {
+                                targetState.ordinal > initialState.ordinal -> 1
+                                targetState.ordinal < initialState.ordinal -> -1
+                                else -> 0
+                            }
+                            val slideDuration = 600
+
+                            (slideInHorizontally(tween(slideDuration, easing = EaseOutCubic)) { fullWidth ->
+                                fullWidth * direction
+                            } + fadeIn(tween(slideDuration, easing = EaseOutCubic)))
+                                .togetherWith(
+                                    slideOutHorizontally(tween(slideDuration, easing = EaseOutCubic)) { fullWidth ->
+                                        -fullWidth * direction
+                                    } + fadeOut(tween(slideDuration, easing = EaseOutCubic))
+                                )
+                                .using(SizeTransform(clip = false))
+                        },
+                        label = "historyPeriodTransition"
+                    ) { period ->
+                        val blur by transition.animateDp(
+                            transitionSpec = { tween(600, easing = EaseOutCubic) },
+                            label = "historyPeriodBlur"
+                        ) { enterExit ->
+                            if (enterExit == EnterExitState.Visible) 0.dp else 10.dp
                         }
-                        TimePeriod.MONTHLY -> {
-                            MonthlyChartSection(
-                                summaries = summaries,
-                                monthOffset = currentMonthOffset,
-                                weekStartDay = themePreferences.weekStartDay,
-                                volumeUnit = volumeUnit,
-                                dateFormat = themePreferences.dateFormat
-                            )
-                        }
-                        TimePeriod.YEARLY -> {
-                            YearlyChartSection(
-                                summaries = summaries,
-                                yearOffset = currentYearOffset,
-                                volumeUnit = volumeUnit
-                            )
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .blur(blur, BlurredEdgeTreatment.Unbounded)
+                        ) {
+                            when (period) {
+                                TimePeriod.WEEKLY -> {
+                                    WeeklyChartSection(
+                                        weekOffset = currentWeekOffset,
+                                        summaries = summaries,
+                                        weekStartDay = themePreferences.weekStartDay,
+                                        volumeUnit = volumeUnit,
+                                        dateFormat = themePreferences.dateFormat
+                                    )
+                                }
+                                TimePeriod.MONTHLY -> {
+                                    MonthlyChartSection(
+                                        summaries = summaries,
+                                        monthOffset = currentMonthOffset,
+                                        weekStartDay = themePreferences.weekStartDay,
+                                        volumeUnit = volumeUnit,
+                                        dateFormat = themePreferences.dateFormat
+                                    )
+                                }
+                                TimePeriod.YEARLY -> {
+                                    YearlyChartSection(
+                                        summaries = summaries,
+                                        yearOffset = currentYearOffset,
+                                        volumeUnit = volumeUnit
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -198,7 +248,8 @@ private fun PeriodSelector(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp)
+            .padding(top = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         val haptics = LocalHapticFeedback.current
@@ -521,16 +572,6 @@ internal fun getCurrentPeriodText(
         }
     }
 }
-
-@Composable
-internal fun getPeriodTitle(period: TimePeriod): String {
-    return when (period) {
-        TimePeriod.WEEKLY -> stringResource(R.string.history_weekly_overview)
-        TimePeriod.MONTHLY -> stringResource(R.string.history_monthly_overview)
-        TimePeriod.YEARLY -> stringResource(R.string.history_yearly_overview)
-    }
-}
-
 
 internal fun getWeekDateRange(weekOffset: Int, weekStartDay: WeekStartDay = WeekStartDay.SYSTEM): Pair<LocalDate, LocalDate> {
     val today = LocalDate.now()

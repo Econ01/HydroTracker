@@ -96,7 +96,9 @@ internal fun MonthlyChartSection(
     var selectedSummary by remember { mutableStateOf<DailySummary?>(null) }
 
     Column(
-        modifier = Modifier.padding(horizontal = 16.dp),
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .padding(top = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         val filteredSummaries = filterSummariesByPeriod(summaries, TimePeriod.MONTHLY, weekOffset = 0, monthOffset, 0)
