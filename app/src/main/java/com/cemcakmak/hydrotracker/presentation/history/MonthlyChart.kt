@@ -273,6 +273,7 @@ private fun MonthlyHeatmap(
                     val dateString = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                     val summary = summaryMap[dateString]
                     val isCurrentMonth = date.month == monthYear.month
+                    val isToday = date == LocalDate.now()
 
                     val (animatedScale, cellData) = rememberAnimatedCell(
                         targetDate = date,
@@ -295,29 +296,32 @@ private fun MonthlyHeatmap(
                         modifier = Modifier
                             .weight(1f)
                             .aspectRatio(1f)
-                            .padding(4.dp)
-                            .scale(animatedScale)
-                            .clickable(enabled = cellData.summary != null && cellData.isCurrentMonth) {
-                                cellData.summary?.let { onCellClick(it) }
-                            },
+                            .padding(if (isToday) 2.dp else 4.dp)
+                            .scale(animatedScale),
                         contentAlignment = Alignment.Center
                     ) {
                         Surface(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .then(if (cellData.summary?.goalAchieved == true) Modifier.rotate(rotation) else Modifier),
+                                .then(if (cellData.summary?.goalAchieved == true) Modifier.rotate(rotation) else Modifier)
+                                .clickable(enabled = cellData.summary != null && cellData.isCurrentMonth) {
+                                    cellData.summary?.let { onCellClick(it) }
+                                },
                             shape = MaterialShapes.Cookie9Sided.toShape(),
-                            color = when {
-                                !cellData.isCurrentMonth -> Color.Transparent
-                                cellData.summary == null -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                                cellData.summary.goalAchieved -> MaterialTheme.extendedColorScheme.success
-                                cellData.summary.goalPercentage >= 0.8f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
-                                cellData.summary.goalPercentage >= 0.6f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
-                                cellData.summary.goalPercentage >= 0.4f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                                cellData.summary.goalPercentage >= 0.2f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
-                                else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
-                            },
-
+                            color = if (isToday) {
+                                    MaterialTheme.colorScheme.tertiary
+                                } else {
+                                    when {
+                                    !cellData.isCurrentMonth -> Color.Transparent
+                                    cellData.summary == null -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                                    cellData.summary.goalAchieved -> MaterialTheme.extendedColorScheme.success
+                                    cellData.summary.goalPercentage >= 0.8f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
+                                    cellData.summary.goalPercentage >= 0.6f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                                    cellData.summary.goalPercentage >= 0.4f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                                    cellData.summary.goalPercentage >= 0.2f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
+                                    else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                                }
+                            }
                         ) {
                             // Inner box is used to align childeren
                             Box(
@@ -332,18 +336,23 @@ private fun MonthlyHeatmap(
                                             .padding(8.dp)
                                             .fillMaxSize()
                                             .rotate(-rotation),
-                                        tint = MaterialTheme.extendedColorScheme.onSuccess
+                                        tint = if (isToday) MaterialTheme.colorScheme.onTertiary else MaterialTheme.extendedColorScheme.onSuccess
                                     )
                                 } else {
                                     Text(
                                         text = cellData.date.dayOfMonth.toString(),
                                         style = if (cellData.isCurrentMonth) MaterialTheme.typography.labelSmallEmphasized else MaterialTheme.typography.labelSmall,
-                                        color = when {
-                                            !cellData.isCurrentMonth -> MaterialTheme.colorScheme.onSurfaceVariant.copy(0.6f)
-                                            cellData.summary == null -> MaterialTheme.colorScheme.onSurface
-                                            cellData.summary.goalPercentage > 0.4f -> MaterialTheme.colorScheme.onPrimary
-                                            else -> MaterialTheme.colorScheme.onSurface
+                                        color = if (isToday) {
+                                            MaterialTheme.colorScheme.onTertiary
+                                        } else {
+                                            when {
+                                                !cellData.isCurrentMonth -> MaterialTheme.colorScheme.onSurfaceVariant.copy(0.6f)
+                                                cellData.summary == null -> MaterialTheme.colorScheme.onSurface
+                                                cellData.summary.goalPercentage > 0.4f -> MaterialTheme.colorScheme.onPrimary
+                                                else -> MaterialTheme.colorScheme.onSurface
+                                            }
                                         }
+
                                     )
                                 }
                             }
