@@ -73,7 +73,8 @@ import kotlin.time.Duration.Companion.milliseconds
 internal fun YearlyChartSection(
     summaries: List<DailySummary>,
     yearOffset: Int,
-    volumeUnit: VolumeUnit
+    volumeUnit: VolumeUnit,
+    animationDelayMillis: Int = 0
 ) {
     val context = LocalContext.current
 
@@ -87,7 +88,10 @@ internal fun YearlyChartSection(
 
         if (filteredSummaries.isNotEmpty()) {
             // Yearly visualization - all days of the year
-            YearlyHeatmap(summaries = filteredSummaries)
+            YearlyHeatmap(
+                summaries = filteredSummaries,
+                animationDelayMillis = animationDelayMillis
+            )
 
             Row(
                 modifier = Modifier
@@ -152,7 +156,8 @@ internal fun YearlyChartSection(
 
 @Composable
 private fun YearlyHeatmap(
-    summaries: List<DailySummary>
+    summaries: List<DailySummary>,
+    animationDelayMillis: Int = 0
 ) {
     // Create a map for quick lookup of summaries by date
     val summaryMap = summaries.associateBy { it.date }
@@ -202,7 +207,8 @@ private fun YearlyHeatmap(
                 val (animatedScale, cellData) = rememberAnimatedDay(
                     targetDate = date,
                     targetIsCurrentYear = isCurrentYear,
-                    targetSummary = summary
+                    targetSummary = summary,
+                    animationDelayMillis = animationDelayMillis
                 )
 
                 Box(
@@ -241,7 +247,8 @@ fun rememberAnimatedDay(
     targetDate: LocalDate,
     targetIsCurrentYear: Boolean,
     targetSummary: DailySummary?,
-    animationSpec: AnimationSpec<Float> = MaterialTheme.motionScheme.slowSpatialSpec()
+    animationSpec: AnimationSpec<Float> = MaterialTheme.motionScheme.slowSpatialSpec(),
+    animationDelayMillis: Int = 0
 ): Pair<Float, CellData> {
     var displayData by remember {
         mutableStateOf(CellData(targetDate, targetIsCurrentYear, targetSummary))
@@ -252,7 +259,7 @@ fun rememberAnimatedDay(
 
     LaunchedEffect(targetDate) {
         if (!hasAnimated) {
-            val enterDelay = (targetDate.dayOfYear - 1) * 2L
+            val enterDelay = animationDelayMillis + (targetDate.dayOfYear - 1) * 2L
             if (enterDelay > 0) delay(enterDelay.milliseconds)
         }
 

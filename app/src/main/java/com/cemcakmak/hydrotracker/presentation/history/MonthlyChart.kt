@@ -91,7 +91,8 @@ internal fun MonthlyChartSection(
     monthOffset: Int,
     weekStartDay: WeekStartDay = WeekStartDay.SYSTEM,
     volumeUnit: VolumeUnit,
-    dateFormat: DateFormatPattern = DateFormatPattern.SYSTEM
+    dateFormat: DateFormatPattern = DateFormatPattern.SYSTEM,
+    animationDelayMillis: Int = 0
 ) {
     var selectedSummary by remember { mutableStateOf<DailySummary?>(null) }
 
@@ -110,7 +111,8 @@ internal fun MonthlyChartSection(
                 summaries = filteredSummaries,
                 onCellClick = { summary -> selectedSummary = summary
                     haptics.performHapticFeedback(HapticFeedbackType.ContextClick)},
-                weekStartDay = weekStartDay
+                weekStartDay = weekStartDay,
+                animationDelayMillis = animationDelayMillis
             )
 
             // Inline detail panel with animation
@@ -207,7 +209,8 @@ internal fun MonthlyChartSection(
 private fun MonthlyHeatmap(
     summaries: List<DailySummary>,
     onCellClick: (DailySummary) -> Unit,
-    weekStartDay: WeekStartDay = WeekStartDay.SYSTEM
+    weekStartDay: WeekStartDay = WeekStartDay.SYSTEM,
+    animationDelayMillis: Int = 0
 ) {
     // Create a map for quick lookup and determine the month being displayed
     val summaryMap = summaries.associateBy { it.date }
@@ -280,7 +283,8 @@ private fun MonthlyHeatmap(
                     val (animatedScale, cellData) = rememberAnimatedCell(
                         targetDate = date,
                         targetIsCurrentMonth = isCurrentMonth,
-                        targetSummary = summary
+                        targetSummary = summary,
+                        animationDelayMillis = animationDelayMillis
                     )
 
                     val infiniteTransition = rememberInfiniteTransition(label = "cellRotation")
@@ -377,7 +381,8 @@ fun rememberAnimatedCell(
     targetDate: LocalDate,
     targetIsCurrentMonth: Boolean,
     targetSummary: DailySummary?,
-    animationSpec: AnimationSpec<Float> = MaterialTheme.motionScheme.slowSpatialSpec()
+    animationSpec: AnimationSpec<Float> = MaterialTheme.motionScheme.slowSpatialSpec(),
+    animationDelayMillis: Int = 0
 ): Pair<Float, CellData> {
     var displayData by remember {
         mutableStateOf(CellData(targetDate, targetIsCurrentMonth, targetSummary))
@@ -388,7 +393,7 @@ fun rememberAnimatedCell(
 
     LaunchedEffect(targetDate) {
         if (!hasAnimated) {
-            val enterDelay = (targetDate.dayOfMonth - 1) * 20L
+            val enterDelay = animationDelayMillis + (targetDate.dayOfMonth - 1) * 20L
             if (enterDelay > 0) delay(enterDelay.milliseconds)
         }
 

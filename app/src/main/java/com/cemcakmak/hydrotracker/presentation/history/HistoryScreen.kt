@@ -197,7 +197,8 @@ fun HistoryScreen(
                                         summaries = summaries,
                                         weekStartDay = themePreferences.weekStartDay,
                                         volumeUnit = volumeUnit,
-                                        dateFormat = themePreferences.dateFormat
+                                        dateFormat = themePreferences.dateFormat,
+                                        animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS
                                     )
                                 }
                                 TimePeriod.MONTHLY -> {
@@ -206,14 +207,16 @@ fun HistoryScreen(
                                         monthOffset = currentMonthOffset,
                                         weekStartDay = themePreferences.weekStartDay,
                                         volumeUnit = volumeUnit,
-                                        dateFormat = themePreferences.dateFormat
+                                        dateFormat = themePreferences.dateFormat,
+                                        animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS
                                     )
                                 }
                                 TimePeriod.YEARLY -> {
                                     YearlyChartSection(
                                         summaries = summaries,
                                         yearOffset = currentYearOffset,
-                                        volumeUnit = volumeUnit
+                                        volumeUnit = volumeUnit,
+                                        animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS
                                     )
                                 }
                             }
@@ -224,6 +227,8 @@ fun HistoryScreen(
         }
     }
 }
+
+private const val CHART_ANIMATION_DELAY_MILLIS = 200
 
 enum class TimePeriod(@param:StringRes val displayNameResId: Int) {
     WEEKLY(R.string.history_period_weekly),

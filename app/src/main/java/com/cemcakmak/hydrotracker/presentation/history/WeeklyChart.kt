@@ -100,7 +100,8 @@ internal fun WeeklyChartSection(
     summaries: List<DailySummary> = emptyList(),
     weekStartDay: WeekStartDay = WeekStartDay.SYSTEM,
     volumeUnit: VolumeUnit,
-    dateFormat: DateFormatPattern = DateFormatPattern.SYSTEM
+    dateFormat: DateFormatPattern = DateFormatPattern.SYSTEM,
+    animationDelayMillis: Int = 0
 ) {
     val context = LocalContext.current
     var selectedDayData by remember { mutableStateOf<DailyTotal?>(null) }
@@ -143,7 +144,8 @@ internal fun WeeklyChartSection(
                 dailyGoal = dailyGoal,
                 onBarClick = { dayTotal -> selectedDayData = dayTotal
                     haptics.performHapticFeedback(HapticFeedbackType.ContextClick)},
-                volumeUnit = volumeUnit
+                volumeUnit = volumeUnit,
+                animationDelayMillis = animationDelayMillis
             )
 
             // Inline detail panel with animation
@@ -243,7 +245,8 @@ private fun WeeklyBarChart(
     dailyTotals: List<DailyTotal>,
     dailyGoal: Double,
     onBarClick: (DailyTotal) -> Unit,
-    volumeUnit: VolumeUnit
+    volumeUnit: VolumeUnit,
+    animationDelayMillis: Int = 0
 ) {
     val context = LocalContext.current
     if (dailyTotals.isEmpty()) {
@@ -272,7 +275,7 @@ private fun WeeklyBarChart(
     val goalLineOffset = (dailyGoal / maxAmount) * barMaxHeight
     val animatedGoalLineOffset = rememberAnimatedBar(
         targetValue = goalLineOffset,
-        launchDelayMillis = dailyTotals.size * 50
+        launchDelayMillis = animationDelayMillis + dailyTotals.size * 50
     )
 
     Column(
@@ -344,7 +347,7 @@ private fun WeeklyBarChart(
                     val targetHeight = rawHeight.dp
                     val animatedHeight = rememberAnimatedBar(
                         targetValue = rawHeight,
-                        launchDelayMillis = index * 50
+                        launchDelayMillis = animationDelayMillis + index * 50
                     )
 
                     val textColor = when {
