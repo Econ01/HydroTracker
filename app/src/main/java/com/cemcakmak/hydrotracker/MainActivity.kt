@@ -474,9 +474,22 @@ fun HydroTrackerApp(
                                 uiState = historyUiState,
                                 themePreferences = themePreferences,
                                 userProfile = userProfile,
+                                activeBeverages = activeBeverages,
+                                paddingValues = paddingValues,
                                 onPeriodSelected = historyViewModel::selectPeriod,
                                 onPreviousPeriod = historyViewModel::previousPeriod,
-                                onNextPeriod = historyViewModel::nextPeriod
+                                onNextPeriod = historyViewModel::nextPeriod,
+                                onDaySelected = historyViewModel::selectDate,
+                                onUpdateEntry = { oldEntry, updatedEntry ->
+                                    coroutineScope.launch {
+                                        waterIntakeRepository.updateWaterIntake(oldEntry, updatedEntry)
+                                    }
+                                },
+                                onDeleteEntry = { entry ->
+                                    coroutineScope.launch {
+                                        waterIntakeRepository.deleteWaterIntake(entry)
+                                    }
+                                }
                             )
                         }
 

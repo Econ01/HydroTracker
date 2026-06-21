@@ -33,17 +33,13 @@ import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -55,15 +51,23 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.vectorResource
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
+import com.cemcakmak.hydrotracker.data.models.ActivityLevel
+import com.cemcakmak.hydrotracker.data.models.AgeGroup
+import com.cemcakmak.hydrotracker.data.models.BeverageType
 import com.cemcakmak.hydrotracker.data.models.DateFormatPattern
+import com.cemcakmak.hydrotracker.data.models.Gender
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
+import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
+import com.cemcakmak.hydrotracker.presentation.common.BeverageOption
 import com.cemcakmak.hydrotracker.presentation.common.BlurMorph
+import com.cemcakmak.hydrotracker.presentation.common.DailyEntriesSection
+import com.cemcakmak.hydrotracker.presentation.common.EditWaterDialog
 import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
+import com.cemcakmak.hydrotracker.presentation.common.toOption
 import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
-import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -74,11 +78,18 @@ fun HistoryScreen(
     uiState: HistoryUiState,
     themePreferences: ThemePreferences = ThemePreferences(),
     userProfile: UserProfile? = null,
+    activeBeverages: List<BeverageOption> = BeverageType.getAllSorted().map { it.toOption() },
+    paddingValues: PaddingValues = PaddingValues(0.dp),
     onPeriodSelected: (TimePeriod) -> Unit,
     onPreviousPeriod: () -> Unit,
-    onNextPeriod: () -> Unit
+    onNextPeriod: () -> Unit,
+    onDaySelected: (String) -> Unit,
+    onUpdateEntry: (WaterIntakeEntry, WaterIntakeEntry) -> Unit,
+    onDeleteEntry: (WaterIntakeEntry) -> Unit
 ) {
     val haptics = LocalHapticFeedback.current
+
+    var entryToEdit by remember { mutableStateOf<WaterIntakeEntry?>(null) }
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
@@ -123,7 +134,8 @@ fun HistoryScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding),
+                    .padding(paddingValues)
+                    .padding(top = innerPadding.calculateTopPadding()),
             ) {
                 // Period Selector
                 item {
@@ -185,8 +197,8 @@ fun HistoryScreen(
                                         stats = uiState.weeklyStats,
                                         weekStartDay = themePreferences.weekStartDay,
                                         volumeUnit = volumeUnit,
-                                        dateFormat = themePreferences.dateFormat,
-                                        animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS
+                                        animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS,
+                                        onDaySelected = onDaySelected
                                     )
                                 }
                                 TimePeriod.MONTHLY -> {
@@ -194,9 +206,8 @@ fun HistoryScreen(
                                         summaries = uiState.summaries,
                                         stats = uiState.monthlyStats,
                                         weekStartDay = themePreferences.weekStartDay,
-                                        volumeUnit = volumeUnit,
-                                        dateFormat = themePreferences.dateFormat,
-                                        animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS
+                                        animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS,
+                                        onDaySelected = onDaySelected
                                     )
                                 }
                                 TimePeriod.YEARLY -> {
@@ -211,7 +222,40 @@ fun HistoryScreen(
                         }
                     }
                 }
+
+                // Selected day entries
+                item {
+                    SelectedDayEntries(
+                        selectedDate = uiState.selectedDate,
+                        entries = uiState.selectedDateEntries,
+                        userProfile = userProfile,
+                        themePreferences = themePreferences,
+                        onEdit = { entry ->
+                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            entryToEdit = entry
+                        },
+                        onDelete = { entry ->
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onDeleteEntry(entry)
+                        }
+                    )
+                }
             }
+        }
+
+        // Edit entry dialogue
+        entryToEdit?.let { entry ->
+            EditWaterDialog(
+                entry = entry,
+                themePreferences = themePreferences,
+                volumeUnit = userProfile?.volumeUnit ?: VolumeUnit.MILLILITRES,
+                onDismiss = { entryToEdit = null },
+                onConfirm = { updatedEntry ->
+                    onUpdateEntry(entry, updatedEntry)
+                    entryToEdit = null
+                },
+                beverages = activeBeverages
+            )
         }
     }
 }
@@ -392,127 +436,39 @@ internal fun ChartStatItem(
     }
 }
 
-data class ChartDetailData(
-    val date: String,
-    val amount: Double,
-    val goal: Double?,
-    val goalPercentage: Float?
-)
-
 @Composable
-internal fun InlineDetailPanel(
-    data: ChartDetailData,
-    onDismiss: () -> Unit,
-    volumeUnit: VolumeUnit,
-    dateFormat: DateFormatPattern
+internal fun SelectedDayEntries(
+    selectedDate: String?,
+    entries: List<WaterIntakeEntry>,
+    userProfile: UserProfile?,
+    themePreferences: ThemePreferences,
+    onEdit: (WaterIntakeEntry) -> Unit,
+    onDelete: (WaterIntakeEntry) -> Unit
 ) {
-    val context = LocalContext.current
-    Card(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            .padding(top = 16.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            // Header with close button
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = DateTimeFormatters.formatDate(LocalDate.parse(data.date), dateFormat),
-                    style = MaterialTheme.typography.titleMediumEmphasized,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+        if (selectedDate == null || userProfile == null) {
+            Text(
+                text = stringResource(R.string.history_select_day_hint),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 24.dp)
+            )
+        } else {
+            DailyEntriesSection(
+                entries = entries,
+                userProfile = userProfile,
+                themePreferences = themePreferences,
+                onEdit = onEdit,
+                onDelete = onDelete,
+                title = DateTimeFormatters.formatDate(
+                    LocalDate.parse(selectedDate),
+                    themePreferences.dateFormat
                 )
-                val haptics = LocalHapticFeedback.current
-                FilledIconButton(
-                    onClick = {
-                        haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                        onDismiss()
-                    },
-                    colors = IconButtonDefaults.filledIconButtonColors(),
-                    shapes = IconButtonDefaults.shapes(),
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = stringResource(R.string.action_close),
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-            }
-
-            // Content in a more compact layout
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                // Water amount - prominent display
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(R.string.history_detail_water_intake),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                    Text(
-                        text = VolumeUnitConverter.format(context, data.amount, volumeUnit),
-                        style = MaterialTheme.typography.titleLargeEmphasized,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-
-                // Goal information (if available)
-                data.goal?.let { goal ->
-                    data.goalPercentage?.let { percentage ->
-                        // Compact progress display
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = stringResource(
-                                        R.string.history_detail_goal,
-                                        VolumeUnitConverter.format(context, goal, volumeUnit)
-                                    ),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                                Text(
-                                    text = stringResource(
-                                        R.string.history_detail_progress,
-                                        (percentage * 100).toInt()
-                                    ),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                            }
-                        }
-
-                        // Compact progress bar
-                        LinearProgressIndicator(
-                            progress = { percentage.coerceAtMost(1.0f) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(6.dp)
-                                .clip(MaterialTheme.shapes.small),
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            trackColor = MaterialTheme.colorScheme.surfaceVariant
-                        )
-                    }
-                }
-            }
+            )
         }
     }
 }
@@ -588,6 +544,51 @@ private fun HistoryScreenPreview() {
         )
     }
 
+    val selectedDate = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+
+    val previewUser = UserProfile(
+        name = "Preview User",
+        gender = Gender.MALE,
+        ageGroup = AgeGroup.ADULT_31_50,
+        activityLevel = ActivityLevel.MODERATE,
+        wakeUpTime = "07:00",
+        sleepTime = "23:00",
+        dailyWaterGoal = dailyGoal,
+        reminderInterval = 60,
+        volumeUnit = VolumeUnit.MILLILITRES
+    )
+
+    val sampleEntries = listOf(
+        WaterIntakeEntry(
+            id = 1,
+            amount = 250.0,
+            timestamp = System.currentTimeMillis() - 3_600_000,
+            date = selectedDate,
+            containerType = "Glass",
+            containerVolume = 250.0,
+            beverageType = BeverageType.WATER.name
+        ),
+        WaterIntakeEntry(
+            id = 2,
+            amount = 330.0,
+            timestamp = System.currentTimeMillis() - 7_200_000,
+            date = selectedDate,
+            containerType = "Mug",
+            containerVolume = 330.0,
+            beverageType = BeverageType.COFFEE.name,
+            beverageMultiplier = 0.95
+        ),
+        WaterIntakeEntry(
+            id = 3,
+            amount = 500.0,
+            timestamp = System.currentTimeMillis() - 10_800_000,
+            date = selectedDate,
+            containerType = "Bottle",
+            containerVolume = 500.0,
+            beverageType = BeverageType.WATER.name
+        )
+    )
+
     val uiState = HistoryUiState(
         summaries = sampleSummaries,
         weeklyStats = WeeklyHistoryStats(
@@ -604,15 +605,22 @@ private fun HistoryScreenPreview() {
             daysTracked = sampleSummaries.size,
             goalsMet = sampleSummaries.count { it.goalAchieved },
             totalIntake = sampleSummaries.sumOf { it.totalIntake }
-        )
+        ),
+        selectedDate = selectedDate,
+        selectedDateEntries = sampleEntries
     )
 
     HydroTrackerTheme {
         HistoryScreen(
             uiState = uiState,
+            themePreferences = ThemePreferences(),
+            userProfile = previewUser,
             onPeriodSelected = {},
             onPreviousPeriod = {},
-            onNextPeriod = {}
+            onNextPeriod = {},
+            onDaySelected = {},
+            onUpdateEntry = { _, _ -> },
+            onDeleteEntry = {}
         )
     }
 }

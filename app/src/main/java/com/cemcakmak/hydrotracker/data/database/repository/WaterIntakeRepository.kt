@@ -253,6 +253,13 @@ class WaterIntakeRepository(
     }
 
     /**
+     * Observe all non-hidden water intake entries for a specific calendar date.
+     */
+    fun getEntriesForDate(date: String): Flow<List<WaterIntakeEntry>> {
+        return waterIntakeDao.getEntriesForDate(date)
+    }
+
+    /**
      * Add an imported water entry without triggering Health Connect sync
      * Used for importing external data to avoid circular syncing
      */

@@ -34,8 +34,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -82,7 +80,6 @@ import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.dao.DailyTotal
 import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
-import com.cemcakmak.hydrotracker.data.models.DateFormatPattern
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
@@ -101,11 +98,10 @@ internal fun WeeklyChartSection(
     stats: WeeklyHistoryStats,
     weekStartDay: WeekStartDay = WeekStartDay.SYSTEM,
     volumeUnit: VolumeUnit,
-    dateFormat: DateFormatPattern = DateFormatPattern.SYSTEM,
-    animationDelayMillis: Int = 0
+    animationDelayMillis: Int = 0,
+    onDaySelected: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
-    var selectedDayData by remember { mutableStateOf<DailyTotal?>(null) }
 
     Column(
         modifier = Modifier
@@ -141,41 +137,13 @@ internal fun WeeklyChartSection(
             WeeklyBarChart(
                 dailyTotals = filteredDailyTotals,
                 dailyGoal = dailyGoal,
-                onBarClick = { dayTotal -> selectedDayData = dayTotal
-                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)},
+                onBarClick = { dayTotal ->
+                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                    onDaySelected(dayTotal.date)
+                },
                 volumeUnit = volumeUnit,
                 animationDelayMillis = animationDelayMillis
             )
-
-            // Inline detail panel with animation
-            AnimatedVisibility(
-                visible = selectedDayData != null,
-                enter = slideInVertically(
-                    initialOffsetY = { -it / 2 },
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessMedium
-                    )
-                ) + fadeIn(animationSpec = tween(300)),
-                exit = slideOutVertically(
-                    targetOffsetY = { -it / 2 },
-                    animationSpec = tween(200)
-                ) + fadeOut(animationSpec = tween(200))
-            ) {
-                selectedDayData?.let { dayData ->
-                    InlineDetailPanel(
-                        data = ChartDetailData(
-                            date = dayData.date,
-                            amount = dayData.totalAmount,
-                            goal = null,
-                            goalPercentage = null
-                        ),
-                        onDismiss = { selectedDayData = null },
-                        volumeUnit = volumeUnit,
-                        dateFormat = dateFormat
-                    )
-                }
-            }
 
             // Period-specific summary
             Row(
@@ -524,8 +492,7 @@ private fun WeeklyChartSectionPreview() {
                 averageIntake = sampleSummaries.map { it.totalIntake }.average(),
                 bestDayIntake = sampleSummaries.maxOfOrNull { it.totalIntake } ?: 0.0
             ),
-            volumeUnit = VolumeUnit.MILLILITRES,
-            dateFormat = DateFormatPattern.SYSTEM
+            volumeUnit = VolumeUnit.MILLILITRES
         )
     }
 }

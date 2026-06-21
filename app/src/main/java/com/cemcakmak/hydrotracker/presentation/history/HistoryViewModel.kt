@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
+import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
@@ -32,7 +33,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -79,7 +80,9 @@ data class HistoryUiState(
     val summaries: List<DailySummary> = emptyList(),
     val weeklyStats: WeeklyHistoryStats = WeeklyHistoryStats(),
     val monthlyStats: MonthlyHistoryStats = MonthlyHistoryStats(),
-    val yearlyStats: YearlyHistoryStats = YearlyHistoryStats()
+    val yearlyStats: YearlyHistoryStats = YearlyHistoryStats(),
+    val selectedDate: String? = null,
+    val selectedDateEntries: List<WaterIntakeEntry> = emptyList()
 )
 
 /**
@@ -99,6 +102,7 @@ class HistoryViewModel(
     private val weekOffset = MutableStateFlow(0)
     private val monthOffset = MutableStateFlow(0)
     private val yearOffset = MutableStateFlow(0)
+    private val selectedDate = MutableStateFlow<String?>(null)
 
     /**
      * Emits the active date range whenever the period, an offset, or the user's preferred
@@ -120,56 +124,76 @@ class HistoryViewModel(
         )
     }
 
-    /**
-     * Complete UI state for the History screen. The list of summaries is always scoped to the
-     * currently selected date range.
-     */
-    val uiState: StateFlow<HistoryUiState> = dateRange
+    private val summariesForRange = dateRange
         .flatMapLatest { (startDate, endDate) ->
             waterIntakeRepository.getSummariesForRange(startDate, endDate)
         }
-        .map { summaries ->
-            HistoryUiState(
-                selectedPeriod = selectedPeriod.value,
-                weekOffset = weekOffset.value,
-                monthOffset = monthOffset.value,
-                yearOffset = yearOffset.value,
-                summaries = summaries,
-                weeklyStats = calculateWeeklyStats(summaries),
-                monthlyStats = calculateMonthlyStats(summaries),
-                yearlyStats = calculateYearlyStats(summaries)
-            )
+
+    private val selectedDateEntries = selectedDate
+        .flatMapLatest { date ->
+            if (date == null) flowOf(emptyList()) else waterIntakeRepository.getEntriesForDate(date)
         }
+
+    /**
+     * Complete UI state for the History screen. The list of summaries is always scoped to the
+     * currently selected date range, and [selectedDateEntries] reflects the entries for the
+     * day tapped by the user.
+     */
+    val uiState: StateFlow<HistoryUiState> = combine(
+        summariesForRange,
+        selectedDateEntries
+    ) { summaries, entries ->
+        HistoryUiState(
+            selectedPeriod = selectedPeriod.value,
+            weekOffset = weekOffset.value,
+            monthOffset = monthOffset.value,
+            yearOffset = yearOffset.value,
+            summaries = summaries,
+            weeklyStats = calculateWeeklyStats(summaries),
+            monthlyStats = calculateMonthlyStats(summaries),
+            yearlyStats = calculateYearlyStats(summaries),
+            selectedDate = selectedDate.value,
+            selectedDateEntries = entries
+        )
+    }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = HistoryUiState()
         )
 
-    /** Switches the active period and resets all navigation offsets. */
+    /** Switches the active period and resets all navigation offsets and the selected day. */
     fun selectPeriod(period: TimePeriod) {
         selectedPeriod.value = period
         weekOffset.value = 0
         monthOffset.value = 0
         yearOffset.value = 0
+        selectedDate.value = null
     }
 
-    /** Moves one step backward within the current period type. */
+    /** Moves one step backward within the current period type and clears the selected day. */
     fun previousPeriod() {
         when (selectedPeriod.value) {
             TimePeriod.WEEKLY -> weekOffset.value--
             TimePeriod.MONTHLY -> monthOffset.value--
             TimePeriod.YEARLY -> yearOffset.value--
         }
+        selectedDate.value = null
     }
 
-    /** Moves one step forward within the current period type. */
+    /** Moves one step forward within the current period type and clears the selected day. */
     fun nextPeriod() {
         when (selectedPeriod.value) {
             TimePeriod.WEEKLY -> weekOffset.value++
             TimePeriod.MONTHLY -> monthOffset.value++
             TimePeriod.YEARLY -> yearOffset.value++
         }
+        selectedDate.value = null
+    }
+
+    /** Selects a calendar date and loads its entries underneath the chart. */
+    fun selectDate(date: String) {
+        selectedDate.value = date
     }
 
     private fun computeDateRange(

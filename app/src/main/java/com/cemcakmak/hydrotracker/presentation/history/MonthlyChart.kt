@@ -20,21 +20,14 @@
 
 package com.cemcakmak.hydrotracker.presentation.history
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -73,8 +66,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
-import com.cemcakmak.hydrotracker.data.models.DateFormatPattern
-import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.ui.theme.extendedColorScheme
@@ -90,12 +81,9 @@ internal fun MonthlyChartSection(
     summaries: List<DailySummary>,
     stats: MonthlyHistoryStats,
     weekStartDay: WeekStartDay = WeekStartDay.SYSTEM,
-    volumeUnit: VolumeUnit,
-    dateFormat: DateFormatPattern = DateFormatPattern.SYSTEM,
-    animationDelayMillis: Int = 0
+    animationDelayMillis: Int = 0,
+    onDaySelected: (String) -> Unit = {}
 ) {
-    var selectedSummary by remember { mutableStateOf<DailySummary?>(null) }
-
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
@@ -107,41 +95,13 @@ internal fun MonthlyChartSection(
             // Monthly heatmap-style visualization
             MonthlyHeatmap(
                 summaries = summaries,
-                onCellClick = { summary -> selectedSummary = summary
-                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)},
+                onCellClick = { summary ->
+                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                    onDaySelected(summary.date)
+                },
                 weekStartDay = weekStartDay,
                 animationDelayMillis = animationDelayMillis
             )
-
-            // Inline detail panel with animation
-            AnimatedVisibility(
-                visible = selectedSummary != null,
-                enter = slideInVertically(
-                    initialOffsetY = { -it / 2 },
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessMedium
-                    )
-                ) + fadeIn(animationSpec = tween(300)),
-                exit = slideOutVertically(
-                    targetOffsetY = { -it / 2 },
-                    animationSpec = tween(200)
-                ) + fadeOut(animationSpec = tween(200))
-            ) {
-                selectedSummary?.let { summary ->
-                    InlineDetailPanel(
-                        data = ChartDetailData(
-                            date = summary.date,
-                            amount = summary.totalIntake,
-                            goal = summary.dailyGoal,
-                            goalPercentage = summary.goalPercentage
-                        ),
-                        onDismiss = { selectedSummary = null },
-                        volumeUnit = volumeUnit,
-                        dateFormat = dateFormat
-                    )
-                }
-            }
 
             Row(
                 modifier = Modifier
@@ -469,9 +429,7 @@ private fun MonthlyChartSectionPreview() {
                 daysTracked = sampleSummaries.size,
                 goalsMet = sampleSummaries.count { it.goalAchieved },
                 successRate = (sampleSummaries.count { it.goalAchieved }.toDouble() / sampleSummaries.size) * 100.0
-            ),
-            volumeUnit = VolumeUnit.MILLILITRES,
-            dateFormat = DateFormatPattern.SYSTEM
+            )
         )
     }
 }

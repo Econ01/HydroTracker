@@ -907,6 +907,7 @@
     <string name="history_empty_month">No data available for the last 30 days</string>
     <string name="history_empty_year">No data available for this year</string>
     <string name="history_empty_generic">No data available</string>
+    <string name="history_select_day_hint">Tap a day on the chart to see its entries</string>
 
     <string name="history_legend_less">Less</string>
     <string name="history_legend_more">More</string>

@@ -11,23 +11,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -44,10 +39,8 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.launch
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
@@ -92,9 +85,10 @@ fun DailyEntriesSection(
     var pendingDeleteEntry by remember { mutableStateOf<WaterIntakeEntry?>(null) }
 
     Column(
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier.padding(horizontal = 16.dp)
     ) {
         Text(
+            modifier = Modifier.padding(vertical = 16.dp),
             text = title,
             style = MaterialTheme.typography.titleLargeEmphasized
         )
@@ -232,15 +226,13 @@ fun DailyEntryItem(
                         preset?.iconRes != null -> {
                             Icon(
                                 painter = painterResource(preset.iconRes),
-                                contentDescription = containerLabel,
-                                modifier = Modifier.size(44.dp)
+                                contentDescription = containerLabel
                             )
                         }
                         preset?.icon != null -> {
                             Icon(
                                 imageVector = preset.icon,
-                                contentDescription = containerLabel,
-                                modifier = Modifier.size(44.dp)
+                                contentDescription = containerLabel
                             )
                         }
                         else -> {
@@ -326,91 +318,6 @@ fun DailyEntryItem(
                             ),
                             style = MaterialTheme.typography.titleMediumEmphasized
                         )
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-/**
- * Confirmation dialogue shown before deleting an entry.
- */
-@Composable
-fun DailyEntryDeleteDialog(
-    entry: WaterIntakeEntry,
-    userProfile: UserProfile,
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    val context = LocalContext.current
-    val preset = remember(entry.containerType) {
-        ContainerPreset.getDefaultPresets().firstOrNull { it.name == entry.containerType }
-    }
-    val containerLabel = when {
-        preset?.labelResId != 0 && preset?.labelResId != null -> stringResource(preset.labelResId)
-        entry.containerType == "Custom" -> stringResource(R.string.home_option_custom)
-        else -> entry.containerType
-    }
-
-    Dialog(onDismissRequest = onDismiss) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.extraLargeIncreased,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = stringResource(R.string.action_delete),
-                        tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Text(
-                        text = stringResource(
-                            if (entry.isExternalEntry()) {
-                                R.string.home_dialog_external_entry_title
-                            } else {
-                                R.string.home_dialog_edit_entry_title
-                            }
-                        ),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                Text(
-                    text = stringResource(
-                        R.string.home_dialog_delete_message,
-                        containerLabel,
-                        entry.getFormattedAmount(context, userProfile.volumeUnit)
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(onClick = onDismiss) {
-                        Text(stringResource(R.string.action_cancel))
-                    }
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    TextButton(onClick = onConfirm) {
-                        Text(stringResource(R.string.action_confirm))
                     }
                 }
             }
