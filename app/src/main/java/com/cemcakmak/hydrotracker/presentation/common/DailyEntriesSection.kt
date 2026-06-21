@@ -40,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import com.cemcakmak.hydrotracker.R
@@ -59,23 +60,25 @@ import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
  * Each row supports a Gmail-style swipe-to-edit and swipe-to-delete gesture, and the
  * section only renders when [entries] is not empty.
  *
+ * @param modifier Modifier applied to the outer card.
  * @param entries The list of entries to display for the selected day.
  * @param userProfile Profile used for volume formatting and goal context.
  * @param themePreferences Theme preferences used for time/date formatting.
+ * @param tonalElevation Tonal elevation of the surface
  * @param onEdit Called when the user swipes an entry to edit it.
  * @param onDelete Called when the user confirms deletion of an entry.
- * @param modifier Modifier applied to the outer card.
  * @param title Optional section title. Defaults to the "Recent entries" label.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DailyEntriesSection(
+    modifier: Modifier = Modifier,
     entries: List<WaterIntakeEntry>,
     userProfile: UserProfile,
     themePreferences: ThemePreferences,
+    tonalElevation: Dp = 2.dp,
     onEdit: (WaterIntakeEntry) -> Unit,
     onDelete: (WaterIntakeEntry) -> Unit,
-    modifier: Modifier = Modifier,
     title: String = stringResource(R.string.home_section_recent_entries)
 ) {
     if (entries.isEmpty()) return
@@ -131,6 +134,7 @@ fun DailyEntriesSection(
                         DailyGroupCard(
                             index = index,
                             size = entries.size,
+                            tonalElevation = tonalElevation
                         ) {
                             DailyEntryItem(
                                 entry = entry,
@@ -163,13 +167,14 @@ fun DailyEntriesSection(
 internal fun DailyGroupCard(
     index: Int,
     size: Int,
+    tonalElevation: Dp = 2.dp,
     content: @Composable () -> Unit
 ) {
     val shape = getGroupShape(index, size)
 
     Surface(
         shape = shape,
-        tonalElevation = 2.dp,
+        tonalElevation = tonalElevation,
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 2.dp)
