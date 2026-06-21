@@ -1,5 +1,12 @@
 package com.cemcakmak.hydrotracker.presentation.common
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,12 +29,18 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -34,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import kotlinx.coroutines.launch
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
 import com.cemcakmak.hydrotracker.data.models.ActivityLevel
@@ -48,8 +63,8 @@ import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 /**
  * A reusable card that lists daily water intake entries.
  *
- * Each row supports swipe-to-edit and swipe-to-delete gestures, and the section only
- * renders when [entries] is not empty.
+ * Each row supports a Gmail-style swipe-to-edit and swipe-to-delete gesture, and the
+ * section only renders when [entries] is not empty.
  *
  * @param entries The list of entries to display for the selected day.
  * @param userProfile Profile used for volume formatting and goal context.
@@ -59,6 +74,7 @@ import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
  * @param modifier Modifier applied to the outer card.
  * @param title Optional section title. Defaults to the "Recent entries" label.
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DailyEntriesSection(
     entries: List<WaterIntakeEntry>,
@@ -71,6 +87,10 @@ fun DailyEntriesSection(
 ) {
     if (entries.isEmpty()) return
 
+    val haptics = LocalHapticFeedback.current
+    val coroutineScope = rememberCoroutineScope()
+    var pendingDeleteEntry by remember { mutableStateOf<WaterIntakeEntry?>(null) }
+
     Column(
         modifier = Modifier.padding(16.dp)
     ) {
@@ -81,20 +101,67 @@ fun DailyEntriesSection(
 
         entries.forEachIndexed { index, entry ->
             key(entry.id) {
-                DailyGroupCard(
-                    index = index,
-                    size = entries.size,
+                AnimatedVisibility(
+                    visible = pendingDeleteEntry?.id != entry.id,
+                    enter = fadeIn() + expandVertically(),
+                    exit = slideOutHorizontally(targetOffsetX = { -it }) + shrinkVertically()
                 ) {
-                    DailyEntryItem(
-                        entry = entry,
-                        userProfile = userProfile,
-                        themePreferences = themePreferences,
-                        onEdit = onEdit,
-                        onDelete = onDelete
-                    )
+                    val swipeState = rememberSwipeActionState()
+
+                    SwipeActionItem(
+                        state = swipeState,
+                        startAction = SwipeActionConfig(
+                            icon = Icons.Default.Edit,
+                            contentDescription = stringResource(R.string.cd_edit_entry),
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        ),
+                        endAction = SwipeActionConfig(
+                            icon = Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.cd_delete_entry),
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer
+                        ),
+                        onStartAction = {
+                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onEdit(entry)
+                            coroutineScope.launch {
+                                swipeState.animateTo(SwipeActionAnchor.Center)
+                            }
+                        },
+                        onEndAction = {
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                            pendingDeleteEntry = entry
+                        }
+                    ) {
+                        DailyGroupCard(
+                            index = index,
+                            size = entries.size,
+                        ) {
+                            DailyEntryItem(
+                                entry = entry,
+                                userProfile = userProfile,
+                                themePreferences = themePreferences
+                            )
+                        }
+                    }
                 }
             }
         }
+    }
+
+    pendingDeleteEntry?.let { entryToDelete ->
+        DailyEntryDeleteDialog(
+            entry = entryToDelete,
+            userProfile = userProfile,
+            onConfirm = {
+                onDelete(entryToDelete)
+                pendingDeleteEntry = null
+            },
+            onDismiss = {
+                pendingDeleteEntry = null
+            }
+        )
     }
 }
 
@@ -116,16 +183,14 @@ internal fun DailyGroupCard(
 }
 
 /**
- * A single daily intake row with swipe actions for edit and delete.
+ * A single daily intake row. Swipe actions are provided by [DailyEntriesSection].
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DailyEntryItem(
     entry: WaterIntakeEntry,
     userProfile: UserProfile,
-    themePreferences: ThemePreferences,
-    onEdit: (WaterIntakeEntry) -> Unit,
-    onDelete: (WaterIntakeEntry) -> Unit
+    themePreferences: ThemePreferences
 ) {
     val context = LocalContext.current
     val preset = remember(entry.containerType) {
@@ -437,20 +502,7 @@ private fun DailyEntryItemPreview() {
                 beverageMultiplier = 0.9
             ),
             userProfile = previewUser,
-            themePreferences = previewTheme,
-            onEdit = {},
-            onDelete = {
-                WaterIntakeEntry(
-                    id = 4,
-                    amount = 250.0,
-                    timestamp = System.currentTimeMillis(),
-                    date = "2026-06-20",
-                    containerType = "Glass",
-                    containerVolume = 250.0,
-                    beverageType = BeverageType.TEA.name,
-                    beverageMultiplier = 0.9
-                )
-            }
+            themePreferences = previewTheme
         )
     }
 }

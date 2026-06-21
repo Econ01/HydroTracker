@@ -55,6 +55,7 @@ import com.cemcakmak.hydrotracker.presentation.common.AddContainerPresetBottomSh
 import com.cemcakmak.hydrotracker.presentation.common.EditContainerPresetBottomSheet
 import com.cemcakmak.hydrotracker.presentation.common.BeverageOption
 import com.cemcakmak.hydrotracker.presentation.common.toOption
+import com.cemcakmak.hydrotracker.presentation.common.DailyEntriesSection
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import kotlin.time.Duration.Companion.milliseconds
@@ -473,43 +474,18 @@ fun HomeScreen(
                 }
 
                 // Recent Entries Section
-                if (todayEntries.isNotEmpty()) {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer
-                        )
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(20.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            Text(
-                                text = stringResource(R.string.home_section_recent_entries),
-                                style = MaterialTheme.typography.titleLargeEmphasized,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-
-                            todayEntries.forEach { entry ->
-                                key(entry.id) {
-                                    RecentEntryItem(
-                                        entry = entry,
-                                        userProfile = userProfile,
-                                        themePreferences = themePreferences,
-                                        onEdit = { entry ->
-                                            entryToEdit = entry
-                                            showEditDialog = true
-                                        },
-                                        onDelete = { entryToDelete ->
-                                            deleteWaterIntake(entryToDelete)
-                                        }
-                                    )
-                                    HorizontalDivider()
-                                }
-                            }
-                        }
+                DailyEntriesSection(
+                    entries = todayEntries,
+                    userProfile = userProfile,
+                    themePreferences = themePreferences,
+                    onEdit = { entry ->
+                        entryToEdit = entry
+                        showEditDialog = true
+                    },
+                    onDelete = { entryToDelete ->
+                        deleteWaterIntake(entryToDelete)
                     }
-                }
+                )
             }
 
             // Bottom spacing for FAB
