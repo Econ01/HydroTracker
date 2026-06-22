@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,14 +31,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -119,18 +123,28 @@ fun SwipeActionItem(
     content: @Composable () -> Unit
 ) {
     val density = LocalDensity.current
-    val maxOffsetPx = with(density) { maxOffset.toPx() }
+    val pillCardGap = 2.dp
+    val iconMinLeadingPadding = 20.dp
 
+    val gapPx = with(density) { pillCardGap.toPx() }
+    val minLeadingPaddingPx = with(density) { iconMinLeadingPadding.toPx() }
+
+    // Fire actions only once the row settles at an edge — i.e. after the finger is released.
     LaunchedEffect(state.settledValue) {
         when (state.settledValue) {
-            SwipeActionAnchor.End -> {
-                startAction?.let { onStartAction() }
-            }
-            SwipeActionAnchor.Start -> {
-                endAction?.let { onEndAction() }
-            }
+            SwipeActionAnchor.End -> startAction?.let { onStartAction() }
+            SwipeActionAnchor.Start -> endAction?.let { onEndAction() }
             SwipeActionAnchor.Center -> {}
         }
+    }
+
+    // Subtle tick the moment the drag crosses the commit threshold.
+    val haptics = LocalHapticFeedback.current
+    val thresholdPx = with(density) { maxOffset.toPx() } * 0.4f
+    LaunchedEffect(state, thresholdPx) {
+        snapshotFlow { state.requireOffset().absoluteValue >= thresholdPx }
+            .distinctUntilChanged()
+            .collect { past -> if (past) haptics.performHapticFeedback(HapticFeedbackType.SegmentTick) }
     }
 
     Box(
@@ -142,14 +156,16 @@ fun SwipeActionItem(
             startAction?.let { config ->
                 StartActionPill(
                     state = state,
-                    maxOffsetPx = maxOffsetPx,
+                    gapPx = gapPx,
+                    minLeadingPaddingPx = minLeadingPaddingPx,
                     config = config
                 )
             }
             endAction?.let { config ->
                 EndActionPill(
                     state = state,
-                    maxOffsetPx = maxOffsetPx,
+                    gapPx = gapPx,
+                    minLeadingPaddingPx = minLeadingPaddingPx,
                     config = config
                 )
             }
@@ -174,14 +190,15 @@ fun SwipeActionItem(
 @Composable
 private fun StartActionPill(
     state: AnchoredDraggableState<SwipeActionAnchor>,
-    maxOffsetPx: Float,
+    gapPx: Float,
+    minLeadingPaddingPx: Float,
     config: SwipeActionConfig
 ) {
     Box(
         modifier = Modifier
             .fillMaxHeight()
             .layout { measurable, constraints ->
-                val widthPx = state.requireOffset().coerceAtLeast(0f).roundToInt()
+                val widthPx = (state.requireOffset() - gapPx).coerceAtLeast(0f).roundToInt()
                 val placeable = measurable.measure(
                     constraints.copy(minWidth = widthPx, maxWidth = widthPx)
                 )
@@ -193,9 +210,11 @@ private fun StartActionPill(
             .background(config.containerColor),
         contentAlignment = Alignment.Center
     ) {
-        ScaledActionIcon(
+        ActionIcon(
             state = state,
-            maxOffsetPx = maxOffsetPx,
+            gapPx = gapPx,
+            minLeadingPaddingPx = minLeadingPaddingPx,
+            leadingStart = true,
             config = config
         )
     }
@@ -205,14 +224,15 @@ private fun StartActionPill(
 @Composable
 private fun EndActionPill(
     state: AnchoredDraggableState<SwipeActionAnchor>,
-    maxOffsetPx: Float,
+    gapPx: Float,
+    minLeadingPaddingPx: Float,
     config: SwipeActionConfig
 ) {
     Box(
         modifier = Modifier
             .fillMaxHeight()
             .layout { measurable, constraints ->
-                val widthPx = (-state.requireOffset()).coerceAtLeast(0f).roundToInt()
+                val widthPx = (-state.requireOffset() - gapPx).coerceAtLeast(0f).roundToInt()
                 val placeable = measurable.measure(
                     constraints.copy(minWidth = widthPx, maxWidth = widthPx)
                 )
@@ -224,19 +244,28 @@ private fun EndActionPill(
             .background(config.containerColor),
         contentAlignment = Alignment.Center
     ) {
-        ScaledActionIcon(
+        ActionIcon(
             state = state,
-            maxOffsetPx = maxOffsetPx,
+            gapPx = gapPx,
+            minLeadingPaddingPx = minLeadingPaddingPx,
+            leadingStart = false,
             config = config
         )
     }
 }
 
+/**
+ * Constant-size action icon. Centered in the pill once it is wide enough, but kept at least
+ * [minLeadingPaddingPx] from the pill's leading edge (and clipped by the pill) while narrow, so it
+ * emerges from the swiped edge instead of being squeezed in the middle.
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ScaledActionIcon(
+private fun ActionIcon(
     state: AnchoredDraggableState<SwipeActionAnchor>,
-    maxOffsetPx: Float,
+    gapPx: Float,
+    minLeadingPaddingPx: Float,
+    leadingStart: Boolean,
     config: SwipeActionConfig
 ) {
     Icon(
@@ -244,10 +273,10 @@ private fun ScaledActionIcon(
         contentDescription = config.contentDescription,
         tint = config.contentColor,
         modifier = Modifier.graphicsLayer {
-            val progress = (state.requireOffset().absoluteValue / maxOffsetPx).coerceIn(0f, 1f)
-            val scale = 0.5f + (0.5f * progress)
-            scaleX = scale
-            scaleY = scale
+            val pillWidth = (state.requireOffset().absoluteValue - gapPx).coerceAtLeast(0f)
+            val centeredLeft = (pillWidth - size.width) / 2f
+            val delta = (minLeadingPaddingPx - centeredLeft).coerceAtLeast(0f)
+            translationX = if (leadingStart) delta else -delta
         }
     )
 }

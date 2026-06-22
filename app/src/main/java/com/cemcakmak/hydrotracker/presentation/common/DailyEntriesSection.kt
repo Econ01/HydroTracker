@@ -1,14 +1,16 @@
 package com.cemcakmak.hydrotracker.presentation.common
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -85,7 +88,10 @@ fun DailyEntriesSection(
 
     val haptics = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
-    var pendingDeleteEntry by remember { mutableStateOf<WaterIntakeEntry?>(null) }
+    // Drives the confirmation dialogue (set when a left-swipe commits; row returns to centre meanwhile).
+    var dialogEntry by remember { mutableStateOf<WaterIntakeEntry?>(null) }
+    // Set on confirm; the matching row plays the collapse, then onDelete fires when it settles.
+    var confirmedDeleteEntry by remember { mutableStateOf<WaterIntakeEntry?>(null) }
 
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
@@ -98,49 +104,64 @@ fun DailyEntriesSection(
 
         entries.forEachIndexed { index, entry ->
             key(entry.id) {
-                AnimatedVisibility(
-                    visible = pendingDeleteEntry?.id != entry.id,
-                    enter = fadeIn() + expandVertically(),
-                    exit = slideOutHorizontally(targetOffsetX = { -it }) + shrinkVertically()
-                ) {
-                    val swipeState = rememberSwipeActionState()
+                val visibleState = remember { MutableTransitionState(true) }
+                // Start the collapse once this entry's deletion is confirmed.
+                LaunchedEffect(confirmedDeleteEntry) {
+                    if (confirmedDeleteEntry?.id == entry.id) visibleState.targetState = false
+                }
+                // Remove from the data only after the collapse animation has settled.
+                LaunchedEffect(visibleState.isIdle) {
+                    if (visibleState.isIdle && !visibleState.currentState) {
+                        onDelete(entry)
+                        confirmedDeleteEntry = null
+                    }
+                }
 
-                    SwipeActionItem(
-                        state = swipeState,
-                        startAction = SwipeActionConfig(
-                            icon = Icons.Default.Edit,
-                            contentDescription = stringResource(R.string.cd_edit_entry),
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                        ),
-                        endAction = SwipeActionConfig(
-                            icon = Icons.Default.Delete,
-                            contentDescription = stringResource(R.string.cd_delete_entry),
-                            containerColor = MaterialTheme.colorScheme.errorContainer,
-                            contentColor = MaterialTheme.colorScheme.onErrorContainer
-                        ),
-                        onStartAction = {
-                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            onEdit(entry)
-                            coroutineScope.launch {
-                                swipeState.animateTo(SwipeActionAnchor.Center)
+                AnimatedVisibility(
+                    visibleState = visibleState,
+                    enter = fadeIn() + expandVertically(),
+                    exit = shrinkVertically() + fadeOut()
+                ) {
+                    BoxWithConstraints {
+
+                        val swipeState = rememberSwipeActionState(maxOffset = maxWidth)
+
+                        SwipeActionItem(
+                            state = swipeState,
+                            startAction = SwipeActionConfig(
+                                icon = Icons.Default.Edit,
+                                contentDescription = stringResource(R.string.cd_edit_entry),
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            endAction = SwipeActionConfig(
+                                icon = Icons.Default.Delete,
+                                contentDescription = stringResource(R.string.cd_delete_entry),
+                                containerColor = MaterialTheme.colorScheme.error,
+                                contentColor = MaterialTheme.colorScheme.onError
+                            ),
+                            onStartAction = {
+                                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                onEdit(entry)
+                                coroutineScope.launch { swipeState.animateTo(SwipeActionAnchor.Center) }
+                            },
+                            onEndAction = {
+                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                dialogEntry = entry
+                                coroutineScope.launch { swipeState.animateTo(SwipeActionAnchor.Center) }
                             }
-                        },
-                        onEndAction = {
-                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                            pendingDeleteEntry = entry
-                        }
-                    ) {
-                        DailyGroupCard(
-                            index = index,
-                            size = entries.size,
-                            tonalElevation = tonalElevation
                         ) {
-                            DailyEntryItem(
-                                entry = entry,
-                                userProfile = userProfile,
-                                themePreferences = themePreferences
-                            )
+                            DailyGroupCard(
+                                index = index,
+                                size = entries.size,
+                                tonalElevation = tonalElevation
+                            ) {
+                                DailyEntryItem(
+                                    entry = entry,
+                                    userProfile = userProfile,
+                                    themePreferences = themePreferences
+                                )
+                            }
                         }
                     }
                 }
@@ -148,16 +169,16 @@ fun DailyEntriesSection(
         }
     }
 
-    pendingDeleteEntry?.let { entryToDelete ->
+    dialogEntry?.let { entryToDelete ->
         DailyEntryDeleteDialog(
             entry = entryToDelete,
             userProfile = userProfile,
             onConfirm = {
-                onDelete(entryToDelete)
-                pendingDeleteEntry = null
+                confirmedDeleteEntry = entryToDelete
+                dialogEntry = null
             },
             onDismiss = {
-                pendingDeleteEntry = null
+                dialogEntry = null
             }
         )
     }
