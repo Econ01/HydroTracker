@@ -222,6 +222,7 @@ private fun StartActionPill(
 ) {
     Box(
         modifier = Modifier
+            .padding(bottom = 2.dp)
             .fillMaxHeight()
             .layout { measurable, constraints ->
                 val widthPx = (state.requireOffset() - gapPx).coerceAtLeast(0f).roundToInt()
@@ -258,6 +259,7 @@ private fun EndActionPill(
 ) {
     Box(
         modifier = Modifier
+            .padding(bottom = 2.dp)
             .fillMaxHeight()
             .layout { measurable, constraints ->
                 val widthPx = (-state.requireOffset() - gapPx).coerceAtLeast(0f).roundToInt()
