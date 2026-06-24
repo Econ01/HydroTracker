@@ -1,7 +1,6 @@
 package com.cemcakmak.hydrotracker.presentation.home
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -18,7 +17,6 @@ import androidx.compose.material.icons.rounded.Cloud
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -26,13 +24,13 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -49,45 +47,33 @@ internal fun HomeTopAppBar(
     userProfile: UserProfile?,
     waterIntakeRepository: WaterIntakeRepository?
 ) {
-    val elevated by remember {
-        derivedStateOf { scrollBehavior.state.collapsedFraction > 0f }
-    }
-    val animatedElevation by animateDpAsState(
-        targetValue = if (elevated) 6.dp else 0.dp,
-        label = "AppBarElevation"
-    )
 
-    Surface(
-        tonalElevation = animatedElevation,
-        shadowElevation = animatedElevation
-    ) {
-        TopAppBar(
-            scrollBehavior = scrollBehavior,
-            title = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.app_name),
-                        style = MaterialTheme.typography.headlineLargeEmphasized,
-                        color = MaterialTheme.colorScheme.onSurface,
+    TopAppBar(
+        scrollBehavior = scrollBehavior,
+        title = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.app_name),
+                    style = MaterialTheme.typography.headlineLargeEmphasized
+                )
+
+                if (userProfile != null && waterIntakeRepository != null) {
+                    HealthConnectSyncIcon(
+                        userProfile = userProfile,
+                        waterIntakeRepository = waterIntakeRepository,
+                        modifier = Modifier.size(24.dp)
                     )
-
-                    if (userProfile != null && waterIntakeRepository != null) {
-                        HealthConnectSyncIcon(
-                            userProfile = userProfile,
-                            waterIntakeRepository = waterIntakeRepository,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
                 }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color.Transparent,
+            scrolledContainerColor = Color.Transparent
         )
-    }
+    )
 }
 
 @Composable

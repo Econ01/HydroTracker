@@ -96,7 +96,7 @@ fun MainNavigationScaffold(
     }
 
     // Scroll behaviours remembered per route so collapsed state survives tab switches
-    val homeScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val homeScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     val nestedScrollModifier = run {
         val base = when (currentKey) {

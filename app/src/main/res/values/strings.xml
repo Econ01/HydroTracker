@@ -291,6 +291,8 @@
     <string name="appearance_autohide_title">Auto-hide on scroll</string>
     <string name="appearance_autohide_desc">Hide the bar when scrolling down</string>
     <string name="appearance_labels_title">Labels</string>
+    <string name="appearance_home_header">Home screen</string>
+    <string name="appearance_edge_effect_title">Edge Effect</string>
     <!-- Sample data shown in the theme preview card -->
     <string name="appearance_preview_amount">1,250 / 2,500 ml</string>
     <string name="appearance_preview_entries">Entries</string>
@@ -535,6 +537,11 @@
     <string name="navbar_label_always">Always shown</string>
     <string name="navbar_label_selected">Selected only</string>
     <string name="navbar_label_none">Off</string>
+
+    <!-- Home screen edge effect -->
+    <string name="edge_effect_transparent">Transparent</string>
+    <string name="edge_effect_blurred">Blurred</string>
+    <string name="edge_effect_scrim">Scrim</string>
 
     <!-- Beverage types -->
     <string name="beverage_water">Water</string>

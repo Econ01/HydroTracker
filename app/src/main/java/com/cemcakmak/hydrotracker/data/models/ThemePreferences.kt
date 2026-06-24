@@ -22,7 +22,8 @@ data class ThemePreferences(
     val usePureBlack: Boolean = false, // Pure black backgrounds in dark mode
     val appFont: AppFont = AppFont.GOOGLE_SANS_FLEX, // App-wide typeface
     val autoHideNavBar: Boolean = false, // Hide the bottom nav bar when scrolling down
-    val navBarLabelMode: NavBarLabelMode = NavBarLabelMode.ALWAYS // Bottom nav label visibility
+    val navBarLabelMode: NavBarLabelMode = NavBarLabelMode.ALWAYS, // Bottom nav label visibility
+    val edgeEffect: EdgeEffect = EdgeEffect.BLURRED // Home screen top edge treatment
 )
 
 @Serializable
@@ -114,4 +115,11 @@ enum class NavBarLabelMode(@param:StringRes val labelResId: Int) {
     ALWAYS(R.string.navbar_label_always),    // Show every tab's label
     SELECTED(R.string.navbar_label_selected),  // Show only the selected tab's label
     NONE(R.string.navbar_label_none)      // No labels
+}
+
+@Serializable
+enum class EdgeEffect(@param:StringRes val labelResId: Int) {
+    TRANSPARENT(R.string.edge_effect_transparent), // No top treatment; content runs edge-to-edge
+    BLURRED(R.string.edge_effect_blurred),         // Variable-radius backdrop blur (API 33+)
+    SCRIM(R.string.edge_effect_scrim)              // Surface -> transparent gradient fade
 }

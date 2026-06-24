@@ -68,6 +68,7 @@ import com.cemcakmak.hydrotracker.data.models.AppFont
 import com.cemcakmak.hydrotracker.data.models.ColorSource
 import com.cemcakmak.hydrotracker.data.models.DarkModePreference
 import com.cemcakmak.hydrotracker.data.models.NavBarLabelMode
+import com.cemcakmak.hydrotracker.data.models.EdgeEffect
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.ui.theme.fontFamilyFor
@@ -83,10 +84,13 @@ fun AppearanceScreen(
     onAppFontChange: (AppFont) -> Unit = {},
     onAutoHideNavBarChange: (Boolean) -> Unit = {},
     onNavBarLabelModeChange: (NavBarLabelMode) -> Unit = {},
+    isBlurSupported: Boolean = true,
+    onEdgeEffectChange: (EdgeEffect) -> Unit = {},
     onNavigateBack: () -> Unit = {}
 ) {
     var showFontSheet by remember { mutableStateOf(false) }
     var showLabelSheet by remember { mutableStateOf(false) }
+    var showEdgeEffectSheet by remember { mutableStateOf(false) }
 
     SettingsDetailScaffold(
         title = stringResource(R.string.screen_appearance_title),
@@ -113,6 +117,12 @@ fun AppearanceScreen(
             onOpenLabelSheet = { showLabelSheet = true }
         )
 
+        HomeScreenSection(
+            edgeEffect = themePreferences.edgeEffect,
+            isBlurSupported = isBlurSupported,
+            onOpenEdgeEffectSheet = { showEdgeEffectSheet = true }
+        )
+
         FontSection(
             selectedFont = themePreferences.appFont,
             onOpenFontSheet = { showFontSheet = true }
@@ -132,6 +142,15 @@ fun AppearanceScreen(
             selected = themePreferences.navBarLabelMode,
             onSelect = onNavBarLabelModeChange,
             onDismiss = { showLabelSheet = false }
+        )
+    }
+
+    if (showEdgeEffectSheet) {
+        EdgeEffectBottomSheet(
+            selected = themePreferences.edgeEffect,
+            isBlurSupported = isBlurSupported,
+            onSelect = onEdgeEffectChange,
+            onDismiss = { showEdgeEffectSheet = false }
         )
     }
 }
@@ -673,6 +692,114 @@ private fun NavLabelBottomSheet(
 }
 
 @Composable
+private fun HomeScreenSection(
+    edgeEffect: EdgeEffect,
+    isBlurSupported: Boolean,
+    onOpenEdgeEffectSheet: () -> Unit
+) {
+    val haptics = LocalHapticFeedback.current
+    // Devices that can't blur never show the Blurred option, so a stored BLURRED value is
+    // surfaced (and rendered) as Transparent here.
+    val effective = if (edgeEffect == EdgeEffect.BLURRED && !isBlurSupported) {
+        EdgeEffect.TRANSPARENT
+    } else {
+        edgeEffect
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        SettingsSectionHeader(stringResource(R.string.appearance_home_header))
+        SettingsGroupCard(
+            index = 0,
+            size = 1,
+            onClick = {
+                haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                onOpenEdgeEffectSheet()
+            }
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.blur_on_filled),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.appearance_edge_effect_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = stringResource(effective.labelResId),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EdgeEffectBottomSheet(
+    selected: EdgeEffect,
+    isBlurSupported: Boolean,
+    onSelect: (EdgeEffect) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
+    val haptics = LocalHapticFeedback.current
+    // Hide Blurred where the device can't render it; treat a stored BLURRED as Transparent.
+    val options = EdgeEffect.entries.filter { isBlurSupported || it != EdgeEffect.BLURRED }
+    val effectiveSelected = if (selected == EdgeEffect.BLURRED && !isBlurSupported) {
+        EdgeEffect.TRANSPARENT
+    } else {
+        selected
+    }
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(top = 8.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            options.forEachIndexed { index, mode ->
+                SelectableOptionCard(
+                    index = index,
+                    size = options.size,
+                    selected = mode == effectiveSelected,
+                    onClick = {
+                        onSelect(mode)
+                        haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
+                    }
+                ) { contentColor ->
+                    Text(
+                        text = stringResource(mode.labelResId),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = contentColor
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun PreviewStatChip(
     label: String,
     value: String
@@ -721,6 +848,9 @@ fun AppearanceScreenWithAppBarPreview() {
             },
             onPureBlackChange = { enabled ->
                 previewPreferences = previewPreferences.copy(usePureBlack = enabled)
+            },
+            onEdgeEffectChange = { style ->
+                previewPreferences = previewPreferences.copy(edgeEffect = style)
             }
         )
     }

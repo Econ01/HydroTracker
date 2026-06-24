@@ -16,7 +16,6 @@ import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
@@ -35,20 +34,36 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.launch
+import androidx.compose.ui.tooling.preview.Preview
 import com.cemcakmak.hydrotracker.R
+import com.cemcakmak.hydrotracker.data.database.dao.ContainerPresetDao
+import com.cemcakmak.hydrotracker.data.database.dao.DailySummaryDao
+import com.cemcakmak.hydrotracker.data.database.dao.DailyTotal
+import com.cemcakmak.hydrotracker.data.database.dao.WaterIntakeDao
+import com.cemcakmak.hydrotracker.data.database.entities.ContainerPresetEntity
+import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
+import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
+import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
+import com.cemcakmak.hydrotracker.data.database.repository.TodayStatistics
+import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
+import com.cemcakmak.hydrotracker.data.database.repository.WaterProgress
+import com.cemcakmak.hydrotracker.data.models.ActivityLevel
+import com.cemcakmak.hydrotracker.data.models.AgeGroup
+import com.cemcakmak.hydrotracker.data.models.BeverageType
+import com.cemcakmak.hydrotracker.data.models.ContainerPreset
+import com.cemcakmak.hydrotracker.data.models.DayEndMode
+import com.cemcakmak.hydrotracker.data.models.Gender
+import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
-import com.cemcakmak.hydrotracker.data.models.ContainerPreset
-import com.cemcakmak.hydrotracker.data.models.BeverageType
-import com.cemcakmak.hydrotracker.data.models.ThemePreferences
-import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
-import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
-import com.cemcakmak.hydrotracker.data.database.repository.WaterProgress
-import com.cemcakmak.hydrotracker.data.database.repository.TodayStatistics
-import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
+import com.cemcakmak.hydrotracker.data.repository.UserRepository
+import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
+import com.cemcakmak.hydrotracker.utils.UserDayCalculator
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 import com.cemcakmak.hydrotracker.utils.WaterCalculator
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import com.cemcakmak.hydrotracker.presentation.common.showSuccessSnackbar
 import com.cemcakmak.hydrotracker.presentation.common.showErrorSnackbar
 import com.cemcakmak.hydrotracker.presentation.common.AddContainerPresetBottomSheet
@@ -59,6 +74,21 @@ import com.cemcakmak.hydrotracker.presentation.common.DailyEntriesSection
 import com.cemcakmak.hydrotracker.presentation.common.EditWaterDialog
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.drawBehind
+import android.os.Build
+import com.cemcakmak.hydrotracker.data.models.EdgeEffect
+import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurState
+import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurStyle
+import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropProgressive
+import com.cemcakmak.hydrotracker.presentation.common.effect.backdropBlur
+import com.cemcakmak.hydrotracker.presentation.common.effect.backdropSource
+import com.cemcakmak.hydrotracker.presentation.common.effect.rememberBackdropBlurState
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -278,6 +308,17 @@ fun HomeScreen(
 
     val scrollState = rememberScrollState()
 
+    val edgeEffectStyle = themePreferences.edgeEffect.let {
+        if (it == EdgeEffect.BLURRED && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            EdgeEffect.TRANSPARENT
+        } else {
+            it
+        }
+    }
+
+    // Backdrop captured for the frosted top band
+    val backdropState = rememberBackdropBlurState()
+
     // Track scroll direction for FAB collapse/expand
     var lastScrollValue by remember { mutableIntStateOf(0) }
     LaunchedEffect(scrollState) {
@@ -290,84 +331,110 @@ fun HomeScreen(
             }
     }
 
-    PullToRefreshBox(
-        isRefreshing = isRefreshing,
-        onRefresh = ::performManualSync,
+    val scaleFraction = {
+        if (isRefreshing) 1f
+        else LinearOutSlowInEasing.transform(pullToRefreshState.distanceFraction).coerceIn(0f, 1f)
+    }
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(paddingValues),
-        state = pullToRefreshState
+            .pullToRefresh(
+                state = pullToRefreshState,
+                isRefreshing = isRefreshing,
+                onRefresh = ::performManualSync
+            )
     ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .then(
+                    if (edgeEffectStyle == EdgeEffect.BLURRED) {
+                        Modifier
+                            .backdropSource(backdropState)
+                            .background(MaterialTheme.colorScheme.background)
+                    } else {
+                        Modifier
+                    }
+                )
+                .verticalScroll(scrollState),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Spacer(modifier = Modifier.height(paddingValues.calculateTopPadding()))
+            // Daily Progress Section
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollState),
-                verticalArrangement = Arrangement.spacedBy(14.dp)
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
+                    .padding(horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(R.string.home_label_daily_progress),
+                    textAlign = TextAlign.Start,
+                    style = MaterialTheme.typography.headlineLargeEmphasized,
+                )
 
-            // Daily Progress Section
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
-            ) {
-                Column(
-                    modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.home_label_daily_progress),
-                        style = MaterialTheme.typography.headlineLargeEmphasized,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                // Progress amount display
+                Text(
+                    text = stringResource(
+                        R.string.progress_current_of_goal_format,
+                        VolumeUnitConverter.format(context, todayProgress.currentIntake, userProfile.volumeUnit),
+                        VolumeUnitConverter.format(context, todayProgress.dailyGoal, userProfile.volumeUnit)
+                    ),
+                    style = MaterialTheme.typography.headlineMedium
+                )
 
-                    // Progress amount display
-                    Text(
-                        text = stringResource(
-                            R.string.progress_current_of_goal_format,
-                            VolumeUnitConverter.format(context, todayProgress.currentIntake, userProfile.volumeUnit),
-                            VolumeUnitConverter.format(context, todayProgress.dailyGoal, userProfile.volumeUnit)
-                        ),
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                // Wavy Progress Indicator
+                LinearWavyProgressIndicator(
+                    progress = { animatedProgress },
+                    modifier = Modifier.fillMaxWidth(0.5f).scale(scaleX = 2f, scaleY = 2f),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.primaryContainer,
+                    stroke = WavyProgressIndicatorDefaults.linearIndicatorStroke,
+                    trackStroke = WavyProgressIndicatorDefaults.linearTrackStroke,
+                    gapSize = WavyProgressIndicatorDefaults.LinearIndicatorTrackGapSize,
+                    amplitude = WavyProgressIndicatorDefaults.indicatorAmplitude,
+                    wavelength = WavyProgressIndicatorDefaults.LinearIndeterminateWavelength,
+                    waveSpeed = WavyProgressIndicatorDefaults.LinearIndeterminateWavelength
+                )
 
-                    // Wavy Progress Indicator
-                    LinearWavyProgressIndicator(
-                        progress = { animatedProgress },
+                // Motivational message
+                Text(
+                    text = getMotivationalMessage(todayProgress.progress, userProfile, todayProgress.isGoalAchieved),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                // Additional stats row
+                if (todayStatistics.entryCount > 0) {
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.primary,
-                        trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-                        stroke = WavyProgressIndicatorDefaults.linearIndicatorStroke,
-                        trackStroke = WavyProgressIndicatorDefaults.linearTrackStroke,
-                        amplitude = WavyProgressIndicatorDefaults.indicatorAmplitude,
-                        wavelength = WavyProgressIndicatorDefaults.LinearDeterminateWavelength,
-                        waveSpeed = WavyProgressIndicatorDefaults.LinearDeterminateWavelength
-                    )
-
-                    // Motivational message
-                    Text(
-                        text = getMotivationalMessage(todayProgress.progress, userProfile, todayProgress.isGoalAchieved),
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-
-                    // Additional stats row
-                    if (todayStatistics.entryCount > 0) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        StatChip(
+                            label = stringResource(R.string.home_label_entries),
+                            value = "${todayStatistics.entryCount}"
+                        )
+                        todayStatistics.firstIntakeTime?.let { timestamp ->
                             StatChip(
-                                label = stringResource(R.string.home_label_entries),
-                                value = "${todayStatistics.entryCount}"
+                                label = stringResource(R.string.home_label_first_intake),
+                                value = DateTimeFormatters.formatTime(
+                                    context,
+                                    java.time.Instant.ofEpochMilli(timestamp)
+                                        .atZone(java.time.ZoneId.systemDefault())
+                                        .toLocalTime(),
+                                    themePreferences.timeFormat
+                                )
                             )
-                            todayStatistics.firstIntakeTime?.let { timestamp ->
+                        }
+                        if (todayStatistics.entryCount > 1) {
+                            todayStatistics.lastIntakeTime?.let { timestamp ->
                                 StatChip(
-                                    label = stringResource(R.string.home_label_first_intake),
+                                    label = stringResource(R.string.home_label_latest_intake),
                                     value = DateTimeFormatters.formatTime(
                                         context,
                                         java.time.Instant.ofEpochMilli(timestamp)
@@ -376,20 +443,6 @@ fun HomeScreen(
                                         themePreferences.timeFormat
                                     )
                                 )
-                            }
-                            if (todayStatistics.entryCount > 1) {
-                                todayStatistics.lastIntakeTime?.let { timestamp ->
-                                    StatChip(
-                                        label = stringResource(R.string.home_label_latest_intake),
-                                        value = DateTimeFormatters.formatTime(
-                                            context,
-                                            java.time.Instant.ofEpochMilli(timestamp)
-                                                .atZone(java.time.ZoneId.systemDefault())
-                                                .toLocalTime(),
-                                            themePreferences.timeFormat
-                                        )
-                                    )
-                                }
                             }
                         }
                     }
@@ -490,10 +543,24 @@ fun HomeScreen(
                 )
             }
 
-            // Bottom spacing for FAB
-            Spacer(modifier = Modifier.height(20.dp))
-            }
+            Spacer(modifier = Modifier.height(paddingValues.calculateBottomPadding()))
         }
+
+        TopEdgeEffect(
+            style = edgeEffectStyle,
+            backdropState = backdropState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
+
+        Box(
+            modifier = Modifier.align(Alignment.TopCenter).graphicsLayer {
+                scaleX = scaleFraction()
+                scaleY = scaleFraction()
+            }
+        ) {
+            PullToRefreshDefaults.LoadingIndicator(state= pullToRefreshState, isRefreshing = isRefreshing)
+        }
+    }
 
     // Custom Water Entry Dialogue
     if (showCustomDialog) {
@@ -579,6 +646,62 @@ fun HomeScreen(
                 }
             }
         )
+    }
+}
+
+/**
+ * Top-edge treatment for the Home screen, chosen by the user's [EdgeEffect] setting:
+ *  - [EdgeEffect.TRANSPARENT]: nothing (content runs edge-to-edge under the status bar).
+ *  - [EdgeEffect.SCRIM]: a plain surface→transparent gradient fade.
+ *  - [EdgeEffect.BLURRED]: a variable-radius backdrop blur of the captured content.
+ *
+ * The band is fixed height (status bar + app bar area) and sits above the content but below the app bar title.
+ */
+@Composable
+private fun TopEdgeEffect(
+    style: EdgeEffect,
+    backdropState: BackdropBlurState,
+    modifier: Modifier = Modifier
+) {
+    val bandHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 40.dp
+
+    when (style) {
+        EdgeEffect.TRANSPARENT -> Unit
+        EdgeEffect.SCRIM -> {
+            val scrimColor = MaterialTheme.colorScheme.surface
+            Box(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .height(bandHeight)
+                    .drawBehind {
+                        drawRect(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(scrimColor, Color.Transparent)
+                            )
+                        )
+                    }
+            )
+        }
+        EdgeEffect.BLURRED -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Box(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .height(bandHeight)
+                        .backdropBlur(
+                            state = backdropState,
+                            style = BackdropBlurStyle(
+                                blurRadius = 10.dp,
+                                progressive = BackdropProgressive(
+                                    startFraction = 0f,
+                                    endFraction = 1f
+                                ),
+                                tint = MaterialTheme.colorScheme.surface.copy(0.3f)
+                            )
+                        )
+                )
+            }
+        }
     }
 }
 
@@ -1104,3 +1227,140 @@ private fun BeverageSelectionSection(
         }
     }
 }
+//region Preview
+
+/** Static user profile used by the HomeScreen preview. */
+private val previewUserProfile = UserProfile(
+    name = "Preview User",
+    gender = Gender.MALE,
+    ageGroup = AgeGroup.ADULT_31_50,
+    activityLevel = ActivityLevel.MODERATE,
+    wakeUpTime = "07:00",
+    sleepTime = "23:00",
+    dailyWaterGoal = 2700.0,
+    reminderInterval = 60,
+    volumeUnit = VolumeUnit.MILLILITRES,
+    healthConnectSyncEnabled = false
+)
+
+/** Fixed sample entries shown in the preview. */
+private val previewEntries: List<WaterIntakeEntry>
+    get() {
+        val now = System.currentTimeMillis()
+        val date = UserDayCalculator.getCurrentUserDayString(
+            wakeUpTime = "07:00",
+            dayEndMode = DayEndMode.SLEEP_TIME
+        )
+        return listOf(
+            WaterIntakeEntry(
+                id = 1,
+                amount = 300.0,
+                timestamp = now - 3_600_000 * 4,
+                date = date,
+                containerType = "Medium Glass",
+                containerVolume = 200.0,
+                beverageType = BeverageType.WATER.name
+            ),
+            WaterIntakeEntry(
+                id = 2,
+                amount = 500.0,
+                timestamp = now - 3_600_000 * 2,
+                date = date,
+                containerType = "Water Bottle",
+                containerVolume = 500.0,
+                beverageType = BeverageType.WATER.name
+            ),
+            WaterIntakeEntry(
+                id = 3,
+                amount = 550.0,
+                timestamp = now - 3_600_000,
+                date = date,
+                containerType = "Coffee Cup",
+                containerVolume = 100.0,
+                beverageType = BeverageType.COFFEE.name,
+                beverageMultiplier = BeverageType.COFFEE.hydrationMultiplier
+            )
+        )
+    }
+
+/** Preview-time DAO that returns static water intake data. */
+private class PreviewWaterIntakeDao : WaterIntakeDao {
+    override fun getEntriesForDate(date: String): Flow<List<WaterIntakeEntry>> = flowOf(previewEntries)
+    override suspend fun getEntriesForDateSync(date: String): List<WaterIntakeEntry> = previewEntries
+    override suspend fun getAllEntriesForDateSync(date: String): List<WaterIntakeEntry> = previewEntries
+    override fun getEntriesForDateRange(startDate: String, endDate: String): Flow<List<WaterIntakeEntry>> =
+        flowOf(previewEntries)
+    override fun getTotalIntakeForDate(date: String): Flow<Double> = flowOf(1350.0)
+    override suspend fun getEntryCountForDate(date: String): Int = previewEntries.size
+    override suspend fun getEntryCount(): Int = previewEntries.size
+    override fun getLast30DaysEntries(): Flow<List<WaterIntakeEntry>> = flowOf(previewEntries)
+    override fun getAllEntries(): Flow<List<WaterIntakeEntry>> = flowOf(previewEntries)
+    override suspend fun updateEntry(entry: WaterIntakeEntry) {}
+    override suspend fun deleteEntry(entry: WaterIntakeEntry) {}
+    override suspend fun deleteEntryById(entryId: Long) {}
+    override suspend fun deleteAllEntries() {}
+    override suspend fun hideEntry(entryId: Long) {}
+    override suspend fun unhideEntry(entryId: Long) {}
+    override fun getHiddenEntries(): Flow<List<WaterIntakeEntry>> = flowOf(emptyList())
+    override suspend fun getDailyTotals(startDate: String, endDate: String): List<DailyTotal> = emptyList()
+    override suspend fun insertEntry(entry: WaterIntakeEntry): Long = 1L
+    override suspend fun insertEntries(entries: List<WaterIntakeEntry>) {}
+}
+
+/** Preview-time DAO that returns empty summaries. */
+private class PreviewDailySummaryDao : DailySummaryDao {
+    override suspend fun insertSummary(summary: DailySummary) {}
+    override suspend fun insertSummaries(summaries: List<DailySummary>) {}
+    override fun getSummaryForDate(date: String): Flow<DailySummary?> = flowOf(null)
+    override fun getSummariesForRange(startDate: String, endDate: String): Flow<List<DailySummary>> =
+        flowOf(emptyList())
+    override fun getLast30DaysSummaries(): Flow<List<DailySummary>> = flowOf(emptyList())
+    override fun getAllSummaries(): Flow<List<DailySummary>> = flowOf(emptyList())
+    override suspend fun updateSummary(summary: DailySummary) {}
+    override suspend fun deleteSummaryForDate(date: String) {}
+    override suspend fun deleteAllSummaries() {}
+}
+
+/** Preview-time DAO that seeds the default container presets. */
+private class PreviewContainerPresetDao : ContainerPresetDao {
+    private val defaultEntities = ContainerPresetRepository.getDefaultPresetEntities()
+
+    override fun getAllPresets(): Flow<List<ContainerPresetEntity>> = flowOf(defaultEntities)
+    override suspend fun getAllPresetsSync(): List<ContainerPresetEntity> = defaultEntities
+    override suspend fun getPresetById(id: Long): ContainerPresetEntity? = defaultEntities.find { it.id == id }
+    override suspend fun insertPreset(preset: ContainerPresetEntity): Long = 1L
+    override suspend fun insertPresets(presets: List<ContainerPresetEntity>) {}
+    override suspend fun updatePreset(preset: ContainerPresetEntity) {}
+    override suspend fun deletePresetById(id: Long) {}
+    override suspend fun deleteAllPresets() {}
+    override suspend fun getPresetCount(): Int = defaultEntities.size
+    override suspend fun getMaxDisplayOrder(): Int = defaultEntities.size
+    override suspend fun updateDisplayOrder(id: Long, displayOrder: Int) {}
+    override suspend fun reorderPresets(orderedIds: List<Long>) {}
+}
+
+@Preview(showBackground = true, name = "Home Screen")
+@Composable
+private fun HomeScreenPreview() {
+    val context = LocalContext.current
+    val waterRepository = WaterIntakeRepository(
+        waterIntakeDao = PreviewWaterIntakeDao(),
+        dailySummaryDao = PreviewDailySummaryDao(),
+        userRepository = UserRepository(context),
+        context = context
+    )
+    val containerRepository = ContainerPresetRepository(PreviewContainerPresetDao())
+
+    HydroTrackerTheme {
+        HomeScreen(
+            userProfile = previewUserProfile,
+            themePreferences = ThemePreferences(),
+            waterIntakeRepository = waterRepository,
+            containerPresetRepository = containerRepository,
+            paddingValues = PaddingValues(0.dp),
+            snackbarHostState = SnackbarHostState()
+        )
+    }
+}
+
+//endregion

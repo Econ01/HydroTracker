@@ -14,6 +14,7 @@ import com.cemcakmak.hydrotracker.data.models.TimeFormat
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
 import com.cemcakmak.hydrotracker.data.models.AppFont
 import com.cemcakmak.hydrotracker.data.models.NavBarLabelMode
+import com.cemcakmak.hydrotracker.data.models.EdgeEffect
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
 
 class ThemeViewModel(private val userRepository: UserRepository) : ViewModel() {
@@ -120,8 +121,23 @@ class ThemeViewModel(private val userRepository: UserRepository) : ViewModel() {
         }
     }
 
+    fun setEdgeEffect(style: EdgeEffect) {
+        viewModelScope.launch {
+            val newPreferences = _themePreferences.value.copy(
+                edgeEffect = style
+            )
+            _themePreferences.value = newPreferences
+            userRepository.updateThemePreferences(newPreferences)
+        }
+    }
+
     fun isDynamicColorAvailable(): Boolean {
         return android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S
+    }
+
+    /** Whether the "Blurred" edge effect can render (its AGSL RuntimeShader requires API 33+). */
+    fun isBlurSupported(): Boolean {
+        return android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU
     }
 }
 

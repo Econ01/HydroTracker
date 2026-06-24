@@ -523,6 +523,8 @@ fun HydroTrackerApp(
                                 onAppFontChange = themeViewModel::setAppFont,
                                 onAutoHideNavBarChange = themeViewModel::setAutoHideNavBar,
                                 onNavBarLabelModeChange = themeViewModel::setNavBarLabelMode,
+                                isBlurSupported = themeViewModel.isBlurSupported(),
+                                onEdgeEffectChange = themeViewModel::setEdgeEffect,
                                 onNavigateBack = popBackStack
                             )
                         }
