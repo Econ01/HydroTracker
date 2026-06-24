@@ -1,5 +1,12 @@
 package com.cemcakmak.hydrotracker.presentation.common.effect
 
+import android.graphics.Bitmap
+import android.graphics.BitmapShader
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.set
+import android.graphics.BlendMode as AndroidBlendMode
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.RenderEffect as AndroidRenderEffect
@@ -7,6 +14,7 @@ import android.graphics.RuntimeShader
 import android.graphics.Shader as AndroidShader
 import android.graphics.Shader.TileMode
 import android.os.Build
+import java.util.Random
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -78,7 +86,7 @@ data class BackdropProgressive(
  * @param blurRadius maximum blur radius.
  * @param progressive vertical ramp, or null for a uniform blur across the whole region.
  * @param tint optional translucent wash over the blur ([Color.Transparent] = off).
- * @param noise optional film-grain amount in [0, 1] (0 = off).
+ * @param noise optional film-grain amount in [0, 1] (0 = off, 1 = strong).
  */
 data class BackdropBlurStyle(
     val blurRadius: Dp = 24.dp,
@@ -143,7 +151,8 @@ fun Modifier.backdropBlur(
                     blurRadiusPx = blurRadiusPx,
                     size = size,
                     progressive = style.progressive,
-                    tint = style.tint
+                    tint = style.tint,
+                    noiseFactor = style.noise
                 )
 
                 drawLayer(blurLayer)
@@ -159,22 +168,25 @@ private fun createBlurRenderEffect(
     blurRadiusPx: Float,
     size: Size,
     progressive: BackdropProgressive?,
-    tint: Color
+    tint: Color,
+    noiseFactor: Float
 ): RenderEffect {
+    val maskShader: AndroidShader?
+
     val blur = if (progressive != null) {
         // Two-pass separated Gaussian blur, modulated by a vertical gradient mask.
-        val maskShader = createProgressiveMaskShader(size, progressive)
         val crop = floatArrayOf(0f, 0f, size.width, size.height)
+        val shader = createProgressiveMaskShader(size, progressive).also { maskShader = it }
 
         val horizontalShader = RuntimeShader(HORIZONTAL_BLUR_AGSL).apply {
             setFloatUniform("blurRadius", blurRadiusPx)
             setFloatUniform("crop", crop[0], crop[1], crop[2], crop[3])
-            setInputShader("mask", maskShader)
+            setInputShader("mask", shader)
         }
         val verticalShader = RuntimeShader(VERTICAL_BLUR_WITH_TINT_AGSL).apply {
             setFloatUniform("blurRadius", blurRadiusPx)
             setFloatUniform("crop", crop[0], crop[1], crop[2], crop[3])
-            setInputShader("mask", maskShader)
+            setInputShader("mask", shader)
             setFloatUniform("tint", tint.red, tint.green, tint.blue, tint.alpha)
         }
 
@@ -183,6 +195,7 @@ private fun createBlurRenderEffect(
         // Chain: horizontal blur first, then vertical blur.
         AndroidRenderEffect.createChainEffect(vertical, horizontal)
     } else {
+        maskShader = null
         // Uniform blur: use the platform blur RenderEffect directly.
         AndroidRenderEffect.createBlurEffect(
             blurRadiusPx,
@@ -191,9 +204,20 @@ private fun createBlurRenderEffect(
         )
     }
 
+    val blurWithNoise = if (noiseFactor > 0.005f) {
+        val noise = createNoiseRenderEffect(
+            noiseFactor = noiseFactor,
+            maskShader = maskShader
+        )
+        // Blend the noise over the blurred backdrop using soft light, as Haze does.
+        AndroidRenderEffect.createBlendModeEffect(blur, noise, AndroidBlendMode.SOFT_LIGHT)
+    } else {
+        blur
+    }
+
     return if (tint.alpha > 0.005f && progressive == null) {
         // Uniform blur: tint is applied as a single colour filter over the whole output.
-        // Coller should set the transparency of the tint colour
+        // Caller should set the transparency of the tint colour.
         val tintColor = android.graphics.Color.argb(
             (tint.alpha * 255).toInt(),
             (tint.red * 255).toInt(),
@@ -202,10 +226,10 @@ private fun createBlurRenderEffect(
         )
         AndroidRenderEffect.createColorFilterEffect(
             PorterDuffColorFilter(tintColor, PorterDuff.Mode.SRC_IN),
-            blur
+            blurWithNoise
         ).asComposeRenderEffect()
     } else {
-        blur.asComposeRenderEffect()
+        blurWithNoise.asComposeRenderEffect()
     }
 }
 
@@ -222,6 +246,60 @@ private fun createProgressiveMaskShader(size: Size, progressive: BackdropProgres
 private fun Brush.toShader(size: Size): AndroidShader? = when (this) {
     is ShaderBrush -> createShader(size)
     else -> null
+}
+
+private var cachedNoiseBitmap: Bitmap? = null
+
+private fun getNoiseBitmap(): Bitmap {
+    val cached = cachedNoiseBitmap
+    if (cached != null && !cached.isRecycled) {
+        return cached
+    }
+    return generateNoiseBitmap().also { cachedNoiseBitmap = it }
+}
+
+private fun generateNoiseBitmap(width: Int = 256, height: Int = 256): Bitmap {
+    val random = Random()
+    val bitmap = createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    for (x in 0 until width) {
+        for (y in 0 until height) {
+            val value = random.nextInt(256)
+            bitmap[x, y] = android.graphics.Color.argb(255, value, value, value)
+        }
+    }
+    return bitmap
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+private fun createNoiseRenderEffect(
+    noiseFactor: Float,
+    maskShader: AndroidShader?
+): AndroidRenderEffect {
+    val noiseShader = BitmapShader(
+        getNoiseBitmap(),
+        TileMode.REPEAT,
+        TileMode.REPEAT
+    )
+
+    val noiseAlpha = noiseFactor.coerceIn(0f, 1f)
+    val baseNoiseEffect = AndroidRenderEffect.createShaderEffect(noiseShader)
+    val noiseEffect = if (noiseAlpha < 1f) {
+        val matrix = ColorMatrix().apply { setScale(1f, 1f, 1f, noiseAlpha) }
+        AndroidRenderEffect.createColorFilterEffect(ColorMatrixColorFilter(matrix), baseNoiseEffect)
+    } else {
+        baseNoiseEffect
+    }
+
+    return if (maskShader != null) {
+        // Mask the noise with the same progressive gradient so it fades with the blur.
+        AndroidRenderEffect.createBlendModeEffect(
+            AndroidRenderEffect.createShaderEffect(maskShader),
+            noiseEffect,
+            AndroidBlendMode.SRC_IN
+        )
+    } else {
+        noiseEffect
+    }
 }
 
 /**
