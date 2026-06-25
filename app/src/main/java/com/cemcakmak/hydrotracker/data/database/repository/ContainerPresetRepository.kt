@@ -130,8 +130,8 @@ class ContainerPresetRepository(
                 ContainerPresetEntity(
                     name = "Coffee Cup",
                     volume = 100.0,
-                    iconType = IconType.VECTOR.name,
-                    iconName = "LocalCafe",
+                    iconType = IconType.DRAWABLE.name,
+                    iconName = "local_cafe",
                     isDefault = true,
                     displayOrder = 0
                 ),
@@ -192,23 +192,17 @@ class ContainerPresetRepository(
  * Extension function to convert entity to UI model
  */
 fun ContainerPresetEntity.toContainerPreset(): ContainerPreset {
-    val vectorIcon = if (iconType == IconType.VECTOR.name) {
-        ContainerIconMapper.getVectorIcon(iconName)
-    } else null
-
-    val drawableRes = if (iconType == IconType.DRAWABLE.name) {
-        ContainerIconMapper.getDrawableResId(iconName)
-    } else null
+    val containerIcon = ContainerIconMapper.getIconByName(iconType, iconName)
+        ?: ContainerIconMapper.getIconForVolume(volume)
 
     return ContainerPreset(
         id = id,
         name = name,
         volume = volume,
         isDefault = isDefault,
-        icon = vectorIcon,
-        iconRes = drawableRes,
-        iconType = iconType,
-        iconName = iconName,
+        iconRes = containerIcon.checkedRes,
+        iconType = containerIcon.type.name,
+        iconName = containerIcon.name,
         isCustom = !isDefault
     )
 }

@@ -369,6 +369,7 @@ object HealthConnectManager {
         Log.d(TAG, "📦 Package: ${record.metadata.dataOrigin.packageName}")
         Log.d(TAG, "💾 Using record ID for local storage: $recordId")
 
+        val containerIcon = com.cemcakmak.hydrotracker.utils.ContainerIconMapper.getIconForVolume(volumeInML)
         return WaterIntakeEntry(
             amount = volumeInML,
             timestamp = timestamp,
@@ -376,7 +377,9 @@ object HealthConnectManager {
             containerType = friendlySourceName, // Use the actual source app name
             containerVolume = volumeInML, // Use same as amount for external data
             note = context.getString(R.string.health_connect_imported_from, friendlySourceName),
-            healthConnectRecordId = recordId // Store the Health Connect record ID for deletion
+            healthConnectRecordId = recordId, // Store the Health Connect record ID for deletion
+            iconType = containerIcon.type.name,
+            iconName = containerIcon.name
         )
     }
 

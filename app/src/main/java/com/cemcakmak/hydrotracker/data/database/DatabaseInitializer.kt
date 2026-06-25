@@ -210,10 +210,46 @@ object DatabaseInitializer {
         }
     }
 
+    private val MIGRATION_8_9 = object : Migration(8, 9) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            try {
+                println("DatabaseInitializer: Starting migration from version 8 to 9")
+
+                // Add icon columns to water_intake_entries so each entry keeps its container icon.
+                db.execSQL("ALTER TABLE water_intake_entries ADD COLUMN icon_type TEXT NOT NULL DEFAULT 'DRAWABLE'")
+                db.execSQL("ALTER TABLE water_intake_entries ADD COLUMN icon_name TEXT NOT NULL DEFAULT 'water_filled'")
+
+                // Backfill existing rows with an icon derived from their stored container volume.
+                // Thresholds mirror ContainerIconMapper.getIconForVolume().
+                db.execSQL(
+                    """
+                    UPDATE water_intake_entries
+                    SET icon_name = CASE
+                        WHEN container_volume <= 125 THEN 'local_cafe'
+                        WHEN container_volume <= 162 THEN 'glass_cup'
+                        WHEN container_volume <= 187 THEN 'water_loss'
+                        WHEN container_volume <= 250 THEN 'water_medium'
+                        WHEN container_volume <= 400 THEN 'water_full'
+                        WHEN container_volume <= 750 THEN 'water_bottle'
+                        ELSE 'water_bottle_large'
+                    END
+                    """.trimIndent()
+                )
+
+                println("DatabaseInitializer: Migration 8→9 completed. Added icon columns and backfilled existing rows.")
+
+            } catch (e: Exception) {
+                println("DatabaseInitializer: Error during migration 8→9: ${e.message}")
+                throw e
+            }
+        }
+    }
+
     /** Every shipped schema migration, in order. Exposed so migration tests exercise the real chain. */
     val ALL_MIGRATIONS: Array<Migration> = arrayOf(
         MIGRATION_1_2, MIGRATION_1_3, MIGRATION_2_3, MIGRATION_3_4,
-        MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8
+        MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8,
+        MIGRATION_8_9
     )
 
     fun getDatabase(context: Context): HydroTrackerDatabase {

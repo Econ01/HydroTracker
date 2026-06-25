@@ -39,13 +39,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
@@ -59,11 +57,11 @@ import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
 import com.cemcakmak.hydrotracker.data.models.ActivityLevel
 import com.cemcakmak.hydrotracker.data.models.AgeGroup
 import com.cemcakmak.hydrotracker.data.models.BeverageType
-import com.cemcakmak.hydrotracker.data.models.ContainerPreset
 import com.cemcakmak.hydrotracker.data.models.Gender
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
+import com.cemcakmak.hydrotracker.utils.ContainerIconMapper
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -265,11 +263,11 @@ fun DailyEntryItem(
     themePreferences: ThemePreferences
 ) {
     val context = LocalContext.current
-    val preset = remember(entry.containerType) {
-        ContainerPreset.getDefaultPresets().firstOrNull { it.name == entry.containerType }
+    val containerIcon = remember(entry.iconType, entry.iconName, entry.containerVolume) {
+        ContainerIconMapper.getIconByName(entry.iconType, entry.iconName)
+            ?: ContainerIconMapper.getIconForVolume(entry.containerVolume)
     }
     val containerLabel = when {
-        preset?.labelResId != 0 && preset?.labelResId != null -> stringResource(preset.labelResId)
         entry.containerType == "Custom" -> stringResource(R.string.home_option_custom)
         else -> entry.containerType
     }
@@ -300,26 +298,10 @@ fun DailyEntryItem(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    when {
-                        preset?.iconRes != null -> {
-                            Icon(
-                                painter = painterResource(preset.iconRes),
-                                contentDescription = containerLabel
-                            )
-                        }
-                        preset?.icon != null -> {
-                            Icon(
-                                imageVector = preset.icon,
-                                contentDescription = containerLabel
-                            )
-                        }
-                        else -> {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(R.drawable.water_filled),
-                                contentDescription = containerLabel
-                            )
-                        }
-                    }
+                    Icon(
+                        painter = painterResource(containerIcon.checkedRes),
+                        contentDescription = containerLabel
+                    )
                 }
             }
 

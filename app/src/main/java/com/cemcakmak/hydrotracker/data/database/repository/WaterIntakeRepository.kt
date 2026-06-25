@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import com.cemcakmak.hydrotracker.widgets.WidgetUpdateHelper
 import com.cemcakmak.hydrotracker.utils.UserDayCalculator
+import com.cemcakmak.hydrotracker.utils.ContainerIconMapper
 import android.content.Context
 import androidx.core.content.edit
 import android.content.SharedPreferences
@@ -103,7 +104,9 @@ class WaterIntakeRepository(
                 beverageType = beverageKey,
                 beverageMultiplier = beverageMultiplier,
                 note = note,
-                createdAt = System.currentTimeMillis()
+                createdAt = System.currentTimeMillis(),
+                iconType = containerPreset.iconType,
+                iconName = containerPreset.iconName
             )
 
             Log.d(TAG, "💾 Saving water intake to local database...")
@@ -464,6 +467,7 @@ class WaterIntakeRepository(
                         largestIntake = finalAmount
                     }
 
+                    val containerIcon = ContainerIconMapper.getIconForVolume(baseAmount)
                     val entry = WaterIntakeEntry(
                         amount = finalAmount,
                         timestamp = entryTimestamp,
@@ -473,7 +477,9 @@ class WaterIntakeRepository(
                         note = if (random.nextFloat() > 0.8f) {
                             listOf("After workout", "With meal", "Morning hydration", "Feeling thirsty", "Reminder").random()
                         } else null,
-                        createdAt = entryTimestamp
+                        createdAt = entryTimestamp,
+                        iconType = containerIcon.type.name,
+                        iconName = containerIcon.name
                     )
 
                     entries.add(entry)

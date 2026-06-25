@@ -307,13 +307,6 @@ private fun ContainerLeadingIcon(preset: ContainerPreset) {
             modifier = Modifier.size(24.dp)
         )
 
-        preset.icon != null -> Icon(
-            imageVector = preset.icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(24.dp)
-        )
-
         else -> Icon(
             imageVector = Icons.Default.WaterDrop,
             contentDescription = null,

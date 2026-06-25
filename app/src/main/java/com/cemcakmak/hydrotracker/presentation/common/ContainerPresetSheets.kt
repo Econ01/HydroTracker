@@ -3,15 +3,14 @@ package com.cemcakmak.hydrotracker.presentation.common
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.material3.SheetValue
-import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
-import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,6 +21,9 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -160,8 +162,8 @@ private fun EditContainerPresetSheetContent(
                 .defaultMinSize(minHeight = 60.dp)
         )
 
-        // Icon picker carousel
-        IconPickerCarousel(
+        // Icon picker toggle group
+        IconPickerToggleGroup(
             selectedIcon = selectedIcon,
             onIconSelected = { icon ->
                 selectedIcon = icon
@@ -385,7 +387,7 @@ private fun EditContainerPresetSheetContent(
 }
 
 /**
- * Renders a [ContainerIcon] as either a vector or drawable icon.
+ * Renders a [ContainerIcon] using its checked (filled) drawable resource.
  */
 @Composable
 private fun ContainerIconImage(
@@ -394,79 +396,60 @@ private fun ContainerIconImage(
     modifier: Modifier = Modifier,
     tint: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onPrimaryContainer
 ) {
-    when {
-        icon.drawableRes != null -> {
-            Icon(
-                painter = painterResource(icon.drawableRes),
-                contentDescription = contentDescription,
-                tint = tint,
-                modifier = modifier
-            )
-        }
-        icon.vectorIcon != null -> {
-            Icon(
-                imageVector = icon.vectorIcon,
-                contentDescription = contentDescription,
-                tint = tint,
-                modifier = modifier
-            )
-        }
-    }
+    Icon(
+        painter = painterResource(icon.checkedRes),
+        contentDescription = contentDescription,
+        tint = tint,
+        modifier = modifier
+    )
 }
 
 /**
- * Horizontal carousel that displays all available container icons and highlights
- * the currently selected one.
+ * Horizontally scrollable single-select connected toggle-button group for picking
+ * a container icon. Shows the outlined icon when unchecked and the filled icon
+ * when checked.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun IconPickerCarousel(
+private fun IconPickerToggleGroup(
     selectedIcon: ContainerIcon,
     onIconSelected: (ContainerIcon) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val icons = remember { ContainerIconMapper.getAllIcons() }
-    val state = rememberCarouselState { icons.size }
     val haptics = LocalHapticFeedback.current
 
-    HorizontalUncontainedCarousel(
-        state = state,
+    Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(64.dp),
-        itemWidth = 64.dp,
-        itemSpacing = 2.dp,
-    ) { index ->
-        val icon = icons[index]
-        val isSelected = icon.name == selectedIcon.name && icon.type == selectedIcon.type
-        Surface(
-            shape = MaterialTheme.shapes.extraExtraLarge,
-            color = if (isSelected) {
-                MaterialTheme.colorScheme.primaryContainer
-            } else {
-                MaterialTheme.colorScheme.surfaceVariant
-            },
-            modifier = Modifier
-                .size(64.dp)
-                .maskClip(MaterialTheme.shapes.extraExtraLarge)
-                .clickable {
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
+    ) {
+        icons.forEachIndexed { index, icon ->
+            val isSelected = icon.name == selectedIcon.name && icon.type == selectedIcon.type
+            val shapes = when (index) {
+                0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                icons.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+            }
+
+            ToggleButton(
+                checked = isSelected,
+                onCheckedChange = {
                     haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
                     onIconSelected(icon)
-                }
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                },
+                shapes = shapes,
+                modifier = Modifier
+                    .size(width = 64.dp, height = 56.dp)
+                    .semantics { role = Role.RadioButton }
             ) {
-                ContainerIconImage(
-                    icon = icon,
+                Icon(
+                    painter = painterResource(
+                        if (isSelected) icon.checkedRes else icon.uncheckedRes
+                    ),
                     contentDescription = icon.name,
-                    modifier = Modifier.size(28.dp),
-                    tint = if (isSelected) {
-                        MaterialTheme.colorScheme.onPrimaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    }
+                    modifier = Modifier.size(28.dp)
                 )
             }
         }
@@ -611,8 +594,8 @@ private fun AddContainerPresetSheetContent(
             modifier = Modifier.fillMaxWidth()
         )
 
-        // Icon picker carousel
-        IconPickerCarousel(
+        // Icon picker toggle group
+        IconPickerToggleGroup(
             selectedIcon = selectedIcon,
             onIconSelected = { icon ->
                 selectedIcon = icon

@@ -197,9 +197,14 @@ fun HomeScreen(
     // Function to add water intake to database
     fun addWaterIntake(amount: Double, containerName: String) {
         coroutineScope.launch {
-            val containerPreset = ContainerPreset.getDefaultPresets()
-                .find { it.name == containerName }
-                ?: ContainerPreset(name = containerName, volume = amount)
+            val containerPreset = presets.find { it.name == containerName }
+                ?: ContainerPreset.getDefaultPresets().find { it.name == containerName }
+                ?: ContainerPreset(
+                    name = containerName,
+                    volume = amount,
+                    iconType = "DRAWABLE",
+                    iconName = "water_filled"
+                )
 
             val result = waterIntakeRepository.addWaterIntake(
                 amount = amount,
@@ -792,14 +797,6 @@ fun CarouselWaterCard(
                         modifier = Modifier.size(32.dp)
                     )
                 }
-                preset.icon != null -> {
-                    Icon(
-                        imageVector = preset.icon,
-                        contentDescription = presetLabel,
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
                 else -> {
                     Icon(
                         imageVector = Icons.Default.WaterDrop,
@@ -1314,7 +1311,9 @@ private val previewEntries: List<WaterIntakeEntry>
                 date = date,
                 containerType = "Medium Glass",
                 containerVolume = 200.0,
-                beverageType = BeverageType.WATER.name
+                beverageType = BeverageType.WATER.name,
+                iconType = "DRAWABLE",
+                iconName = "water_medium"
             ),
             WaterIntakeEntry(
                 id = 2,
@@ -1323,7 +1322,9 @@ private val previewEntries: List<WaterIntakeEntry>
                 date = date,
                 containerType = "Water Bottle",
                 containerVolume = 500.0,
-                beverageType = BeverageType.WATER.name
+                beverageType = BeverageType.WATER.name,
+                iconType = "DRAWABLE",
+                iconName = "water_bottle"
             ),
             WaterIntakeEntry(
                 id = 3,
@@ -1333,7 +1334,9 @@ private val previewEntries: List<WaterIntakeEntry>
                 containerType = "Coffee Cup",
                 containerVolume = 100.0,
                 beverageType = BeverageType.COFFEE.name,
-                beverageMultiplier = BeverageType.COFFEE.hydrationMultiplier
+                beverageMultiplier = BeverageType.COFFEE.hydrationMultiplier,
+                iconType = "DRAWABLE",
+                iconName = "local_cafe"
             )
         )
     }

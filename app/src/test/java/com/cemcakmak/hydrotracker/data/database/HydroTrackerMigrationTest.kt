@@ -42,6 +42,6 @@ class HydroTrackerMigrationTest {
         helper.createDatabase(1).close()
 
         // Run every shipped migration and validate the result matches the latest schema
-        helper.runMigrationsAndValidate(8, DatabaseInitializer.ALL_MIGRATIONS.toList())
+        helper.runMigrationsAndValidate(9, DatabaseInitializer.ALL_MIGRATIONS.toList())
     }
 }

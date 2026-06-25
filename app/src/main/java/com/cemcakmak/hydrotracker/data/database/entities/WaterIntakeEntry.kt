@@ -55,7 +55,15 @@ data class WaterIntakeEntry(
     // Effectiveness captured at log time for custom beverages. Null for preset/legacy rows,
     // which fall back to the BeverageType enum multiplier.
     @ColumnInfo(name = "beverage_multiplier")
-    val beverageMultiplier: Double? = null
+    val beverageMultiplier: Double? = null,
+
+    // Container icon captured at log time so recent entries keep the correct icon even if the
+    // preset is edited or deleted later.
+    @ColumnInfo(name = "icon_type", defaultValue = "DRAWABLE")
+    val iconType: String = "DRAWABLE",
+
+    @ColumnInfo(name = "icon_name", defaultValue = "water_filled")
+    val iconName: String = "water_filled"
 ) {
     /**
      * Returns a formatted time string according to the user's [timeFormat] preference.
@@ -111,7 +119,9 @@ data class WaterIntakeEntry(
             containerType: String,
             containerVolume: Double,
             beverageType: BeverageType = BeverageType.WATER,
-            note: String? = null
+            note: String? = null,
+            iconType: String = "DRAWABLE",
+            iconName: String = "water_filled"
         ): WaterIntakeEntry {
             val now = System.currentTimeMillis()
             val today = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -124,7 +134,9 @@ data class WaterIntakeEntry(
                 containerType = containerType,
                 containerVolume = containerVolume,
                 note = note,
-                beverageType = beverageType.name
+                beverageType = beverageType.name,
+                iconType = iconType,
+                iconName = iconName
             )
         }
     }

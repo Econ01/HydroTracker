@@ -1,7 +1,6 @@
 package com.cemcakmak.hydrotracker.data.models
 
 import com.cemcakmak.hydrotracker.R
-import androidx.compose.ui.graphics.vector.ImageVector
 import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -19,7 +18,6 @@ data class ContainerPreset(
     val name: String,
     val volume: Double,
     val isDefault: Boolean = false,
-    val icon: ImageVector? = null,
     @param:DrawableRes val iconRes: Int? = null,
     val iconType: String = "",
     val iconName: String = "",
@@ -43,8 +41,8 @@ data class ContainerPreset(
                     volume = 100.0,
                     isDefault = true,
                     iconRes = R.drawable.local_cafe_filled,
-                    iconType = "VECTOR",
-                    iconName = "LocalCafe",
+                    iconType = "DRAWABLE",
+                    iconName = "local_cafe",
                     labelResId = R.string.container_coffee_cup
                 ),
                 ContainerPreset(
