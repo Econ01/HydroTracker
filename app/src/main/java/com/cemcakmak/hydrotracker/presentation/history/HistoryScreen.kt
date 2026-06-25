@@ -118,7 +118,7 @@ fun HistoryScreen(
         PaddingValues(
             start = paddingValues.calculateStartPadding(layoutDirection),
             end = paddingValues.calculateEndPadding(layoutDirection),
-            bottom = paddingValues.calculateBottomPadding(),
+            bottom = 0.dp,
             top = 0.dp
         )
     }
@@ -255,6 +255,10 @@ fun HistoryScreen(
                         onDeleteEntry(entry)
                     }
                 )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(paddingValues.calculateBottomPadding()))
             }
         }
 
@@ -436,7 +440,7 @@ private fun TopEdgeEffect(
             Box(
                 modifier = modifier
                     .fillMaxWidth()
-                    .height(bandHeight)
+                    .height(bandHeight + 20.dp)
                     .drawBehind {
                         drawRect(
                             brush = Brush.verticalGradient(

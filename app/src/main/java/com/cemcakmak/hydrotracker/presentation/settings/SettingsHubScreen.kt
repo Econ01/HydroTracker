@@ -160,7 +160,7 @@ fun SettingsHubScreen(
         PaddingValues(
             start = paddingValues.calculateStartPadding(layoutDirection),
             end = paddingValues.calculateEndPadding(layoutDirection),
-            bottom = paddingValues.calculateBottomPadding(),
+            bottom = 0.dp,
             top = 0.dp
         )
     }
@@ -187,6 +187,7 @@ fun SettingsHubScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Spacer(modifier = Modifier.height(paddingValues.calculateTopPadding()))
+
             if (userProfile != null) {
                 ProfileSettingsCategoryCard(
                     userProfile = userProfile,
@@ -275,6 +276,8 @@ fun SettingsHubScreen(
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(paddingValues.calculateBottomPadding()))
         }
 
         TopEdgeEffect(
@@ -314,7 +317,7 @@ private fun TopEdgeEffect(
             Box(
                 modifier = modifier
                     .fillMaxWidth()
-                    .height(bandHeight)
+                    .height(bandHeight + 20.dp)
                     .drawBehind {
                         drawRect(
                             brush = Brush.verticalGradient(
