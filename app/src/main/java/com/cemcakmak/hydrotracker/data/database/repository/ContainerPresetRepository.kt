@@ -21,17 +21,21 @@ class ContainerPresetRepository(
     }
 
     /**
-     * Get all container presets synchronously
+     * Add a new preset. If [iconType] or [iconName] are blank, the icon is auto-assigned
+     * based on [volume].
      */
-    suspend fun getAllPresetsSync(): List<ContainerPreset> {
-        return containerPresetDao.getAllPresetsSync().map { it.toContainerPreset() }
-    }
-
-    /**
-     * Add a new preset with auto-assigned icon based on volume
-     */
-    suspend fun addPreset(name: String, volume: Double): Long {
-        val icon = ContainerIconMapper.getIconForVolume(volume)
+    suspend fun addPreset(
+        name: String,
+        volume: Double,
+        iconType: String = "",
+        iconName: String = ""
+    ): Long {
+        val icon = if (iconType.isBlank() || iconName.isBlank()) {
+            ContainerIconMapper.getIconForVolume(volume)
+        } else {
+            ContainerIconMapper.getIconByName(iconType, iconName)
+                ?: ContainerIconMapper.getIconForVolume(volume)
+        }
         val maxOrder = containerPresetDao.getMaxDisplayOrder()
 
         val entity = ContainerPresetEntity(
@@ -47,11 +51,23 @@ class ContainerPresetRepository(
     }
 
     /**
-     * Update an existing preset, re-assigning icon if volume changed
+     * Update an existing preset. If [iconType] or [iconName] are blank, the icon is
+     * auto-assigned based on [volume].
      */
-    suspend fun updatePreset(id: Long, name: String, volume: Double) {
+    suspend fun updatePreset(
+        id: Long,
+        name: String,
+        volume: Double,
+        iconType: String = "",
+        iconName: String = ""
+    ) {
         val existing = containerPresetDao.getPresetById(id) ?: return
-        val icon = ContainerIconMapper.getIconForVolume(volume)
+        val icon = if (iconType.isBlank() || iconName.isBlank()) {
+            ContainerIconMapper.getIconForVolume(volume)
+        } else {
+            ContainerIconMapper.getIconByName(iconType, iconName)
+                ?: ContainerIconMapper.getIconForVolume(volume)
+        }
 
         val updated = existing.copy(
             name = name,
@@ -103,13 +119,6 @@ class ContainerPresetRepository(
     private suspend fun seedDefaults() {
         val defaults = getDefaultPresetEntities()
         containerPresetDao.insertPresets(defaults)
-    }
-
-    /**
-     * Get the current preset count
-     */
-    suspend fun getPresetCount(): Int {
-        return containerPresetDao.getPresetCount()
     }
 
     companion object {
@@ -198,6 +207,8 @@ fun ContainerPresetEntity.toContainerPreset(): ContainerPreset {
         isDefault = isDefault,
         icon = vectorIcon,
         iconRes = drawableRes,
+        iconType = iconType,
+        iconName = iconName,
         isCustom = !isDefault
     )
 }

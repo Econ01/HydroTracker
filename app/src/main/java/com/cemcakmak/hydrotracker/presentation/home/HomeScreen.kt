@@ -14,8 +14,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
+import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
-import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
@@ -81,7 +81,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.drawBehind
 import android.os.Build
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import com.cemcakmak.hydrotracker.data.models.EdgeEffect
 import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurState
 import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurStyle
@@ -91,6 +94,11 @@ import com.cemcakmak.hydrotracker.presentation.common.effect.backdropSource
 import com.cemcakmak.hydrotracker.presentation.common.effect.rememberBackdropBlurState
 import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
 import com.cemcakmak.hydrotracker.presentation.common.timeBasedGreeting
+import kotlinx.coroutines.delay
+import java.time.Instant
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -265,12 +273,12 @@ fun HomeScreen(
                 isRefreshing = true
                 try {
                     // Import external hydration data from the last 30 days
-                    val since = java.time.Instant.now().minus(30, java.time.temporal.ChronoUnit.DAYS)
+                    val since = Instant.now().minus(30, ChronoUnit.DAYS)
 
                     waterIntakeRepository.getSyncManager().importExternalHydrationData(context, waterIntakeRepository.getUserRepository(), waterIntakeRepository, since) { imported, errors ->
                         coroutineScope.launch {
                             // Always show loading for at least 1.5 seconds for better UX
-                            kotlinx.coroutines.delay(1500.milliseconds)
+                            delay(1500.milliseconds)
 
                             when {
                                 imported > 0 -> {
@@ -294,7 +302,7 @@ fun HomeScreen(
                     }
                 } catch (e: Exception) {
                     // Show loading for at least 1.5 seconds even on error
-                    kotlinx.coroutines.delay(1500.milliseconds)
+                    delay(1500.milliseconds)
                     snackbarHostState.showErrorSnackbar(
                         message = syncFailedMessageTemplate.format(e.message ?: "")
                     )
@@ -440,35 +448,51 @@ fun HomeScreen(
                 if (todayStatistics.entryCount > 0) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        StatChip(
+                        AnimatedStatItem(
                             label = stringResource(R.string.home_label_entries),
-                            value = "${todayStatistics.entryCount}"
+                            targetValue = todayStatistics.entryCount.toDouble(),
+                            formatValue = { it.toInt().toString() }
                         )
                         todayStatistics.firstIntakeTime?.let { timestamp ->
-                            StatChip(
+                            val firstIntakeTime = Instant.ofEpochMilli(timestamp)
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalTime()
+                            AnimatedStatItem(
                                 label = stringResource(R.string.home_label_first_intake),
-                                value = DateTimeFormatters.formatTime(
-                                    context,
-                                    java.time.Instant.ofEpochMilli(timestamp)
-                                        .atZone(java.time.ZoneId.systemDefault())
-                                        .toLocalTime(),
-                                    themePreferences.timeFormat
-                                )
+                                targetValue = (firstIntakeTime.hour * 60 + firstIntakeTime.minute).toDouble(),
+                                formatValue = { minutes ->
+                                    DateTimeFormatters.formatTime(
+                                        context,
+                                        LocalTime.of(
+                                            (minutes.toInt() / 60).coerceIn(0, 23),
+                                            (minutes.toInt() % 60).coerceIn(0, 59)
+                                        ),
+                                        themePreferences.timeFormat
+                                    )
+                                }
                             )
                         }
                         if (todayStatistics.entryCount > 1) {
                             todayStatistics.lastIntakeTime?.let { timestamp ->
-                                StatChip(
+                                val latestIntakeTime = Instant.ofEpochMilli(timestamp)
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalTime()
+                                AnimatedStatItem(
                                     label = stringResource(R.string.home_label_latest_intake),
-                                    value = DateTimeFormatters.formatTime(
-                                        context,
-                                        java.time.Instant.ofEpochMilli(timestamp)
-                                            .atZone(java.time.ZoneId.systemDefault())
-                                            .toLocalTime(),
-                                        themePreferences.timeFormat
-                                    )
+                                    targetValue = (latestIntakeTime.hour * 60 + latestIntakeTime.minute).toDouble(),
+                                    formatValue = { minutes ->
+                                        DateTimeFormatters.formatTime(
+                                            context,
+                                            LocalTime.of(
+                                                (minutes.toInt() / 60).coerceIn(0, 23),
+                                                (minutes.toInt() % 60).coerceIn(0, 59)
+                                            ),
+                                            themePreferences.timeFormat
+                                        )
+                                    }
                                 )
                             }
                         }
@@ -479,7 +503,8 @@ fun HomeScreen(
             Card (
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(),
+                    .fillMaxHeight()
+                    .padding(top = 24.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer
                 ),
@@ -492,22 +517,16 @@ fun HomeScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp, bottom = 12.dp)
-                        .padding(horizontal = 20.dp),
+                        .padding(top = 16.dp)
+                        .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text(
-                        text = stringResource(R.string.home_section_quick_select),
-                        style = MaterialTheme.typography.titleLargeEmphasized,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-
-                    HorizontalMultiBrowseCarousel(
+                    HorizontalUncontainedCarousel(
                         state = carouselState,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(135.dp),
-                        preferredItemWidth = 130.dp,
+                            .height(155.dp),
+                        itemWidth = 150.dp,
                         itemSpacing = 8.dp,
                     ) { index ->
                         if (index < presets.size) {
@@ -525,8 +544,8 @@ fun HomeScreen(
                                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                                 },
                                 modifier = Modifier
-                                    .height(130.dp)
-                                    .maskClip(MaterialTheme.shapes.extraLarge)
+                                    .height(150.dp)
+                                    .maskClip(MaterialTheme.shapes.extraLargeIncreased)
                             )
                         } else {
                             // Add button at the end
@@ -536,8 +555,8 @@ fun HomeScreen(
                                     haptics.performHapticFeedback(HapticFeedbackType.Confirm)
                                 },
                                 modifier = Modifier
-                                    .height(130.dp)
-                                    .maskClip(MaterialTheme.shapes.extraLarge)
+                                    .height(150.dp)
+                                    .maskClip(MaterialTheme.shapes.extraLargeIncreased)
                             )
                         }
                     }
@@ -630,9 +649,9 @@ fun HomeScreen(
         AddContainerPresetBottomSheet(
             volumeUnit = userProfile.volumeUnit,
             onDismiss = { showAddPresetSheet = false },
-            onAdd = { name, volume ->
+            onAdd = { name, volume, iconType, iconName ->
                 coroutineScope.launch {
-                    containerPresetRepository.addPreset(name, volume)
+                    containerPresetRepository.addPreset(name, volume, iconType, iconName)
                     showAddPresetSheet = false
                     snackbarHostState.showSuccessSnackbar(
                         message = containerAddedTemplate.format(name)
@@ -651,9 +670,9 @@ fun HomeScreen(
                 showEditPresetSheet = false
                 presetToEdit = null
             },
-            onSave = { name, volume ->
+            onSave = { name, volume, iconType, iconName ->
                 coroutineScope.launch {
-                    containerPresetRepository.updatePreset(presetToEdit!!.id, name, volume)
+                    containerPresetRepository.updatePreset(presetToEdit!!.id, name, volume, iconType, iconName)
                     showEditPresetSheet = false
                     presetToEdit = null
                     snackbarHostState.showSuccessSnackbar(
@@ -744,8 +763,8 @@ fun CarouselWaterCard(
     val context = LocalContext.current
     Box(
         modifier = modifier
-            .clip(MaterialTheme.shapes.extraLarge)
-            .background(MaterialTheme.colorScheme.primaryContainer)
+            .clip(MaterialTheme.shapes.extraLargeIncreased)
+            .background(MaterialTheme.colorScheme.primary)
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongPress
@@ -760,17 +779,16 @@ fun CarouselWaterCard(
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceEvenly,
+            verticalArrangement = Arrangement.spacedBy(12.dp, alignment = Alignment.CenterVertically),
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 10.dp, bottom = 10.dp)
         ) {
             when {
                 preset.iconRes != null -> {
                     Icon(
                         painter = painterResource(preset.iconRes),
                         contentDescription = presetLabel,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(32.dp)
                     )
                 }
@@ -778,7 +796,7 @@ fun CarouselWaterCard(
                     Icon(
                         imageVector = preset.icon,
                         contentDescription = presetLabel,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(32.dp)
                     )
                 }
@@ -786,25 +804,30 @@ fun CarouselWaterCard(
                     Icon(
                         imageVector = Icons.Default.WaterDrop,
                         contentDescription = presetLabel,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(32.dp)
                     )
                 }
             }
 
-            Text(
-                text = presetLabel,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                textAlign = TextAlign.Center,
-                maxLines = 2
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = presetLabel,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    maxLines = 2
+                )
 
-            Text(
-                text = preset.getFormattedVolume(context, userProfile.volumeUnit),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
+                Text(
+                    text = preset.getFormattedVolume(context, userProfile.volumeUnit),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
     }
 }
@@ -816,31 +839,27 @@ fun AddContainerCard(
 ) {
     Box(
         modifier = modifier
-            .clip(MaterialTheme.shapes.extraLarge)
-            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+            .clip(MaterialTheme.shapes.extraExtraLarge)
+            .background(MaterialTheme.colorScheme.secondaryContainer)
             .clickable { onClick() },
         contentAlignment = Alignment.Center,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp, alignment = Alignment.CenterVertically),
+            modifier = Modifier.fillMaxSize()
         ) {
             Icon(
-                imageVector = Icons.Default.Add,
+                imageVector = ImageVector.vectorResource(R.drawable.add_filled),
                 contentDescription = stringResource(R.string.cd_add_container),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier.size(32.dp)
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = stringResource(R.string.home_add_container_label),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
                 textAlign = TextAlign.Center
             )
         }
@@ -1061,31 +1080,40 @@ private fun CustomWaterDialog(
 }
 
 @Composable
-private fun StatChip(
+private fun AnimatedStatItem(
+    label: String,
+    targetValue: Double,
+    hapticsEnabled: Boolean = false,
+    formatValue: @Composable (Float) -> String
+) {
+    val animatedValue = rememberAnimatedDouble(
+        targetValue = targetValue,
+        hapticsEnabled = hapticsEnabled
+    )
+    ChartStatItem(
+        label = label,
+        value = formatValue(animatedValue)
+    )
+}
+
+@Composable
+private fun ChartStatItem(
     label: String,
     value: String
 ) {
-    Surface(
-        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
-        shape = MaterialTheme.shapes.small,
-        modifier = Modifier.padding(horizontal = 4.dp)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = value,
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
-        }
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleMediumEmphasized,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.secondary
+        )
     }
 }
 

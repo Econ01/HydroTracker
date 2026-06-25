@@ -34,12 +34,12 @@ object ContainerIconMapper {
      */
     private val iconsByVolume = listOf(
         ContainerIcon(IconType.VECTOR, "LocalCafe", vectorIcon = Icons.Default.LocalCafe),
-        ContainerIcon(IconType.DRAWABLE, "glass_cup", drawableRes = R.drawable.glass_cup),
-        ContainerIcon(IconType.DRAWABLE, "water_loss", drawableRes = R.drawable.water_loss),
-        ContainerIcon(IconType.DRAWABLE, "water_medium", drawableRes = R.drawable.water_medium),
-        ContainerIcon(IconType.DRAWABLE, "water_full", drawableRes = R.drawable.water_full),
-        ContainerIcon(IconType.DRAWABLE, "water_bottle", drawableRes = R.drawable.water_bottle),
-        ContainerIcon(IconType.DRAWABLE, "water_bottle_large", drawableRes = R.drawable.water_bottle_large)
+        ContainerIcon(IconType.DRAWABLE, "glass_cup", drawableRes = R.drawable.glass_cup_filled),
+        ContainerIcon(IconType.DRAWABLE, "water_loss", drawableRes = R.drawable.water_loss_filled),
+        ContainerIcon(IconType.DRAWABLE, "water_medium", drawableRes = R.drawable.water_medium_filled),
+        ContainerIcon(IconType.DRAWABLE, "water_full", drawableRes = R.drawable.water_full_filled),
+        ContainerIcon(IconType.DRAWABLE, "water_bottle", drawableRes = R.drawable.water_bottle_filled),
+        ContainerIcon(IconType.DRAWABLE, "water_bottle_large", drawableRes = R.drawable.water_bottle_large_filled)
     )
 
     /**
@@ -85,17 +85,7 @@ object ContainerIconMapper {
     }
 
     /**
-     * Get icon type string for storage
-     */
-    fun getIconType(icon: ContainerIcon): String = icon.type.name
-
-    /**
-     * Get icon name string for storage
-     */
-    fun getIconName(icon: ContainerIcon): String = icon.name
-
-    /**
-     * Get all available icons (useful for icon picker if needed in future)
+     * Get all available icons (useful for icon picker)
      */
     fun getAllIcons(): List<ContainerIcon> = iconsByVolume
 
@@ -104,12 +94,12 @@ object ContainerIconMapper {
      */
     fun getDrawableResId(iconName: String): Int? {
         return when (iconName) {
-            "glass_cup" -> R.drawable.glass_cup
-            "water_loss" -> R.drawable.water_loss
-            "water_medium" -> R.drawable.water_medium
-            "water_full" -> R.drawable.water_full
-            "water_bottle" -> R.drawable.water_bottle
-            "water_bottle_large" -> R.drawable.water_bottle_large
+            "glass_cup" -> R.drawable.glass_cup_filled
+            "water_loss" -> R.drawable.water_loss_filled
+            "water_medium" -> R.drawable.water_medium_filled
+            "water_full" -> R.drawable.water_full_filled
+            "water_bottle" -> R.drawable.water_bottle_filled
+            "water_bottle_large" -> R.drawable.water_bottle_large_filled
             else -> null
         }
     }

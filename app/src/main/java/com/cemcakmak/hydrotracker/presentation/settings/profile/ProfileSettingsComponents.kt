@@ -560,8 +560,8 @@ internal fun DailyGoalBottomSheetContent(
         )
 
         // Custom slider
-        val startIcon = rememberVectorPainter(ImageVector.vectorResource(R.drawable.glass_cup))
-        val endIcon = rememberVectorPainter(ImageVector.vectorResource(R.drawable.water_bottle_large))
+        val startIcon = rememberVectorPainter(ImageVector.vectorResource(R.drawable.glass_cup_filled))
+        val endIcon = rememberVectorPainter(ImageVector.vectorResource(R.drawable.water_bottle_large_filled))
 
         Slider(
             value = sliderPosition,

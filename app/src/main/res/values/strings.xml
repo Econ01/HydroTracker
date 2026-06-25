@@ -243,6 +243,8 @@
     <!-- %1$s = minimum valid amount, %2$s = maximum valid amount (both with unit) -->
     <string name="container_volume_error">Enter a valid volume (%1$s–%2$s)</string>
     <string name="container_icon_auto">Icon updates automatically based on volume</string>
+    <string name="container_icon_picker_hint">Tap an icon below to override the automatic choice</string>
+    <string name="container_icon_preview_description">Selected container icon</string>
     <string name="container_delete_title">Delete Container?</string>
 
     <!-- ============================================================================

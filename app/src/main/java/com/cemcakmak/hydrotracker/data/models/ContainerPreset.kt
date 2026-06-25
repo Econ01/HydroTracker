@@ -1,8 +1,6 @@
 package com.cemcakmak.hydrotracker.data.models
 
 import com.cemcakmak.hydrotracker.R
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import android.content.Context
 import androidx.annotation.DrawableRes
@@ -23,6 +21,8 @@ data class ContainerPreset(
     val isDefault: Boolean = false,
     val icon: ImageVector? = null,
     @param:DrawableRes val iconRes: Int? = null,
+    val iconType: String = "",
+    val iconName: String = "",
     val isCustom: Boolean = false,
     @param:StringRes val labelResId: Int = 0
 ) {
@@ -42,7 +42,9 @@ data class ContainerPreset(
                     name = "Coffee Cup",
                     volume = 100.0,
                     isDefault = true,
-                    icon = Icons.Default.LocalCafe,
+                    iconRes = R.drawable.local_cafe_filled,
+                    iconType = "VECTOR",
+                    iconName = "LocalCafe",
                     labelResId = R.string.container_coffee_cup
                 ),
                 ContainerPreset(
@@ -50,7 +52,9 @@ data class ContainerPreset(
                     name = "Tea Cup",
                     volume = 150.0,
                     isDefault = true,
-                    iconRes = R.drawable.glass_cup,
+                    iconRes = R.drawable.glass_cup_filled,
+                    iconType = "DRAWABLE",
+                    iconName = "glass_cup",
                     labelResId = R.string.container_tea_cup
                 ),
                 ContainerPreset(
@@ -58,7 +62,9 @@ data class ContainerPreset(
                     name = "Small Cup",
                     volume = 175.0,
                     isDefault = true,
-                    iconRes = R.drawable.water_loss,
+                    iconRes = R.drawable.water_loss_filled,
+                    iconType = "DRAWABLE",
+                    iconName = "water_loss",
                     labelResId = R.string.container_small_cup
                 ),
                 ContainerPreset(
@@ -66,7 +72,9 @@ data class ContainerPreset(
                     name = "Medium Glass",
                     volume = 200.0,
                     isDefault = true,
-                    iconRes = R.drawable.water_medium,
+                    iconRes = R.drawable.water_medium_filled,
+                    iconType = "DRAWABLE",
+                    iconName = "water_medium",
                     labelResId = R.string.container_medium_glass
                 ),
                 ContainerPreset(
@@ -74,7 +82,9 @@ data class ContainerPreset(
                     name = "Large Glass",
                     volume = 300.0,
                     isDefault = true,
-                    iconRes = R.drawable.water_full,
+                    iconRes = R.drawable.water_full_filled,
+                    iconType = "DRAWABLE",
+                    iconName = "water_full",
                     labelResId = R.string.container_large_glass
                 ),
                 ContainerPreset(
@@ -82,7 +92,9 @@ data class ContainerPreset(
                     name = "Water Bottle",
                     volume = 500.0,
                     isDefault = true,
-                    iconRes = R.drawable.water_bottle,
+                    iconRes = R.drawable.water_bottle_filled,
+                    iconType = "DRAWABLE",
+                    iconName = "water_bottle",
                     labelResId = R.string.container_water_bottle
                 ),
                 ContainerPreset(
@@ -90,7 +102,9 @@ data class ContainerPreset(
                     name = "Large Bottle",
                     volume = 1000.0,
                     isDefault = true,
-                    iconRes = R.drawable.water_bottle_large,
+                    iconRes = R.drawable.water_bottle_large_filled,
+                    iconType = "DRAWABLE",
+                    iconName = "water_bottle_large",
                     labelResId = R.string.container_large_bottle
                 )
             )

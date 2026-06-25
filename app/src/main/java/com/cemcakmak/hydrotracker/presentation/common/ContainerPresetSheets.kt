@@ -5,10 +5,13 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.material3.SheetValue
+import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
+import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,6 +29,7 @@ import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.models.ContainerPreset
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
+import com.cemcakmak.hydrotracker.utils.ContainerIcon
 import com.cemcakmak.hydrotracker.utils.ContainerIconMapper
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 
@@ -34,7 +38,7 @@ import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 private fun EditContainerPresetSheetContent(
     preset: ContainerPreset,
     volumeUnit: VolumeUnit,
-    onSave: (name: String, volume: Double) -> Unit,
+    onSave: (name: String, volume: Double, iconType: String, iconName: String) -> Unit,
     onDelete: () -> Unit
 ) {
 
@@ -52,11 +56,26 @@ private fun EditContainerPresetSheetContent(
     var nameError by remember { mutableStateOf(false) }
     var volumeError by remember { mutableStateOf(false) }
 
-    // Calculate preview icon based on current volume (converted back to millilitres)
-    val previewIcon = remember(volumeText, volumeUnit) {
-        val volumeInUserUnit = volumeText.toDoubleOrNull() ?: 0.0
-        val volumeInMl = VolumeUnitConverter.toMillilitres(volumeInUserUnit, volumeUnit)
-        ContainerIconMapper.getIconForVolume(if (volumeInMl > 0) volumeInMl else preset.volume)
+    // Icon selection state. Initialize with the preset's stored icon if available,
+    // otherwise fall back to the volume-based auto icon.
+    var selectedIcon by remember {
+        mutableStateOf(
+            ContainerIconMapper.getIconByName(preset.iconType, preset.iconName)
+                ?: ContainerIconMapper.getIconForVolume(preset.volume)
+        )
+    }
+    var isIconManuallySelected by remember { mutableStateOf(false) }
+
+    // Update the icon automatically when the volume changes, unless the user has
+    // manually chosen one.
+    LaunchedEffect(volumeText, volumeUnit) {
+        if (!isIconManuallySelected) {
+            val volumeInUserUnit = volumeText.toDoubleOrNull() ?: 0.0
+            val volumeInMl = VolumeUnitConverter.toMillilitres(volumeInUserUnit, volumeUnit)
+            selectedIcon = ContainerIconMapper.getIconForVolume(
+                if (volumeInMl > 0) volumeInMl else preset.volume
+            )
+        }
     }
 
     Column(
@@ -87,24 +106,11 @@ private fun EditContainerPresetSheetContent(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    when {
-                        previewIcon.drawableRes != null -> {
-                            Icon(
-                                painter = painterResource(previewIcon.drawableRes),
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.size(28.dp)
-                            )
-                        }
-                        previewIcon.vectorIcon != null -> {
-                            Icon(
-                                imageVector = previewIcon.vectorIcon,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.size(28.dp)
-                            )
-                        }
-                    }
+                    ContainerIconImage(
+                        icon = selectedIcon,
+                        contentDescription = stringResource(R.string.container_icon_preview_description),
+                        modifier = Modifier.size(28.dp)
+                    )
                 }
             }
         }
@@ -146,12 +152,21 @@ private fun EditContainerPresetSheetContent(
             supportingText = if (volumeError) {
                 { Text(stringResource(R.string.container_volume_error, minVolumeDisplay, maxVolumeDisplay)) }
             } else {
-                { Text(stringResource(R.string.container_icon_auto)) }
+                null
             },
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
                 .defaultMinSize(minHeight = 60.dp)
+        )
+
+        // Icon picker carousel
+        IconPickerCarousel(
+            selectedIcon = selectedIcon,
+            onIconSelected = { icon ->
+                selectedIcon = icon
+                isIconManuallySelected = true
+            }
         )
 
         // Action buttons - Standard button group with press animations
@@ -233,7 +248,7 @@ private fun EditContainerPresetSheetContent(
                             volumeError = volumeInMl == null || volumeInMl <= 0 || volumeInMl > maxVolumeMl
 
                             if (!nameError && !volumeError && volumeInMl != null) {
-                                onSave(trimmedName, volumeInMl)
+                                onSave(trimmedName, volumeInMl, selectedIcon.type.name, selectedIcon.name)
                             }
                         },
                         shapes = ButtonDefaults.shapes(),
@@ -370,6 +385,95 @@ private fun EditContainerPresetSheetContent(
 }
 
 /**
+ * Renders a [ContainerIcon] as either a vector or drawable icon.
+ */
+@Composable
+private fun ContainerIconImage(
+    icon: ContainerIcon,
+    contentDescription: String?,
+    modifier: Modifier = Modifier,
+    tint: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onPrimaryContainer
+) {
+    when {
+        icon.drawableRes != null -> {
+            Icon(
+                painter = painterResource(icon.drawableRes),
+                contentDescription = contentDescription,
+                tint = tint,
+                modifier = modifier
+            )
+        }
+        icon.vectorIcon != null -> {
+            Icon(
+                imageVector = icon.vectorIcon,
+                contentDescription = contentDescription,
+                tint = tint,
+                modifier = modifier
+            )
+        }
+    }
+}
+
+/**
+ * Horizontal carousel that displays all available container icons and highlights
+ * the currently selected one.
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun IconPickerCarousel(
+    selectedIcon: ContainerIcon,
+    onIconSelected: (ContainerIcon) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val icons = remember { ContainerIconMapper.getAllIcons() }
+    val state = rememberCarouselState { icons.size }
+    val haptics = LocalHapticFeedback.current
+
+    HorizontalUncontainedCarousel(
+        state = state,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(64.dp),
+        itemWidth = 64.dp,
+        itemSpacing = 2.dp,
+    ) { index ->
+        val icon = icons[index]
+        val isSelected = icon.name == selectedIcon.name && icon.type == selectedIcon.type
+        Surface(
+            shape = MaterialTheme.shapes.extraExtraLarge,
+            color = if (isSelected) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                MaterialTheme.colorScheme.surfaceVariant
+            },
+            modifier = Modifier
+                .size(64.dp)
+                .maskClip(MaterialTheme.shapes.extraExtraLarge)
+                .clickable {
+                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                    onIconSelected(icon)
+                }
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                ContainerIconImage(
+                    icon = icon,
+                    contentDescription = icon.name,
+                    modifier = Modifier.size(28.dp),
+                    tint = if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    }
+                )
+            }
+        }
+    }
+}
+
+/**
  * Bottom sheet for editing an existing container preset
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -378,7 +482,7 @@ fun EditContainerPresetBottomSheet(
     preset: ContainerPreset,
     volumeUnit: VolumeUnit,
     onDismiss: () -> Unit,
-    onSave: (name: String, volume: Double) -> Unit,
+    onSave: (name: String, volume: Double, iconType: String, iconName: String) -> Unit,
     onDelete: () -> Unit
 ) {
     val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
@@ -399,7 +503,7 @@ fun EditContainerPresetBottomSheet(
 @Composable
 private fun AddContainerPresetSheetContent(
     volumeUnit: VolumeUnit,
-    onAdd: (name: String, volume: Double) -> Unit
+    onAdd: (name: String, volume: Double, iconType: String, iconName: String) -> Unit
 ) {
 
     val minVolumeMl = 1.0
@@ -413,11 +517,20 @@ private fun AddContainerPresetSheetContent(
     var nameError by remember { mutableStateOf(false) }
     var volumeError by remember { mutableStateOf(false) }
 
-    // Calculate preview icon based on current volume (converted back to millilitres)
-    val previewIcon = remember(volumeText, volumeUnit) {
-        val volumeInUserUnit = volumeText.toDoubleOrNull() ?: 250.0
-        val volumeInMl = VolumeUnitConverter.toMillilitres(volumeInUserUnit, volumeUnit)
-        ContainerIconMapper.getIconForVolume(volumeInMl)
+    // Icon selection state. Default to a medium glass icon until a volume is entered.
+    var selectedIcon by remember {
+        mutableStateOf(ContainerIconMapper.getIconForVolume(250.0))
+    }
+    var isIconManuallySelected by remember { mutableStateOf(false) }
+
+    // Update the icon automatically when the volume changes, unless the user has
+    // manually chosen one.
+    LaunchedEffect(volumeText, volumeUnit) {
+        if (!isIconManuallySelected) {
+            val volumeInUserUnit = volumeText.toDoubleOrNull() ?: 250.0
+            val volumeInMl = VolumeUnitConverter.toMillilitres(volumeInUserUnit, volumeUnit)
+            selectedIcon = ContainerIconMapper.getIconForVolume(volumeInMl)
+        }
     }
 
     Column(
@@ -448,24 +561,11 @@ private fun AddContainerPresetSheetContent(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    when {
-                        previewIcon.drawableRes != null -> {
-                            Icon(
-                                painter = painterResource(previewIcon.drawableRes),
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.size(28.dp)
-                            )
-                        }
-                        previewIcon.vectorIcon != null -> {
-                            Icon(
-                                imageVector = previewIcon.vectorIcon,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.size(28.dp)
-                            )
-                        }
-                    }
+                    ContainerIconImage(
+                        icon = selectedIcon,
+                        contentDescription = stringResource(R.string.container_icon_preview_description),
+                        modifier = Modifier.size(28.dp)
+                    )
                 }
             }
         }
@@ -505,10 +605,19 @@ private fun AddContainerPresetSheetContent(
             supportingText = if (volumeError) {
                 { Text(stringResource(R.string.container_volume_error, minVolumeDisplay, maxVolumeDisplay)) }
             } else {
-                { Text(stringResource(R.string.container_icon_auto)) }
+                { Text(stringResource(R.string.container_icon_picker_hint)) }
             },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
+        )
+
+        // Icon picker carousel
+        IconPickerCarousel(
+            selectedIcon = selectedIcon,
+            onIconSelected = { icon ->
+                selectedIcon = icon
+                isIconManuallySelected = true
+            }
         )
 
         val haptics = LocalHapticFeedback.current
@@ -527,7 +636,7 @@ private fun AddContainerPresetSheetContent(
                 volumeError = volumeInMl == null || volumeInMl <= 0 || volumeInMl > maxVolumeMl
 
                 if (!nameError && !volumeError && volumeInMl != null) {
-                    onAdd(trimmedName, volumeInMl)
+                    onAdd(trimmedName, volumeInMl, selectedIcon.type.name, selectedIcon.name)
                 }
             },
             colors = ButtonDefaults.filledTonalButtonColors(
@@ -553,7 +662,7 @@ private fun AddContainerPresetSheetContent(
 fun AddContainerPresetBottomSheet(
     volumeUnit: VolumeUnit,
     onDismiss: () -> Unit,
-    onAdd: (name: String, volume: Double) -> Unit
+    onAdd: (name: String, volume: Double, iconType: String, iconName: String) -> Unit
 ) {
     val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
     ModalBottomSheet(
@@ -582,7 +691,7 @@ fun EditContainerPresetBottomSheetPreview() {
                 EditContainerPresetSheetContent(
                     preset = ContainerPreset.getDefaultPresets().first(),
                     volumeUnit = VolumeUnit.MILLILITRES,
-                    onSave = { _, _ -> },
+                    onSave = { _, _, _, _ -> },
                     onDelete = {}
                 )
             }
@@ -607,7 +716,7 @@ fun AddContainerPresetBottomSheetPreview() {
                 BottomSheetDefaults.DragHandle()
                 AddContainerPresetSheetContent(
                     volumeUnit = VolumeUnit.MILLILITRES,
-                    onAdd = { _, _ -> }
+                    onAdd = { _, _, _, _ -> }
                 )
             }
         }

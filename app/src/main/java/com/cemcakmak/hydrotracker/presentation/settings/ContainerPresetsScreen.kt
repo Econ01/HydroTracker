@@ -137,11 +137,11 @@ fun ContainerPresetsScreen(
         AddContainerPresetBottomSheet(
             volumeUnit = volumeUnit,
             onDismiss = { showAddSheet = false },
-            onAdd = { name, volume ->
+            onAdd = { name, volume, iconType, iconName ->
                 showAddSheet = false
                 containerPresetRepository?.let { repo ->
                     coroutineScope.launch {
-                        repo.addPreset(name, volume)
+                        repo.addPreset(name, volume, iconType, iconName)
                         snackbarHostState?.showSuccessSnackbar(message = containerAddedTemplate.format(name))
                     }
                 }
@@ -158,12 +158,12 @@ fun ContainerPresetsScreen(
                     showEditSheet = false
                     presetToEdit = null
                 },
-                onSave = { name, volume ->
+                onSave = { name, volume, iconType, iconName ->
                     showEditSheet = false
                     presetToEdit = null
                     containerPresetRepository?.let { repo ->
                         coroutineScope.launch {
-                            repo.updatePreset(target.id, name, volume)
+                            repo.updatePreset(target.id, name, volume, iconType, iconName)
                             snackbarHostState?.showSuccessSnackbar(message = containerUpdatedTemplate.format(name))
                         }
                     }
