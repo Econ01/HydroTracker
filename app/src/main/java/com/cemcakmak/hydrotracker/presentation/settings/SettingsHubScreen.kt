@@ -20,11 +20,17 @@
 
 package com.cemcakmak.hydrotracker.presentation.settings
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,19 +42,17 @@ import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.scale
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -56,8 +60,10 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -66,8 +72,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.compose.ui.res.vectorResource
 
 import androidx.compose.ui.tooling.preview.Preview
@@ -76,14 +83,22 @@ import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.models.ActivityLevel
 import com.cemcakmak.hydrotracker.data.models.AgeGroup
+import com.cemcakmak.hydrotracker.data.models.EdgeEffect
 import com.cemcakmak.hydrotracker.data.models.Gender
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
 import com.cemcakmak.hydrotracker.data.update.UpdateStatus
 import com.cemcakmak.hydrotracker.presentation.common.LocalNavAnimatedVisibilityScope
+import com.cemcakmak.hydrotracker.presentation.common.LocalSettingsHubBlur
 import com.cemcakmak.hydrotracker.presentation.common.LocalSharedTransitionScope
+import com.cemcakmak.hydrotracker.presentation.common.MainNavigationScaffold
 import com.cemcakmak.hydrotracker.presentation.common.NavigationRoutes
+import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurState
+import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurStyle
+import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropProgressive
+import com.cemcakmak.hydrotracker.presentation.common.effect.backdropBlur
+import com.cemcakmak.hydrotracker.presentation.common.effect.rememberBackdropBlurState
 import com.cemcakmak.hydrotracker.presentation.settings.profile.ProfileAvatar
 import com.cemcakmak.hydrotracker.presentation.settings.profile.ProfileSettingsScreen
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
@@ -92,15 +107,14 @@ import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 @Composable
 fun SettingsHubScreen(
     userProfile: UserProfile? = null,
+    themePreferences: ThemePreferences = ThemePreferences(),
     wasPop: Boolean = false,
     developerOptionsEnabled: Boolean = false,
     paddingValues: PaddingValues = PaddingValues(0.dp),
     updateStatus: UpdateStatus = UpdateStatus.Idle,
     onNavigateTo: (NavigationRoutes) -> Unit = {}
 ) {
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
-
-    val haptics = LocalHapticFeedback.current
+    val settingsBlurState = LocalSettingsHubBlur.current
 
     val isPreview = LocalInspectionMode.current
     val shouldApplyDepth = !isPreview && wasPop
@@ -115,6 +129,10 @@ fun SettingsHubScreen(
         }
     } else {
         remember { mutableStateOf(0.dp) }
+    }
+
+    LaunchedEffect(blur) {
+        settingsBlurState.value = blur
     }
 
     // Depth scrim that clears in sync with the blur as the hub comes forward.
@@ -137,52 +155,38 @@ fun SettingsHubScreen(
         Color.Black
     }
 
-    // Scroll haptic logic
-    var settingsWasExpanded by remember { mutableStateOf(true) }
-    var settingsWasCollapsed by remember { mutableStateOf(false) }
-
-    LaunchedEffect(scrollBehavior.state) {
-        snapshotFlow { scrollBehavior.state.collapsedFraction }
-            .collect { fraction ->
-                val isExpanded = fraction == 0f
-                val isCollapsed = fraction == 1f
-
-                if (isExpanded && !settingsWasExpanded) {
-                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                }
-                if (isCollapsed && !settingsWasCollapsed) {
-                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                }
-
-                settingsWasExpanded = isExpanded
-                settingsWasCollapsed = isCollapsed
-            }
+    val layoutDirection = LocalLayoutDirection.current
+    val contentPadding = remember(paddingValues, layoutDirection) {
+        PaddingValues(
+            start = paddingValues.calculateStartPadding(layoutDirection),
+            end = paddingValues.calculateEndPadding(layoutDirection),
+            bottom = paddingValues.calculateBottomPadding(),
+            top = 0.dp
+        )
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-    Scaffold(
-        modifier = Modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .blur(blur),
-        topBar = {
-            LargeFlexibleTopAppBar(
-                title = { Text(stringResource(R.string.nav_settings)) },
-                scrollBehavior = scrollBehavior,
-                colors = TopAppBarDefaults.topAppBarColors(
-                    scrolledContainerColor = MaterialTheme.colorScheme.surface
-                )
-            )
+    val edgeEffectStyle = themePreferences.edgeEffect.let {
+        if (it == EdgeEffect.BLURRED && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            EdgeEffect.TRANSPARENT
+        } else {
+            it
         }
-    ) { innerPadding ->
+    }
+
+    // Backdrop captured for the frosted top band
+    val backdropState = rememberBackdropBlurState()
+
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(top = innerPadding.calculateTopPadding())
+                .padding(contentPadding)
                 .padding(horizontal = 16.dp)
+                .blur(blur)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            Spacer(modifier = Modifier.height(paddingValues.calculateTopPadding()))
             if (userProfile != null) {
                 ProfileSettingsCategoryCard(
                     userProfile = userProfile,
@@ -272,7 +276,13 @@ fun SettingsHubScreen(
                 }
             }
         }
-    }
+
+        TopEdgeEffect(
+            style = edgeEffectStyle,
+            backdropState = backdropState,
+            paddingValues = paddingValues,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
 
     // Oversized so it still blankets the screen while NavDisplay scales the entry to 0.8,
     // leaving no bright ring. Sits above the hub but inside the incoming entry, so the
@@ -285,6 +295,55 @@ fun SettingsHubScreen(
                 .background(scrimColor.copy(alpha = scrimAlpha))
         )
     }
+    }
+}
+
+@Composable
+private fun TopEdgeEffect(
+    style: EdgeEffect,
+    backdropState: BackdropBlurState,
+    paddingValues: PaddingValues,
+    modifier: Modifier = Modifier
+) {
+    val bandHeight = paddingValues.calculateTopPadding()
+
+    when (style) {
+        EdgeEffect.TRANSPARENT -> Unit
+        EdgeEffect.SCRIM -> {
+            val scrimColor = MaterialTheme.colorScheme.surface
+            Box(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .height(bandHeight)
+                    .drawBehind {
+                        drawRect(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(scrimColor, Color.Transparent)
+                            )
+                        )
+                    }
+            )
+        }
+        EdgeEffect.BLURRED -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Box(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .height(bandHeight)
+                        .backdropBlur(
+                            state = backdropState,
+                            style = BackdropBlurStyle(
+                                blurRadius = 20.dp,
+                                progressive = BackdropProgressive(
+                                    startFraction = 0f,
+                                    endFraction = 1f
+                                ),
+                                tint = MaterialTheme.colorScheme.surface.copy(0.4f)
+                            )
+                        )
+                )
+            }
+        }
     }
 }
 
@@ -401,6 +460,7 @@ private fun getShapeForIndex(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Preview(showBackground = true)
 @Composable
 fun SettingsHubInteractivePreview() {
@@ -408,19 +468,30 @@ fun SettingsHubInteractivePreview() {
         var selectedRoute by remember { mutableStateOf<NavigationRoutes?>(null) }
 
         if (selectedRoute == null) {
-            SettingsHubScreen(
-                userProfile = UserProfile(
-                    name = "Preview User",
-                    gender = Gender.OTHER,
-                    ageGroup = AgeGroup.YOUNG_ADULT_18_30,
-                    activityLevel = ActivityLevel.MODERATE,
-                    wakeUpTime = "07:00",
-                    sleepTime = "23:00",
-                    dailyWaterGoal = 2500.0,
-                    reminderInterval = 120
-                ),
-                developerOptionsEnabled = true,
-                onNavigateTo = { route -> selectedRoute = route }
+            val backStack = rememberNavBackStack(NavigationRoutes.Settings)
+            val snackbarHostState = remember { SnackbarHostState() }
+
+            MainNavigationScaffold(
+                backStack = backStack,
+                currentKey = NavigationRoutes.Settings,
+                snackbarHostState = snackbarHostState,
+                content = { paddingValues ->
+                    SettingsHubScreen(
+                        userProfile = UserProfile(
+                            name = "Preview User",
+                            gender = Gender.OTHER,
+                            ageGroup = AgeGroup.YOUNG_ADULT_18_30,
+                            activityLevel = ActivityLevel.MODERATE,
+                            wakeUpTime = "07:00",
+                            sleepTime = "23:00",
+                            dailyWaterGoal = 2500.0,
+                            reminderInterval = 120
+                        ),
+                        developerOptionsEnabled = true,
+                        paddingValues = paddingValues,
+                        onNavigateTo = { route -> selectedRoute = route }
+                    )
+                }
             )
         } else {
             val onNavigateBack = { selectedRoute = null }

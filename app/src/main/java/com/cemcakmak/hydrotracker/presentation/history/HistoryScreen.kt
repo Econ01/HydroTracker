@@ -20,6 +20,7 @@
 
 package com.cemcakmak.hydrotracker.presentation.history
 
+import android.os.Build
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.EnterTransition
@@ -49,11 +50,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.annotation.StringRes
 import androidx.compose.animation.core.EaseOut
+import androidx.compose.foundation.background
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.Dp
+import androidx.navigation3.runtime.rememberNavBackStack
 import com.cemcakmak.hydrotracker.R
+import com.cemcakmak.hydrotracker.presentation.common.MainNavigationScaffold
+import com.cemcakmak.hydrotracker.presentation.common.NavigationRoutes
 import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.data.models.ActivityLevel
@@ -66,10 +74,17 @@ import com.cemcakmak.hydrotracker.data.models.WeekStartDay
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
+import com.cemcakmak.hydrotracker.data.models.EdgeEffect
 import com.cemcakmak.hydrotracker.presentation.common.BeverageOption
 import com.cemcakmak.hydrotracker.presentation.common.BlurMorph
 import com.cemcakmak.hydrotracker.presentation.common.DailyEntriesSection
 import com.cemcakmak.hydrotracker.presentation.common.EditWaterDialog
+import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurState
+import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurStyle
+import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropProgressive
+import com.cemcakmak.hydrotracker.presentation.common.effect.backdropBlur
+import com.cemcakmak.hydrotracker.presentation.common.effect.backdropSource
+import com.cemcakmak.hydrotracker.presentation.common.effect.rememberBackdropBlurState
 import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
 import com.cemcakmak.hydrotracker.presentation.common.toOption
 import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
@@ -96,157 +111,159 @@ fun HistoryScreen(
 
     var entryToEdit by remember { mutableStateOf<WaterIntakeEntry?>(null) }
 
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
-
-    // Scroll haptic logic
-    var historyWasExpanded by remember { mutableStateOf(true) }
-    var historyWasCollapsed by remember { mutableStateOf(false) }
-
-    LaunchedEffect(scrollBehavior.state) {
-        snapshotFlow { scrollBehavior.state.collapsedFraction }
-            .collect { fraction ->
-                val isExpanded = fraction == 0f
-                val isCollapsed = fraction == 1f
-
-                if (isExpanded && !historyWasExpanded) {
-                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                }
-                if (isCollapsed && !historyWasCollapsed) {
-                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                }
-
-                historyWasExpanded = isExpanded
-                historyWasCollapsed = isCollapsed
-            }
-    }
-
     val volumeUnit = userProfile?.volumeUnit ?: VolumeUnit.MILLILITRES
 
+    val layoutDirection = LocalLayoutDirection.current
+    val contentPadding = remember(paddingValues, layoutDirection) {
+        PaddingValues(
+            start = paddingValues.calculateStartPadding(layoutDirection),
+            end = paddingValues.calculateEndPadding(layoutDirection),
+            bottom = paddingValues.calculateBottomPadding(),
+            top = 0.dp
+        )
+    }
+
+    val edgeEffectStyle = themePreferences.edgeEffect.let {
+        if (it == EdgeEffect.BLURRED && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            EdgeEffect.TRANSPARENT
+        } else {
+            it
+        }
+    }
+
+    // Backdrop captured for the frosted top band
+    val backdropState = rememberBackdropBlurState()
+
     Box(modifier = Modifier.fillMaxSize()) {
-        Scaffold(
+        LazyColumn(
             modifier = Modifier
-                .nestedScroll(scrollBehavior.nestedScrollConnection),
-            topBar = {
-                LargeFlexibleTopAppBar(
-                    title = { Text(stringResource(R.string.nav_history)) },
-                    scrollBehavior = scrollBehavior,
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        scrolledContainerColor = MaterialTheme.colorScheme.surface
-                    )
+                .fillMaxSize()
+                .then(
+                    if (edgeEffectStyle == EdgeEffect.BLURRED) {
+                        Modifier
+                            .backdropSource(backdropState)
+                            .background(MaterialTheme.colorScheme.background)
+                    } else {
+                        Modifier
+                    }
+                )
+                .padding(contentPadding),
+        ) {
+            item {
+                Spacer(modifier = Modifier.height(paddingValues.calculateTopPadding()))
+            }
+
+            // Period Selector
+            item {
+                PeriodSelector(
+                    selectedPeriod = uiState.selectedPeriod,
+                    onPeriodSelected = onPeriodSelected,
+                    currentWeekOffset = uiState.weekOffset,
+                    currentMonthOffset = uiState.monthOffset,
+                    currentYearOffset = uiState.yearOffset,
+                    onPreviousPeriod = onPreviousPeriod,
+                    onNextPeriod = onNextPeriod,
+                    weekStartDay = themePreferences.weekStartDay,
+                    dateFormat = themePreferences.dateFormat
                 )
             }
-        ) { innerPadding ->
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(top = innerPadding.calculateTopPadding()),
-            ) {
-                // Period Selector
-                item {
-                    PeriodSelector(
-                        selectedPeriod = uiState.selectedPeriod,
-                        onPeriodSelected = onPeriodSelected,
-                        currentWeekOffset = uiState.weekOffset,
-                        currentMonthOffset = uiState.monthOffset,
-                        currentYearOffset = uiState.yearOffset,
-                        onPreviousPeriod = onPreviousPeriod,
-                        onNextPeriod = onNextPeriod,
-                        weekStartDay = themePreferences.weekStartDay,
-                        dateFormat = themePreferences.dateFormat
-                    )
-                }
 
-                // Main Chart Section
-                item {
-                    AnimatedContent(
-                        targetState = uiState.selectedPeriod,
-                        modifier = Modifier.fillMaxWidth(),
-                        transitionSpec = {
-                            val direction = when {
-                                targetState.ordinal > initialState.ordinal -> 1
-                                targetState.ordinal < initialState.ordinal -> -1
-                                else -> 0
-                            }
-                            val slideDuration = 600
-
-                            (slideInHorizontally(tween(slideDuration, easing = EaseOutCubic)) { fullWidth ->
-                                fullWidth * direction
-                            } + fadeIn(tween(slideDuration, easing = EaseOutCubic)))
-                                .togetherWith(
-                                    slideOutHorizontally(tween(slideDuration, easing = EaseOutCubic)) { fullWidth ->
-                                        -fullWidth * direction
-                                    } + fadeOut(tween(slideDuration, easing = EaseOutCubic))
-                                )
-                                .using(SizeTransform(clip = false))
-                        },
-                        label = "historyPeriodTransition"
-                    ) { period ->
-                        val blur by transition.animateDp(
-                            transitionSpec = { tween(600, easing = EaseOutCubic) },
-                            label = "historyPeriodBlur"
-                        ) { enterExit ->
-                            if (enterExit == EnterExitState.Visible) 0.dp else 10.dp
+            // Main Chart Section
+            item {
+                AnimatedContent(
+                    targetState = uiState.selectedPeriod,
+                    modifier = Modifier.fillMaxWidth(),
+                    transitionSpec = {
+                        val direction = when {
+                            targetState.ordinal > initialState.ordinal -> 1
+                            targetState.ordinal < initialState.ordinal -> -1
+                            else -> 0
                         }
+                        val slideDuration = 600
 
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .blur(blur, BlurredEdgeTreatment.Unbounded)
-                        ) {
-                            when (period) {
-                                TimePeriod.WEEKLY -> {
-                                    WeeklyChartSection(
-                                        weekOffset = uiState.weekOffset,
-                                        summaries = uiState.summaries,
-                                        stats = uiState.weeklyStats,
-                                        weekStartDay = themePreferences.weekStartDay,
-                                        volumeUnit = volumeUnit,
-                                        animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS,
-                                        onDaySelected = onDaySelected
-                                    )
-                                }
-                                TimePeriod.MONTHLY -> {
-                                    MonthlyChartSection(
-                                        summaries = uiState.summaries,
-                                        stats = uiState.monthlyStats,
-                                        weekStartDay = themePreferences.weekStartDay,
-                                        animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS,
-                                        onDaySelected = onDaySelected
-                                    )
-                                }
-                                TimePeriod.YEARLY -> {
-                                    YearlyChartSection(
-                                        summaries = uiState.summaries,
-                                        stats = uiState.yearlyStats,
-                                        volumeUnit = volumeUnit,
-                                        animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS
-                                    )
-                                }
+                        (slideInHorizontally(tween(slideDuration, easing = EaseOutCubic)) { fullWidth ->
+                            fullWidth * direction
+                        } + fadeIn(tween(slideDuration, easing = EaseOutCubic)))
+                            .togetherWith(
+                                slideOutHorizontally(tween(slideDuration, easing = EaseOutCubic)) { fullWidth ->
+                                    -fullWidth * direction
+                                } + fadeOut(tween(slideDuration, easing = EaseOutCubic))
+                            )
+                            .using(SizeTransform(clip = false))
+                    },
+                    label = "historyPeriodTransition"
+                ) { period ->
+                    val blur by transition.animateDp(
+                        transitionSpec = { tween(600, easing = EaseOutCubic) },
+                        label = "historyPeriodBlur"
+                    ) { enterExit ->
+                        if (enterExit == EnterExitState.Visible) 0.dp else 10.dp
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .blur(blur, BlurredEdgeTreatment.Unbounded)
+                    ) {
+                        when (period) {
+                            TimePeriod.WEEKLY -> {
+                                WeeklyChartSection(
+                                    weekOffset = uiState.weekOffset,
+                                    summaries = uiState.summaries,
+                                    stats = uiState.weeklyStats,
+                                    weekStartDay = themePreferences.weekStartDay,
+                                    volumeUnit = volumeUnit,
+                                    animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS,
+                                    onDaySelected = onDaySelected
+                                )
+                            }
+                            TimePeriod.MONTHLY -> {
+                                MonthlyChartSection(
+                                    summaries = uiState.summaries,
+                                    stats = uiState.monthlyStats,
+                                    weekStartDay = themePreferences.weekStartDay,
+                                    animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS,
+                                    onDaySelected = onDaySelected
+                                )
+                            }
+                            TimePeriod.YEARLY -> {
+                                YearlyChartSection(
+                                    summaries = uiState.summaries,
+                                    stats = uiState.yearlyStats,
+                                    volumeUnit = volumeUnit,
+                                    animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS
+                                )
                             }
                         }
                     }
                 }
+            }
 
-                // Selected day entries
-                item {
-                    SelectedDayEntries(
-                        selectedDate = uiState.selectedDate,
-                        entries = uiState.selectedDateEntries,
-                        userProfile = userProfile,
-                        themePreferences = themePreferences,
-                        onEdit = { entry ->
-                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            entryToEdit = entry
-                        },
-                        onDelete = { entry ->
-                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                            onDeleteEntry(entry)
-                        }
-                    )
-                }
+            // Selected day entries
+            item {
+                SelectedDayEntries(
+                    selectedDate = uiState.selectedDate,
+                    entries = uiState.selectedDateEntries,
+                    userProfile = userProfile,
+                    themePreferences = themePreferences,
+                    onEdit = { entry ->
+                        haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        entryToEdit = entry
+                    },
+                    onDelete = { entry ->
+                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onDeleteEntry(entry)
+                    }
+                )
             }
         }
+
+        TopEdgeEffect(
+            style = edgeEffectStyle,
+            backdropState = backdropState,
+            paddingValues = paddingValues,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
 
         // Edit entry dialogue
         entryToEdit?.let { entry ->
@@ -397,6 +414,55 @@ private fun PeriodSelector(
                         R.string.cd_next_period,
                         stringResource(selectedPeriod.displayNameResId)
                     )
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TopEdgeEffect(
+    style: EdgeEffect,
+    backdropState: BackdropBlurState,
+    paddingValues: PaddingValues,
+    modifier: Modifier = Modifier
+) {
+    val bandHeight = paddingValues.calculateTopPadding()
+
+    when (style) {
+        EdgeEffect.TRANSPARENT -> Unit
+        EdgeEffect.SCRIM -> {
+            val scrimColor = MaterialTheme.colorScheme.surface
+            Box(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .height(bandHeight)
+                    .drawBehind {
+                        drawRect(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(scrimColor, Color.Transparent)
+                            )
+                        )
+                    }
+            )
+        }
+        EdgeEffect.BLURRED -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Box(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .height(bandHeight)
+                        .backdropBlur(
+                            state = backdropState,
+                            style = BackdropBlurStyle(
+                                blurRadius = 20.dp,
+                                progressive = BackdropProgressive(
+                                    startFraction = 0f,
+                                    endFraction = 1f
+                                ),
+                                tint = MaterialTheme.colorScheme.surface.copy(0.4f)
+                            )
+                        )
                 )
             }
         }
@@ -568,6 +634,7 @@ internal fun getCurrentPeriodText(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Preview(showBackground = true, name = "History Screen")
 @Composable
 private fun HistoryScreenPreview() {
@@ -641,6 +708,24 @@ private fun HistoryScreenPreview() {
             containerType = "Bottle",
             containerVolume = 500.0,
             beverageType = BeverageType.WATER.name
+        ),
+        WaterIntakeEntry(
+            id = 4,
+            amount = 500.0,
+            timestamp = System.currentTimeMillis() - 10_800_000,
+            date = selectedDate,
+            containerType = "Bottle",
+            containerVolume = 500.0,
+            beverageType = BeverageType.WATER.name
+        ),
+        WaterIntakeEntry(
+            id = 5,
+            amount = 500.0,
+            timestamp = System.currentTimeMillis() - 10_800_000,
+            date = selectedDate,
+            containerType = "Bottle",
+            containerVolume = 500.0,
+            beverageType = BeverageType.WATER.name
         )
     )
 
@@ -666,16 +751,27 @@ private fun HistoryScreenPreview() {
     )
 
     HydroTrackerTheme {
-        HistoryScreen(
-            uiState = uiState,
-            themePreferences = ThemePreferences(),
-            userProfile = previewUser,
-            onPeriodSelected = {},
-            onPreviousPeriod = {},
-            onNextPeriod = {},
-            onDaySelected = {},
-            onUpdateEntry = { _, _ -> },
-            onDeleteEntry = {}
+        val backStack = rememberNavBackStack(NavigationRoutes.History)
+        val snackbarHostState = remember { SnackbarHostState() }
+
+        MainNavigationScaffold(
+            backStack = backStack,
+            currentKey = NavigationRoutes.History,
+            snackbarHostState = snackbarHostState,
+            content = { paddingValues ->
+                HistoryScreen(
+                    uiState = uiState,
+                    themePreferences = ThemePreferences(),
+                    userProfile = previewUser,
+                    paddingValues = paddingValues,
+                    onPeriodSelected = {},
+                    onPreviousPeriod = {},
+                    onNextPeriod = {},
+                    onDaySelected = {},
+                    onUpdateEntry = { _, _ -> },
+                    onDeleteEntry = {}
+                )
+            }
         )
     }
 }

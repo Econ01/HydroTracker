@@ -5,7 +5,6 @@ package com.cemcakmak.hydrotracker.presentation.common
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -13,8 +12,6 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -37,9 +34,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -53,22 +51,27 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import com.cemcakmak.hydrotracker.R
-import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
 import com.cemcakmak.hydrotracker.data.models.NavBarLabelMode
-import com.cemcakmak.hydrotracker.data.models.UserProfile
+
+/**
+ * Composition local used by SettingsHubScreen to communicate its animated
+ * depth-blur value to the common top app bar hosted in MainNavigationScaffold.
+ */
+val LocalSettingsHubBlur = compositionLocalOf<MutableState<Dp>> {
+    error("LocalSettingsHubBlur must be provided by MainNavigationScaffold")
+}
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavigationScaffold(
     backStack: NavBackStack<NavKey>,
     currentKey: NavigationRoutes,
-    userProfile: UserProfile? = null,
-    waterIntakeRepository: WaterIntakeRepository? = null,
     snackbarHostState: SnackbarHostState,
     fabExpanded: Boolean = true,
     onAddCustomClick: () -> Unit = {},
@@ -99,89 +102,94 @@ fun MainNavigationScaffold(
     }
 
     // Scroll behaviours remembered per route so collapsed state survives tab switches
-    val homeScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val historyScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val settingsScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
     val nestedScrollModifier = run {
         val base = when (currentKey) {
-            NavigationRoutes.Home -> Modifier.nestedScroll(homeScrollBehavior.nestedScrollConnection)
+            NavigationRoutes.History -> Modifier.nestedScroll(historyScrollBehavior.nestedScrollConnection)
+            NavigationRoutes.Settings -> Modifier.nestedScroll(settingsScrollBehavior.nestedScrollConnection)
             else -> Modifier
         }
         if (autoHideNavBar) base.nestedScroll(autoHideConnection) else base
     }
 
-    Scaffold(
-        /*
-        modifier = nestedScrollModifier,
-        topBar = {
-            AnimatedContent(
-                targetState = currentKey,
-                transitionSpec = {
-                    fadeIn(animationSpec = tween(400)) togetherWith
-                    fadeOut(animationSpec = tween(400))
-                },
-                label = "top_bar_crossfade"
-            ) { route ->
-                when (route) {
-                    NavigationRoutes.Home -> HomeTopAppBar(
-                        scrollBehavior = homeScrollBehavior,
-                        userProfile = userProfile,
-                        waterIntakeRepository = waterIntakeRepository
-                    )
-                    else -> {}
-                }
-            }
-        },
+    val settingsBlurState = remember { mutableStateOf(0.dp) }
 
-         */
-        bottomBar = {
-            AnimatedVisibility(
-                visible = shouldShowBottomBar && (!autoHideNavBar || barVisibleByScroll.value),
-                enter = slideInVertically { it } + fadeIn(),
-                exit = slideOutVertically { it } + fadeOut()
-            ) {
-                HydroNavigationBar(
-                    currentKey = currentKey,
-                    labelMode = navBarLabelMode,
-                    onTabSwitch = onTabSwitch,
-                    onTabSelected = { key ->
-                        backStack.apply {
-                            clear()
-                            add(key)
+    CompositionLocalProvider(LocalSettingsHubBlur provides settingsBlurState) {
+        Scaffold(
+            modifier = nestedScrollModifier,
+            topBar = {
+                if (currentKey == NavigationRoutes.History || currentKey == NavigationRoutes.Settings) {
+                    MainTabTopAppBar(
+                        titleResId = if (currentKey == NavigationRoutes.History) {
+                            R.string.nav_history
+                        } else {
+                            R.string.nav_settings
+                        },
+                        scrollBehavior = if (currentKey == NavigationRoutes.History) {
+                            historyScrollBehavior
+                        } else {
+                            settingsScrollBehavior
+                        },
+                        blur = if (currentKey == NavigationRoutes.Settings) {
+                            settingsBlurState.value
+                        } else {
+                            0.dp
                         }
-                    }
-                )
-            }
-        },
-        floatingActionButton = {
-            AnimatedVisibility(
-                visible = currentKey == NavigationRoutes.Home,
-                enter = scaleIn() + fadeIn(),
-                exit = scaleOut() + fadeOut()
-            ) {
-                ExtendedFloatingActionButton(
-                    onClick = {
-                        onAddCustomClick()
-                        haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                    },
-                    expanded = fabExpanded,
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = stringResource(R.string.cd_add_custom_amount)
-                        )
-                    },
-                    text = {
-                        Text(
-                            text = stringResource(R.string.nav_add_custom),
-                            style = MaterialTheme.typography.labelLargeEmphasized
-                        )
-                    }
-                )
-            }
-        },
-        snackbarHost = { HydroSnackbarHost(snackbarHostState) }
-    ) { paddingValues ->
-        content(paddingValues)
+                    )
+                }
+            },
+            bottomBar = {
+                AnimatedVisibility(
+                    visible = shouldShowBottomBar && (!autoHideNavBar || barVisibleByScroll.value),
+                    enter = slideInVertically { it } + fadeIn(),
+                    exit = slideOutVertically { it } + fadeOut()
+                ) {
+                    HydroNavigationBar(
+                        currentKey = currentKey,
+                        labelMode = navBarLabelMode,
+                        onTabSwitch = onTabSwitch,
+                        onTabSelected = { key ->
+                            backStack.apply {
+                                clear()
+                                add(key)
+                            }
+                        }
+                    )
+                }
+            },
+            floatingActionButton = {
+                AnimatedVisibility(
+                    visible = currentKey == NavigationRoutes.Home,
+                    enter = scaleIn() + fadeIn(),
+                    exit = scaleOut() + fadeOut()
+                ) {
+                    ExtendedFloatingActionButton(
+                        onClick = {
+                            onAddCustomClick()
+                            haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                        },
+                        expanded = fabExpanded,
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = stringResource(R.string.cd_add_custom_amount)
+                            )
+                        },
+                        text = {
+                            Text(
+                                text = stringResource(R.string.nav_add_custom),
+                                style = MaterialTheme.typography.labelLargeEmphasized
+                            )
+                        }
+                    )
+                }
+            },
+            snackbarHost = { HydroSnackbarHost(snackbarHostState) }
+        ) { paddingValues ->
+            content(paddingValues)
+        }
     }
 }
 
@@ -280,7 +288,7 @@ fun MainNavigationScaffoldPreview() {
     val backStack = rememberNavBackStack(NavigationRoutes.Home)
     MainNavigationScaffold(
         backStack = backStack,
-        currentKey = NavigationRoutes.Home,
+        currentKey = NavigationRoutes.History,
         snackbarHostState = remember { SnackbarHostState() },
         content = { _ ->
             Text(text = "Sample Content")

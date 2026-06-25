@@ -353,8 +353,6 @@ fun HydroTrackerApp(
             MainNavigationScaffold(
                 backStack = backStack,
                 currentKey = currentKey,
-                userProfile = userProfile,
-                waterIntakeRepository = waterIntakeRepository,
                 snackbarHostState = snackbarHostState,
                 fabExpanded = homeFabExpanded,
                 onAddCustomClick = { homeShowCustomDialog = true },
@@ -500,6 +498,7 @@ fun HydroTrackerApp(
                             ) {
                                 SettingsHubScreen(
                                     userProfile = userProfile,
+                                    themePreferences = themePreferences,
                                     wasPop = wasPop,
                                     developerOptionsEnabled = BuildConfig.DEBUG,
                                     paddingValues = paddingValues,
