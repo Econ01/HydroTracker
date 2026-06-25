@@ -776,10 +776,10 @@
     <string name="home_label_hydration_percentage">%1$d%% hydration</string>
 
     <!-- Motivational messages -->
-    <string name="home_motivation_goal_achieved">🎉 Amazing! You\'ve reached your daily goal!</string>
-    <string name="home_motivation_almost_there">💪 You\'re doing great! Almost there!</string>
-    <string name="home_motivation_halfway">🌟 Halfway there! Keep up the good work!</string>
-    <string name="home_motivation_good_start">👍 Good start! Stay consistent!</string>
+    <string name="home_motivation_goal_achieved">Amazing! You\'ve reached your daily goal!</string>
+    <string name="home_motivation_almost_there">You\'re doing great! Almost there!</string>
+    <string name="home_motivation_halfway">Halfway there! Keep up the good work!</string>
+    <string name="home_motivation_good_start">Good start! Stay consistent!</string>
 
     <!-- ============================================================================
          Profile

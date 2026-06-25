@@ -108,6 +108,7 @@ import com.cemcakmak.hydrotracker.data.models.Gender
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
+import com.cemcakmak.hydrotracker.presentation.common.timeBasedGreeting
 import com.cemcakmak.hydrotracker.presentation.common.LocalNavAnimatedVisibilityScope
 import com.cemcakmak.hydrotracker.presentation.common.LocalSharedTransitionScope
 import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
@@ -116,7 +117,6 @@ import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.utils.ImageUtils
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 import java.io.File
-import java.time.LocalTime
 import kotlin.math.round
 
 /**
@@ -375,17 +375,6 @@ private fun AnimatedStatItem(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
-    }
-}
-
-@Composable
-private fun timeBasedGreeting(): String {
-    val currentHour = LocalTime.now().hour
-    return when (currentHour) {
-        in 5..11 -> stringResource(R.string.profile_greeting_morning)
-        in 12..16 -> stringResource(R.string.profile_greeting_afternoon)
-        in 17..21 -> stringResource(R.string.profile_greeting_evening)
-        else -> stringResource(R.string.profile_greeting_default)
     }
 }
 

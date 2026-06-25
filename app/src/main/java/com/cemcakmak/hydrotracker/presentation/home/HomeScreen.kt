@@ -19,7 +19,6 @@ import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.TransformOrigin
@@ -82,6 +81,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.drawBehind
 import android.os.Build
+import androidx.compose.ui.Alignment
 import com.cemcakmak.hydrotracker.data.models.EdgeEffect
 import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurState
 import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurStyle
@@ -89,6 +89,8 @@ import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropProgressive
 import com.cemcakmak.hydrotracker.presentation.common.effect.backdropBlur
 import com.cemcakmak.hydrotracker.presentation.common.effect.backdropSource
 import com.cemcakmak.hydrotracker.presentation.common.effect.rememberBackdropBlurState
+import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
+import com.cemcakmak.hydrotracker.presentation.common.timeBasedGreeting
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -109,6 +111,9 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         waterIntakeRepository.checkAndHandleNewUserDay()
     }
+
+    val scrollState = rememberScrollState()
+
     // Collect real-time water intake data from database
     val todayProgress by waterIntakeRepository.getTodayProgress().collectAsState(
         initial = WaterProgress(
@@ -306,8 +311,6 @@ fun HomeScreen(
         label = "progress_animation"
     )
 
-    val scrollState = rememberScrollState()
-
     val edgeEffectStyle = themePreferences.edgeEffect.let {
         if (it == EdgeEffect.BLURRED && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             EdgeEffect.TRANSPARENT
@@ -361,27 +364,48 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Spacer(modifier = Modifier.height(paddingValues.calculateTopPadding()))
+
             // Daily Progress Section
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp)
+                    .padding(top = 24.dp)
                     .padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text(
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(R.string.home_label_daily_progress),
-                    textAlign = TextAlign.Start,
-                    style = MaterialTheme.typography.headlineLargeEmphasized,
-                )
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    // Personal greeting
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = timeBasedGreeting() + " " + userProfile.name,
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+
+                    // Hero title
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(R.string.home_label_daily_progress),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.displaySmallEmphasized,
+                    )
+                }
 
                 // Progress amount display
+                val animatedCurrentIntake = rememberAnimatedDouble(
+                    targetValue = todayProgress.currentIntake / 1000,
+                    hapticsEnabled = true
+                )
+
                 Text(
                     text = stringResource(
                         R.string.progress_current_of_goal_format,
-                        VolumeUnitConverter.format(context, todayProgress.currentIntake, userProfile.volumeUnit),
+                        VolumeUnitConverter.format(context, (animatedCurrentIntake * 1000).toDouble(), userProfile.volumeUnit),
                         VolumeUnitConverter.format(context, todayProgress.dailyGoal, userProfile.volumeUnit)
                     ),
                     style = MaterialTheme.typography.headlineMedium
@@ -389,8 +413,11 @@ fun HomeScreen(
 
                 // Wavy Progress Indicator
                 LinearWavyProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth(0.5f)
+                        .scale(scaleX = 2f, scaleY = 2f)
+                        .padding(vertical = 16.dp),
                     progress = { animatedProgress },
-                    modifier = Modifier.fillMaxWidth(0.5f).scale(scaleX = 2f, scaleY = 2f),
                     color = MaterialTheme.colorScheme.primary,
                     trackColor = MaterialTheme.colorScheme.primaryContainer,
                     stroke = WavyProgressIndicatorDefaults.linearIndicatorStroke,

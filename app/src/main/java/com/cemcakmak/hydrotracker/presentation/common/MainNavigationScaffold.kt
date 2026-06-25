@@ -38,6 +38,8 @@ import androidx.compose.material3.rememberTooltipState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -59,7 +61,6 @@ import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
 import com.cemcakmak.hydrotracker.data.models.NavBarLabelMode
 import com.cemcakmak.hydrotracker.data.models.UserProfile
-import com.cemcakmak.hydrotracker.presentation.home.HomeTopAppBar
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -76,6 +77,8 @@ fun MainNavigationScaffold(
     navBarLabelMode: NavBarLabelMode = NavBarLabelMode.ALWAYS,
     content: @Composable (PaddingValues) -> Unit,
 ) {
+    val haptics = LocalHapticFeedback.current
+
     val shouldShowBottomBar = currentKey in setOf(
         NavigationRoutes.Home,
         NavigationRoutes.History,
@@ -96,7 +99,7 @@ fun MainNavigationScaffold(
     }
 
     // Scroll behaviours remembered per route so collapsed state survives tab switches
-    val homeScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val homeScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
     val nestedScrollModifier = run {
         val base = when (currentKey) {
@@ -106,9 +109,8 @@ fun MainNavigationScaffold(
         if (autoHideNavBar) base.nestedScroll(autoHideConnection) else base
     }
 
-    val haptics = LocalHapticFeedback.current
-
     Scaffold(
+        /*
         modifier = nestedScrollModifier,
         topBar = {
             AnimatedContent(
@@ -129,6 +131,8 @@ fun MainNavigationScaffold(
                 }
             }
         },
+
+         */
         bottomBar = {
             AnimatedVisibility(
                 visible = shouldShowBottomBar && (!autoHideNavBar || barVisibleByScroll.value),
