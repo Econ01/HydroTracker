@@ -4,12 +4,14 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.role
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.*
@@ -526,6 +528,17 @@ fun HomeScreen(
                         .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    // Beverage Selection Section
+                    BeverageSelectionSection(
+                        selectedBeverage = selectedBeverage,
+                        onBeverageChange = { beverage ->
+                            selectedBeverage = beverage
+                            haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                        },
+                        beverages = activeBeverages,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
                     HorizontalUncontainedCarousel(
                         state = carouselState,
                         modifier = Modifier
@@ -548,6 +561,7 @@ fun HomeScreen(
                                     showEditPresetSheet = true
                                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                                 },
+                                useTertiaryColors = !selectedBeverage.isWater,
                                 modifier = Modifier
                                     .height(150.dp)
                                     .maskClip(MaterialTheme.shapes.extraLargeIncreased)
@@ -559,6 +573,7 @@ fun HomeScreen(
                                     showAddPresetSheet = true
                                     haptics.performHapticFeedback(HapticFeedbackType.Confirm)
                                 },
+                                useTertiaryColors = !selectedBeverage.isWater,
                                 modifier = Modifier
                                     .height(150.dp)
                                     .maskClip(MaterialTheme.shapes.extraLargeIncreased)
@@ -566,13 +581,9 @@ fun HomeScreen(
                         }
                     }
 
-                    // Beverage Selection Section
-                    BeverageSelectionSection(
+                    // Effective hydration info for non-water beverages
+                    EffectiveHydrationInfoCard(
                         selectedBeverage = selectedBeverage,
-                        onBeverageChange = { beverage ->
-                            selectedBeverage = beverage
-                            haptics.performHapticFeedback(HapticFeedbackType.Confirm)
-                        },
                         beverages = activeBeverages,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -764,12 +775,32 @@ fun CarouselWaterCard(
     userProfile: UserProfile,
     onClick: () -> Unit,
     onLongPress: () -> Unit = {},
+    useTertiaryColors: Boolean = false
 ) {
     val context = LocalContext.current
+    val containerColor by animateColorAsState(
+        targetValue = if (useTertiaryColors) {
+            MaterialTheme.colorScheme.tertiary
+        } else {
+            MaterialTheme.colorScheme.primary
+        },
+        animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
+        label = "carousel_card_container_color"
+    )
+    val contentColor by animateColorAsState(
+        targetValue = if (useTertiaryColors) {
+            MaterialTheme.colorScheme.onTertiary
+        } else {
+            MaterialTheme.colorScheme.onPrimary
+        },
+        animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
+        label = "carousel_card_content_color"
+    )
+
     Box(
         modifier = modifier
             .clip(MaterialTheme.shapes.extraLargeIncreased)
-            .background(MaterialTheme.colorScheme.primary)
+            .background(containerColor)
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongPress
@@ -793,7 +824,7 @@ fun CarouselWaterCard(
                     Icon(
                         painter = painterResource(preset.iconRes),
                         contentDescription = presetLabel,
-                        tint = MaterialTheme.colorScheme.onPrimary,
+                        tint = contentColor,
                         modifier = Modifier.size(32.dp)
                     )
                 }
@@ -801,7 +832,7 @@ fun CarouselWaterCard(
                     Icon(
                         imageVector = Icons.Default.WaterDrop,
                         contentDescription = presetLabel,
-                        tint = MaterialTheme.colorScheme.onPrimary,
+                        tint = contentColor,
                         modifier = Modifier.size(32.dp)
                     )
                 }
@@ -815,14 +846,14 @@ fun CarouselWaterCard(
                 Text(
                     text = presetLabel,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = contentColor,
                     maxLines = 2
                 )
 
                 Text(
                     text = preset.getFormattedVolume(context, userProfile.volumeUnit),
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = contentColor
                 )
             }
         }
@@ -831,13 +862,33 @@ fun CarouselWaterCard(
 
 @Composable
 fun AddContainerCard(
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    useTertiaryColors: Boolean = false
 ) {
+    val containerColor by animateColorAsState(
+        targetValue = if (useTertiaryColors) {
+            MaterialTheme.colorScheme.tertiaryContainer
+        } else {
+            MaterialTheme.colorScheme.primaryContainer
+        },
+        animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
+        label = "carousel_card_container_color"
+    )
+    val contentColor by animateColorAsState(
+        targetValue = if (useTertiaryColors) {
+            MaterialTheme.colorScheme.onTertiaryContainer
+        } else {
+            MaterialTheme.colorScheme.onPrimaryContainer
+        },
+        animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
+        label = "carousel_card_content_color"
+    )
+
     Box(
         modifier = modifier
             .clip(MaterialTheme.shapes.extraExtraLarge)
-            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .background(containerColor)
             .clickable { onClick() },
         contentAlignment = Alignment.Center,
     ) {
@@ -849,16 +900,204 @@ fun AddContainerCard(
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.add_filled),
                 contentDescription = stringResource(R.string.cd_add_container),
-                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                tint = contentColor,
                 modifier = Modifier.size(32.dp)
             )
 
             Text(
                 text = stringResource(R.string.home_add_container_label),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                color = contentColor,
                 textAlign = TextAlign.Center
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun BeverageSelectionSection(
+    modifier: Modifier = Modifier,
+    selectedBeverage: BeverageOption,
+    onBeverageChange: (BeverageOption) -> Unit,
+    beverages: List<BeverageOption> = BeverageType.getAllSorted().map { it.toOption() },
+) {
+    val haptics = LocalHapticFeedback.current
+
+    val safeSelected = if (selectedBeverage in beverages) selectedBeverage else beverages.first()
+    LaunchedEffect(beverages) {
+        if (selectedBeverage !in beverages) onBeverageChange(beverages.firstOrNull { it.isWater } ?: beverages.first())
+    }
+
+    // Horizontally scrollable connected toggle-button group
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
+    ) {
+        beverages.forEach { beverage ->
+            val isSelected = safeSelected == beverage
+
+            val labelText = if (beverage.hasLabelRes) {
+                stringResource(beverage.labelResId)
+            } else {
+                beverage.displayName
+            }
+
+            val useTertiaryColors = isSelected && !safeSelected.isWater
+            val checkedContainerColor by animateColorAsState(
+                targetValue = if (useTertiaryColors) {
+                    MaterialTheme.colorScheme.tertiary
+                } else {
+                    MaterialTheme.colorScheme.primary
+                },
+                animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
+                label = "beverage_toggle_container_color"
+            )
+            val checkedContentColor by animateColorAsState(
+                targetValue = if (useTertiaryColors) {
+                    MaterialTheme.colorScheme.onTertiary
+                } else {
+                    MaterialTheme.colorScheme.onPrimary
+                },
+                animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
+                label = "beverage_toggle_content_color"
+            )
+
+            ToggleButton(
+                modifier = Modifier
+                    .semantics { role = Role.RadioButton },
+                checked = isSelected,
+                onCheckedChange = {
+                    haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
+                    onBeverageChange(beverage)
+                },
+                colors = ToggleButtonDefaults.toggleButtonColors(
+                    checkedContainerColor = checkedContainerColor,
+                    checkedContentColor = checkedContentColor,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Crossfade(
+                        targetState = isSelected,
+                        animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
+                        label = "containerSelectionToggleIcon"
+                    ) { selected ->
+                        Icon(
+                            painter = painterResource(
+                                if (selected) beverage.iconResFilled else beverage.iconRes
+                            ),
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+
+                    Text(
+                        text = labelText,
+                        style = if (isSelected) {
+                            MaterialTheme.typography.labelMediumEmphasized
+                        } else {
+                            MaterialTheme.typography.labelMedium
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Displays the effective hydration percentage for the selected non-water beverage.
+ * Intended to appear below the preset carousel.
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun EffectiveHydrationInfoCard(
+    modifier: Modifier = Modifier,
+    selectedBeverage: BeverageOption,
+    beverages: List<BeverageOption> = BeverageType.getAllSorted().map { it.toOption() }
+) {
+    val safeSelected = if (selectedBeverage in beverages) selectedBeverage else beverages.first()
+
+    AnimatedVisibility(
+        modifier = modifier,
+        visible = !safeSelected.isWater,
+        enter = expandVertically(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow
+            ),
+            expandFrom = Alignment.Top
+        ) + scaleIn(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow
+            ),
+            initialScale = 0.3f,
+            transformOrigin = TransformOrigin(0.5f, 0f)
+        ),
+        exit = shrinkVertically(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioNoBouncy,
+                stiffness = Spring.StiffnessMedium
+            ),
+            shrinkTowards = Alignment.Top
+        ) + scaleOut(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow
+            ),
+            targetScale = 0.3f,
+            transformOrigin = TransformOrigin(0.5f, 0f)
+        )
+    ) {
+        Card(
+            shape = MaterialTheme.shapes.extraLarge,
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            ),
+            modifier = Modifier
+                .padding(horizontal = 10.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Info,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                    modifier = Modifier.size(18.dp)
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    AnimatedContent(
+                        targetState = (safeSelected.hydrationMultiplier * 100).toInt(),
+                        transitionSpec = {
+                            slideInVertically { height -> height } + fadeIn() togetherWith
+                                    slideOutVertically { height -> -height } + fadeOut()
+                        },
+                        label = "hydration_percentage"
+                    ) { percentage ->
+                        Text(
+                            text = stringResource(
+                                R.string.home_label_effective_hydration,
+                                percentage
+                            ),
+                            style = MaterialTheme.typography.titleSmall,
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -1122,161 +1361,6 @@ private fun getMotivationalMessage(progress: Float, userProfile: UserProfile, is
         progress >= 0.5f -> stringResource(R.string.home_motivation_halfway)
         progress >= 0.25f -> stringResource(R.string.home_motivation_good_start)
         else -> stringResource(userProfile.activityLevel.hydrationTipResId)
-    }
-}
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-private fun BeverageSelectionSection(
-    modifier: Modifier = Modifier,
-    selectedBeverage: BeverageOption,
-    onBeverageChange: (BeverageOption) -> Unit,
-    beverages: List<BeverageOption> = BeverageType.getAllSorted().map { it.toOption() },
-) {
-    val haptics = LocalHapticFeedback.current
-
-    val safeSelected = if (selectedBeverage in beverages) selectedBeverage else beverages.first()
-    LaunchedEffect(beverages) {
-        if (selectedBeverage !in beverages) onBeverageChange(beverages.firstOrNull { it.isWater } ?: beverages.first())
-    }
-
-    Column(
-        modifier = modifier.padding(horizontal = 5.dp, vertical = 5.dp),
-        verticalArrangement = Arrangement.spacedBy(5.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Horizontally scrollable chips
-        LazyRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(horizontal = 4.dp)
-        ) {
-            items(beverages) { beverage ->
-                val isSelected = safeSelected == beverage
-
-                FilterChip(
-                    shape = if (isSelected){
-                        MaterialTheme.shapes.medium
-                    } else {
-                        MaterialTheme.shapes.extraLarge
-                    },
-                    onClick = {
-                        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
-                        onBeverageChange(beverage)
-                    },
-                    label = {
-                        val labelText = if (beverage.hasLabelRes) {
-                            stringResource(beverage.labelResId)
-                        } else {
-                            beverage.displayName
-                        }
-                        if (isSelected){
-                            Text(
-                                text = labelText,
-                                style = MaterialTheme.typography.labelMediumEmphasized,
-                                textAlign = TextAlign.Center
-                            )
-                        } else {
-                            Text(
-                                text = labelText,
-                                style = MaterialTheme.typography.labelMedium,
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    },
-                    leadingIcon = {
-                        if (isSelected){
-                            Icon(
-                                painter = painterResource(beverage.iconResFilled),
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        } else {
-                            Icon(
-                                painter = painterResource(beverage.iconRes),
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-                    },
-                    selected = isSelected,
-                    modifier = Modifier.animateItem()
-                )
-            }
-        }
-
-        // Show selected beverage info with animation
-        AnimatedVisibility(
-            visible = !safeSelected.isWater,
-            enter = expandVertically(
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessLow
-                ),
-                expandFrom = Alignment.Top
-            ) + scaleIn(
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessLow
-                ),
-                initialScale = 0.8f,
-                transformOrigin = TransformOrigin(0.5f, 0f)
-            ),
-            exit = shrinkVertically(
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioNoBouncy,
-                    stiffness = Spring.StiffnessMedium
-                ),
-                shrinkTowards = Alignment.Top
-            ) + scaleOut(
-                animationSpec = tween(150),
-                targetScale = 0.9f,
-                transformOrigin = TransformOrigin(0.5f, 0f)
-            )
-        ) {
-            Card(
-                shape = MaterialTheme.shapes.extraLarge,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                ),
-                modifier = Modifier
-                    .padding(horizontal = 10.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .padding(12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Info,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        AnimatedContent(
-                            targetState = (safeSelected.hydrationMultiplier * 100).toInt(),
-                            transitionSpec = {
-                                slideInVertically { height -> height } + fadeIn() togetherWith
-                                slideOutVertically { height -> -height } + fadeOut()
-                            },
-                            label = "hydration_percentage"
-                        ) { percentage ->
-                            Text(
-                                text = stringResource(
-                                    R.string.home_label_effective_hydration,
-                                    percentage
-                                ),
-                                style = MaterialTheme.typography.titleSmall,
-                            )
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 //region Preview

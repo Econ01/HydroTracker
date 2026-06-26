@@ -425,13 +425,8 @@ private fun IconPickerToggleGroup(
             .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
     ) {
-        icons.forEachIndexed { index, icon ->
+        icons.forEach { icon ->
             val isSelected = icon.name == selectedIcon.name && icon.type == selectedIcon.type
-            val shapes = when (index) {
-                0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                icons.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-            }
 
             ToggleButton(
                 checked = isSelected,
@@ -439,7 +434,6 @@ private fun IconPickerToggleGroup(
                     haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
                     onIconSelected(icon)
                 },
-                shapes = shapes,
                 modifier = Modifier
                     .size(width = 64.dp, height = 56.dp)
                     .semantics { role = Role.RadioButton }

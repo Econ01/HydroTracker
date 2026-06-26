@@ -98,6 +98,7 @@ import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurState
 import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurStyle
 import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropProgressive
 import com.cemcakmak.hydrotracker.presentation.common.effect.backdropBlur
+import com.cemcakmak.hydrotracker.presentation.common.effect.backdropSource
 import com.cemcakmak.hydrotracker.presentation.common.effect.rememberBackdropBlurState
 import com.cemcakmak.hydrotracker.presentation.settings.profile.ProfileAvatar
 import com.cemcakmak.hydrotracker.presentation.settings.profile.ProfileSettingsScreen
@@ -183,6 +184,15 @@ fun SettingsHubScreen(
                 .padding(contentPadding)
                 .padding(horizontal = 16.dp)
                 .blur(blur)
+                .then(
+                    if (edgeEffectStyle == EdgeEffect.BLURRED) {
+                        Modifier
+                            .backdropSource(backdropState)
+                            .background(MaterialTheme.colorScheme.background)
+                    } else {
+                        Modifier
+                    }
+                )
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
