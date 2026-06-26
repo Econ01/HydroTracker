@@ -13,7 +13,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.role
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
@@ -509,7 +508,9 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp)
-                        .padding(horizontal = 16.dp),
+                        .padding(horizontal = 16.dp)
+                        .animateContentSize()
+                        .graphicsLayer(clip = false),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     // Beverage Selection Section
@@ -1012,75 +1013,65 @@ private fun EffectiveHydrationInfoCard(
     AnimatedVisibility(
         modifier = modifier,
         visible = !safeSelected.isWater,
-        enter = expandVertically(
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessLow
-            ),
-            expandFrom = Alignment.Top
-        ) + scaleIn(
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessLow
-            ),
+        enter = scaleIn(
+            animationSpec = MaterialTheme.motionScheme.slowSpatialSpec(),
             initialScale = 0.3f,
             transformOrigin = TransformOrigin(0.5f, 0f)
-        ),
-        exit = shrinkVertically(
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioNoBouncy,
-                stiffness = Spring.StiffnessMedium
-            ),
-            shrinkTowards = Alignment.Top
-        ) + scaleOut(
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessLow
-            ),
+        ) + fadeIn(animationSpec = MaterialTheme.motionScheme.slowEffectsSpec()),
+        exit = scaleOut(
+            animationSpec = MaterialTheme.motionScheme.slowSpatialSpec(),
             targetScale = 0.3f,
             transformOrigin = TransformOrigin(0.5f, 0f)
-        )
+        ) + fadeOut(animationSpec = MaterialTheme.motionScheme.slowEffectsSpec())
     ) {
-        Card(
+        EffectiveHydrationCardContent(safeSelected = safeSelected)
+    }
+}
+
+/**
+ * The actual content of the effective-hydration info card.
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun EffectiveHydrationCardContent(
+    safeSelected: BeverageOption,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        Surface(
+            modifier = modifier
+                .widthIn(max = 280.dp),
             shape = MaterialTheme.shapes.extraLarge,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            ),
-            modifier = Modifier
-                .padding(horizontal = 10.dp)
+            color = MaterialTheme.colorScheme.tertiaryContainer
         ) {
             Row(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = Icons.Rounded.Info,
+                    imageVector = ImageVector.vectorResource(R.drawable.info_filled),
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                    tint = MaterialTheme.colorScheme.onTertiaryContainer,
                     modifier = Modifier.size(18.dp)
                 )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    AnimatedContent(
-                        targetState = (safeSelected.hydrationMultiplier * 100).toInt(),
-                        transitionSpec = {
-                            slideInVertically { height -> height } + fadeIn() togetherWith
-                                    slideOutVertically { height -> -height } + fadeOut()
-                        },
-                        label = "hydration_percentage"
-                    ) { percentage ->
-                        Text(
-                            text = stringResource(
-                                R.string.home_label_effective_hydration,
-                                percentage
-                            ),
-                            style = MaterialTheme.typography.titleSmall,
-                        )
-                    }
-                }
+
+                val animatedValue = rememberAnimatedDouble(
+                    targetValue = (safeSelected.hydrationMultiplier * 100),
+                    hapticsEnabled = false
+                )
+                Text(
+                    text = stringResource(
+                        R.string.home_label_effective_hydration,
+                        animatedValue.toInt()
+                    ),
+                    style = MaterialTheme.typography.titleSmall,
+                )
             }
         }
     }
