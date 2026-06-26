@@ -1,4 +1,24 @@
-package com.cemcakmak.hydrotracker.presentation.common
+/*
+ *
+ *  * HydroTracker - A modern and private water intake tracking application
+ *  * Copyright (c) 2026 Ali Cem Çakmak
+ *  *
+ *  * This program is free software: you can redistribute it and/or modify
+ *  * it under the terms of the GNU General Public License as published by
+ *  * the Free Software Foundation, either version 3 of the License, or
+ *  * (at your option) any later version.
+ *  *
+ *  * This program is distributed in the hope that it will be useful,
+ *  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  * GNU General Public License for more details.
+ *  *
+ *  * You should have received a copy of the GNU General Public License
+ *  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
+package com.cemcakmak.hydrotracker.presentation.common.dialogs
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -56,9 +76,12 @@ import com.cemcakmak.hydrotracker.data.models.Gender
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
+import com.cemcakmak.hydrotracker.presentation.common.BeverageOption
+import com.cemcakmak.hydrotracker.presentation.common.toOption
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
+import java.time.LocalTime
 import java.util.Calendar
 
 /**
@@ -329,7 +352,7 @@ fun EditWaterDialog(
                     OutlinedTextField(
                         value = DateTimeFormatters.formatTime(
                             context,
-                            java.time.LocalTime.of(selectedHour, selectedMinute),
+                            LocalTime.of(selectedHour, selectedMinute),
                             themePreferences.timeFormat
                         ),
                         onValueChange = { },

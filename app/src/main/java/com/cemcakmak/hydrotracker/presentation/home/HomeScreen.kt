@@ -72,7 +72,7 @@ import com.cemcakmak.hydrotracker.presentation.common.sheets.EditContainerPreset
 import com.cemcakmak.hydrotracker.presentation.common.BeverageOption
 import com.cemcakmak.hydrotracker.presentation.common.toOption
 import com.cemcakmak.hydrotracker.presentation.common.DailyEntriesSection
-import com.cemcakmak.hydrotracker.presentation.common.EditWaterDialog
+import com.cemcakmak.hydrotracker.presentation.common.dialogs.EditWaterDialog
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults

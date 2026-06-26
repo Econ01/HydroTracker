@@ -78,7 +78,7 @@ import com.cemcakmak.hydrotracker.data.models.EdgeEffect
 import com.cemcakmak.hydrotracker.presentation.common.BeverageOption
 import com.cemcakmak.hydrotracker.presentation.common.BlurMorph
 import com.cemcakmak.hydrotracker.presentation.common.DailyEntriesSection
-import com.cemcakmak.hydrotracker.presentation.common.EditWaterDialog
+import com.cemcakmak.hydrotracker.presentation.common.dialogs.EditWaterDialog
 import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurState
 import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurStyle
 import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropProgressive

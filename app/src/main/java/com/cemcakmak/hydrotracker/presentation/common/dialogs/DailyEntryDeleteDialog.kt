@@ -1,4 +1,4 @@
-package com.cemcakmak.hydrotracker.presentation.common
+package com.cemcakmak.hydrotracker.presentation.common.dialogs
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
