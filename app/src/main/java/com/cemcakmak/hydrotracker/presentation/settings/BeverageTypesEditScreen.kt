@@ -40,10 +40,10 @@ import com.cemcakmak.hydrotracker.data.database.repository.CustomBeverageReposit
 import com.cemcakmak.hydrotracker.data.models.BeveragePreferences
 import com.cemcakmak.hydrotracker.data.models.BeverageType
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
-import com.cemcakmak.hydrotracker.presentation.common.AddCustomBeverageBottomSheet
-import com.cemcakmak.hydrotracker.presentation.common.BeverageIcons
-import com.cemcakmak.hydrotracker.presentation.common.EditCustomBeverageBottomSheet
-import com.cemcakmak.hydrotracker.presentation.common.PresetBeverageBottomSheet
+import com.cemcakmak.hydrotracker.presentation.common.sheets.AddCustomBeverageBottomSheet
+import com.cemcakmak.hydrotracker.presentation.common.sheets.BeverageIcons
+import com.cemcakmak.hydrotracker.presentation.common.sheets.EditCustomBeverageBottomSheet
+import com.cemcakmak.hydrotracker.presentation.common.sheets.PresetBeverageBottomSheet
 import com.cemcakmak.hydrotracker.presentation.common.ReorderableGroupedColumn
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import kotlinx.coroutines.flow.flowOf

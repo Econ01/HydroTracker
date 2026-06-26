@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import com.cemcakmak.hydrotracker.data.database.entities.CustomBeverageEntity
 import com.cemcakmak.hydrotracker.data.models.BeveragePreferences
 import com.cemcakmak.hydrotracker.data.models.BeverageType
+import com.cemcakmak.hydrotracker.presentation.common.sheets.BeverageIcons
 
 /**
  * Unified beverage shown in the Home pickers — either a preset ([BeverageType]) or a
