@@ -84,6 +84,7 @@ Changed
 - Redesigned daily entry list with tonal elevation and animations
 - Overhauled notification settings UI with updated time pickers
 - Overhaul home page with container carousel, new beverage selector and more
+- Update every sheet and dialogue UI
 
 [1.0.6.1]
 • Small preparations for F-Droid release
