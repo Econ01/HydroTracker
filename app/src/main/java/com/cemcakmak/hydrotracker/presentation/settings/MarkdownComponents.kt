@@ -101,23 +101,16 @@ internal fun MarkdownBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
-                .padding(bottom = 32.dp)
+                .padding(horizontal = 16.dp)
+                .verticalScroll((rememberScrollState())),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.SemiBold
+                style = MaterialTheme.typography.headlineSmallEmphasized
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                MarkdownText(text = content, modifier = Modifier.fillMaxWidth())
-            }
+
+            MarkdownText(text = content, modifier = Modifier.fillMaxWidth())
         }
     }
 }
@@ -161,6 +154,15 @@ internal fun MarkdownText(
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = stringResource(R.string.markdown_section_added),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                }
+                trimmed == "Changed" -> {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(R.string.markdown_section_changed),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.tertiary
@@ -260,8 +262,7 @@ internal fun MarkdownText(
                 line.trim().startsWith("**") && line.trim().endsWith("**") -> {
                     Text(
                         text = line.trim().removeSurrounding("**"),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.bodyMediumEmphasized,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
@@ -343,9 +344,16 @@ private fun parseInlineMarkdown(text: String): AnnotatedString {
 @Composable
 private fun MarkdownTextPreview() {
     HydroTrackerTheme {
-        MarkdownText(
-            modifier = Modifier.padding(16.dp),
-            text = """
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+                .verticalScroll((rememberScrollState())),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            MarkdownText(
+                modifier = Modifier.padding(16.dp),
+                text = """
                 # Heading 1
                 ## Heading 2
                 ### Heading 3
@@ -353,9 +361,6 @@ private fun MarkdownTextPreview() {
                 ##### Heading 5
                 
                 Normal paragraph with **inline bold** and *italic* text.
-                You can also use _underscores_ for emphasis.
-                
-                **Fully bold line**
                 
                 - Bullet item one
                 - Bullet item with **bold inside**
@@ -385,6 +390,7 @@ private fun MarkdownTextPreview() {
                 Added
                 • Now you can remove and re-order beverages
             """.trimIndent()
-        )
+            )
+        }
     }
 }

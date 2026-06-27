@@ -686,6 +686,7 @@
     <string name="markdown_error_loading">Error loading %1$s: %2$s</string>
     <string name="markdown_version_prefix">Version %1$s</string>
     <string name="markdown_section_added">Added</string>
+    <string name="markdown_section_changed">Changed</string>
     <string name="markdown_section_fixed">Fixed</string>
 
     <!-- ============================================================================

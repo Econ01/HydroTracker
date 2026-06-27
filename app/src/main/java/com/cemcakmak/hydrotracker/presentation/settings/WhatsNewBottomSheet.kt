@@ -20,7 +20,6 @@
 
 package com.cemcakmak.hydrotracker.presentation.settings
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -74,8 +73,8 @@ private fun WhatsNewBottomSheetContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp)
-            .padding(bottom = 32.dp)
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
     ) {
         Text(
             text = stringResource(R.string.whats_new_title),
@@ -88,15 +87,7 @@ private fun WhatsNewBottomSheetContent(
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary
         )
-        Spacer(modifier = Modifier.height(16.dp))
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            MarkdownText(text = content, modifier = Modifier.fillMaxWidth())
-        }
+        MarkdownText(text = content, modifier = Modifier.fillMaxWidth())
     }
 }
 
