@@ -181,8 +181,6 @@ fun SettingsHubScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(contentPadding)
-                .padding(horizontal = 16.dp)
                 .blur(blur)
                 .then(
                     if (edgeEffectStyle == EdgeEffect.BLURRED) {
@@ -193,6 +191,8 @@ fun SettingsHubScreen(
                         Modifier
                     }
                 )
+                .padding(contentPadding)
+                .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
