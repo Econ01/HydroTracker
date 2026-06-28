@@ -21,12 +21,15 @@
 package com.cemcakmak.hydrotracker.presentation.common.dialogs
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -36,6 +39,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -43,14 +47,18 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -58,27 +66,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
-import com.cemcakmak.hydrotracker.data.models.ActivityLevel
-import com.cemcakmak.hydrotracker.data.models.AgeGroup
 import com.cemcakmak.hydrotracker.data.models.BeverageType
 import com.cemcakmak.hydrotracker.data.models.ContainerPreset
-import com.cemcakmak.hydrotracker.data.models.Gender
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
-import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.presentation.common.BeverageOption
 import com.cemcakmak.hydrotracker.presentation.common.toOption
-import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 import java.time.LocalTime
@@ -147,25 +151,42 @@ fun EditWaterDialog(
     val presets = remember { ContainerPreset.getDefaultPresets() }
     val isExternalEntry = entry.isExternalEntry()
 
+    val handleSave = {
+        val amountInUserUnit = amountText.toDouble()
+        val amountInMl = VolumeUnitConverter.toMillilitres(amountInUserUnit, volumeUnit)
+
+        val newCalendar = Calendar.getInstance().apply {
+            timeInMillis = entry.timestamp
+            set(Calendar.HOUR_OF_DAY, selectedHour)
+            set(Calendar.MINUTE, selectedMinute)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        val updatedEntry = entry.copy(
+            amount = amountInMl,
+            containerType = containerType,
+            beverageType = selectedBeverage.storageKey,
+            beverageMultiplier = selectedBeverage.storedMultiplier,
+            timestamp = newCalendar.timeInMillis
+        )
+        onConfirm(updatedEntry)
+    }
+
     Dialog(onDismissRequest = onDismiss) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.extraLargeIncreased,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
+        Surface(
+            shape = MaterialTheme.shapes.extraLargeIncreased
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
                     text = stringResource(
                         if (isExternalEntry) R.string.home_dialog_external_entry_title
                         else R.string.home_dialog_edit_entry_title
                     ),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.headlineSmallEmphasized
                 )
 
                 // Warning message for external entries
@@ -203,7 +224,7 @@ fun EditWaterDialog(
                     }
                 }
 
-                // Container type dropdown (disabled for external entries)
+                // Container type dropdown
                 var expanded by remember { mutableStateOf(false) }
 
                 val customContainerKey = "Custom"
@@ -218,11 +239,22 @@ fun EditWaterDialog(
                     onExpandedChange = { if (!isExternalEntry) expanded = !expanded }
                 ) {
                     OutlinedTextField(
+                        shape = MaterialTheme.shapes.extraExtraLarge,
                         value = displayContainerType,
                         onValueChange = { },
                         readOnly = true,
                         enabled = !isExternalEntry,
                         label = { Text(stringResource(R.string.home_label_container_type)) },
+                        leadingIcon = {
+                            val matchedPreset = presets.find { it.name == containerType }
+                            if (matchedPreset?.iconRes != null) {
+                                Icon(
+                                    painter = painterResource(matchedPreset.iconRes),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        },
                         trailingIcon = {
                             if (!isExternalEntry) {
                                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
@@ -234,40 +266,63 @@ fun EditWaterDialog(
                     )
 
                     if (!isExternalEntry) {
+                        // "Custom" is appended as a virtual item at the end
+                        val allItems = presets + null
+                        val itemCount = allItems.size
+
                         ExposedDropdownMenu(
                             expanded = expanded,
-                            onDismissRequest = { expanded = false }
+                            onDismissRequest = { expanded = false },
+                            containerColor = MenuDefaults.groupStandardContainerColor,
+                            shape = MenuDefaults.standaloneGroupShape,
                         ) {
-                            presets.forEach { preset ->
+                            allItems.forEachIndexed { index, preset ->
+                                val isCustomItem = preset == null
+                                val itemLabel = if (isCustomItem) {
+                                    stringResource(R.string.home_option_custom)
+                                } else if (preset.labelResId != 0) {
+                                    stringResource(preset.labelResId)
+                                } else {
+                                    preset.name
+                                }
+                                val isSelected = if (isCustomItem) {
+                                    containerType == customContainerKey
+                                } else {
+                                    containerType == preset.name
+                                }
+
                                 DropdownMenuItem(
-                                    text = {
-                                        Text(
-                                            if (preset.labelResId != 0) {
-                                                stringResource(preset.labelResId)
-                                            } else {
-                                                preset.name
-                                            }
-                                        )
-                                    },
+                                    selected = isSelected,
                                     onClick = {
-                                        containerType = preset.name
-                                        amountText = VolumeUnitConverter.formatValue(preset.volume, volumeUnit)
+                                        if (isCustomItem) {
+                                            containerType = customContainerKey
+                                        } else {
+                                            containerType = preset.name
+                                            amountText = VolumeUnitConverter.formatValue(
+                                                preset.volume, volumeUnit
+                                            )
+                                        }
                                         expanded = false
-                                    }
+                                    },
+                                    text = { Text(itemLabel) },
+                                    shapes = MenuDefaults.itemShape(index, itemCount),
+                                    leadingIcon = if (!isCustomItem && preset.iconRes != null) {
+                                        {
+                                            Icon(
+                                                painter = painterResource(preset.iconRes),
+                                                contentDescription = null,
+                                                modifier = Modifier.size(MenuDefaults.LeadingIconSize)
+                                            )
+                                        }
+                                    } else null,
+                                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                                 )
                             }
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.home_option_custom)) },
-                                onClick = {
-                                    containerType = customContainerKey
-                                    expanded = false
-                                }
-                            )
                         }
                     }
                 }
 
-                // Beverage Type Selection Dropdown (disabled for external entries)
+                // Beverage Type Selection Dropdown
                 if (!isExternalEntry) {
                     var beverageExpanded by remember { mutableStateOf(false) }
 
@@ -276,6 +331,7 @@ fun EditWaterDialog(
                         onExpandedChange = { beverageExpanded = !beverageExpanded }
                     ) {
                         OutlinedTextField(
+                            shape = MaterialTheme.shapes.extraExtraLarge,
                             value = if (selectedBeverage.hasLabelRes) {
                                 stringResource(selectedBeverage.labelResId)
                             } else {
@@ -301,55 +357,54 @@ fun EditWaterDialog(
 
                         ExposedDropdownMenu(
                             expanded = beverageExpanded,
-                            onDismissRequest = { beverageExpanded = false }
+                            onDismissRequest = { beverageExpanded = false },
+                            containerColor = MenuDefaults.groupStandardContainerColor,
+                            shape = MenuDefaults.standaloneGroupShape,
                         ) {
-                            beverages.forEach { beverage ->
+                            val beverageCount = beverages.size
+                            beverages.forEachIndexed { index, beverage ->
+                                val itemLabel = if (beverage.hasLabelRes) {
+                                    stringResource(beverage.labelResId)
+                                } else {
+                                    beverage.displayName
+                                }
+
                                 DropdownMenuItem(
-                                    text = {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                        ) {
-                                            Icon(
-                                                painter = painterResource(beverage.iconRes),
-                                                contentDescription = null,
-                                                modifier = Modifier.size(20.dp)
-                                            )
-                                            Column {
-                                                Text(
-                                                    text = if (beverage.hasLabelRes) {
-                                                        stringResource(beverage.labelResId)
-                                                    } else {
-                                                        beverage.displayName
-                                                    },
-                                                    style = MaterialTheme.typography.bodyLarge
-                                                )
-                                                Text(
-                                                    text = stringResource(
-                                                        R.string.home_label_hydration_percentage,
-                                                        (beverage.hydrationMultiplier * 100).toInt()
-                                                    ),
-                                                    style = MaterialTheme.typography.bodySmall,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                )
-                                            }
-                                        }
-                                    },
+                                    selected = selectedBeverage.displayName == beverage.displayName,
                                     onClick = {
                                         selectedBeverage = beverage
                                         beverageExpanded = false
-                                    }
+                                    },
+                                    text = { Text(itemLabel) },
+                                    shapes = MenuDefaults.itemShape(index, beverageCount),
+                                    supportingText = {
+                                        Text(
+                                            stringResource(
+                                                R.string.home_label_hydration_percentage,
+                                                (beverage.hydrationMultiplier * 100).toInt()
+                                            )
+                                        )
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            painter = painterResource(beverage.iconRes),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(MenuDefaults.LeadingIconSize)
+                                        )
+                                    },
+                                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                                 )
                             }
                         }
                     }
                 }
 
-                // Time picker field (disabled for external entries)
+                // Time picker field
                 Box(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     OutlinedTextField(
+                        shape = MaterialTheme.shapes.extraLargeIncreased,
                         value = DateTimeFormatters.formatTime(
                             context,
                             LocalTime.of(selectedHour, selectedMinute),
@@ -378,8 +433,9 @@ fun EditWaterDialog(
                     }
                 }
 
-                // Amount field (disabled for external entries)
+                // Amount field
                 OutlinedTextField(
+                    shape = MaterialTheme.shapes.extraLargeIncreased,
                     value = amountText,
                     onValueChange = {
                         if (!isExternalEntry) {
@@ -399,57 +455,20 @@ fun EditWaterDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(onClick = onDismiss) {
-                        Text(
-                            stringResource(
-                                if (isExternalEntry) R.string.action_close else R.string.action_cancel
-                            )
-                        )
-                    }
-
-                    if (!isExternalEntry) {
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        Button(
-                            shapes = ButtonDefaults.shapes(),
-                            onClick = {
-                                val amountInUserUnit = amountText.toDoubleOrNull()
-                                if (amountInUserUnit != null && amountInUserUnit > 0) {
-                                    val amountInMl = VolumeUnitConverter.toMillilitres(amountInUserUnit, volumeUnit)
-                                    if (amountInMl in minAmountMl..maxAmountMl) {
-                                        // Calculate new timestamp with selected time
-                                        val newCalendar = Calendar.getInstance().apply {
-                                            timeInMillis = entry.timestamp
-                                            set(Calendar.HOUR_OF_DAY, selectedHour)
-                                            set(Calendar.MINUTE, selectedMinute)
-                                            set(Calendar.SECOND, 0)
-                                            set(Calendar.MILLISECOND, 0)
-                                        }
-
-                                        val updatedEntry = entry.copy(
-                                            amount = amountInMl,
-                                            containerType = containerType,
-                                            beverageType = selectedBeverage.storageKey,
-                                            beverageMultiplier = selectedBeverage.storedMultiplier,
-                                            timestamp = newCalendar.timeInMillis
-                                        )
-                                        onConfirm(updatedEntry)
-                                    } else {
-                                        isError = true
-                                    }
-                                } else {
-                                    isError = true
-                                }
-                            }
-                        ) {
-                            Text(stringResource(R.string.action_save))
-                        }
-                    }
-                }
+                ActionButtons(
+                    onDismiss = onDismiss,
+                    onSave = handleSave,
+                    primaryLabel = stringResource(
+                        if (isExternalEntry) R.string.action_close else R.string.action_save
+                    ),
+                    secondaryLabel = stringResource(
+                        if (isExternalEntry) R.string.action_close else R.string.action_cancel
+                    ),
+                    amountText = amountText,
+                    volumeUnit = volumeUnit,
+                    isError = { isError = true },
+                    showPrimaryButton = !isExternalEntry
+                )
             }
         }
     }
@@ -507,37 +526,116 @@ fun EditWaterDialog(
     }
 }
 
-@Preview(showBackground = true, name = "Edit Water Dialog")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun EditWaterDialogPreview() {
-    val previewUser = UserProfile(
-        name = "Preview User",
-        gender = Gender.MALE,
-        ageGroup = AgeGroup.ADULT_31_50,
-        activityLevel = ActivityLevel.MODERATE,
-        wakeUpTime = "07:00",
-        sleepTime = "23:00",
-        dailyWaterGoal = 2500.0,
-        reminderInterval = 60,
-        volumeUnit = VolumeUnit.MILLILITRES
-    )
+private fun ActionButtons(
+    onDismiss: () -> Unit,
+    onSave: () -> Unit,
+    primaryLabel: String,
+    secondaryLabel: String,
+    amountText: String,
+    volumeUnit: VolumeUnit,
+    isError: () -> Unit,
+    showPrimaryButton: Boolean = true
+) {
+    val haptics = LocalHapticFeedback.current
+    val cancelInteractionSource = remember { MutableInteractionSource() }
+    val addInteractionSource = remember { MutableInteractionSource() }
 
-    HydroTrackerTheme {
-        EditWaterDialog(
-            entry = WaterIntakeEntry(
-                id = 1,
-                amount = 330.0,
-                timestamp = System.currentTimeMillis(),
-                date = "2026-06-21",
-                containerType = "Mug",
-                containerVolume = 330.0,
-                beverageType = BeverageType.COFFEE.name,
-                beverageMultiplier = 0.95
-            ),
-            themePreferences = ThemePreferences(),
-            volumeUnit = previewUser.volumeUnit,
-            onDismiss = {},
-            onConfirm = {}
+    val minAmountMl = 1.0
+    val maxAmountMl = 5000.0
+
+    var isInvalid by remember { mutableStateOf(false) }
+
+    LaunchedEffect(cancelInteractionSource) {
+        cancelInteractionSource.interactions.collect { interaction ->
+            when (interaction) {
+                is PressInteraction.Press -> haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                is PressInteraction.Release -> haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                else -> {  }
+            }
+        }
+    }
+
+    LaunchedEffect(addInteractionSource) {
+        addInteractionSource.interactions.collect { interaction ->
+            when (interaction) {
+                is PressInteraction.Press -> haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                is PressInteraction.Release -> if (isInvalid) haptics.performHapticFeedback(HapticFeedbackType.Reject) else haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                else -> {  }
+            }
+        }
+    }
+
+    ButtonGroup(
+        modifier = Modifier.fillMaxWidth(),
+        overflowIndicator = {}
+    ) {
+        val scope = this
+        customItem(
+            buttonGroupContent = {
+                FilledTonalButton(
+                    onClick = onDismiss,
+                    shapes = ButtonDefaults.shapes(),
+                    interactionSource = cancelInteractionSource,
+                    modifier = with(scope) {
+                        Modifier
+                            .weight(1f)
+                            .height(46.dp)
+                            .animateWidth(interactionSource = cancelInteractionSource)
+                    }
+                ) {
+                    Text(
+                        text = secondaryLabel,
+                        maxLines = 1,
+                        softWrap = false
+                    )
+                }
+            },
+            menuContent = {}
         )
+
+        if (showPrimaryButton) {
+            customItem(
+                buttonGroupContent = {
+                    Button(
+                        onClick = {
+                            val amountInUserUnit = amountText.toDoubleOrNull()
+                            if (amountInUserUnit != null && amountInUserUnit > 0) {
+                                val amountInMl = VolumeUnitConverter.toMillilitres(amountInUserUnit, volumeUnit)
+                                if (amountInMl in minAmountMl..maxAmountMl) {
+                                    onSave()
+                                } else {
+                                    isError()
+                                    isInvalid = true
+                                }
+                            } else {
+                                isError()
+                                isInvalid = true
+                            }
+                        },
+                        colors = ButtonDefaults.filledTonalButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                        shapes = ButtonDefaults.shapes(),
+                        interactionSource = addInteractionSource,
+                        modifier = with(scope) {
+                            Modifier
+                                .weight(1f)
+                                .height(46.dp)
+                                .animateWidth(interactionSource = addInteractionSource)
+                        }
+                    ) {
+                        Text(
+                            text = primaryLabel,
+                            maxLines = 1,
+                            softWrap = false
+                        )
+                    }
+                },
+                menuContent = {}
+            )
+        }
     }
 }
