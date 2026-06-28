@@ -55,13 +55,14 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.Dp
 import androidx.navigation3.runtime.rememberNavBackStack
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.presentation.common.MainNavigationScaffold
+import com.cemcakmak.hydrotracker.presentation.common.MainTabTopAppBar
 import com.cemcakmak.hydrotracker.presentation.common.NavigationRoutes
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.data.models.ActivityLevel
@@ -99,7 +100,7 @@ fun HistoryScreen(
     themePreferences: ThemePreferences = ThemePreferences(),
     userProfile: UserProfile? = null,
     activeBeverages: List<BeverageOption> = BeverageType.getAllSorted().map { it.toOption() },
-    paddingValues: PaddingValues = PaddingValues(0.dp),
+    paddingValues: PaddingValues,
     onPeriodSelected: (TimePeriod) -> Unit,
     onPreviousPeriod: () -> Unit,
     onNextPeriod: () -> Unit,
@@ -113,16 +114,6 @@ fun HistoryScreen(
 
     val volumeUnit = userProfile?.volumeUnit ?: VolumeUnit.MILLILITRES
 
-    val layoutDirection = LocalLayoutDirection.current
-    val contentPadding = remember(paddingValues, layoutDirection) {
-        PaddingValues(
-            start = paddingValues.calculateStartPadding(layoutDirection),
-            end = paddingValues.calculateEndPadding(layoutDirection),
-            bottom = 0.dp,
-            top = 0.dp
-        )
-    }
-
     val edgeEffectStyle = themePreferences.edgeEffect.let {
         if (it == EdgeEffect.BLURRED && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             EdgeEffect.TRANSPARENT
@@ -134,154 +125,171 @@ fun HistoryScreen(
     // Backdrop captured for the frosted top band
     val backdropState = rememberBackdropBlurState()
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            MainTabTopAppBar(
+                titleResId = R.string.nav_history,
+                scrollBehavior = scrollBehavior,
+                blur = 0.dp
+            )
+        }
+    ) { innerPadding ->
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .then(
-                    if (edgeEffectStyle == EdgeEffect.BLURRED) {
-                        Modifier
-                            .backdropSource(backdropState)
-                            .background(MaterialTheme.colorScheme.background)
-                    } else {
-                        Modifier
-                    }
-                )
-                .padding(contentPadding),
         ) {
-            item {
-                Spacer(modifier = Modifier.height(paddingValues.calculateTopPadding()))
-            }
-
-            // Period Selector
-            item {
-                PeriodSelector(
-                    selectedPeriod = uiState.selectedPeriod,
-                    onPeriodSelected = onPeriodSelected,
-                    currentWeekOffset = uiState.weekOffset,
-                    currentMonthOffset = uiState.monthOffset,
-                    currentYearOffset = uiState.yearOffset,
-                    onPreviousPeriod = onPreviousPeriod,
-                    onNextPeriod = onNextPeriod,
-                    weekStartDay = themePreferences.weekStartDay,
-                    dateFormat = themePreferences.dateFormat
-                )
-            }
-
-            // Main Chart Section
-            item {
-                AnimatedContent(
-                    targetState = uiState.selectedPeriod,
-                    modifier = Modifier.fillMaxWidth(),
-                    transitionSpec = {
-                        val direction = when {
-                            targetState.ordinal > initialState.ordinal -> 1
-                            targetState.ordinal < initialState.ordinal -> -1
-                            else -> 0
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .then(
+                        if (edgeEffectStyle == EdgeEffect.BLURRED) {
+                            Modifier
+                                .backdropSource(backdropState)
+                                .background(MaterialTheme.colorScheme.surface)
+                        } else {
+                            Modifier
                         }
-                        val slideDuration = 600
+                    )
+            ) {
+                item {
+                    Spacer(modifier = Modifier.height(innerPadding.calculateTopPadding()))
+                }
 
-                        (slideInHorizontally(tween(slideDuration, easing = EaseOutCubic)) { fullWidth ->
-                            fullWidth * direction
-                        } + fadeIn(tween(slideDuration, easing = EaseOutCubic)))
-                            .togetherWith(
-                                slideOutHorizontally(tween(slideDuration, easing = EaseOutCubic)) { fullWidth ->
-                                    -fullWidth * direction
-                                } + fadeOut(tween(slideDuration, easing = EaseOutCubic))
-                            )
-                            .using(SizeTransform(clip = false))
-                    },
-                    label = "historyPeriodTransition"
-                ) { period ->
-                    val blur by transition.animateDp(
-                        transitionSpec = { tween(600, easing = EaseOutCubic) },
-                        label = "historyPeriodBlur"
-                    ) { enterExit ->
-                        if (enterExit == EnterExitState.Visible) 0.dp else 10.dp
-                    }
+                // Period Selector
+                item {
+                    PeriodSelector(
+                        selectedPeriod = uiState.selectedPeriod,
+                        onPeriodSelected = onPeriodSelected,
+                        currentWeekOffset = uiState.weekOffset,
+                        currentMonthOffset = uiState.monthOffset,
+                        currentYearOffset = uiState.yearOffset,
+                        onPreviousPeriod = onPreviousPeriod,
+                        onNextPeriod = onNextPeriod,
+                        weekStartDay = themePreferences.weekStartDay,
+                        dateFormat = themePreferences.dateFormat
+                    )
+                }
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .blur(blur, BlurredEdgeTreatment.Unbounded)
-                    ) {
-                        when (period) {
-                            TimePeriod.WEEKLY -> {
-                                WeeklyChartSection(
-                                    weekOffset = uiState.weekOffset,
-                                    summaries = uiState.summaries,
-                                    stats = uiState.weeklyStats,
-                                    weekStartDay = themePreferences.weekStartDay,
-                                    volumeUnit = volumeUnit,
-                                    animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS,
-                                    onDaySelected = onDaySelected
-                                )
+                // Main Chart Section
+                item {
+                    AnimatedContent(
+                        targetState = uiState.selectedPeriod,
+                        modifier = Modifier.fillMaxWidth(),
+                        transitionSpec = {
+                            val direction = when {
+                                targetState.ordinal > initialState.ordinal -> 1
+                                targetState.ordinal < initialState.ordinal -> -1
+                                else -> 0
                             }
-                            TimePeriod.MONTHLY -> {
-                                MonthlyChartSection(
-                                    summaries = uiState.summaries,
-                                    stats = uiState.monthlyStats,
-                                    weekStartDay = themePreferences.weekStartDay,
-                                    animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS,
-                                    onDaySelected = onDaySelected
+                            val slideDuration = 600
+
+                            (slideInHorizontally(tween(slideDuration, easing = EaseOutCubic)) { fullWidth ->
+                                fullWidth * direction
+                            } + fadeIn(tween(slideDuration, easing = EaseOutCubic)))
+                                .togetherWith(
+                                    slideOutHorizontally(tween(slideDuration, easing = EaseOutCubic)) { fullWidth ->
+                                        -fullWidth * direction
+                                    } + fadeOut(tween(slideDuration, easing = EaseOutCubic))
                                 )
-                            }
-                            TimePeriod.YEARLY -> {
-                                YearlyChartSection(
-                                    summaries = uiState.summaries,
-                                    stats = uiState.yearlyStats,
-                                    volumeUnit = volumeUnit,
-                                    animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS
-                                )
+                                .using(SizeTransform(clip = false))
+                        },
+                        label = "historyPeriodTransition"
+                    ) { period ->
+                        val blur by transition.animateDp(
+                            transitionSpec = { tween(600, easing = EaseOutCubic) },
+                            label = "historyPeriodBlur"
+                        ) { enterExit ->
+                            if (enterExit == EnterExitState.Visible) 0.dp else 10.dp
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .blur(blur, BlurredEdgeTreatment.Unbounded)
+                        ) {
+                            when (period) {
+                                TimePeriod.WEEKLY -> {
+                                    WeeklyChartSection(
+                                        weekOffset = uiState.weekOffset,
+                                        summaries = uiState.summaries,
+                                        stats = uiState.weeklyStats,
+                                        weekStartDay = themePreferences.weekStartDay,
+                                        volumeUnit = volumeUnit,
+                                        animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS,
+                                        onDaySelected = onDaySelected
+                                    )
+                                }
+                                TimePeriod.MONTHLY -> {
+                                    MonthlyChartSection(
+                                        summaries = uiState.summaries,
+                                        stats = uiState.monthlyStats,
+                                        weekStartDay = themePreferences.weekStartDay,
+                                        animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS,
+                                        onDaySelected = onDaySelected
+                                    )
+                                }
+                                TimePeriod.YEARLY -> {
+                                    YearlyChartSection(
+                                        summaries = uiState.summaries,
+                                        stats = uiState.yearlyStats,
+                                        volumeUnit = volumeUnit,
+                                        animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS
+                                    )
+                                }
                             }
                         }
                     }
                 }
+
+                // Selected day entries
+                item {
+                    SelectedDayEntries(
+                        selectedDate = uiState.selectedDate,
+                        entries = uiState.selectedDateEntries,
+                        userProfile = userProfile,
+                        themePreferences = themePreferences,
+                        onEdit = { entry ->
+                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            entryToEdit = entry
+                        },
+                        onDelete = { entry ->
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onDeleteEntry(entry)
+                        }
+                    )
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(paddingValues.calculateBottomPadding()))
+                }
             }
 
-            // Selected day entries
-            item {
-                SelectedDayEntries(
-                    selectedDate = uiState.selectedDate,
-                    entries = uiState.selectedDateEntries,
-                    userProfile = userProfile,
+            TopEdgeEffect(
+                style = edgeEffectStyle,
+                backdropState = backdropState,
+                paddingValues = innerPadding,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
+
+            // Edit entry dialogue
+            entryToEdit?.let { entry ->
+                EditWaterDialog(
+                    entry = entry,
                     themePreferences = themePreferences,
-                    onEdit = { entry ->
-                        haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        entryToEdit = entry
+                    volumeUnit = userProfile?.volumeUnit ?: VolumeUnit.MILLILITRES,
+                    onDismiss = { entryToEdit = null },
+                    onConfirm = { updatedEntry ->
+                        onUpdateEntry(entry, updatedEntry)
+                        entryToEdit = null
                     },
-                    onDelete = { entry ->
-                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onDeleteEntry(entry)
-                    }
+                    beverages = activeBeverages
                 )
             }
-
-            item {
-                Spacer(modifier = Modifier.height(paddingValues.calculateBottomPadding()))
-            }
-        }
-
-        TopEdgeEffect(
-            style = edgeEffectStyle,
-            backdropState = backdropState,
-            paddingValues = paddingValues,
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
-
-        // Edit entry dialogue
-        entryToEdit?.let { entry ->
-            EditWaterDialog(
-                entry = entry,
-                themePreferences = themePreferences,
-                volumeUnit = userProfile?.volumeUnit ?: VolumeUnit.MILLILITRES,
-                onDismiss = { entryToEdit = null },
-                onConfirm = { updatedEntry ->
-                    onUpdateEntry(entry, updatedEntry)
-                    entryToEdit = null
-                },
-                beverages = activeBeverages
-            )
         }
     }
 }

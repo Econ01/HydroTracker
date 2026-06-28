@@ -35,15 +35,10 @@ import androidx.compose.material3.ToggleFloatingActionButtonDefaults.containerSi
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.animateFloatingActionButton
 import androidx.compose.material3.rememberTooltipState
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -81,7 +76,6 @@ import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
@@ -90,19 +84,9 @@ import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.TAB_SWITCH_DURATION
 import com.cemcakmak.hydrotracker.data.models.NavBarLabelMode
 
-/**
- * Composition local used by SettingsHubScreen to communicate its animated
- * depth-blur value to the common top app bar hosted in MainNavigationScaffold.
- */
-val LocalSettingsHubBlur = compositionLocalOf<MutableState<Dp>> {
-    error("LocalSettingsHubBlur must be provided by MainNavigationScaffold")
-}
-
 private const val NAV_BAR_ENTER_DURATION_MS = 250
 private const val NAV_BAR_EXIT_DURATION_MS = 200
 
-private val topBarEnter = fadeIn(tween(TAB_SWITCH_DURATION)) + slideInVertically { -it }
-private val topBarExit = fadeOut(tween(TAB_SWITCH_DURATION)) + slideOutVertically { -it }
 private val bottomBarEnter = fadeIn(tween(TAB_SWITCH_DURATION)) + slideInVertically { it }
 private val bottomBarExit = fadeOut(tween(TAB_SWITCH_DURATION)) + slideOutVertically { it }
 
@@ -125,7 +109,6 @@ fun MainNavigationScaffold(
         NavigationRoutes.History,
         NavigationRoutes.Settings
     )
-    val shouldShowTopBar = currentKey == NavigationRoutes.History || currentKey == NavigationRoutes.Settings
 
     // Auto-hide on scroll: hide on scrolling down, reveal on scrolling up.
     // This state is shared by the navigation bar (when auto-hide is enabled)
@@ -141,25 +124,6 @@ fun MainNavigationScaffold(
             }
         }
     }
-
-    // Scroll behaviours remembered per route so collapsed state survives tab switches
-    val historyScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
-    val settingsScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
-
-    // Attach the shared auto-hide connection whenever either the nav bar or the
-    // FAB needs it. Under the current rules one of them is always active, so the
-    // connection is attached unconditionally; it only observes deltas and does
-    // not consume scroll events.
-    val nestedScrollModifier = run {
-        val base = when (currentKey) {
-            NavigationRoutes.History -> Modifier.nestedScroll(historyScrollBehavior.nestedScrollConnection)
-            NavigationRoutes.Settings -> Modifier.nestedScroll(settingsScrollBehavior.nestedScrollConnection)
-            else -> Modifier
-        }
-        base.nestedScroll(autoHideConnection)
-    }
-
-    val settingsBlurState = remember { mutableStateOf(0.dp) }
 
     // Pixel height of the navigation bar, captured via onSizeChanged for the FAB offset.
     // Only used for graphicsLayer translation — not for layout constraints — so no feedback loop.
@@ -180,75 +144,48 @@ fun MainNavigationScaffold(
     // only active when the navigation bar itself is not auto-hiding.
     val effectiveFabVisible = fabVisible && (autoHideNavBar || scrollDirectionVisible.value)
 
-    CompositionLocalProvider(LocalSettingsHubBlur provides settingsBlurState) {
-        Scaffold(
-            modifier = nestedScrollModifier,
-            topBar = {
-                AnimatedVisibility(
-                    visible = shouldShowTopBar,
-                    enter = topBarEnter,
-                    exit = topBarExit
-                ) {
-                    MainTabTopAppBar(
-                        titleResId = if (currentKey == NavigationRoutes.History) {
-                            R.string.nav_history
-                        } else {
-                            R.string.nav_settings
+    Scaffold(
+        modifier = Modifier.nestedScroll(autoHideConnection),
+        bottomBar = {
+            AnimatedVisibility(
+                visible = shouldShowBottomBar,
+                enter = bottomBarEnter,
+                exit = bottomBarExit
+            ) {
+                HydroNavigationBar(
+                    modifier = Modifier
+                        .onSizeChanged { barHeightPx.floatValue = it.height.toFloat() }
+                        .graphicsLayer {
+                            translationY = size.height * hideProgress
+                            alpha = 1f - hideProgress
                         },
-                        scrollBehavior = if (currentKey == NavigationRoutes.History) {
-                            historyScrollBehavior
-                        } else {
-                            settingsScrollBehavior
-                        },
-                        blur = if (currentKey == NavigationRoutes.Settings) {
-                            settingsBlurState.value
-                        } else {
-                            0.dp
-                        }
-                    )
-                }
-            },
-            bottomBar = {
-                AnimatedVisibility(
-                    visible = shouldShowBottomBar,
-                    enter = bottomBarEnter,
-                    exit = bottomBarExit
-                ) {
-                    HydroNavigationBar(
-                        modifier = Modifier
-                            .onSizeChanged { barHeightPx.floatValue = it.height.toFloat() }
-                            .graphicsLayer {
-                                translationY = size.height * hideProgress
-                                alpha = 1f - hideProgress
-                            },
-                        currentKey = currentKey,
-                        labelMode = navBarLabelMode,
-                        onTabSwitch = onTabSwitch,
-                        onTabSelected = { key ->
-                            backStack.apply {
-                                clear()
-                                add(key)
-                            }
-                        }
-                    )
-                }
-            },
-            floatingActionButton = {
-                FloatingActionMenuButton(
-                    modifier = Modifier.graphicsLayer {
-                        translationX = 10.dp.toPx()
-                        translationY = barHeightPx.floatValue * hideProgress + 16.dp.toPx()
-                    },
                     currentKey = currentKey,
-                    fabVisible = effectiveFabVisible,
-                    onAddCustomClick = onAddCustomClick,
-                    onAddBeverageClick = onAddBeverageClick,
-                    onAddContainerClick = onAddContainerClick
+                    labelMode = navBarLabelMode,
+                    onTabSwitch = onTabSwitch,
+                    onTabSelected = { key ->
+                        backStack.apply {
+                            clear()
+                            add(key)
+                        }
+                    }
                 )
-            },
-        ) { paddingValues ->
-            content(paddingValues)
+            }
+        },
+        floatingActionButton = {
+            FloatingActionMenuButton(
+                modifier = Modifier.graphicsLayer {
+                    translationX = 10.dp.toPx()
+                    translationY = barHeightPx.floatValue * hideProgress + 16.dp.toPx()
+                },
+                currentKey = currentKey,
+                fabVisible = effectiveFabVisible,
+                onAddCustomClick = onAddCustomClick,
+                onAddBeverageClick = onAddBeverageClick,
+                onAddContainerClick = onAddContainerClick
+            )
         }
+    ) { paddingValues ->
+        content(paddingValues)
     }
 }
 

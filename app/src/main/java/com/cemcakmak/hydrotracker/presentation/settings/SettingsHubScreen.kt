@@ -27,8 +27,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -38,6 +36,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
@@ -52,7 +54,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -68,7 +69,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.compose.ui.res.vectorResource
@@ -86,9 +86,9 @@ import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
 import com.cemcakmak.hydrotracker.data.update.UpdateStatus
 import com.cemcakmak.hydrotracker.presentation.common.LocalNavAnimatedVisibilityScope
-import com.cemcakmak.hydrotracker.presentation.common.LocalSettingsHubBlur
 import com.cemcakmak.hydrotracker.presentation.common.LocalSharedTransitionScope
 import com.cemcakmak.hydrotracker.presentation.common.MainNavigationScaffold
+import com.cemcakmak.hydrotracker.presentation.common.MainTabTopAppBar
 import com.cemcakmak.hydrotracker.presentation.common.NavigationRoutes
 import com.cemcakmak.hydrotracker.presentation.common.effect.backdropSource
 import com.cemcakmak.hydrotracker.presentation.common.effect.rememberBackdropBlurState
@@ -107,7 +107,7 @@ fun SettingsHubScreen(
     updateStatus: UpdateStatus = UpdateStatus.Idle,
     onNavigateTo: (NavigationRoutes) -> Unit = {}
 ) {
-    val settingsBlurState = LocalSettingsHubBlur.current
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
     val isPreview = LocalInspectionMode.current
     val shouldApplyDepth = !isPreview && wasPop
@@ -122,10 +122,6 @@ fun SettingsHubScreen(
         }
     } else {
         remember { mutableStateOf(0.dp) }
-    }
-
-    LaunchedEffect(blur) {
-        settingsBlurState.value = blur
     }
 
     // Depth scrim that clears in sync with the blur as the hub comes forward.
@@ -148,16 +144,6 @@ fun SettingsHubScreen(
         Color.Black
     }
 
-    val layoutDirection = LocalLayoutDirection.current
-    val contentPadding = remember(paddingValues, layoutDirection) {
-        PaddingValues(
-            start = paddingValues.calculateStartPadding(layoutDirection),
-            end = paddingValues.calculateEndPadding(layoutDirection),
-            bottom = 0.dp,
-            top = 0.dp
-        )
-    }
-
     val edgeEffectStyle = themePreferences.edgeEffect.let {
         if (it == EdgeEffect.BLURRED && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             EdgeEffect.TRANSPARENT
@@ -169,126 +155,139 @@ fun SettingsHubScreen(
     // Backdrop captured for the frosted top band
     val backdropState = rememberBackdropBlurState()
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .blur(blur)
-                .then(
-                    if (edgeEffectStyle == EdgeEffect.BLURRED) {
-                        Modifier
-                            .backdropSource(backdropState)
-                            .background(MaterialTheme.colorScheme.surface)
-                    } else {
-                        Modifier
-                    }
-                )
-                .padding(contentPadding)
-                .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+    Scaffold(
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .blur(blur),
+        topBar = {
+            MainTabTopAppBar(
+                titleResId = R.string.nav_settings,
+                scrollBehavior = scrollBehavior
+            )
+        },
+        containerColor = Color.Transparent
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Spacer(modifier = Modifier.height(paddingValues.calculateTopPadding()))
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .then(
+                        if (edgeEffectStyle == EdgeEffect.BLURRED) {
+                            Modifier
+                                .backdropSource(backdropState)
+                                .background(MaterialTheme.colorScheme.surface)
+                        } else {
+                            Modifier
+                        }
+                    )
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Spacer(modifier = Modifier.height(innerPadding.calculateTopPadding()))
 
-            if (userProfile != null) {
-                ProfileSettingsCategoryCard(
-                    userProfile = userProfile,
-                    onNavigateTo = { onNavigateTo(NavigationRoutes.SettingsProfile) }
-                )
-            }
+                if (userProfile != null) {
+                    ProfileSettingsCategoryCard(
+                        userProfile = userProfile,
+                        onNavigateTo = { onNavigateTo(NavigationRoutes.SettingsProfile) }
+                    )
+                }
 
-            val categories = buildList {
-                add(
-                    SettingsCategory(
-                        title = stringResource(R.string.screen_appearance_title),
-                        description = stringResource(R.string.settings_appearance_desc),
-                        icon = { Icon(ImageVector.vectorResource(R.drawable.palette_filled), contentDescription = null) },
-                        route = NavigationRoutes.SettingsAppearance
-                    )
-                )
-                add(
-                    SettingsCategory(
-                        title = stringResource(R.string.screen_display_locale_title),
-                        description = stringResource(R.string.settings_display_desc),
-                        icon = { Icon(ImageVector.vectorResource(R.drawable.event_filled), contentDescription = null) },
-                        route = NavigationRoutes.SettingsDisplay
-                    )
-                )
-                add(
-                    SettingsCategory(
-                        title = stringResource(R.string.screen_hydration_title),
-                        description = stringResource(R.string.settings_hydration_desc),
-                        icon = { Icon(ImageVector.vectorResource(R.drawable.water_filled), contentDescription = null) },
-                        route = NavigationRoutes.SettingsHydration
-                    )
-                )
-                add(
-                    SettingsCategory(
-                        title = stringResource(R.string.screen_quickadd_title),
-                        description = stringResource(R.string.settings_quickadd_desc),
-                        icon = { Icon(ImageVector.vectorResource(R.drawable.checklist_filled), contentDescription = null) },
-                        route = NavigationRoutes.SettingsContainers
-                    )
-                )
-                add(
-                    SettingsCategory(
-                        title = stringResource(R.string.screen_notifications_title),
-                        description = stringResource(R.string.settings_notifications_desc),
-                        icon = { Icon(ImageVector.vectorResource(R.drawable.notifications_filled), contentDescription = null) },
-                        route = NavigationRoutes.SettingsNotifications
-                    )
-                )
-                add(
-                    SettingsCategory(
-                        title = stringResource(R.string.screen_support_title),
-                        description = stringResource(R.string.settings_support_desc),
-                        icon = { Icon(ImageVector.vectorResource(R.drawable.heart_smile_filled), contentDescription = null) },
-                        route = NavigationRoutes.SettingsSupport
-                    )
-                )
-                val isUpdateAvailable = updateStatus is UpdateStatus.Available
-                add(
-                    SettingsCategory(
-                        title = if (isUpdateAvailable) stringResource(R.string.settings_about_update_available) else stringResource(R.string.screen_about_title),
-                        titleColor = if (isUpdateAvailable) MaterialTheme.colorScheme.tertiary else null,
-                        description = stringResource(R.string.settings_about_desc),
-                        icon = { Icon(ImageVector.vectorResource(R.drawable.info_filled), contentDescription = null) },
-                        route = NavigationRoutes.SettingsAbout
-                    )
-                )
-                if (developerOptionsEnabled) {
+                val categories = buildList {
                     add(
                         SettingsCategory(
-                            title = stringResource(R.string.screen_developer_title),
-                            description = stringResource(R.string.settings_developer_desc),
-                            icon = { Icon(ImageVector.vectorResource(R.drawable.code_blocks_filled), contentDescription = null) },
-                            route = NavigationRoutes.SettingsDeveloper
+                            title = stringResource(R.string.screen_appearance_title),
+                            description = stringResource(R.string.settings_appearance_desc),
+                            icon = { Icon(ImageVector.vectorResource(R.drawable.palette_filled), contentDescription = null) },
+                            route = NavigationRoutes.SettingsAppearance
                         )
                     )
-                }
-            }
-
-            Column {
-                categories.forEachIndexed { index, category ->
-                    SettingsCategoryCard(
-                        index = index,
-                        category = category,
-                        totalSize = categories.size,
-                        onNavigateTo = onNavigateTo
+                    add(
+                        SettingsCategory(
+                            title = stringResource(R.string.screen_display_locale_title),
+                            description = stringResource(R.string.settings_display_desc),
+                            icon = { Icon(ImageVector.vectorResource(R.drawable.event_filled), contentDescription = null) },
+                            route = NavigationRoutes.SettingsDisplay
+                        )
                     )
+                    add(
+                        SettingsCategory(
+                            title = stringResource(R.string.screen_hydration_title),
+                            description = stringResource(R.string.settings_hydration_desc),
+                            icon = { Icon(ImageVector.vectorResource(R.drawable.water_filled), contentDescription = null) },
+                            route = NavigationRoutes.SettingsHydration
+                        )
+                    )
+                    add(
+                        SettingsCategory(
+                            title = stringResource(R.string.screen_quickadd_title),
+                            description = stringResource(R.string.settings_quickadd_desc),
+                            icon = { Icon(ImageVector.vectorResource(R.drawable.checklist_filled), contentDescription = null) },
+                            route = NavigationRoutes.SettingsContainers
+                        )
+                    )
+                    add(
+                        SettingsCategory(
+                            title = stringResource(R.string.screen_notifications_title),
+                            description = stringResource(R.string.settings_notifications_desc),
+                            icon = { Icon(ImageVector.vectorResource(R.drawable.notifications_filled), contentDescription = null) },
+                            route = NavigationRoutes.SettingsNotifications
+                        )
+                    )
+                    add(
+                        SettingsCategory(
+                            title = stringResource(R.string.screen_support_title),
+                            description = stringResource(R.string.settings_support_desc),
+                            icon = { Icon(ImageVector.vectorResource(R.drawable.heart_smile_filled), contentDescription = null) },
+                            route = NavigationRoutes.SettingsSupport
+                        )
+                    )
+                    val isUpdateAvailable = updateStatus is UpdateStatus.Available
+                    add(
+                        SettingsCategory(
+                            title = if (isUpdateAvailable) stringResource(R.string.settings_about_update_available) else stringResource(R.string.screen_about_title),
+                            titleColor = if (isUpdateAvailable) MaterialTheme.colorScheme.tertiary else null,
+                            description = stringResource(R.string.settings_about_desc),
+                            icon = { Icon(ImageVector.vectorResource(R.drawable.info_filled), contentDescription = null) },
+                            route = NavigationRoutes.SettingsAbout
+                        )
+                    )
+                    if (developerOptionsEnabled) {
+                        add(
+                            SettingsCategory(
+                                title = stringResource(R.string.screen_developer_title),
+                                description = stringResource(R.string.settings_developer_desc),
+                                icon = { Icon(ImageVector.vectorResource(R.drawable.code_blocks_filled), contentDescription = null) },
+                                route = NavigationRoutes.SettingsDeveloper
+                            )
+                        )
+                    }
                 }
+
+                Column {
+                    categories.forEachIndexed { index, category ->
+                        SettingsCategoryCard(
+                            index = index,
+                            category = category,
+                            totalSize = categories.size,
+                            onNavigateTo = onNavigateTo
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(paddingValues.calculateBottomPadding()))
             }
 
-            Spacer(modifier = Modifier.height(paddingValues.calculateBottomPadding()))
+            TopEdgeEffect(
+                style = edgeEffectStyle,
+                backdropState = backdropState,
+                paddingValues = innerPadding,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
         }
-
-        TopEdgeEffect(
-            style = edgeEffectStyle,
-            backdropState = backdropState,
-            paddingValues = paddingValues,
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
-
+    }
     // Oversized so it still blankets the screen while NavDisplay scales the entry to 0.8,
     // leaving no bright ring. Sits above the hub but inside the incoming entry, so the
     // foreground page stays bright.
@@ -299,7 +298,6 @@ fun SettingsHubScreen(
                 .scale(1.3f)
                 .background(scrimColor.copy(alpha = scrimAlpha))
         )
-    }
     }
 }
 
