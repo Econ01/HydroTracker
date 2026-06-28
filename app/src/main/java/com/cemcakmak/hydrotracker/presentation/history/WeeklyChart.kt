@@ -82,6 +82,7 @@ import com.cemcakmak.hydrotracker.data.database.dao.DailyTotal
 import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
+import com.cemcakmak.hydrotracker.presentation.common.shapes.SquircleShape
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.ui.theme.extendedColorScheme
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
@@ -327,7 +328,7 @@ private fun WeeklyBarChart(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(animatedHeight.dp)
-                                .clip(MaterialTheme.shapes.extraExtraLarge)
+                                .clip(SquircleShape())
                                 .clickable { onBarClick(dayTotal) }
                                 .background(color = barColor)
                         ) {

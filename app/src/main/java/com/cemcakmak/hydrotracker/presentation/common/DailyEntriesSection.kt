@@ -61,6 +61,7 @@ import com.cemcakmak.hydrotracker.data.models.Gender
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.presentation.common.dialogs.DailyEntryDeleteDialog
+import com.cemcakmak.hydrotracker.presentation.common.shapes.PillShape
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.utils.ContainerIconMapper
 import kotlin.time.Duration.Companion.milliseconds
@@ -292,7 +293,7 @@ fun DailyEntryItem(
             // Leading icon
             Surface(
                 modifier = Modifier.size(height = 56.dp, width = 34.dp),
-                shape = MaterialTheme.shapes.extraExtraLarge,
+                shape = PillShape,
                 color = if (entry.beverageType != BeverageType.WATER.name) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary
             ) {
                 Box(
@@ -352,7 +353,7 @@ fun DailyEntryItem(
                 verticalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.Top)
             ) {
                 Surface(
-                    shape = MaterialTheme.shapes.extraExtraLarge,
+                    shape = PillShape,
                     color = MaterialTheme.colorScheme.primary
                 ) {
                     Text(

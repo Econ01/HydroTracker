@@ -91,6 +91,8 @@ import com.cemcakmak.hydrotracker.presentation.common.effect.backdropBlur
 import com.cemcakmak.hydrotracker.presentation.common.effect.backdropSource
 import com.cemcakmak.hydrotracker.presentation.common.effect.rememberBackdropBlurState
 import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
+import com.cemcakmak.hydrotracker.presentation.common.shapes.PillShape
+import com.cemcakmak.hydrotracker.presentation.common.shapes.SquircleShape
 import com.cemcakmak.hydrotracker.presentation.common.timeBasedGreeting
 import kotlinx.coroutines.delay
 import java.time.Instant
@@ -549,7 +551,7 @@ fun HomeScreen(
                                 useTertiaryColors = !selectedBeverage.isWater,
                                 modifier = Modifier
                                     .height(150.dp)
-                                    .maskClip(MaterialTheme.shapes.extraLargeIncreased)
+                                    .maskClip(SquircleShape())
                             )
                         } else {
                             // Add button at the end
@@ -561,7 +563,7 @@ fun HomeScreen(
                                 useTertiaryColors = !selectedBeverage.isWater,
                                 modifier = Modifier
                                     .height(150.dp)
-                                    .maskClip(MaterialTheme.shapes.extraLargeIncreased)
+                                    .maskClip(SquircleShape())
                             )
                         }
                     }
@@ -784,7 +786,7 @@ fun CarouselWaterCard(
 
     Box(
         modifier = modifier
-            .clip(MaterialTheme.shapes.extraLargeIncreased)
+            .clip(SquircleShape())
             .background(containerColor)
             .combinedClickable(
                 onClick = onClick,
@@ -872,7 +874,7 @@ fun AddContainerCard(
 
     Box(
         modifier = modifier
-            .clip(MaterialTheme.shapes.extraExtraLarge)
+            .clip(SquircleShape())
             .background(containerColor)
             .clickable { onClick() },
         contentAlignment = Alignment.Center,
@@ -1044,7 +1046,7 @@ private fun EffectiveHydrationCardContent(
         Surface(
             modifier = modifier
                 .widthIn(max = 280.dp),
-            shape = MaterialTheme.shapes.extraLarge,
+            shape = PillShape,
             color = MaterialTheme.colorScheme.tertiaryContainer
         ) {
             Row(

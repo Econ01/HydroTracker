@@ -63,7 +63,7 @@ data class SquircleShape(
      * Convenience constructor that applies the same [cornerSize] to all four corners.
      */
     constructor(
-        cornerSize: CornerSize,
+        cornerSize: CornerSize = DEFAULT_CORNER_SIZE,
         smoothing: Float = DEFAULT_SMOOTHING
     ) : this(
         topStart = cornerSize,
@@ -144,6 +144,8 @@ data class SquircleShape(
     companion object {
         /** Default smoothing value — maximum continuous-curve effect. */
         const val DEFAULT_SMOOTHING = 1f
+
+        val DEFAULT_CORNER_SIZE = CornerSize(40.dp)
 
         private const val MAX_CACHE_SIZE = 8
 
