@@ -7,6 +7,7 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.EaseOutCubic
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -87,8 +88,8 @@ import com.cemcakmak.hydrotracker.data.models.NavBarLabelMode
 private const val NAV_BAR_ENTER_DURATION_MS = 250
 private const val NAV_BAR_EXIT_DURATION_MS = 200
 
-private val bottomBarEnter = fadeIn(tween(TAB_SWITCH_DURATION)) + slideInVertically { it }
-private val bottomBarExit = fadeOut(tween(TAB_SWITCH_DURATION)) + slideOutVertically { it }
+private val bottomBarEnter = fadeIn(tween(TAB_SWITCH_DURATION, easing = EaseOutCubic)) + slideInVertically { it }
+private val bottomBarExit = fadeOut(tween(TAB_SWITCH_DURATION, easing = EaseOutCubic)) + slideOutVertically { it }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
