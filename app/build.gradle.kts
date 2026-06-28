@@ -100,6 +100,9 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.exifinterface)
 
+    // Graphics Shapes (continuous-corner squircle/pill shapes)
+    implementation(libs.androidx.graphics.shapes)
+
     // Compose BOM (Bill of Materials) - Use the latest stable version
     implementation(platform(libs.compose.bom))
 

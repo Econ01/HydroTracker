@@ -17,6 +17,7 @@ room = "2.8.4"
 healthConnect = "1.1.0"
 datastore = "1.2.1"
 exifinterface = "1.4.2"
+graphicsShapes = "1.1.0"
 serializationJson = "1.11.0"
 
 # Testing (JVM/Robolectric)
@@ -66,6 +67,7 @@ app-update-ktx = { module = "com.google.android.play:app-update-ktx", version.re
 # DataStore + Serialization
 androidx-datastore = { group = "androidx.datastore", name = "datastore", version.ref = "datastore" }
 androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterface" }
+androidx-graphics-shapes = { group = "androidx.graphics", name = "graphics-shapes", version.ref = "graphicsShapes" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serializationJson" }
 
 # Testing (JVM/Robolectric)
