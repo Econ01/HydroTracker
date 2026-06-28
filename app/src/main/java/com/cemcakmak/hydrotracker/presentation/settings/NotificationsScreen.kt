@@ -218,7 +218,8 @@ fun NotificationsScreen(
         Box(modifier = Modifier.fillMaxSize().blur(blur)) {
             SettingsDetailScaffold(
                 title = stringResource(R.string.screen_notifications_title),
-                onNavigateBack = onNavigateBack
+                onNavigateBack = onNavigateBack,
+                themePreferences = themePreferences
             ) {
                 // Permission status banner
                 if (!allPermissionsGranted) {

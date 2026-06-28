@@ -192,7 +192,8 @@ fun DeveloperOptionsScreen(
         Box(modifier = Modifier.fillMaxSize().blur(blur)) {
             SettingsDetailScaffold(
                 title = "Developer Options",
-                onNavigateBack = onNavigateBack
+                onNavigateBack = onNavigateBack,
+                themePreferences = themePreferences
             ) {
                 // Device Info
                 DeviceInfoSection(themePreferences = themePreferences)

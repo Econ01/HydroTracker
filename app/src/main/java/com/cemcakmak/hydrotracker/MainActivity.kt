@@ -598,6 +598,7 @@ fun HydroTrackerApp(
                         }
                         entry<NavigationRoutes.SettingsContainers> {
                             QuickAddCustomizationScreen(
+                                themePreferences = themePreferences,
                                 wasPop = quickAddWasPop,
                                 onNavigateToContainerPresets = {
                                     quickAddWasPop = true
@@ -612,6 +613,7 @@ fun HydroTrackerApp(
                         }
                         entry<NavigationRoutes.SettingsContainerPresets> {
                             ContainerPresetsScreen(
+                                themePreferences = themePreferences,
                                 containerPresetRepository = containerPresetRepository,
                                 snackbarHostState = snackbarHostState,
                                 userProfile = userProfile,
@@ -620,6 +622,7 @@ fun HydroTrackerApp(
                         }
                         entry<NavigationRoutes.SettingsBeverageTypes> {
                             BeverageTypesEditScreen(
+                                themePreferences = themePreferences,
                                 userRepository = userRepository,
                                 customBeverageRepository = customBeverageRepository,
                                 onNavigateBack = popBackStack
@@ -691,7 +694,10 @@ fun HydroTrackerApp(
                             )
                         }
                         entry<NavigationRoutes.SettingsLicenses> {
-                            LicensesScreen(onNavigateBack = popBackStack)
+                            LicensesScreen(
+                                themePreferences = themePreferences,
+                                onNavigateBack = popBackStack
+                            )
                         }
                         entry<NavigationRoutes.SettingsDeveloper> {
                             DeveloperOptionsScreen(

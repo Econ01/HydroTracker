@@ -126,7 +126,8 @@ fun HapticsTestScreen(
 
     SettingsDetailScaffold(
         title = "Haptic Feedback Test",
-        onNavigateBack = onNavigateBack
+        onNavigateBack = onNavigateBack,
+        themePreferences = themePreferences
     ) {
 
         DeviceInfoSection(themePreferences = themePreferences)
@@ -280,7 +281,7 @@ private fun DeviceInfoSection(
     }
 
     // Which tier SmartHaptics will actually route to on this device — straight from the engine,
-    // so the readout always matches real behavior. Uses a representative token (Confirm).
+    // so the readout always matches real behaviour. Uses a representative token (Confirm).
     val resolvedTier = remember { SmartHaptics.resolveTierLabel(context) }
 
     Surface(

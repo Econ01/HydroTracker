@@ -75,10 +75,25 @@ import android.content.Context
 import android.os.Build
 import android.view.RoundedCorner
 import android.view.WindowManager
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Brush
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.cemcakmak.hydrotracker.R
+import com.cemcakmak.hydrotracker.data.models.EdgeEffect
+import com.cemcakmak.hydrotracker.data.models.ThemePreferences
+import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurState
+import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurStyle
+import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropProgressive
+import com.cemcakmak.hydrotracker.presentation.common.effect.backdropBlur
+import com.cemcakmak.hydrotracker.presentation.common.effect.backdropSource
+import com.cemcakmak.hydrotracker.presentation.common.effect.rememberBackdropBlurState
 import com.cemcakmak.hydrotracker.presentation.common.groupCorners
 import com.cemcakmak.hydrotracker.presentation.common.getGroupShape
+import com.cemcakmak.hydrotracker.presentation.common.shapes.SquircleShape
 
 /**
  * Shared UI building blocks for the settings sub-screens (Appearance, Display & Locale, …).
@@ -92,6 +107,7 @@ internal fun SettingsDetailScaffold(
     onNavigateBack: () -> Unit,
     paddingValues: PaddingValues = PaddingValues(),
     scrollable: Boolean = true,
+    themePreferences: ThemePreferences = ThemePreferences(),
     content: @Composable ColumnScope.() -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
@@ -136,50 +152,132 @@ internal fun SettingsDetailScaffold(
             }
     }
 
-    Scaffold(
-        modifier = Modifier
-            .padding(paddingValues)
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .clip(RoundedCornerShape(cornerRadius)),
-        topBar = {
-            LargeFlexibleTopAppBar(
-                title = { Text(title) },
-                navigationIcon = {
-                    val collapsedFraction = scrollBehavior.state.collapsedFraction
-                    val buttonWidth = (40 - collapsedFraction * 8).dp
-                    FilledIconButton(
-                        onClick = {
-                            onNavigateBack()
-                            haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                        },
-                        shapes = IconButtonDefaults.shapes(),
-                        colors = IconButtonDefaults.filledIconButtonColors(),
-                        modifier = Modifier.size(width = buttonWidth, height = 40.dp)
-                    ) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.arrow_back_filled),
-                            contentDescription = stringResource(R.string.cd_back)
-                        )
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-                colors = TopAppBarDefaults.topAppBarColors(
-                    scrolledContainerColor = MaterialTheme.colorScheme.surface
+    val edgeEffectStyle = themePreferences.edgeEffect.let {
+        if (it == EdgeEffect.BLURRED && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            EdgeEffect.TRANSPARENT
+        } else {
+            it
+        }
+    }
+
+    // Backdrop captured for the frosted top band
+    val backdropState = rememberBackdropBlurState()
+    var contentPadding by remember { mutableStateOf(PaddingValues()) }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            modifier = Modifier
+                .padding(paddingValues)
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .clip(SquircleShape(CornerSize(cornerRadius))),
+            topBar = {
+                LargeFlexibleTopAppBar(
+                    title = { Text(title) },
+                    navigationIcon = {
+                        val collapsedFraction = scrollBehavior.state.collapsedFraction
+                        val buttonWidth = (40 - collapsedFraction * 8).dp
+                        FilledIconButton(
+                            onClick = {
+                                onNavigateBack()
+                                haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                            },
+                            shapes = IconButtonDefaults.shapes(),
+                            colors = IconButtonDefaults.filledIconButtonColors(),
+                            modifier = Modifier.size(width = buttonWidth, height = 40.dp)
+                        ) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(R.drawable.arrow_back_filled),
+                                contentDescription = stringResource(R.string.cd_back)
+                            )
+                        }
+                    },
+                    scrollBehavior = scrollBehavior,
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        scrolledContainerColor = Color.Transparent
+                    )
                 )
+            }
+        ) { innerPadding ->
+            contentPadding = innerPadding
+            val scrollState = rememberScrollState()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .then(
+                        if (edgeEffectStyle == EdgeEffect.BLURRED) {
+                            Modifier
+                                .backdropSource(backdropState)
+                                .background(MaterialTheme.colorScheme.surface)
+                        } else {
+                            Modifier
+                        }
+                    )
+                    .then(if (scrollable) Modifier.verticalScroll(scrollState) else Modifier)
+                    .padding(horizontal = 16.dp)
+                    .then(if (scrollable) Modifier.padding(bottom = 24.dp) else Modifier),
+                verticalArrangement = if (scrollable) Arrangement.spacedBy(24.dp) else Arrangement.Top,
+            ) {
+                Spacer(modifier = Modifier.height(innerPadding.calculateTopPadding()))
+                content()
+            }
+
+            TopEdgeEffect(
+                style = edgeEffectStyle,
+                backdropState = backdropState,
+                paddingValues = contentPadding,
+                modifier = Modifier.align(Alignment.TopCenter)
             )
         }
-    ) { innerPadding ->
-        val scrollState = rememberScrollState()
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .then(if (scrollable) Modifier.verticalScroll(scrollState) else Modifier)
-                .padding(horizontal = 16.dp)
-                .then(if (scrollable) Modifier.padding(bottom = 24.dp) else Modifier),
-            verticalArrangement = if (scrollable) Arrangement.spacedBy(24.dp) else Arrangement.Top,
-            content = content
-        )
+    }
+}
+
+@Composable
+internal fun TopEdgeEffect(
+    style: EdgeEffect,
+    backdropState: BackdropBlurState,
+    paddingValues: PaddingValues,
+    modifier: Modifier = Modifier
+) {
+    val bandHeight = paddingValues.calculateTopPadding()
+
+    when (style) {
+        EdgeEffect.TRANSPARENT -> Unit
+        EdgeEffect.SCRIM -> {
+            val scrimColor = MaterialTheme.colorScheme.surface
+            Box(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .height(bandHeight + 20.dp)
+                    .drawBehind {
+                        drawRect(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(scrimColor, Color.Transparent)
+                            )
+                        )
+                    }
+            )
+        }
+        EdgeEffect.BLURRED -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Box(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .height(bandHeight)
+                        .backdropBlur(
+                            state = backdropState,
+                            style = BackdropBlurStyle(
+                                blurRadius = 20.dp,
+                                progressive = BackdropProgressive(
+                                    startFraction = 0f,
+                                    endFraction = 1f
+                                ),
+                                tint = MaterialTheme.colorScheme.surface.copy(0.4f)
+                            )
+                        )
+                )
+            }
+        }
     }
 }
 

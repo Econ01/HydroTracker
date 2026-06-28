@@ -103,7 +103,8 @@ fun ReminderIntervalScreen(
 
     SettingsDetailScaffold(
         title = stringResource(R.string.screen_reminder_schedule_title),
-        onNavigateBack = onNavigateBack
+        onNavigateBack = onNavigateBack,
+        themePreferences = themePreferences
     ) {
         if (userProfile != null) {
             val previewText = buildPreviewText(userProfile, themePreferences)

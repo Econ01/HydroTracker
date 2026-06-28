@@ -53,17 +53,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.cemcakmak.hydrotracker.R
+import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 
 /**
- * Lists the open-source licenses of every runtime dependency, from the build-generated
+ * Lists the open-source licences of every runtime dependency, from the build-generated
  * `assets/licenses.json` (produced by the GenerateLicensesTask in app/build.gradle.kts).
  */
 @Composable
 fun LicensesScreen(
+    themePreferences: ThemePreferences = ThemePreferences(),
     onNavigateBack: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -76,7 +78,8 @@ fun LicensesScreen(
     SettingsDetailScaffold(
         title = stringResource(R.string.screen_licenses_title),
         onNavigateBack = onNavigateBack,
-        scrollable = false
+        scrollable = false,
+        themePreferences = themePreferences
     ) {
         val list = licenses
         when {

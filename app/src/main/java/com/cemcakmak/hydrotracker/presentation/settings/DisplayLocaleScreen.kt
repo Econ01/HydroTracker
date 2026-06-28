@@ -78,7 +78,8 @@ fun DisplayLocaleScreen(
 ) {
     SettingsDetailScaffold(
         title = stringResource(R.string.screen_display_locale_title),
-        onNavigateBack = onNavigateBack
+        onNavigateBack = onNavigateBack,
+        themePreferences = themePreferences
     ) {
         TimeFormatSection(
             timeFormat = themePreferences.timeFormat,

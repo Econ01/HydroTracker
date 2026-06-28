@@ -134,7 +134,8 @@ fun AboutScreen(
         Box(modifier = Modifier.fillMaxSize().blur(blur)) {
             SettingsDetailScaffold(
                 title = stringResource(R.string.screen_about_title),
-                onNavigateBack = onNavigateBack
+                onNavigateBack = onNavigateBack,
+                themePreferences = themePreferences
             ) {
                 VersionHero(themePreferences = themePreferences)
 

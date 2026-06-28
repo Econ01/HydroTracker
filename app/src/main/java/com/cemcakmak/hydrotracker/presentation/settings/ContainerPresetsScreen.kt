@@ -46,12 +46,14 @@ import com.cemcakmak.hydrotracker.presentation.common.ReorderableGroupedColumn
 import com.cemcakmak.hydrotracker.presentation.common.showSuccessSnackbar
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import androidx.compose.ui.platform.LocalContext
+import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ContainerPresetsScreen(
+    themePreferences: ThemePreferences = ThemePreferences(),
     containerPresetRepository: ContainerPresetRepository? = null,
     snackbarHostState: SnackbarHostState? = null,
     userProfile: UserProfile? = null,
@@ -81,7 +83,8 @@ fun ContainerPresetsScreen(
         title = stringResource(R.string.container_presets_screen_title),
         onNavigateBack = onNavigateBack,
         paddingValues = paddingValues,
-        scrollable = false
+        scrollable = false,
+        themePreferences = themePreferences
     ) {
         ReorderableGroupedColumn(
             items = presets,

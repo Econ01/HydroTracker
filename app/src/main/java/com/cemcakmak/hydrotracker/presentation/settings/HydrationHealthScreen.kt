@@ -90,7 +90,8 @@ fun HydrationHealthScreen(
 ) {
     SettingsDetailScaffold(
         title = stringResource(R.string.screen_hydration_title),
-        onNavigateBack = onNavigateBack
+        onNavigateBack = onNavigateBack,
+        themePreferences = themePreferences
     ) {
         CalculationStandardSection(
             userProfile = userProfile,

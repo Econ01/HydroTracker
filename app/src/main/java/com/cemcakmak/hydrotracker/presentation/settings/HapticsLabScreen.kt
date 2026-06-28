@@ -72,7 +72,7 @@ import kotlin.math.roundToInt
 /**
  * Developer-only lab for designing primitive compositions live on-device. Lets you add any primitive,
  * adjust its intensity (scale) and the delay before it, chain several together, play the whole chain
- * (or a single step), and copy the result as Kotlin so a dialed-in recipe can be pasted straight into
+ * (or a single step), and copy the result as Kotlin so a dialled-in recipe can be pasted straight into
  * [SmartHaptics.toPrimitiveComposition]. Requires API 31+ and a vibrator with composition support.
  */
 @SuppressLint("NewApi")
@@ -168,7 +168,8 @@ fun HapticsLabScreen(
 
     SettingsDetailScaffold(
         title = "Haptics Primitive Lab",
-        onNavigateBack = onNavigateBack
+        onNavigateBack = onNavigateBack,
+        themePreferences = themePreferences
     ) {
         LabDeviceInfoCard(themePreferences = themePreferences, anySupported = anySupported)
 

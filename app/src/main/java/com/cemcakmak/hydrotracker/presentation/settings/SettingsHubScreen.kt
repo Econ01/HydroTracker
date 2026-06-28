@@ -42,7 +42,6 @@ import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.scale
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -62,8 +61,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -94,10 +91,6 @@ import com.cemcakmak.hydrotracker.presentation.common.LocalSettingsHubBlur
 import com.cemcakmak.hydrotracker.presentation.common.LocalSharedTransitionScope
 import com.cemcakmak.hydrotracker.presentation.common.MainNavigationScaffold
 import com.cemcakmak.hydrotracker.presentation.common.NavigationRoutes
-import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurState
-import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurStyle
-import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropProgressive
-import com.cemcakmak.hydrotracker.presentation.common.effect.backdropBlur
 import com.cemcakmak.hydrotracker.presentation.common.effect.backdropSource
 import com.cemcakmak.hydrotracker.presentation.common.effect.rememberBackdropBlurState
 import com.cemcakmak.hydrotracker.presentation.settings.profile.ProfileAvatar
@@ -186,7 +179,7 @@ fun SettingsHubScreen(
                     if (edgeEffectStyle == EdgeEffect.BLURRED) {
                         Modifier
                             .backdropSource(backdropState)
-                            .background(MaterialTheme.colorScheme.background)
+                            .background(MaterialTheme.colorScheme.surface)
                     } else {
                         Modifier
                     }
@@ -308,55 +301,6 @@ fun SettingsHubScreen(
                 .background(scrimColor.copy(alpha = scrimAlpha))
         )
     }
-    }
-}
-
-@Composable
-private fun TopEdgeEffect(
-    style: EdgeEffect,
-    backdropState: BackdropBlurState,
-    paddingValues: PaddingValues,
-    modifier: Modifier = Modifier
-) {
-    val bandHeight = paddingValues.calculateTopPadding()
-
-    when (style) {
-        EdgeEffect.TRANSPARENT -> Unit
-        EdgeEffect.SCRIM -> {
-            val scrimColor = MaterialTheme.colorScheme.surface
-            Box(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .height(bandHeight + 20.dp)
-                    .drawBehind {
-                        drawRect(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(scrimColor, Color.Transparent)
-                            )
-                        )
-                    }
-            )
-        }
-        EdgeEffect.BLURRED -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                Box(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .height(bandHeight)
-                        .backdropBlur(
-                            state = backdropState,
-                            style = BackdropBlurStyle(
-                                blurRadius = 20.dp,
-                                progressive = BackdropProgressive(
-                                    startFraction = 0f,
-                                    endFraction = 1f
-                                ),
-                                tint = MaterialTheme.colorScheme.surface.copy(0.4f)
-                            )
-                        )
-                )
-            }
-        }
     }
 }
 

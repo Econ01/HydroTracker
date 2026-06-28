@@ -105,7 +105,8 @@ fun ProfileSettingsScreen(
 
     SettingsDetailScaffold(
         title = stringResource(R.string.nav_profile),
-        onNavigateBack = onNavigateBack
+        onNavigateBack = onNavigateBack,
+        themePreferences = themePreferences
     ) {
         ProfileHeroPreview(
             userProfile = userProfile,

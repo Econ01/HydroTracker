@@ -61,11 +61,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.cemcakmak.hydrotracker.R
+import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuickAddCustomizationScreen(
+    themePreferences: ThemePreferences = ThemePreferences(),
     wasPop: Boolean = false,
     onNavigateToContainerPresets: () -> Unit = {},
     onNavigateToBeverageTypes: () -> Unit = {},
@@ -109,7 +111,8 @@ fun QuickAddCustomizationScreen(
         Box(modifier = Modifier.fillMaxSize().blur(blur)) {
             SettingsDetailScaffold(
                 title = stringResource(R.string.screen_quickadd_title),
-                onNavigateBack = onNavigateBack
+                onNavigateBack = onNavigateBack,
+                themePreferences = themePreferences
             ) {
                 Column(
                     modifier = Modifier.padding(top = 24.dp),

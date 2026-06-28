@@ -170,7 +170,11 @@ private fun UpdatesContent(
     onCompleteInstall: () -> Unit,
     onPrimaryAction: (UpdateStatus.Available) -> Unit
 ) {
-    SettingsDetailScaffold(title = stringResource(R.string.screen_updates_title), onNavigateBack = onNavigateBack) {
+    SettingsDetailScaffold(
+        title = stringResource(R.string.screen_updates_title),
+        onNavigateBack = onNavigateBack,
+        themePreferences = themePreferences
+    ) {
         VersionInfo(
             themePreferences = themePreferences,
             installSource = installSource

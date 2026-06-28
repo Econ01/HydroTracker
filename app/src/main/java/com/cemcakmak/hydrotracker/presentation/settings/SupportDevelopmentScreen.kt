@@ -77,7 +77,8 @@ fun SupportDevelopmentScreen(
 
     SettingsDetailScaffold(
         title = stringResource(R.string.screen_support_title),
-        onNavigateBack = onNavigateBack
+        onNavigateBack = onNavigateBack,
+        themePreferences = themePreferences
     ) {
         SupportHeroCard(themePreferences = themePreferences)
 

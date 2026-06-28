@@ -94,7 +94,8 @@ fun AppearanceScreen(
 
     SettingsDetailScaffold(
         title = stringResource(R.string.screen_appearance_title),
-        onNavigateBack = onNavigateBack
+        onNavigateBack = onNavigateBack,
+        themePreferences = themePreferences
     ) {
         ThemePreviewCard(themePreferences = themePreferences)
 

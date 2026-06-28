@@ -39,6 +39,7 @@ import com.cemcakmak.hydrotracker.data.database.entities.CustomBeverageEntity
 import com.cemcakmak.hydrotracker.data.database.repository.CustomBeverageRepository
 import com.cemcakmak.hydrotracker.data.models.BeveragePreferences
 import com.cemcakmak.hydrotracker.data.models.BeverageType
+import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
 import com.cemcakmak.hydrotracker.presentation.common.sheets.AddCustomBeverageBottomSheet
 import com.cemcakmak.hydrotracker.presentation.common.sheets.BeverageIcons
@@ -87,6 +88,7 @@ private fun buildHiddenPresets(prefs: BeveragePreferences): List<BeverageType> =
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun BeverageTypesEditScreen(
+    themePreferences: ThemePreferences = ThemePreferences(),
     userRepository: UserRepository? = null,
     customBeverageRepository: CustomBeverageRepository? = null,
     onNavigateBack: () -> Unit = {},
@@ -133,7 +135,8 @@ fun BeverageTypesEditScreen(
         title = stringResource(R.string.screen_beverage_types_title),
         onNavigateBack = onNavigateBack,
         paddingValues = paddingValues,
-        scrollable = false
+        scrollable = false,
+        themePreferences = themePreferences
     ) {
         ReorderableGroupedColumn(
             items = allItems,
