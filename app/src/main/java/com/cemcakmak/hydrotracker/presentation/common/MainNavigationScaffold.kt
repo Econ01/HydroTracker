@@ -27,7 +27,6 @@ import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShortNavigationBar
 import androidx.compose.material3.ShortNavigationBarItem
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.material3.ToggleFloatingActionButtonDefaults.animateIcon
@@ -112,7 +111,6 @@ private val bottomBarExit = fadeOut(tween(TAB_SWITCH_DURATION)) + slideOutVertic
 fun MainNavigationScaffold(
     backStack: NavBackStack<NavKey>,
     currentKey: NavigationRoutes,
-    snackbarHostState: SnackbarHostState,
     isHistoryDaySelected: Boolean = false,
     onAddCustomClick: () -> Unit = {},
     onAddBeverageClick: () -> Unit = {},
@@ -248,7 +246,6 @@ fun MainNavigationScaffold(
                     onAddContainerClick = onAddContainerClick
                 )
             },
-            snackbarHost = { HydroSnackbarHost(snackbarHostState) }
         ) { paddingValues ->
             content(paddingValues)
         }
@@ -514,7 +511,6 @@ fun MainNavigationScaffoldPreview() {
     MainNavigationScaffold(
         backStack = backStack,
         currentKey = NavigationRoutes.Home,
-        snackbarHostState = remember { SnackbarHostState() },
         content = { _ ->
             Text(text = "Sample Content")
         }

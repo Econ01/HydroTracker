@@ -43,7 +43,7 @@ import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.presentation.common.sheets.AddContainerPresetBottomSheet
 import com.cemcakmak.hydrotracker.presentation.common.sheets.EditContainerPresetBottomSheet
 import com.cemcakmak.hydrotracker.presentation.common.ReorderableGroupedColumn
-import com.cemcakmak.hydrotracker.presentation.common.showSuccessSnackbar
+import android.widget.Toast
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import androidx.compose.ui.platform.LocalContext
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
@@ -55,7 +55,6 @@ import kotlinx.coroutines.launch
 fun ContainerPresetsScreen(
     themePreferences: ThemePreferences = ThemePreferences(),
     containerPresetRepository: ContainerPresetRepository? = null,
-    snackbarHostState: SnackbarHostState? = null,
     userProfile: UserProfile? = null,
     onNavigateBack: () -> Unit = {},
     paddingValues: PaddingValues = PaddingValues()
@@ -145,7 +144,11 @@ fun ContainerPresetsScreen(
                 containerPresetRepository?.let { repo ->
                     coroutineScope.launch {
                         repo.addPreset(name, volume, iconType, iconName)
-                        snackbarHostState?.showSuccessSnackbar(message = containerAddedTemplate.format(name))
+                        Toast.makeText(
+                            context,
+                            containerAddedTemplate.format(name),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
@@ -167,7 +170,11 @@ fun ContainerPresetsScreen(
                     containerPresetRepository?.let { repo ->
                         coroutineScope.launch {
                             repo.updatePreset(target.id, name, volume, iconType, iconName)
-                            snackbarHostState?.showSuccessSnackbar(message = containerUpdatedTemplate.format(name))
+                            Toast.makeText(
+                                context,
+                                containerUpdatedTemplate.format(name),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 },
@@ -177,7 +184,11 @@ fun ContainerPresetsScreen(
                     containerPresetRepository?.let { repo ->
                         coroutineScope.launch {
                             repo.deletePreset(target.id)
-                            snackbarHostState?.showSuccessSnackbar(message = containerDeletedTemplate.format(target.name))
+                            Toast.makeText(
+                                context,
+                                containerDeletedTemplate.format(target.name),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 }
@@ -205,7 +216,11 @@ fun ContainerPresetsScreen(
                         containerPresetRepository?.let { repo ->
                             coroutineScope.launch {
                                 repo.resetToDefaults()
-                                snackbarHostState?.showSuccessSnackbar(message = containerResetDone)
+                                Toast.makeText(
+                                    context,
+                                    containerResetDone,
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
                     }

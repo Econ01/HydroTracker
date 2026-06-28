@@ -296,7 +296,6 @@ fun HydroTrackerApp(
                 NavigationRoutes.Home else NavigationRoutes.Onboarding
             val backStack = rememberNavBackStack(startKey)
             val currentKey = backStack.lastOrNull() as? NavigationRoutes ?: startKey
-            val snackbarHostState = remember { SnackbarHostState() }
 
             // Shared onboarding ViewModel so the cropper can update it.
             val onboardingViewModel: OnboardingViewModel = viewModel(
@@ -364,7 +363,6 @@ fun HydroTrackerApp(
             MainNavigationScaffold(
                 backStack = backStack,
                 currentKey = currentKey,
-                snackbarHostState = snackbarHostState,
                 isHistoryDaySelected = historyUiState.selectedDate != null,
                 onAddCustomClick = {
                     when (currentKey) {
@@ -481,7 +479,6 @@ fun HydroTrackerApp(
                                     containerPresetRepository = containerPresetRepository,
                                     activeBeverages = activeBeverages,
                                     paddingValues = paddingValues,
-                                    snackbarHostState = snackbarHostState,
                                     showCustomDialog = homeShowCustomDialog,
                                     onCustomDialogChange = { homeShowCustomDialog = it }
                                 )
@@ -570,7 +567,6 @@ fun HydroTrackerApp(
                                 userProfile = userProfile,
                                 userRepository = userRepository,
                                 waterIntakeRepository = waterIntakeRepository,
-                                snackbarHostState = snackbarHostState,
                                 healthConnectPermissionLauncher = healthConnectPermissionLauncher,
                                 themePreferences = themePreferences,
                                 onHydrationStandardChange = { newStandard ->
@@ -615,7 +611,6 @@ fun HydroTrackerApp(
                             ContainerPresetsScreen(
                                 themePreferences = themePreferences,
                                 containerPresetRepository = containerPresetRepository,
-                                snackbarHostState = snackbarHostState,
                                 userProfile = userProfile,
                                 onNavigateBack = popBackStack
                             )

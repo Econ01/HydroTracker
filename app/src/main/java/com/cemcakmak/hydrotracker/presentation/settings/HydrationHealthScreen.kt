@@ -23,6 +23,7 @@ package com.cemcakmak.hydrotracker.presentation.settings
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.animation.Crossfade
@@ -81,7 +82,6 @@ fun HydrationHealthScreen(
     userProfile: UserProfile? = null,
     userRepository: UserRepository? = null,
     waterIntakeRepository: WaterIntakeRepository? = null,
-    snackbarHostState: SnackbarHostState? = null,
     healthConnectPermissionLauncher: ActivityResultLauncher<Set<String>>? = null,
     themePreferences: ThemePreferences = ThemePreferences(),
     onHydrationStandardChange: (HydrationStandard) -> Unit = {},
@@ -105,7 +105,6 @@ fun HydrationHealthScreen(
                 userProfile = userProfile,
                 userRepository = userRepository,
                 waterIntakeRepository = waterIntakeRepository,
-                snackbarHostState = snackbarHostState,
                 themePreferences = themePreferences,
                 onHealthConnectSyncChange = onHealthConnectSyncChange
             )
@@ -312,7 +311,6 @@ private fun HealthConnectSection(
     userProfile: UserProfile?,
     userRepository: UserRepository?,
     waterIntakeRepository: WaterIntakeRepository?,
-    snackbarHostState: SnackbarHostState?,
     themePreferences: ThemePreferences = ThemePreferences(),
     onHealthConnectSyncChange: (Boolean) -> Unit
 ) {
@@ -555,9 +553,11 @@ private fun HealthConnectSection(
                     coroutineScope.launch {
                         isRestoring = false
                         showRestoreDialog = false
-                        snackbarHostState?.showSnackbar(
-                            hcRestoredTemplate.format(imported, skipped)
-                        )
+                        Toast.makeText(
+                            context,
+                            hcRestoredTemplate.format(imported, skipped),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             },

@@ -57,11 +57,9 @@ import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
 import com.cemcakmak.hydrotracker.utils.UserDayCalculator
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
-import com.cemcakmak.hydrotracker.utils.WaterCalculator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
-import com.cemcakmak.hydrotracker.presentation.common.showSuccessSnackbar
-import com.cemcakmak.hydrotracker.presentation.common.showErrorSnackbar
+import android.widget.Toast
 import com.cemcakmak.hydrotracker.presentation.common.sheets.AddContainerPresetBottomSheet
 import com.cemcakmak.hydrotracker.presentation.common.sheets.EditContainerPresetBottomSheet
 import com.cemcakmak.hydrotracker.presentation.common.BeverageOption
@@ -110,7 +108,6 @@ fun HomeScreen(
     containerPresetRepository: ContainerPresetRepository,
     activeBeverages: List<BeverageOption> = BeverageType.getAllSorted().map { it.toOption() },
     paddingValues: PaddingValues,
-    snackbarHostState: SnackbarHostState,
     showCustomDialog: Boolean = false,
     onCustomDialogChange: (Boolean) -> Unit = {}
 ) {
@@ -173,17 +170,9 @@ fun HomeScreen(
     var isRefreshing by remember { mutableStateOf(false) }
     val pullToRefreshState = rememberPullToRefreshState()
 
-    // Resolved message templates for snackbars launched from coroutines.
-    val selectedBeverageLabel = if (selectedBeverage.hasLabelRes) {
-        stringResource(selectedBeverage.labelResId)
-    } else {
-        selectedBeverage.displayName
-    }
-    val addedMessageTemplate = stringResource(R.string.home_snackbar_added)
+    // Message templates for toast feedback on failure or important confirmations.
     val addFailedMessageTemplate = stringResource(R.string.home_snackbar_add_failed)
-    val deletedMessageTemplate = stringResource(R.string.home_snackbar_deleted)
     val deleteFailedMessageTemplate = stringResource(R.string.home_snackbar_delete_failed)
-    val updatedMessageTemplate = stringResource(R.string.home_snackbar_updated)
     val updateFailedMessageTemplate = stringResource(R.string.home_snackbar_update_failed)
     val syncedMessageTemplate = stringResource(R.string.home_snackbar_synced)
     val syncErrorsMessageTemplate = stringResource(R.string.home_snackbar_sync_errors)
@@ -213,21 +202,13 @@ fun HomeScreen(
             )
 
             result.onSuccess {
-                val beverageInfo = if (!selectedBeverage.isWater) {
-                    " $selectedBeverageLabel"
-                } else {
-                    ""
-                }
-                snackbarHostState.showSuccessSnackbar(
-                    message = addedMessageTemplate.format(
-                        WaterCalculator.formatWaterAmount(context, amount, userProfile.volumeUnit),
-                        beverageInfo
-                    )
-                )
+                // No success toast; the updated UI provides enough feedback.
             }.onFailure { error ->
-                snackbarHostState.showErrorSnackbar(
-                    message = addFailedMessageTemplate.format(error.message ?: "")
-                )
+                Toast.makeText(
+                    context,
+                    addFailedMessageTemplate.format(error.message ?: ""),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -238,15 +219,13 @@ fun HomeScreen(
             val result = waterIntakeRepository.deleteWaterIntake(entry)
             
             result.onSuccess {
-                snackbarHostState.showSuccessSnackbar(
-                    message = deletedMessageTemplate.format(
-                        entry.getFormattedAmount(context, userProfile.volumeUnit)
-                    )
-                )
+                // No success toast; the updated UI provides enough feedback.
             }.onFailure { error ->
-                snackbarHostState.showErrorSnackbar(
-                    message = deleteFailedMessageTemplate.format(error.message ?: "")
-                )
+                Toast.makeText(
+                    context,
+                    deleteFailedMessageTemplate.format(error.message ?: ""),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -257,15 +236,13 @@ fun HomeScreen(
             val result = waterIntakeRepository.updateWaterIntake(oldEntry, newEntry)
 
             result.onSuccess {
-                snackbarHostState.showSuccessSnackbar(
-                    message = updatedMessageTemplate.format(
-                        newEntry.getFormattedAmount(context, userProfile.volumeUnit)
-                    )
-                )
+                // No success toast; the updated UI provides enough feedback.
             }.onFailure { error ->
-                snackbarHostState.showErrorSnackbar(
-                    message = updateFailedMessageTemplate.format(error.message ?: "")
-                )
+                Toast.makeText(
+                    context,
+                    updateFailedMessageTemplate.format(error.message ?: ""),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -286,19 +263,25 @@ fun HomeScreen(
 
                             when {
                                 imported > 0 -> {
-                                    snackbarHostState.showSuccessSnackbar(
-                                        message = syncedMessageTemplate.format(imported)
-                                    )
+                                    Toast.makeText(
+                                        context,
+                                        syncedMessageTemplate.format(imported),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                                 errors > 0 -> {
-                                    snackbarHostState.showErrorSnackbar(
-                                        message = syncErrorsMessageTemplate.format(errors)
-                                    )
+                                    Toast.makeText(
+                                        context,
+                                        syncErrorsMessageTemplate.format(errors),
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                 }
                                 else -> {
-                                    snackbarHostState.showSuccessSnackbar(
-                                        message = upToDateMessage
-                                    )
+                                    Toast.makeText(
+                                        context,
+                                        upToDateMessage,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                             }
                             isRefreshing = false
@@ -307,9 +290,11 @@ fun HomeScreen(
                 } catch (e: Exception) {
                     // Show loading for at least 1.5 seconds even on error
                     delay(1500.milliseconds)
-                    snackbarHostState.showErrorSnackbar(
-                        message = syncFailedMessageTemplate.format(e.message ?: "")
-                    )
+                    Toast.makeText(
+                        context,
+                        syncFailedMessageTemplate.format(e.message ?: ""),
+                        Toast.LENGTH_LONG
+                    ).show()
                     isRefreshing = false
                 }
             }
@@ -656,9 +641,11 @@ fun HomeScreen(
                 coroutineScope.launch {
                     containerPresetRepository.addPreset(name, volume, iconType, iconName)
                     showAddPresetSheet = false
-                    snackbarHostState.showSuccessSnackbar(
-                        message = containerAddedTemplate.format(name)
-                    )
+                    Toast.makeText(
+                        context,
+                        containerAddedTemplate.format(name),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         )
@@ -678,9 +665,11 @@ fun HomeScreen(
                     containerPresetRepository.updatePreset(presetToEdit!!.id, name, volume, iconType, iconName)
                     showEditPresetSheet = false
                     presetToEdit = null
-                    snackbarHostState.showSuccessSnackbar(
-                        message = containerUpdatedTemplate.format(name)
-                    )
+                    Toast.makeText(
+                        context,
+                        containerUpdatedTemplate.format(name),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             },
             onDelete = {
@@ -689,9 +678,11 @@ fun HomeScreen(
                     containerPresetRepository.deletePreset(presetToEdit!!.id)
                     showEditPresetSheet = false
                     presetToEdit = null
-                    snackbarHostState.showSuccessSnackbar(
-                        message = containerDeletedTemplate.format(deletedName)
-                    )
+                    Toast.makeText(
+                        context,
+                        containerDeletedTemplate.format(deletedName),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         )
@@ -1263,8 +1254,7 @@ private fun HomeScreenPreview() {
             themePreferences = ThemePreferences(),
             waterIntakeRepository = waterRepository,
             containerPresetRepository = containerRepository,
-            paddingValues = PaddingValues(0.dp),
-            snackbarHostState = SnackbarHostState()
+            paddingValues = PaddingValues(0.dp)
         )
     }
 }

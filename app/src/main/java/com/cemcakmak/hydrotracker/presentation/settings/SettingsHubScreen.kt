@@ -49,7 +49,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -426,12 +425,10 @@ fun SettingsHubInteractivePreview() {
 
         if (selectedRoute == null) {
             val backStack = rememberNavBackStack(NavigationRoutes.Settings)
-            val snackbarHostState = remember { SnackbarHostState() }
 
             MainNavigationScaffold(
                 backStack = backStack,
                 currentKey = NavigationRoutes.Settings,
-                snackbarHostState = snackbarHostState,
                 content = { paddingValues ->
                     SettingsHubScreen(
                         userProfile = UserProfile(

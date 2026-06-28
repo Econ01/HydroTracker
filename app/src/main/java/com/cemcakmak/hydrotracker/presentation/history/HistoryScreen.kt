@@ -756,12 +756,10 @@ private fun HistoryScreenPreview() {
 
     HydroTrackerTheme {
         val backStack = rememberNavBackStack(NavigationRoutes.History)
-        val snackbarHostState = remember { SnackbarHostState() }
 
         MainNavigationScaffold(
             backStack = backStack,
             currentKey = NavigationRoutes.History,
-            snackbarHostState = snackbarHostState,
             content = { paddingValues ->
                 HistoryScreen(
                     uiState = uiState,
