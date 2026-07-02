@@ -4,7 +4,6 @@
 package com.cemcakmak.hydrotracker.presentation.common
 
 import androidx.activity.compose.BackHandler
-import kotlinx.coroutines.delay
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
@@ -31,13 +30,13 @@ import androidx.compose.material3.ShortNavigationBar
 import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleFloatingActionButton
+import androidx.compose.material3.ToggleFloatingActionButtonDefaults
 import androidx.compose.material3.ToggleFloatingActionButtonDefaults.animateIcon
 import androidx.compose.material3.ToggleFloatingActionButtonDefaults.containerCornerRadius
 import androidx.compose.material3.ToggleFloatingActionButtonDefaults.containerSize
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
-import androidx.compose.material3.animateFloatingActionButton
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -52,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -85,7 +85,6 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.TAB_SWITCH_DURATION
 import com.cemcakmak.hydrotracker.data.models.NavBarLabelMode
-import kotlin.time.Duration.Companion.milliseconds
 
 private const val NAV_BAR_ENTER_DURATION_MS = 250
 private const val NAV_BAR_EXIT_DURATION_MS = 200
@@ -147,16 +146,6 @@ fun MainNavigationScaffold(
     // only active when the navigation bar itself is not auto-hiding.
     val effectiveFabVisible = fabVisible && (autoHideNavBar || scrollDirectionVisible.value)
 
-    var fabInteractive by remember { mutableStateOf(effectiveFabVisible) }
-    LaunchedEffect(effectiveFabVisible) {
-        if (effectiveFabVisible) {
-            fabInteractive = true
-        } else {
-            delay(300.milliseconds) // Wait for the built-in animateFloatingActionButton scale/alpha to finish
-            fabInteractive = false
-        }
-    }
-
     Scaffold(
         modifier = Modifier.nestedScroll(autoHideConnection),
         bottomBar = {
@@ -190,8 +179,7 @@ fun MainNavigationScaffold(
                     .graphicsLayer {
                         translationX = 10.dp.toPx()
                         translationY = barHeightPx.floatValue * hideProgress + 16.dp.toPx()
-                    }
-                    .then(if (!fabInteractive) Modifier.size(0.dp) else Modifier),
+                    },
                 currentKey = currentKey,
                 fabVisible = effectiveFabVisible,
                 onAddCustomClick = onAddCustomClick,
@@ -255,10 +243,30 @@ fun FloatingActionMenuButton(
         if (!fabVisible) fabMenuExpanded = false
     }
 
-    FloatingActionButtonMenu(
-        modifier = modifier,
-        expanded = fabMenuExpanded,
-        button = {
+    var isFabInComposition by remember { mutableStateOf(fabVisible) }
+    val fabScale by animateFloatAsState(
+        targetValue = if (fabVisible || fabMenuExpanded) 1f else 0f,
+        animationSpec = MaterialTheme.motionScheme.slowSpatialSpec(),
+        finishedListener = { scale ->
+            if (scale == 0f) isFabInComposition = false
+        },
+        label = "fabScale"
+    )
+
+    LaunchedEffect(fabVisible, fabMenuExpanded) {
+        if (fabVisible || fabMenuExpanded) isFabInComposition = true
+    }
+
+    if (isFabInComposition) {
+        FloatingActionButtonMenu(
+            modifier = modifier.graphicsLayer {
+                scaleX = fabScale
+                scaleY = fabScale
+                alpha = fabScale
+                transformOrigin = TransformOrigin(1f, 1f)
+            },
+            expanded = fabMenuExpanded,
+            button = {
             TooltipBox(
                 positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
                     if (fabMenuExpanded) {
@@ -286,13 +294,10 @@ fun FloatingActionMenuButton(
                             stateDescription = toggleMenuLabel
                             contentDescription = toggleMenuLabel
                         }
-                        .animateFloatingActionButton(
-                            visible = fabVisible || fabMenuExpanded,
-                            alignment = Alignment.BottomEnd
-                        )
                         .focusRequester(focusRequester),
-                    containerSize = containerSize(80.dp, 55.dp),
-                    containerCornerRadius = containerCornerRadius(24.dp, 55.dp),
+                    contentAlignment = Alignment.TopEnd,
+                    containerSize = containerSize(80.dp, 60.dp),
+                    containerCornerRadius = containerCornerRadius(24.dp, 30.dp),
                     checked = fabMenuExpanded,
                     onCheckedChange = {
                         haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
@@ -307,7 +312,14 @@ fun FloatingActionMenuButton(
                     Icon(
                         painter = rememberVectorPainter(imageVector),
                         contentDescription = null,
-                        modifier = Modifier.animateIcon({ checkedProgress })
+                        modifier = Modifier
+                            .graphicsLayer {
+                                rotationZ = checkedProgress * 180f
+                            }
+                            .animateIcon(
+                                checkedProgress = { checkedProgress },
+                                size = ToggleFloatingActionButtonDefaults.iconSize(28.dp, 24.dp)
+                            ),
                     )
                 }
             }
@@ -356,6 +368,7 @@ fun FloatingActionMenuButton(
                 text = { Text(text = stringResource(item.labelResId)) }
             )
         }
+    }
     }
 }
 
