@@ -45,6 +45,10 @@ class UserRepository(context: Context) {
         dataStore.updateData { it.copy(beverages = beveragePreferences) }
     }
 
+    suspend fun updateHapticsEnabled(enabled: Boolean) {
+        dataStore.updateData { it.copy(hapticsEnabled = enabled) }
+    }
+
     /** Resets all preferences (profile, theme, beverages) back to defaults. */
     suspend fun clearUserProfile() {
         dataStore.updateData { AppPreferences() }

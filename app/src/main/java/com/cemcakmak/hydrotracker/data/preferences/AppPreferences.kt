@@ -21,4 +21,5 @@ data class AppPreferences(
     val profile: UserProfile? = null,
     val theme: ThemePreferences = ThemePreferences(),
     val beverages: BeveragePreferences = BeveragePreferences.default(),
+    val hapticsEnabled: Boolean = true,
 )

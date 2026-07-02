@@ -32,8 +32,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -77,6 +75,8 @@ import com.cemcakmak.hydrotracker.ui.theme.fontFamilyFor
 @Composable
 fun AppearanceScreen(
     themePreferences: ThemePreferences = ThemePreferences(),
+    isHapticsEnabled: Boolean = true,
+    onHapticsEnabledChange: (Boolean) -> Unit = {},
     isDynamicColorAvailable: Boolean = true,
     onColorSourceChange: (ColorSource) -> Unit = {},
     onDarkModeChange: (DarkModePreference) -> Unit = {},
@@ -122,6 +122,11 @@ fun AppearanceScreen(
             edgeEffect = themePreferences.edgeEffect,
             isBlurSupported = isBlurSupported,
             onOpenEdgeEffectSheet = { showEdgeEffectSheet = true }
+        )
+
+        FeedbackSection(
+            isHapticsEnabled = isHapticsEnabled,
+            onHapticsEnabledChange = onHapticsEnabledChange
         )
 
         FontSection(
@@ -354,8 +359,7 @@ private fun DynamicColorsRow(
         ) {
             Text(
                 text = stringResource(R.string.color_source_dynamic),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                style = MaterialTheme.typography.titleMedium
             )
             Text(
                 text = stringResource(R.string.color_source_dynamic_desc),
@@ -416,8 +420,7 @@ private fun AmoledRow(
         ) {
             Text(
                 text = stringResource(R.string.appearance_amoled_title),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                style = MaterialTheme.typography.titleMedium
             )
             Text(
                 text = stringResource(R.string.appearance_amoled_desc),
@@ -443,95 +446,6 @@ private fun AmoledRow(
                 null
             }
         )
-    }
-}
-
-@Composable
-private fun FontSection(
-    selectedFont: AppFont,
-    onOpenFontSheet: () -> Unit
-) {
-    val haptics = LocalHapticFeedback.current
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        SettingsSectionHeader(stringResource(R.string.appearance_font_header))
-        SettingsGroupCard(
-            index = 0,
-            size = 1,
-            onClick = {
-                haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                onOpenFontSheet()
-            }
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.font_filled),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
-                Text(
-                    text = stringResource(selectedFont.labelResId),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontFamily = fontFamilyFor(selectedFont),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f)
-                )
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun FontBottomSheet(
-    selectedFont: AppFont,
-    onAppFontChange: (AppFont) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
-    val haptics = LocalHapticFeedback.current
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(top = 8.dp, bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            val fonts = AppFont.entries
-            fonts.forEachIndexed { index, font ->
-                SelectableOptionCard(
-                    index = index,
-                    size = fonts.size,
-                    selected = font == selectedFont,
-                    onClick = {
-                        onAppFontChange(font)
-                        haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
-                    }
-                ) { contentColor ->
-                    Text(
-                        text = stringResource(font.labelResId),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontFamily = fontFamilyFor(font),
-                        color = contentColor
-                    )
-                }
-            }
-        }
     }
 }
 
@@ -570,8 +484,7 @@ private fun NavigationBarSection(
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = stringResource(R.string.appearance_autohide_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            style = MaterialTheme.typography.titleMedium
                         )
                         Text(
                             text = stringResource(R.string.appearance_autohide_desc),
@@ -630,8 +543,7 @@ private fun NavigationBarSection(
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = stringResource(R.string.appearance_labels_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            style = MaterialTheme.typography.titleMedium
                         )
                         Text(
                             text = stringResource(labelMode.labelResId),
@@ -640,7 +552,7 @@ private fun NavigationBarSection(
                         )
                     }
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        imageVector = ImageVector.vectorResource(R.drawable.keyboard_arrow_up_filled),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -732,8 +644,7 @@ private fun HomeScreenSection(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = stringResource(R.string.appearance_edge_effect_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface
+                        style = MaterialTheme.typography.titleMedium
                     )
                     Text(
                         text = stringResource(effective.labelResId),
@@ -742,7 +653,7 @@ private fun HomeScreenSection(
                     )
                 }
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    imageVector = ImageVector.vectorResource(R.drawable.keyboard_arrow_up_filled),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -792,6 +703,162 @@ private fun EdgeEffectBottomSheet(
                     Text(
                         text = stringResource(mode.labelResId),
                         style = MaterialTheme.typography.bodyLarge,
+                        color = contentColor
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FeedbackSection(
+    isHapticsEnabled: Boolean,
+    onHapticsEnabledChange: (Boolean) -> Unit
+) {
+    val haptics = LocalHapticFeedback.current
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        SettingsSectionHeader(stringResource(R.string.appearance_feedback_header))
+        SettingsGroupCard(index = 0, size = 1) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Crossfade(
+                    targetState = isHapticsEnabled,
+                    animationSpec = tween(400),
+                    label = "hapticsIcon"
+                ) { on ->
+                    Icon(
+                        imageVector = if (on) ImageVector.vectorResource(R.drawable.mobile_vibrate_filled) else ImageVector.vectorResource(R.drawable.mobile_vibrate),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.appearance_haptics_title),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = stringResource(R.string.appearance_haptics_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Switch(
+                    checked = isHapticsEnabled,
+                    onCheckedChange = { enabled ->
+                        onHapticsEnabledChange(enabled)
+
+                        val hapticType = if (enabled) {
+                            HapticFeedbackType.ToggleOn
+                        } else {
+                            HapticFeedbackType.ToggleOff
+                        }
+                        haptics.performHapticFeedback(hapticType)
+                    },
+                    thumbContent = if (isHapticsEnabled) {
+                        {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(R.drawable.check_filled),
+                                contentDescription = null,
+                                modifier = Modifier.size(SwitchDefaults.IconSize),
+                            )
+                        }
+                    } else {
+                        null
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FontSection(
+    selectedFont: AppFont,
+    onOpenFontSheet: () -> Unit
+) {
+    val haptics = LocalHapticFeedback.current
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        SettingsSectionHeader(stringResource(R.string.appearance_font_header))
+        SettingsGroupCard(
+            index = 0,
+            size = 1,
+            onClick = {
+                haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                onOpenFontSheet()
+            }
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.font_filled),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Text(
+                    text = stringResource(selectedFont.labelResId),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontFamily = fontFamilyFor(selectedFont),
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.keyboard_arrow_up_filled),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FontBottomSheet(
+    selectedFont: AppFont,
+    onAppFontChange: (AppFont) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
+    val haptics = LocalHapticFeedback.current
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(top = 8.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            val fonts = AppFont.entries
+            fonts.forEachIndexed { index, font ->
+                SelectableOptionCard(
+                    index = index,
+                    size = fonts.size,
+                    selected = font == selectedFont,
+                    onClick = {
+                        onAppFontChange(font)
+                        haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
+                    }
+                ) { contentColor ->
+                    Text(
+                        text = stringResource(font.labelResId),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontFamily = fontFamilyFor(font),
                         color = contentColor
                     )
                 }

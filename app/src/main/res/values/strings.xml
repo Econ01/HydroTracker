@@ -298,6 +298,9 @@
     <string name="appearance_autohide_desc">Hide the bar when scrolling down</string>
     <string name="appearance_labels_title">Labels</string>
     <string name="appearance_home_header">Home screen</string>
+    <string name="appearance_feedback_header">Interaction &amp; Feedback</string>
+    <string name="appearance_haptics_title">Haptic Feedback</string>
+    <string name="appearance_haptics_desc">Vibrate on button taps and actions</string>
     <string name="appearance_edge_effect_title">Edge Effect</string>
     <!-- Sample data shown in the theme preview card -->
     <string name="appearance_preview_amount">1,250 / 2,500 ml</string>

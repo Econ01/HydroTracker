@@ -288,7 +288,22 @@ fun HydroTrackerApp(
         }
     }
 
-    HydroTrackerTheme(themePreferences = themePreferences) {
+    val systemHaptics = LocalHapticFeedback.current
+    val isHapticsEnabled = appPreferences?.hapticsEnabled ?: true
+    val proxyHaptics = remember(systemHaptics, isHapticsEnabled) {
+        object : androidx.compose.ui.hapticfeedback.HapticFeedback {
+            override fun performHapticFeedback(hapticFeedbackType: androidx.compose.ui.hapticfeedback.HapticFeedbackType) {
+                if (isHapticsEnabled) {
+                    systemHaptics.performHapticFeedback(hapticFeedbackType)
+                }
+            }
+        }
+    }
+
+    CompositionLocalProvider(
+        LocalHapticFeedback provides proxyHaptics
+    ) {
+        HydroTrackerTheme(themePreferences = themePreferences) {
         if (isLoading) {
             LoadingScreen()
         } else {
@@ -533,6 +548,12 @@ fun HydroTrackerApp(
                         entry<NavigationRoutes.SettingsAppearance> {
                             AppearanceScreen(
                                 themePreferences = themePreferences,
+                                isHapticsEnabled = isHapticsEnabled,
+                                onHapticsEnabledChange = { enabled ->
+                                    coroutineScope.launch {
+                                        userRepository.updateHapticsEnabled(enabled)
+                                    }
+                                },
                                 isDynamicColorAvailable = themeViewModel.isDynamicColorAvailable(),
                                 onColorSourceChange = themeViewModel::setColorSource,
                                 onDarkModeChange = themeViewModel::updateDarkModePreference,
@@ -864,6 +885,7 @@ fun HydroTrackerApp(
                         beverages = activeBeverages
                     )
                 }
+            }
             }
         }
     }
