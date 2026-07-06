@@ -53,7 +53,6 @@
          locale-aware (NumberFormat) and the unit swapped independently.
          ============================================================================ -->
     <string name="unit_milliliters_format">%1$s ml</string>
-    <string name="unit_liters_format">%1$s L</string>
     <string name="unit_kilograms_format">%1$d kg</string>
     <!-- current / goal, e.g. "1.2 L / 2.7 L" -->
     <string name="progress_current_of_goal_format">%1$s / %2$s</string>
@@ -120,14 +119,24 @@
     <string name="date_format_year_month_day_desc">Year / Month / Day</string>
 
     <!-- Volume unit options -->
-    <string name="unit_millilitres">Millilitres</string>
+    <string name="unit_millilitres">Metric</string>
     <string name="unit_ml_short">ml</string>
     <string name="unit_us_fl_oz">US fluid ounces</string>
     <string name="unit_us_fl_oz_short">fl oz</string>
     <string name="unit_imperial_fl_oz">Imperial fluid ounces</string>
     <string name="unit_imperial_fl_oz_short">fl oz (UK)</string>
-    <string name="unit_us_cup">US cups</string>
-    <string name="unit_us_cup_short">cup</string>
+
+    <!-- Display-only volume units (auto-scaling and call-site overrides) -->
+    <string name="unit_litre_short">L</string>
+    <string name="unit_kilolitre_short">kL</string>
+    <string name="unit_megalitre_short">ML</string>
+    <string name="unit_gigalitre_short">GL</string>
+    <string name="unit_us_pint_short">pt</string>
+    <string name="unit_us_quart_short">qt</string>
+    <string name="unit_us_gallon_short">gal</string>
+    <string name="unit_imperial_pint_short">pt</string>
+    <string name="unit_imperial_quart_short">qt</string>
+    <string name="unit_imperial_gallon_short">gal</string>
 
     <!-- ============================================================================
          Onboarding
@@ -252,6 +261,7 @@
          ============================================================================ -->
     <string name="nav_home">Home</string>
     <string name="nav_history">History</string>
+    <string name="nav_statistics">Statistics</string>
     <string name="nav_profile">Profile</string>
     <string name="nav_settings">Settings</string>
     <string name="nav_add_custom">Add Custom</string>
@@ -543,6 +553,7 @@
     <string name="font_outfit" translatable="false">Outfit</string>
     <string name="font_dm_sans" translatable="false">DM Sans</string>
     <string name="font_jetbrains_mono" translatable="false">JetBrains Mono</string>
+    <string name="font_xiaomi_warning">Font styling on HyperOS/MIUI (Xiaomi group devices) does not work as intended due to their custom text engine.</string>
 
     <!-- Navigation-bar label mode -->
     <string name="navbar_label_always">Always shown</string>
@@ -916,8 +927,6 @@
         <item quantity="one">day</item>
         <item quantity="other">days</item>
     </plurals>
-    <string name="unit_liters">liters</string>
-
     <string name="history_section_statistics">Statistics</string>
     <string name="history_section_goal_achievement">Goal Achievement</string>
     <string name="history_goal_achievement_subtitle">of days you met your goal</string>
@@ -930,6 +939,61 @@
 
     <string name="history_legend_less">Less</string>
     <string name="history_legend_more">More</string>
+
+    <!-- ============================================================================
+         Statistics
+         All-time insights shown on the dedicated Statistics tab.
+         ============================================================================ -->
+    <string name="statistics_empty_title">No statistics yet</string>
+    <string name="statistics_empty_description">Start logging your water intake to see personalised insights and trends.</string>
+
+    <!-- Section titles -->
+    <string name="statistics_section_overview">Overview</string>
+    <string name="statistics_section_drinking_pattern">Drinking Pattern</string>
+    <string name="statistics_section_beverages">Beverage Breakdown</string>
+    <string name="statistics_section_containers">Container Usage</string>
+    <string name="statistics_section_hydration_multiplier">Hydration Multiplier</string>
+    <string name="statistics_section_health_connect">Health Connect Imports</string>
+
+    <!-- Hero stats -->
+    <string name="statistics_hero_success_rate">Success Rate</string>
+    <string name="statistics_hero_days_tracked">Days Tracked</string>
+
+    <!-- Overview labels -->
+    <string name="statistics_label_current_streak">Current Streak</string>
+    <string name="statistics_label_average_daily_intake">Average Daily Intake</string>
+    <string name="statistics_label_total_intake">Total Intake</string>
+    <string name="statistics_label_success_rate">Success Rate</string>
+    <string name="statistics_label_days_tracked">Days Tracked</string>
+    <plurals name="statistics_streak_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <!-- Drinking pattern labels -->
+    <string name="statistics_label_first_drink">First Drink</string>
+    <string name="statistics_label_last_drink">Last Drink</string>
+    <string name="statistics_label_average_interval">Average Interval</string>
+    <string name="statistics_label_average_drink_size">Average Drink Size</string>
+    <string name="statistics_label_largest_drink">Largest Drink</string>
+
+    <!-- Beverage breakdown -->
+    <!-- %1$d = drink count, %2$s = effective volume with unit -->
+    <string name="statistics_beverage_detail">%1$d drinks • %2$s effective</string>
+    <!-- %1$d = drink count, %2$s = effective volume with unit -->
+    <string name="statistics_single_beverage_description">%1$d drinks logged • %2$s effective hydration</string>
+
+    <!-- Hydration multiplier -->
+    <string name="statistics_label_raw_intake">Raw Intake</string>
+    <string name="statistics_label_effective_intake">Effective Intake</string>
+    <!-- %1$s = signed percentage, e.g. "+5%" -->
+    <string name="statistics_multiplier_effect">Beverage multipliers: %1$s effective hydration</string>
+
+    <!-- Health Connect imports -->
+    <string name="statistics_label_external_entries">Imported Entries</string>
+    <string name="statistics_label_external_volume">Imported Volume</string>
+    <string name="statistics_label_source_breakdown">Source Breakdown</string>
+    <string name="statistics_hc_no_imports_title">No imports yet</string>
+    <string name="statistics_hc_no_imports_description">Data imported from other health apps will appear here.</string>
 
     <string name="history_detail_water_intake">Water Intake</string>
     <!-- %1$s = formatted goal amount -->

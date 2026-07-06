@@ -59,6 +59,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.R
@@ -69,7 +70,9 @@ import com.cemcakmak.hydrotracker.data.models.NavBarLabelMode
 import com.cemcakmak.hydrotracker.data.models.EdgeEffect
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
+import com.cemcakmak.hydrotracker.ui.theme.extendedColorScheme
 import com.cemcakmak.hydrotracker.ui.theme.fontFamilyFor
+import com.cemcakmak.hydrotracker.utils.OemFontWarning
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -844,6 +847,16 @@ private fun FontBottomSheet(
                 .padding(top = 8.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
+            if (OemFontWarning.isAffectedDevice) {
+                Text(
+                    text = stringResource(R.string.font_xiaomi_warning),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.extendedColorScheme.warning,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+            }
+
             val fonts = AppFont.entries
             fonts.forEachIndexed { index, font ->
                 SelectableOptionCard(
