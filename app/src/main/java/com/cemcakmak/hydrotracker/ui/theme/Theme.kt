@@ -89,14 +89,14 @@ private val HydroDarkColorScheme = darkColorScheme(
 private val SuccessSeed = Color(0xFF1E8E3E)
 private val WarningSeed = Color(0xFFFF9500)
 private val WaterSeed = Color(0xFF00B4D8)
-private val CoffeeSeed = Color(0xFF6F4E37)
-private val EnergyDrinkSeed = Color(0xFFFF6B35)
-private val FruitJuiceSeed = Color(0xFFFF9F1C)
-private val MilkSeed = Color(0xFFF8F9FA)
+private val CoffeeSeed = Color(0xFF5D4037)
+private val EnergyDrinkSeed = Color(0xFFFF3B30)
+private val FruitJuiceSeed = Color(0xFFFF9500)
+private val MilkSeed = Color(0xFFF2EFE9)
 private val ORSSeed = Color(0xFF2EC4B6)
 private val SoftDrinkSeed = Color(0xFFE71D36)
 private val SportsDrinkSeed = Color(0xFF9B5DE5)
-private val TeaSeed = Color(0xFFBC6C25)
+private val TeaSeed = Color(0xFFD4A373)
 
 private data class CustomColorRoles(
     val color: Color,
