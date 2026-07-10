@@ -88,6 +88,15 @@ private val HydroDarkColorScheme = darkColorScheme(
 // Seed colours for the extended palettes.
 private val SuccessSeed = Color(0xFF1E8E3E)
 private val WarningSeed = Color(0xFFFF9500)
+private val WaterSeed = Color(0xFF00B4D8)
+private val CoffeeSeed = Color(0xFF6F4E37)
+private val EnergyDrinkSeed = Color(0xFFFF6B35)
+private val FruitJuiceSeed = Color(0xFFFF9F1C)
+private val MilkSeed = Color(0xFFF8F9FA)
+private val ORSSeed = Color(0xFF2EC4B6)
+private val SoftDrinkSeed = Color(0xFFE71D36)
+private val SportsDrinkSeed = Color(0xFF9B5DE5)
+private val TeaSeed = Color(0xFFBC6C25)
 
 private data class CustomColorRoles(
     val color: Color,
@@ -121,16 +130,61 @@ private fun TonalPalette.toDarkRoles() = CustomColorRoles(
 private fun extendedColorScheme(
     successSeed: Color,
     warningSeed: Color,
+    waterSeed: Color,
+    coffeeSeed: Color,
+    energyDrinkSeed: Color,
+    fruitJuiceSeed: Color,
+    milkSeed: Color,
+    oralRehydrationSolutionSeed: Color,
+    softDrinkSeed: Color,
+    sportsDrinkSeed: Color,
+    teaSeed: Color,
     primaryColor: Color,
     isDark: Boolean
 ): ExtendedColorScheme {
     val successHarmonized = successSeed.harmonizedWith(primaryColor)
     val warningHarmonized = warningSeed.harmonizedWith(primaryColor)
+    val waterHarmonized = waterSeed.harmonizedWith(primaryColor)
+    val coffeeHarmonized = coffeeSeed.harmonizedWith(primaryColor)
+    val energyDrinkHarmonized = energyDrinkSeed.harmonizedWith(primaryColor)
+    val fruitJuiceHarmonized = fruitJuiceSeed.harmonizedWith(primaryColor)
+    val milkHarmonized = milkSeed.harmonizedWith(primaryColor)
+    val oralRehydrationSolutionHarmonized = oralRehydrationSolutionSeed.harmonizedWith(primaryColor)
+    val softDrinkHarmonized = softDrinkSeed.harmonizedWith(primaryColor)
+    val sportsDrinkHarmonized = sportsDrinkSeed.harmonizedWith(primaryColor)
+    val teaHarmonized = teaSeed.harmonizedWith(primaryColor)
 
     val successRoles = TonalPalette.fromInt(successHarmonized.toArgb())
         .let { if (isDark) it.toDarkRoles() else it.toLightRoles() }
 
     val warningRoles = TonalPalette.fromInt(warningHarmonized.toArgb())
+        .let { if (isDark) it.toDarkRoles() else it.toLightRoles() }
+
+    val waterRoles = TonalPalette.fromInt(waterHarmonized.toArgb())
+        .let { if (isDark) it.toDarkRoles() else it.toLightRoles() }
+
+    val coffeeRoles = TonalPalette.fromInt(coffeeHarmonized.toArgb())
+        .let { if (isDark) it.toDarkRoles() else it.toLightRoles() }
+
+    val energyDrinkRoles = TonalPalette.fromInt(energyDrinkHarmonized.toArgb())
+        .let { if (isDark) it.toDarkRoles() else it.toLightRoles() }
+
+    val fruitJuiceRoles = TonalPalette.fromInt(fruitJuiceHarmonized.toArgb())
+        .let { if (isDark) it.toDarkRoles() else it.toLightRoles() }
+
+    val milkRoles = TonalPalette.fromInt(milkHarmonized.toArgb())
+        .let { if (isDark) it.toDarkRoles() else it.toLightRoles() }
+
+    val oralRehydrationSolutionRoles = TonalPalette.fromInt(oralRehydrationSolutionHarmonized.toArgb())
+        .let { if (isDark) it.toDarkRoles() else it.toLightRoles() }
+
+    val softDrinkRoles = TonalPalette.fromInt(softDrinkHarmonized.toArgb())
+        .let { if (isDark) it.toDarkRoles() else it.toLightRoles() }
+
+    val sportsDrinkRoles = TonalPalette.fromInt(sportsDrinkHarmonized.toArgb())
+        .let { if (isDark) it.toDarkRoles() else it.toLightRoles() }
+
+    val teaRoles = TonalPalette.fromInt(teaHarmonized.toArgb())
         .let { if (isDark) it.toDarkRoles() else it.toLightRoles() }
 
     return ExtendedColorScheme(
@@ -141,7 +195,43 @@ private fun extendedColorScheme(
         warning = warningRoles.color,
         onWarning = warningRoles.onColor,
         warningContainer = warningRoles.colorContainer,
-        onWarningContainer = warningRoles.onColorContainer
+        onWarningContainer = warningRoles.onColorContainer,
+        water = waterRoles.color,
+        onWater = waterRoles.onColor,
+        waterContainer = waterRoles.colorContainer,
+        onWaterContainer = waterRoles.onColorContainer,
+        coffee = coffeeRoles.color,
+        onCoffee = coffeeRoles.onColor,
+        coffeeContainer = coffeeRoles.colorContainer,
+        onCoffeeContainer = coffeeRoles.onColorContainer,
+        energyDrink = energyDrinkRoles.color,
+        onEnergyDrink = energyDrinkRoles.onColor,
+        energyDrinkContainer = energyDrinkRoles.colorContainer,
+        onEnergyDrinkContainer = energyDrinkRoles.onColorContainer,
+        fruitJuice = fruitJuiceRoles.color,
+        onFruitJuice = fruitJuiceRoles.onColor,
+        fruitJuiceContainer = fruitJuiceRoles.colorContainer,
+        onFruitJuiceContainer = fruitJuiceRoles.onColorContainer,
+        milk = milkRoles.color,
+        onMilk = milkRoles.onColor,
+        milkContainer = milkRoles.colorContainer,
+        onMilkContainer = milkRoles.onColorContainer,
+        oralRehydrationSolution = oralRehydrationSolutionRoles.color,
+        onOralRehydrationSolution = oralRehydrationSolutionRoles.onColor,
+        oralRehydrationSolutionContainer = oralRehydrationSolutionRoles.colorContainer,
+        onOralRehydrationSolutionContainer = oralRehydrationSolutionRoles.onColorContainer,
+        softDrink = softDrinkRoles.color,
+        onSoftDrink = softDrinkRoles.onColor,
+        softDrinkContainer = softDrinkRoles.colorContainer,
+        onSoftDrinkContainer = softDrinkRoles.onColorContainer,
+        sportsDrink = sportsDrinkRoles.color,
+        onSportsDrink = sportsDrinkRoles.onColor,
+        sportsDrinkContainer = sportsDrinkRoles.colorContainer,
+        onSportsDrinkContainer = sportsDrinkRoles.onColorContainer,
+        tea = teaRoles.color,
+        onTea = teaRoles.onColor,
+        teaContainer = teaRoles.colorContainer,
+        onTeaContainer = teaRoles.onColorContainer
     )
 }
 
@@ -187,6 +277,15 @@ fun HydroTrackerTheme(
     val extendedColors = extendedColorScheme(
         successSeed = SuccessSeed,
         warningSeed = WarningSeed,
+        waterSeed = WaterSeed,
+        coffeeSeed = CoffeeSeed,
+        energyDrinkSeed = EnergyDrinkSeed,
+        fruitJuiceSeed = FruitJuiceSeed,
+        milkSeed = MilkSeed,
+        oralRehydrationSolutionSeed = ORSSeed,
+        softDrinkSeed = SoftDrinkSeed,
+        sportsDrinkSeed = SportsDrinkSeed,
+        teaSeed = TeaSeed,
         primaryColor = colorScheme.primary,
         isDark = darkTheme
     )
