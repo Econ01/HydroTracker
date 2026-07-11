@@ -53,6 +53,8 @@
          ============================================================================ -->
     <string name="notification_channel_name">Hydration Reminders</string>
     <string name="notification_channel_description">Notifications to remind you to stay hydrated</string>
+    <string name="notification_channel_fun_facts_name">Daily Hydration Facts</string>
+    <string name="notification_channel_fun_facts_description">A daily hydration tip or fun fact</string>
 
     <!-- ============================================================================
          Widgets
@@ -300,6 +302,10 @@
     <string name="notif_hydration_reminders">Hydration reminders</string>
     <string name="notif_reminders_active">Reminders are active</string>
     <string name="notif_reminders_paused">Reminders are paused</string>
+    <string name="notif_fun_facts_header">Fun Facts</string>
+    <string name="notif_fun_facts">Daily hydration facts</string>
+    <string name="notif_fun_facts_active">A fun fact will be sent each day</string>
+    <string name="notif_fun_facts_paused">Daily facts are paused</string>
     <string name="notif_sample_notification">Sample notification</string>
     <string name="notif_fun_fact">Fun Fact</string>
     <!-- Reminder-style descriptions shown in the preview card -->
@@ -900,13 +906,16 @@
          ============================================================================ -->
     <!-- %1$s = the random water fact -->
     <string name="notification_gentle_fact_prefix">Did you know? %1$s</string>
+    <string name="notification_fun_fact_title">Did you know?</string>
     <!-- %1$d = remaining milliliters -->
     <string name="notification_minimal_remaining">%1$s remaining</string>
 
     <!-- Quick-add success notification -->
-    <string name="notification_quick_add_title">💧 Water Added!</string>
-    <!-- %1$d = amount added in ml -->
+    <string name="notification_quick_add_title">Water Added!</string>
+    <!-- %1$s = formatted amount with unit, e.g. "500 ml" -->
     <string name="notification_quick_add_text">Added %1$s to your daily intake</string>
+    <!-- %1$s = formatted amount with unit, e.g. "500 ml" -->
+    <string name="notification_action_add">Add %1$s</string>
     <string name="notification_quick_add_preset_name">Quick Add</string>
     <string name="notification_quick_add_note">Added from notification</string>
 

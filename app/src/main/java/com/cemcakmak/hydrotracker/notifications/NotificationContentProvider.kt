@@ -8,7 +8,6 @@ import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.models.ReminderStyle
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
-import java.util.Locale
 
 /**
  * Provides creative and personalized notification content
@@ -45,16 +44,12 @@ object NotificationContentProvider {
             ReminderStyle.GENTLE -> NotificationPreview(
                 title = context.resources.getStringArray(R.array.notification_gentle_titles).random(),
                 message = context.resources.getStringArray(getGentleMessageArray(0.3f)).random(),
-                extraContent = context.resources.getStringArray(R.array.notification_facts).random()
+                extraContent = ""
             )
             ReminderStyle.MOTIVATING -> NotificationPreview(
                 title = context.resources.getStringArray(R.array.notification_motivating_titles).random(),
                 message = context.resources.getStringArray(getMotivatingMessageArray(0.3f)).random(),
-                extraContent = if (isEnglishLocale(context)) {
-                    context.resources.getStringArray(R.array.notification_puns).random()
-                } else {
-                    ""
-                }
+                extraContent = ""
             )
             ReminderStyle.MINIMAL -> NotificationPreview(
                 title = context.resources.getStringArray(R.array.notification_minimal_titles).random(),
@@ -70,11 +65,10 @@ object NotificationContentProvider {
     ): NotificationContent {
         val title = context.resources.getStringArray(R.array.notification_gentle_titles).random()
         val message = context.resources.getStringArray(getGentleMessageArray(progress)).random()
-        val funFact = context.resources.getStringArray(R.array.notification_facts).random()
 
         return NotificationContent(
             title = title,
-            message = "$message\n\n${context.getString(R.string.notification_gentle_fact_prefix, funFact)}",
+            message = message,
             progress = progress
         )
     }
@@ -95,12 +89,7 @@ object NotificationContentProvider {
 
         return NotificationContent(
             title = title,
-            message = if (isEnglishLocale(context)) {
-                val pun = context.resources.getStringArray(R.array.notification_puns).random()
-                "$message\n\n$pun"
-            } else {
-                message
-            },
+            message = message,
             progress = progress
         )
     }
@@ -136,12 +125,17 @@ object NotificationContentProvider {
     }
 
     /**
-     * Puns are language-dependent wordplay. Only show them for English locales;
-     * fall back to the plain motivational message for other languages.
+     * Get a daily fun fact for the fun-facts notification channel.
      */
-    private fun isEnglishLocale(context: Context): Boolean {
-        return context.resources.configuration.locales[0].language == Locale.ENGLISH.language
+    fun getFunFactContent(context: Context): NotificationContent {
+        val fact = context.resources.getStringArray(R.array.notification_facts).random()
+        return NotificationContent(
+            title = context.getString(R.string.notification_fun_fact_title),
+            message = fact,
+            progress = -1f
+        )
     }
+
 }
 
 /**

@@ -114,6 +114,46 @@ object WaterCalculator {
     }
 
     /**
+     * Calculates a dynamic reminder interval based on how much water is still needed and how
+     * much awake time remains. This ensures users receive enough reminders to reach their goal
+     * even if they log only small amounts.
+     *
+     * @param remainingAmountMl Millilitres still needed to reach the daily goal.
+     * @param remainingAwakeMinutes Minutes left until sleep time.
+     * @param reminderIntervalMode Auto or Custom mode.
+     * @param customReminderInterval User-defined interval in minutes (used only in Custom mode).
+     * @param averageDrinkSizeMl Estimated drink size for interval calculation (default 300 ml).
+     * @return Interval in minutes.
+     */
+    fun calculateDynamicReminderInterval(
+        remainingAmountMl: Double,
+        remainingAwakeMinutes: Double,
+        reminderIntervalMode: ReminderIntervalMode = ReminderIntervalMode.AUTOMATIC,
+        customReminderInterval: Int = 60,
+        averageDrinkSizeMl: Double = 300.0
+    ): Int {
+        if (reminderIntervalMode == ReminderIntervalMode.CUSTOM) {
+            return customReminderInterval.coerceAtLeast(1)
+        }
+
+        if (remainingAmountMl <= 0 || remainingAwakeMinutes <= 0) {
+            return calculateReminderInterval(
+                wakeUpTime = "07:00",
+                sleepTime = "23:00",
+                dailyGoal = 2000.0,
+                reminderIntervalMode = ReminderIntervalMode.AUTOMATIC
+            )
+        }
+
+        val remindersNeeded = (remainingAmountMl / averageDrinkSizeMl).coerceAtLeast(1.0)
+        val intervalMinutes = (remainingAwakeMinutes / remindersNeeded).toInt()
+
+        val minInterval = 15
+        val maxInterval = 180
+        return intervalMinutes.coerceIn(minInterval, maxInterval)
+    }
+
+    /**
      * Calculates awake hours from wake up and sleep times
      */
     fun calculateAwakeHours(wakeUpTime: String, sleepTime: String): Double {

@@ -83,8 +83,13 @@
             android:name=".notifications.QuickAddWaterReceiver"
             android:enabled="true"
             android:exported="false" />
-        
-        <!-- Boot receiver to reschedule notifications after device restart -->
+
+        <receiver
+            android:name=".notifications.FunFactReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
+        <!-- Boot receiver to reschedule notifications after device restart or app update -->
         <receiver
             android:name=".notifications.BootReceiver"
             android:enabled="true"
@@ -92,7 +97,6 @@
             <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-                <action android:name="android.intent.action.PACKAGE_REPLACED" />
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>

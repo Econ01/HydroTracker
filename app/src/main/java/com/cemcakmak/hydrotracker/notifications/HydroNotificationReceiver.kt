@@ -64,7 +64,7 @@ class HydroNotificationReceiver : BroadcastReceiver() {
             }
 
             // Check if we're within waking hours (double-check)
-            if (!isWithinWakingHours(context, userProfile)) {
+            if (!isWithinWakingHours(userProfile)) {
                 Log.d(TAG, "Outside waking hours, rescheduling for appropriate time")
                 // Schedule for next appropriate time using the improved scheduling method
                 HydroNotificationScheduler.scheduleNextFromTriggered(context, userProfile)
@@ -72,9 +72,20 @@ class HydroNotificationReceiver : BroadcastReceiver() {
             }
 
             Log.d(TAG, "Showing hydration reminder notification")
-            // Show the notification
+            // Show the notification with the user's primary and secondary quick-add actions
+            val quickAddPresets = waterIntakeRepository.getQuickAddPresets()
+            val presetsForNotification = listOfNotNull(
+                quickAddPresets.primary,
+                quickAddPresets.secondary
+            )
+            Log.d(
+                TAG,
+                "Quick-add presets: primary=${quickAddPresets.primary?.let { "${it.name}/${it.volume}" } ?: "none"}, " +
+                    "secondary=${quickAddPresets.secondary?.let { "${it.name}/${it.volume}" } ?: "none"}"
+            )
+
             val notificationService = HydroNotificationService(context)
-            notificationService.showHydrationReminder(userProfile, currentProgress)
+            notificationService.showHydrationReminder(userProfile, currentProgress, presetsForNotification)
 
             // Schedule the next reminder using the new method that ensures continuous operation
             Log.d(TAG, "Scheduling next reminder from triggered time")
@@ -85,20 +96,19 @@ class HydroNotificationReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun isWithinWakingHours(context: Context, userProfile: com.cemcakmak.hydrotracker.data.models.UserProfile): Boolean {
+    private fun isWithinWakingHours(userProfile: com.cemcakmak.hydrotracker.data.models.UserProfile): Boolean {
         return try {
             val currentTime = java.time.LocalTime.now()
             val wakeUpTime = java.time.LocalTime.parse(userProfile.wakeUpTime, java.time.format.DateTimeFormatter.ofPattern("HH:mm"))
             val sleepTime = java.time.LocalTime.parse(userProfile.sleepTime, java.time.format.DateTimeFormatter.ofPattern("HH:mm"))
 
-            if (sleepTime.isAfter(wakeUpTime)) {
-                // Same day sleep (e.g., wake 07:00, sleep 23:00)
-                currentTime.isAfter(wakeUpTime) && currentTime.isBefore(sleepTime)
+            val isInSleepHours = if (sleepTime.isAfter(wakeUpTime)) {
+                currentTime.isBefore(wakeUpTime) || currentTime.isAfter(sleepTime)
             } else {
-                // Next day sleep (e.g., wake 07:00, sleep 01:00)
-                currentTime.isAfter(wakeUpTime) || currentTime.isBefore(sleepTime)
+                !currentTime.isBefore(sleepTime) && currentTime.isBefore(wakeUpTime)
             }
-        } catch (e: Exception) {
+            !isInSleepHours
+        } catch (_: Exception) {
             true // Default to allowing if parsing fails
         }
     }

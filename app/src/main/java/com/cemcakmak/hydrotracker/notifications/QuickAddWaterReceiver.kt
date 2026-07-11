@@ -26,16 +26,21 @@ class QuickAddWaterReceiver : BroadcastReceiver() {
 
     companion object {
         const val ACTION_QUICK_ADD_WATER = "com.cemcakmak.hydrotracker.QUICK_ADD_WATER"
-        const val QUICK_ADD_AMOUNT = 250.0 // Default quick add amount in ml
+        const val EXTRA_CONTAINER_VOLUME = "extra_container_volume"
+        const val EXTRA_CONTAINER_NAME = "extra_container_name"
+        private const val DEFAULT_QUICK_ADD_AMOUNT = 250.0
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == ACTION_QUICK_ADD_WATER) {
-            addQuickWater(context)
+            val amount = intent.getDoubleExtra(EXTRA_CONTAINER_VOLUME, DEFAULT_QUICK_ADD_AMOUNT)
+            val name = intent.getStringExtra(EXTRA_CONTAINER_NAME)
+                ?: context.getString(R.string.notification_quick_add_preset_name)
+            addQuickWater(context, amount, name)
         }
     }
 
-    private fun addQuickWater(context: Context) {
+    private fun addQuickWater(context: Context, amount: Double, containerName: String) {
         // Use coroutine scope for database operations
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -48,14 +53,14 @@ class QuickAddWaterReceiver : BroadcastReceiver() {
 
                 // Create a preset for quick add
                 val quickAddPreset = ContainerPreset(
-                    name = context.getString(R.string.notification_quick_add_preset_name),
-                    volume = QUICK_ADD_AMOUNT,
+                    name = containerName,
+                    volume = amount,
                     isDefault = false
                 )
 
                 // Add water to database
                 val result = waterIntakeRepository.addWaterIntake(
-                    amount = QUICK_ADD_AMOUNT,
+                    amount = amount,
                     containerPreset = quickAddPreset,
                     note = context.getString(R.string.notification_quick_add_note)
                 )
@@ -66,12 +71,17 @@ class QuickAddWaterReceiver : BroadcastReceiver() {
                     notificationManager.cancel(HydroNotificationService.NOTIFICATION_ID)
 
                     // Show a brief success notification
-                    showSuccessNotification(context)
+                    showSuccessNotification(context, amount)
 
-                    // Reschedule next reminder
+                    // Reschedule next reminder with a dynamically calculated interval
                     val userProfile = userRepository.userProfile.first()
                     if (userProfile != null) {
-                        HydroNotificationScheduler.scheduleNextReminder(context, userProfile)
+                        HydroNotificationScheduler.onWaterEntryAdded(
+                            context,
+                            userProfile,
+                            userRepository = userRepository,
+                            waterIntakeRepository = waterIntakeRepository
+                        )
                     }
                 }
 
@@ -85,7 +95,7 @@ class QuickAddWaterReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun showSuccessNotification(context: Context) {
+    private fun showSuccessNotification(context: Context, amount: Double) {
 
         // Format the quick-add amount in the user's preferred unit.
         val userRepository = UserRepository(context)
@@ -96,10 +106,10 @@ class QuickAddWaterReceiver : BroadcastReceiver() {
         } catch (_: Exception) {
             VolumeUnit.MILLILITRES
         }
-        val amountText = VolumeUnitConverter.format(context, QUICK_ADD_AMOUNT, volumeUnit)
+        val amountText = VolumeUnitConverter.format(context, amount, volumeUnit)
 
         // Create a simple success notification that auto-dismisses
-        val successNotification = android.app.Notification.Builder(context, HydroNotificationService.CHANNEL_ID)
+        val successNotification = android.app.Notification.Builder(context, HydroNotificationService.REMINDER_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_menu_save) // System checkmark icon
             .setContentTitle(context.getString(R.string.notification_quick_add_title))
             .setContentText(context.getString(R.string.notification_quick_add_text, amountText))

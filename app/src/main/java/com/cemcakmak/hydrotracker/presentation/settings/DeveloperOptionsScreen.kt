@@ -385,8 +385,27 @@ fun DeveloperOptionsScreen(
                                     } catch (_: Exception) {
                                         fallbackProgress(profile)
                                     }
-                                    HydroNotificationService(context).showTestNotification(profile, progress)
+                                    val quickAddPresets = try {
+                                        waterIntakeRepository?.getQuickAddPresets()
+                                            ?.let { listOfNotNull(it.primary, it.secondary) }
+                                            ?: emptyList()
+                                    } catch (_: Exception) {
+                                        emptyList()
+                                    }
+                                    HydroNotificationService(context).showTestNotification(profile, progress, quickAddPresets)
                                     "Test notification sent"
+                                }
+                            }
+                        )
+                        add(
+                            DevAction(
+                                title = "Send Fun Notification",
+                                description = "Show a daily hydration fact",
+                                icon = ImageVector.vectorResource(R.drawable.star_rate_filled)
+                            ) {
+                                runWithToast("Send Fun Notification") {
+                                    HydroNotificationService(context).showFunFact()
+                                    "Fun notification sent"
                                 }
                             }
                         )

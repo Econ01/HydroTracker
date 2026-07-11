@@ -29,7 +29,8 @@ data class UserProfile(
     val dayEndMode: DayEndMode = DayEndMode.SLEEP_TIME,
     val reminderIntervalMode: ReminderIntervalMode = ReminderIntervalMode.AUTOMATIC,
     val customReminderInterval: Int = 60,
-    val volumeUnit: VolumeUnit = VolumeUnit.MILLILITRES // Display unit for hydration amounts
+    val volumeUnit: VolumeUnit = VolumeUnit.MILLILITRES, // Display unit for hydration amounts
+    val funFactsEnabled: Boolean = false // Opt-in daily hydration fact notifications
 )
 
 @Serializable

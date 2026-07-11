@@ -35,6 +35,7 @@ import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.dao.ContainerPresetDao
 import com.cemcakmak.hydrotracker.data.database.dao.DailySummaryDao
 import com.cemcakmak.hydrotracker.data.database.dao.DailyTotal
+import com.cemcakmak.hydrotracker.data.database.dao.MostUsedContainer
 import com.cemcakmak.hydrotracker.data.database.dao.WaterIntakeDao
 import com.cemcakmak.hydrotracker.data.database.entities.ContainerPresetEntity
 import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
@@ -53,6 +54,7 @@ import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
+import com.cemcakmak.hydrotracker.notifications.HydroNotificationScheduler
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
 import com.cemcakmak.hydrotracker.utils.UserDayCalculator
@@ -202,7 +204,8 @@ fun HomeScreen(
             )
 
             result.onSuccess {
-                // No success toast; the updated UI provides enough feedback.
+                // Reschedule the next reminder using a dynamically calculated interval.
+                HydroNotificationScheduler.onWaterEntryAdded(context, userProfile)
             }.onFailure { error ->
                 Toast.makeText(
                     context,
@@ -1200,6 +1203,9 @@ private class PreviewWaterIntakeDao : WaterIntakeDao {
     override suspend fun unhideEntry(entryId: Long) {}
     override fun getHiddenEntries(): Flow<List<WaterIntakeEntry>> = flowOf(emptyList())
     override suspend fun getDailyTotals(startDate: String, endDate: String): List<DailyTotal> = emptyList()
+    override suspend fun getMostUsedContainer(): MostUsedContainer? = null
+    override suspend fun getMostUsedContainers(limit: Int): List<MostUsedContainer> = emptyList()
+    override suspend fun getMostRecentEntry(): WaterIntakeEntry? = null
     override suspend fun insertEntry(entry: WaterIntakeEntry): Long = 1L
     override suspend fun insertEntries(entries: List<WaterIntakeEntry>) {}
 }

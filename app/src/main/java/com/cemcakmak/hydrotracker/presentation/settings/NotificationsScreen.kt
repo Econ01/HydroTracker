@@ -24,11 +24,21 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import android.text.format.DateFormat
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.EnterExitState
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -99,6 +109,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.cemcakmak.hydrotracker.R
@@ -237,7 +248,8 @@ fun NotificationsScreen(
                 if (userProfile != null) {
                     NotificationPreviewCard(
                         currentStyle = userProfile.reminderStyle,
-                        themePreferences = themePreferences
+                        themePreferences = themePreferences,
+                        funFactsEnabled = userProfile.funFactsEnabled
                     )
                 }
 
@@ -245,72 +257,146 @@ fun NotificationsScreen(
                 if (userProfile != null) {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         SettingsSectionHeader(stringResource(R.string.notif_reminders_header))
-                        SettingsGroupCard(index = 0, size = 1) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Crossfade(
-                                    targetState = isRemindersEnabled,
-                                    animationSpec = tween(400),
-                                    label = "reminderIcon"
-                                ) { enabled ->
-                                    Icon(
-                                        imageVector = if (enabled) {
-                                            ImageVector.vectorResource(R.drawable.notifications_filled)
-                                        } else {
-                                            ImageVector.vectorResource(R.drawable.notifications)
-                                        },
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                }
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = stringResource(R.string.notif_hydration_reminders),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                    Text(
-                                        text = if (isRemindersEnabled) stringResource(R.string.notif_reminders_active) else stringResource(R.string.notif_reminders_paused),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Switch(
-                                    checked = isRemindersEnabled,
-                                    onCheckedChange = { enabled ->
-                                        val hapticType = if (enabled) {
-                                            HapticFeedbackType.ToggleOn
-                                        } else {
-                                            HapticFeedbackType.ToggleOff
-                                        }
-                                        haptics.performHapticFeedback(hapticType)
-                                        isRemindersEnabled = enabled
-                                        if (!isPreview) {
-                                            coroutineScope.launch {
-                                                if (enabled) {
-                                                    HydroNotificationScheduler.startNotifications(context, userProfile)
-                                                } else {
-                                                    HydroNotificationScheduler.stopNotifications(context)
+
+                        Column {
+                            SettingsGroupCard(index = 0, size = 2) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Crossfade(
+                                        targetState = isRemindersEnabled,
+                                        animationSpec = tween(400),
+                                        label = "reminderIcon"
+                                    ) { enabled ->
+                                        Icon(
+                                            imageVector = if (enabled) {
+                                                ImageVector.vectorResource(R.drawable.notifications_filled)
+                                            } else {
+                                                ImageVector.vectorResource(R.drawable.notifications)
+                                            },
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    }
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = stringResource(R.string.notif_hydration_reminders),
+                                            style = MaterialTheme.typography.titleMedium,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                        Text(
+                                            text = if (isRemindersEnabled) stringResource(R.string.notif_reminders_active) else stringResource(R.string.notif_reminders_paused),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                    Switch(
+                                        checked = isRemindersEnabled,
+                                        onCheckedChange = { enabled ->
+                                            val hapticType = if (enabled) {
+                                                HapticFeedbackType.ToggleOn
+                                            } else {
+                                                HapticFeedbackType.ToggleOff
+                                            }
+                                            haptics.performHapticFeedback(hapticType)
+                                            isRemindersEnabled = enabled
+                                            if (!isPreview) {
+                                                coroutineScope.launch {
+                                                    if (enabled) {
+                                                        HydroNotificationScheduler.startNotifications(context, userProfile)
+                                                    } else {
+                                                        HydroNotificationScheduler.stopNotifications(context)
+                                                    }
                                                 }
                                             }
-                                        }
-                                    },
-                                    thumbContent = if (isRemindersEnabled) {
-                                        {
-                                            Icon(
-                                                imageVector = ImageVector.vectorResource(R.drawable.check_filled),
-                                                contentDescription = null,
-                                                modifier = Modifier.size(SwitchDefaults.IconSize)
-                                            )
-                                        }
-                                    } else null
-                                )
+                                        },
+                                        thumbContent = if (isRemindersEnabled) {
+                                            {
+                                                Icon(
+                                                    imageVector = ImageVector.vectorResource(R.drawable.check_filled),
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(SwitchDefaults.IconSize)
+                                                )
+                                            }
+                                        } else null
+                                    )
+                                }
+                            }
+
+                            SettingsGroupCard(index = 1, size = 2) {
+                                val isEnabled = userProfile.funFactsEnabled
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Crossfade(
+                                        targetState = isEnabled,
+                                        animationSpec = tween(400),
+                                        label = "funFactIcon"
+                                    ) { enabled ->
+                                        Icon(
+                                            imageVector = if (enabled) {
+                                                ImageVector.vectorResource(R.drawable.notification_add_filled)
+                                            } else {
+                                                ImageVector.vectorResource(R.drawable.notification_add)
+                                            },
+                                            contentDescription = null,
+                                            tint = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    }
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = stringResource(R.string.notif_fun_facts),
+                                            style = MaterialTheme.typography.titleMedium,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                        Text(
+                                            text = if (isEnabled) stringResource(R.string.notif_fun_facts_active) else stringResource(R.string.notif_fun_facts_paused),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                    Switch(
+                                        checked = isEnabled,
+                                        onCheckedChange = { enabled ->
+                                            val hapticType = if (enabled) {
+                                                HapticFeedbackType.ToggleOn
+                                            } else {
+                                                HapticFeedbackType.ToggleOff
+                                            }
+                                            haptics.performHapticFeedback(hapticType)
+                                            val updated = userProfile.copy(funFactsEnabled = enabled)
+                                            onUserProfileUpdate(updated)
+                                            if (!isPreview) {
+                                                coroutineScope.launch {
+                                                    if (enabled) {
+                                                        HydroNotificationScheduler.scheduleFunFact(context, updated)
+                                                    } else {
+                                                        HydroNotificationScheduler.cancelFunFacts(context)
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        thumbContent = if (isEnabled) {
+                                            {
+                                                Icon(
+                                                    imageVector = ImageVector.vectorResource(R.drawable.check_filled),
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(SwitchDefaults.IconSize)
+                                                )
+                                            }
+                                        } else null
+                                    )
+                                }
                             }
                         }
                     }
@@ -392,8 +478,13 @@ fun NotificationsScreen(
                         reminderInterval = newInterval
                     )
                     onUserProfileUpdate(updated)
-                    if (isRemindersEnabled && !isPreview) {
-                        HydroNotificationScheduler.rescheduleNotifications(context, updated)
+                    if (!isPreview) {
+                        if (isRemindersEnabled) {
+                            HydroNotificationScheduler.rescheduleNotifications(context, updated)
+                        }
+                        if (updated.funFactsEnabled) {
+                            HydroNotificationScheduler.scheduleFunFact(context, updated)
+                        }
                     }
                 }
                 showWakeUpPicker = false
@@ -420,8 +511,13 @@ fun NotificationsScreen(
                         reminderInterval = newInterval
                     )
                     onUserProfileUpdate(updated)
-                    if (isRemindersEnabled && !isPreview) {
-                        HydroNotificationScheduler.rescheduleNotifications(context, updated)
+                    if (!isPreview) {
+                        if (isRemindersEnabled) {
+                            HydroNotificationScheduler.rescheduleNotifications(context, updated)
+                        }
+                        if (updated.funFactsEnabled) {
+                            HydroNotificationScheduler.scheduleFunFact(context, updated)
+                        }
                     }
                 }
                 showSleepPicker = false
@@ -434,7 +530,8 @@ fun NotificationsScreen(
 @Composable
 private fun NotificationPreviewCard(
     currentStyle: ReminderStyle,
-    themePreferences: ThemePreferences
+    themePreferences: ThemePreferences,
+    funFactsEnabled: Boolean
 ) {
     val context = LocalContext.current
     val isDark = when (themePreferences.darkMode) {
@@ -532,40 +629,66 @@ private fun NotificationPreviewCard(
                 }
             }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                HorizontalDivider(modifier = Modifier.weight(1f))
 
-                Text(
-                    text = stringResource(R.string.notif_fun_fact),
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    style = MaterialTheme.typography.labelMediumEmphasized,
-                    color = MaterialTheme.colorScheme.primary
-                )
+            val spatialSpec = MaterialTheme.motionScheme.slowSpatialSpec<IntOffset>()
+            val effectsSpec = MaterialTheme.motionScheme.slowEffectsSpec<Float>()
 
-                HorizontalDivider(modifier = Modifier.weight(1f))
-            }
+            AnimatedContent(
+                targetState = funFactsEnabled,
+                transitionSpec = {
+                    val enter = slideInVertically(animationSpec = spatialSpec) { -it } +
+                            scaleIn(animationSpec = effectsSpec) +
+                            fadeIn(animationSpec = effectsSpec)
+                    val exit = slideOutVertically(animationSpec = spatialSpec) { -it } +
+                            scaleOut(animationSpec = effectsSpec) +
+                            fadeOut(animationSpec = effectsSpec)
+                    enter togetherWith exit using SizeTransform(clip = false) { _, _ ->
+                        spring()
+                    }
+                },
+                label = "funFactVisibility"
+            ) { enabled ->
+                if (enabled) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            HorizontalDivider(modifier = Modifier.weight(1f))
 
-            BlurMorph(targetState = currentStyle) { style, blurModifier ->
-                val preview = remember(style) {
-                    NotificationContentProvider.getNotificationPreview(context, style)
-                }
+                            Text(
+                                text = stringResource(R.string.notif_fun_fact),
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                style = MaterialTheme.typography.labelMediumEmphasized,
+                                color = MaterialTheme.colorScheme.primary
+                            )
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .then(blurModifier)
-                        .padding(vertical = 8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = preview.extraContent,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
+                            HorizontalDivider(modifier = Modifier.weight(1f))
+                        }
+
+                        BlurMorph(targetState = currentStyle) { _, blurModifier ->
+                            val funFact = remember {
+                                NotificationContentProvider.getFunFactContent(context).message
+                            }
+
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .then(blurModifier)
+                                    .padding(vertical = 8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = funFact,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    Box(modifier = Modifier.fillMaxWidth())
                 }
             }
         }

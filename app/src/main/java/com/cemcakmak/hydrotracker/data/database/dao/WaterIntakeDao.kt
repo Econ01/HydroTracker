@@ -61,19 +61,48 @@ interface WaterIntakeDao {
     @Query("SELECT * FROM water_intake_entries WHERE is_hidden = 1 ORDER BY timestamp DESC")
     fun getHiddenEntries(): Flow<List<WaterIntakeEntry>>
 
-    @Query("""
-        SELECT date, SUM(amount) as totalAmount, COUNT(*) as entryCount
-        FROM water_intake_entries
-        WHERE date BETWEEN :startDate AND :endDate AND is_hidden = 0
-        GROUP BY date
-        ORDER BY date ASC
-    """)
-    suspend fun getDailyTotals(startDate: String, endDate: String): List<DailyTotal>
+@Query("""
+    SELECT date, SUM(amount) as totalAmount, COUNT(*) as entryCount
+    FROM water_intake_entries
+    WHERE date BETWEEN :startDate AND :endDate AND is_hidden = 0
+    GROUP BY date
+    ORDER BY date ASC
+""")
+suspend fun getDailyTotals(startDate: String, endDate: String): List<DailyTotal>
+
+@Query("""
+    SELECT container_type AS name, container_volume AS volume, COUNT(*) AS count
+    FROM water_intake_entries
+    WHERE is_hidden = 0
+    GROUP BY container_type, container_volume
+    ORDER BY count DESC
+    LIMIT 1
+""")
+suspend fun getMostUsedContainer(): MostUsedContainer?
+
+@Query("""
+    SELECT container_type AS name, container_volume AS volume, COUNT(*) AS count
+    FROM water_intake_entries
+    WHERE is_hidden = 0
+    GROUP BY container_type, container_volume
+    ORDER BY count DESC
+    LIMIT :limit
+""")
+suspend fun getMostUsedContainers(limit: Int): List<MostUsedContainer>
+
+@Query("SELECT * FROM water_intake_entries WHERE is_hidden = 0 ORDER BY timestamp DESC LIMIT 1")
+suspend fun getMostRecentEntry(): WaterIntakeEntry?
 }
 
 data class DailyTotal(
     val date: String,
     val totalAmount: Double,
     val entryCount: Int
+)
+
+data class MostUsedContainer(
+    val name: String,
+    val volume: Double,
+    val count: Int
 )
 

@@ -252,6 +252,53 @@ class WaterIntakeRepository(
         return waterIntakeDao.getAllEntries()
     }
 
+    /**
+     * Returns the primary and secondary quick-add presets for notifications.
+     *
+     * The primary preset is the most-used container by entry count. The secondary preset
+     * is the most recently logged container, unless its volume matches the primary volume,
+     * in which case the next most-used container with a different volume is used instead.
+     */
+    suspend fun getQuickAddPresets(): QuickAddPresets = withContext(Dispatchers.IO) {
+        val topContainers = waterIntakeDao.getMostUsedContainers(10)
+        val mostRecent = waterIntakeDao.getMostRecentEntry()
+
+        val primary = topContainers.firstOrNull()?.let {
+            ContainerPreset(
+                name = it.name,
+                volume = it.volume,
+                isDefault = false
+            )
+        }
+
+        val secondary = when {
+            primary == null || mostRecent == null -> null
+            mostRecent.containerVolume != primary.volume -> ContainerPreset(
+                name = mostRecent.containerType,
+                volume = mostRecent.containerVolume,
+                isDefault = false
+            )
+            else -> topContainers
+                .drop(1)
+                .firstOrNull { it.volume != primary.volume }
+                ?.let {
+                    ContainerPreset(
+                        name = it.name,
+                        volume = it.volume,
+                        isDefault = false
+                    )
+                }
+        }
+
+        Log.d(
+            TAG,
+            "📝 Quick-add presets: primary=${primary?.let { "${it.name}/${it.volume}" } ?: "none"}, " +
+                "secondary=${secondary?.let { "${it.name}/${it.volume}" } ?: "none"}"
+        )
+
+        QuickAddPresets(primary, secondary)
+    }
+
     suspend fun getAllEntriesForDate(date: String): List<WaterIntakeEntry> = withContext(Dispatchers.IO) {
         waterIntakeDao.getAllEntriesForDateSync(date)
     }
@@ -389,12 +436,13 @@ class WaterIntakeRepository(
             val random = Random
 
             val containerTypes = listOf(
-                "Small Glass" to 200.0,
+                "Coffee Cup" to 100.0,
+                "Tea Cup" to 150.0,
+                "Small Cup" to 175.0,
+                "Medium Glass" to 200.0,
                 "Large Glass" to 300.0,
                 "Water Bottle" to 500.0,
-                "Large Bottle" to 750.0,
-                "Coffee Mug" to 250.0,
-                "Sports Bottle" to 1000.0
+                "Large Bottle" to 1000.0
             )
 
             val entries = mutableListOf<WaterIntakeEntry>()
@@ -542,4 +590,9 @@ data class TodayStatistics(
     val lastIntakeTime: Long?,
     val isGoalAchieved: Boolean,
     val remainingAmount: Double
+)
+
+data class QuickAddPresets(
+    val primary: ContainerPreset?,
+    val secondary: ContainerPreset?
 )
