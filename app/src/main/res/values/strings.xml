@@ -16,34 +16,21 @@
     <string name="action_save">Save</string>
     <string name="action_delete">Delete</string>
     <string name="action_add">Add</string>
-    <string name="action_edit">Edit</string>
     <string name="action_close">Close</string>
-    <string name="action_done">Done</string>
     <string name="action_confirm">Confirm</string>
     <string name="action_reset">Reset</string>
-    <string name="action_continue">Continue</string>
-    <string name="action_back">Back</string>
     <string name="action_next">Next</string>
-    <string name="action_skip">Skip</string>
-    <string name="action_got_it">Got it</string>
-    <string name="action_retry">Retry</string>
-    <string name="action_dismiss">Dismiss</string>
 
     <!-- ============================================================================
          Accessibility content descriptions
          Spoken by TalkBack / screen readers. Keep concise.
          ============================================================================ -->
     <string name="cd_back">Back</string>
-    <string name="cd_close">Close</string>
     <string name="cd_delete_entry">Delete entry</string>
     <string name="cd_edit_entry">Edit entry</string>
-    <string name="cd_add_entry">Add entry</string>
     <string name="cd_reorder">Reorder</string>
-    <string name="cd_previous">Previous</string>
-    <string name="cd_next">Next</string>
     <string name="cd_profile_photo">Profile photo</string>
     <string name="cd_water_drop">Water drop</string>
-    <string name="cd_add_custom_amount">Add Custom Amount</string>
     <string name="cd_pinned">Pinned</string>
     <string name="cd_hidden">Hidden</string>
 
@@ -53,7 +40,6 @@
          locale-aware (NumberFormat) and the unit swapped independently.
          ============================================================================ -->
     <string name="unit_milliliters_format">%1$s ml</string>
-    <string name="unit_kilograms_format">%1$d kg</string>
     <!-- current / goal, e.g. "1.2 L / 2.7 L" -->
     <string name="progress_current_of_goal_format">%1$s / %2$s</string>
     <string name="percent_format">%1$d%%</string>
@@ -77,7 +63,6 @@
     <string name="widget_progress_label">HydroTracker Progress</string>
     <string name="widget_large_label">HydroTracker Large</string>
     <string name="widget_progress_description">Shows your daily hydration progress</string>
-    <string name="widget_progress_title">HydroTracker Progress</string>
     <string name="widget_tap_to_open">Tap to open HydroTracker</string>
     <string name="widget_updated_at">Updated %1$s</string>
     <string name="widget_loading">Loading…</string>
@@ -93,30 +78,21 @@
     <string name="screen_display_locale_title">Display &amp; Locale</string>
     <string name="display_language_header">Language</string>
     <string name="display_date_and_time_format_header">Date &amp; Time</string>
-    <string name="display_week_start_header">Week start</string>
     <string name="display_time_format_header">Time Format</string>
-    <string name="display_date_format_header">Date Format</string>
     <string name="display_volume_unit_header">Volume unit</string>
     <!-- Language option that follows the device language instead of a fixed one -->
     <string name="language_system_default">System default</string>
 
     <!-- Time format options -->
     <string name="time_format_system">System</string>
-    <string name="time_format_system_desc">Follows your device locale</string>
     <string name="time_format_12_hour">12-hour</string>
-    <string name="time_format_12_hour_desc">AM / PM</string>
     <string name="time_format_24_hour">24-hour</string>
-    <string name="time_format_24_hour_desc">13:00 instead of 1:00 PM</string>
 
     <!-- Date format options -->
     <string name="date_format_system">System</string>
-    <string name="date_format_system_desc">Follows your device locale</string>
     <string name="date_format_day_month_year">16 Jun 2026</string>
-    <string name="date_format_day_month_year_desc">Day / Month / Year</string>
     <string name="date_format_month_day_year">Jun 16, 2026</string>
-    <string name="date_format_month_day_year_desc">Month / Day / Year</string>
     <string name="date_format_year_month_day">2026–06–16</string>
-    <string name="date_format_year_month_day_desc">Year / Month / Day</string>
 
     <!-- Volume unit options -->
     <string name="unit_millilitres">Metric</string>
@@ -251,7 +227,6 @@
     <string name="container_volume_placeholder">e.g., 250</string>
     <!-- %1$s = minimum valid amount, %2$s = maximum valid amount (both with unit) -->
     <string name="container_volume_error">Enter a valid volume (%1$s–%2$s)</string>
-    <string name="container_icon_auto">Icon updates automatically based on volume</string>
     <string name="container_icon_picker_hint">Tap an icon below to override the automatic choice</string>
     <string name="container_icon_preview_description">Selected container icon</string>
     <string name="container_delete_title">Delete Container?</string>
@@ -269,7 +244,6 @@
     <string name="fab_menu_new_container">New Container</string>
     <string name="fab_menu_add_past_entry">Add Past Entry</string>
     <string name="fab_menu_toggle_menu">Toggle menu</string>
-    <string name="history_title">History &amp; Statistics</string>
 
     <!-- ============================================================================
          Settings — hub
@@ -408,7 +382,6 @@
     <string name="container_deleted">Deleted \"%1$s\" container</string>
     <string name="container_reset_done">Container presets reset to defaults</string>
     <!-- Snackbars; %1$s = beverage name -->
-    <string name="beverage_added">Added \"%1$s\" beverage</string>
 
     <!-- Beverage types list/editor -->
     <string name="screen_beverage_types_title">Beverage Types</string>
@@ -435,7 +408,6 @@
     <string name="hc_data_desc">View your synced intake history</string>
     <string name="hc_restore">Restore from Health Connect</string>
     <string name="hc_restore_confirm">Restore</string>
-    <string name="hc_try_again">Try Again</string>
     <string name="hc_grant_permissions">Grant Permissions</string>
     <string name="hc_restore_message">Import your past HydroTracker entries from Health Connect. Choose a time range:</string>
     <string name="hc_restore_all">All history</string>
@@ -517,17 +489,11 @@
     <string name="dark_mode_system">System Default</string>
     <string name="dark_mode_light">Light Mode</string>
     <string name="dark_mode_dark">Dark Mode</string>
-    <string name="dark_mode_system_desc">Follows your device settings</string>
-    <string name="dark_mode_light_desc">Always use light theme</string>
-    <string name="dark_mode_dark_desc">Always use dark theme</string>
 
     <!-- Colour source -->
     <string name="color_source_hydro">HydroTracker Blue</string>
     <string name="color_source_dynamic">Dynamic Colors</string>
-    <string name="color_source_custom">Custom Colors</string>
-    <string name="color_source_hydro_desc">Beautiful water-themed blue palette</string>
     <string name="color_source_dynamic_desc">Colors from your wallpaper</string>
-    <string name="color_source_custom_desc">Create your own colour scheme</string>
 
     <!-- Week start day -->
     <string name="weekday_sunday">Sunday</string>
@@ -538,14 +504,6 @@
     <string name="weekday_friday">Friday</string>
     <string name="weekday_saturday">Saturday</string>
     <string name="week_start_system">System</string>
-    <string name="week_start_system_desc">Follows your device locale</string>
-    <string name="week_start_sunday_desc">Week starts on Sunday</string>
-    <string name="week_start_monday_desc">Week starts on Monday</string>
-    <string name="week_start_tuesday_desc">Week starts on Tuesday</string>
-    <string name="week_start_wednesday_desc">Week starts on Wednesday</string>
-    <string name="week_start_thursday_desc">Week starts on Thursday</string>
-    <string name="week_start_friday_desc">Week starts on Friday</string>
-    <string name="week_start_saturday_desc">Week starts on Saturday</string>
 
     <!-- App font (proper-noun font names are not translated) -->
     <string name="font_google_sans_flex" translatable="false">Google Sans Flex</string>
@@ -588,7 +546,6 @@
     <!-- ============================================================================
          Health Connect status & badges
          ============================================================================ -->
-    <string name="hc_status_checking">Checking…</string>
     <string name="hc_status_error">Error: %1$s</string>
     <string name="hc_badge_hidden">Hidden</string>
 
@@ -706,7 +663,6 @@
     <!-- ============================================================================
          Placeholder
          ============================================================================ -->
-    <string name="placeholder_coming_soon">Coming soon</string>
 
     <!-- ============================================================================
          Health Connect Data screen
@@ -727,11 +683,8 @@
          Home
          ============================================================================ -->
     <!-- Snackbars -->
-    <string name="home_snackbar_added">Added %1$s%2$s</string>
     <string name="home_snackbar_add_failed">Failed to add water: %1$s</string>
-    <string name="home_snackbar_deleted">Deleted %1$s entry</string>
     <string name="home_snackbar_delete_failed">Failed to delete entry: %1$s</string>
-    <string name="home_snackbar_updated">Updated entry to %1$s</string>
     <string name="home_snackbar_update_failed">Failed to update entry: %1$s</string>
     <string name="home_snackbar_synced">Synced %1$d entries from Health Connect</string>
     <string name="home_snackbar_sync_errors">Sync completed with %1$d errors</string>
@@ -748,20 +701,14 @@
     <string name="home_label_time">Time</string>
     <!-- %1$s = minimum valid amount, %2$s = maximum valid amount (both with unit) -->
     <string name="home_error_amount_invalid">Please enter a valid amount (%1$s–%2$s)</string>
-    <string name="home_label_selected_beverage">Selected: %1$s</string>
     <string name="home_label_hydration_effectiveness">Hydration effectiveness: %1$d%%</string>
     <string name="home_label_effective_hydration">Effective Hydration: %1$d%%</string>
     <string name="home_option_custom">Custom</string>
-    <string name="home_beverage_effective_format">%1$s • %2$s effective</string>
     <string name="home_beverage_effective_name">%1$s</string>
     <string name="home_beverage_effective_amount">%1$s</string>
 
     <!-- Content descriptions -->
     <string name="cd_add_container">Add container</string>
-    <string name="cd_health_connect_syncing">Health Connect syncing</string>
-    <string name="cd_health_connect_synced">Health Connect synced</string>
-    <string name="cd_health_connect_unavailable">Health Connect not available</string>
-    <string name="cd_health_connect_error">Health Connect error</string>
 
     <!-- Stats labels -->
     <string name="home_label_daily_progress">Daily Progress</string>
@@ -769,22 +716,18 @@
     <string name="home_label_first_intake">First</string>
     <string name="home_label_latest_intake">Latest</string>
     <string name="home_section_recent_entries">Recent Entries</string>
-    <string name="home_section_quick_select">Quick Select</string>
 
     <!-- Dialogue titles -->
     <string name="home_dialog_add_custom_amount">Add Custom Amount</string>
     <string name="home_dialog_edit_entry_title">Edit Water Entry</string>
     <string name="home_dialog_external_entry_title">External Water Entry</string>
     <string name="home_dialog_select_time">Select Time</string>
-    <string name="home_dialog_delete_title">Delete Entry</string>
     <string name="home_dialog_delete_message">Are you sure you want to delete this %1$s %2$s entry?</string>
-    <string name="home_dialog_delete_warning">This action cannot be undone.</string>
     <string name="home_external_entry_title">Entry from another app</string>
     <string name="home_external_entry_message">This entry was imported from another health app and cannot be edited. You can only view its details.</string>
 
     <!-- Add Container Card -->
     <string name="home_add_container_label">Add</string>
-    <string name="home_swipe_hint">Edit → • ← Delete</string>
 
     <!-- Container preset names (stable English key kept for storage; these are display strings) -->
     <string name="container_coffee_cup">Coffee Cup</string>
@@ -807,7 +750,6 @@
     <!-- ============================================================================
          Profile
          ============================================================================ -->
-    <string name="profile_snackbar_updated">Profile updated successfully!</string>
 
     <!-- Time-based greeting shown above the username; keep the trailing comma if the
          language separates greeting and name with a comma. -->
@@ -816,35 +758,24 @@
     <string name="profile_greeting_evening">Good evening,</string>
     <string name="profile_greeting_default">Hello,</string>
 
-    <string name="cd_edit_name">Edit name</string>
-
     <!-- Quick stats under the profile header -->
     <string name="profile_stat_today_entries">Today\'s Entries</string>
     <string name="profile_stat_days_tracked">Days Tracked</string>
     <string name="profile_stat_today_goal">Today\'s Goal</string>
 
     <!-- Section titles on the Profile screen -->
-    <string name="profile_section_details">Profile Details</string>
     <string name="profile_section_daily_goals">Daily Goals</string>
-    <string name="profile_section_active_schedule">Active Schedule</string>
     <string name="profile_section_personal">Personal</string>
 
     <!-- Info-row labels -->
     <string name="profile_label_gender">Gender</string>
-    <string name="profile_label_age_group">Age Group</string>
-    <string name="profile_label_weight">Weight</string>
-    <string name="profile_weight_not_set">Not set</string>
     <string name="profile_label_daily_goal">Daily Water Goal</string>
     <string name="profile_label_activity_level">Activity Level</string>
-    <string name="profile_label_active_hours">Active Hours</string>
-    <string name="profile_label_reminder_interval">Reminder Interval</string>
 
     <!-- e.g. "07:00 - 23:00" -->
-    <string name="profile_active_hours_format">%1$s - %2$s</string>
 
     <!-- Profile photo sheet -->
     <string name="profile_photo_sheet_title">Update Profile Photo</string>
-    <string name="profile_remove_photo_desc">Use default avatar</string>
 
     <!-- Name edit dialogue -->
     <string name="profile_name_dialog_title">Edit Name</string>
@@ -855,41 +786,22 @@
     <string name="profile_goal_edit_title">Edit Daily Goal</string>
     <string name="profile_goal_edit_description">Set your daily water intake goal. This will be used to track your progress and calculate reminders.</string>
     <!-- %1$s = formatted amount in the user's volume unit -->
-    <string name="profile_goal_slider_label">Use slider to adjust: %1$s</string>
-    <string name="profile_goal_manual_label">Or enter manually:</string>
-    <string name="profile_goal_input_label">Daily Goal (%1$s)</string>
     <!-- %1$s = minimum valid amount, %2$s = maximum valid amount (both with unit) -->
-    <string name="profile_goal_input_error">Please enter a valid amount (%1$s–%2$s)</string>
     <!-- %1$s = minimum recommended amount, %2$s = maximum recommended amount (both with unit) -->
-    <string name="profile_goal_input_hint">Recommended: %1$s – %2$s per day</string>
 
     <!-- Activity level bottom sheet -->
     <string name="profile_activity_title">Activity Level</string>
-    <string name="profile_activity_description">Your activity level affects your daily water needs. Changing this will automatically update your daily goal.</string>
 
     <!-- Schedule bottom sheet -->
-    <string name="profile_schedule_title">Edit Schedule</string>
-    <string name="profile_schedule_description">Set your daily schedule to get reminders only during your active hours. This will automatically adjust your reminder frequency.</string>
-    <string name="profile_schedule_wake_label">Wake Up Time</string>
-    <string name="profile_schedule_sleep_label">Sleep Time</string>
 
     <!-- Gender bottom sheet -->
     <string name="profile_gender_title">Select Gender</string>
-    <string name="profile_gender_description">Gender helps us calculate more accurate hydration recommendations based on physiological differences.</string>
 
     <!-- Age group bottom sheet -->
-    <string name="profile_age_title">Select Age Group</string>
-    <string name="profile_age_description">Age affects your daily water needs. Different age groups have varying hydration requirements.</string>
 
     <!-- Weight bottom sheet -->
-    <string name="profile_weight_title">Enter Weight</string>
-    <string name="profile_weight_description">Adding your weight helps us provide more accurate hydration recommendations. This information is optional and stored locally.</string>
-    <string name="profile_weight_input_label">Weight (kg)</string>
-    <string name="profile_weight_input_error">Please enter a valid weight (30–300 kg)</string>
-    <string name="profile_weight_input_hint">Leave empty if you prefer not to share</string>
 
     <!-- Generic OK button for time pickers and similar dialogues -->
-    <string name="action_ok">OK</string>
 
     <!-- ============================================================================
          History &amp; Analytics
@@ -909,10 +821,6 @@
     <string name="history_this_year">This Year</string>
     <string name="history_last_year">Last Year</string>
 
-    <string name="history_weekly_overview">Weekly Overview</string>
-    <string name="history_monthly_overview">Monthly Overview</string>
-    <string name="history_yearly_overview">Yearly Overview</string>
-
     <string name="history_stat_total">Total</string>
     <string name="history_stat_average">Average</string>
     <string name="history_stat_best_day">Best Day</string>
@@ -920,25 +828,12 @@
     <string name="history_stat_goals_met">Goals Met</string>
     <string name="history_stat_success_rate">Success Rate</string>
     <string name="history_stat_total_intake">Total Intake</string>
-    <string name="history_stat_current_streak">Current Streak</string>
-    <string name="history_stat_daily_average">Daily Average</string>
 
-    <plurals name="history_streak_days">
-        <item quantity="one">day</item>
-        <item quantity="other">days</item>
-    </plurals>
-    <string name="history_section_statistics">Statistics</string>
-    <string name="history_section_goal_achievement">Goal Achievement</string>
-    <string name="history_goal_achievement_subtitle">of days you met your goal</string>
-    <string name="history_empty_goal_achievement">Start tracking your water intake to see your goal achievement rate!</string>
     <string name="history_empty_week">No data available for this week</string>
     <string name="history_empty_month">No data available for the last 30 days</string>
     <string name="history_empty_year">No data available for this year</string>
     <string name="history_empty_generic">No data available</string>
     <string name="history_select_day_hint">Tap a day on the chart to see its entries</string>
-
-    <string name="history_legend_less">Less</string>
-    <string name="history_legend_more">More</string>
 
     <!-- ============================================================================
          Statistics
@@ -949,11 +844,8 @@
 
     <!-- Section titles -->
     <string name="statistics_section_overview">Overview</string>
-    <string name="statistics_section_drinking_pattern">Drinking Pattern</string>
     <string name="statistics_section_beverages">Beverage Breakdown</string>
     <string name="statistics_section_containers">Container Usage</string>
-    <string name="statistics_section_hydration_multiplier">Hydration Multiplier</string>
-    <string name="statistics_section_health_connect">Health Connect Imports</string>
 
     <!-- Hero stats -->
     <string name="statistics_hero_success_rate">Success Rate</string>
@@ -978,7 +870,6 @@
 
     <!-- Beverage breakdown -->
     <!-- %1$d = drink count, %2$s = effective volume with unit -->
-    <string name="statistics_beverage_detail">%1$d drinks • %2$s effective</string>
     <!-- %1$s = effective volume with unit -->
     <string name="statistics_beverage_effective_short">%1$s \neffective</string>
 
@@ -988,23 +879,12 @@
     <string name="statistics_container_header_uses">Uses</string>
 
     <!-- Hydration multiplier -->
-    <string name="statistics_label_raw_intake">Raw Intake</string>
-    <string name="statistics_label_effective_intake">Effective Intake</string>
     <!-- %1$s = signed percentage, e.g. "+5%" -->
-    <string name="statistics_multiplier_effect">Beverage multipliers: %1$s effective hydration</string>
 
     <!-- Health Connect imports -->
-    <string name="statistics_label_external_entries">Imported Entries</string>
-    <string name="statistics_label_external_volume">Imported Volume</string>
-    <string name="statistics_label_source_breakdown">Source Breakdown</string>
-    <string name="statistics_hc_no_imports_title">No imports yet</string>
-    <string name="statistics_hc_no_imports_description">Data imported from other health apps will appear here.</string>
 
-    <string name="history_detail_water_intake">Water Intake</string>
     <!-- %1$s = formatted goal amount -->
-    <string name="history_detail_goal">Goal: %1$s</string>
     <!-- %1$d = percentage -->
-    <string name="history_detail_progress">Progress: %1$d%%</string>
 
     <!-- Short weekday names for the monthly calendar header -->
     <string name="weekday_short_sun">Sun</string>
@@ -1159,7 +1039,6 @@
     <string name="date_format_title">Date Format</string>
     <string name="week_start_format_title">Week Start</string>
     <string name="profile_photo_sheet_gallery_title">Choose from Gallery</string>
-    <string name="profile_photo_sheet_gallery_subtitle">Select an existing file</string>
     <string name="profile_photo_sheet_camera_title">Take a photo</string>
     <string name="profile_photo_sheet_delete">Remove profile photo</string>
 
@@ -1171,7 +1050,6 @@
     <string name="crop_rotate_right">Rotate right 90 degrees</string>
     <string name="crop_reset">Reset</string>
     <string name="cd_crop_image">Photo to crop</string>
-    <string name="error_loading_image">Could not load image</string>
     <string name="error_saving_image">Could not save cropped image</string>
 
     <!-- Water facts shown with gentle reminders -->

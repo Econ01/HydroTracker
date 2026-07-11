@@ -2,43 +2,22 @@
 <resources>
     <!-- Widget corner radius -->
     <dimen name="widget_corner_radius">28dp</dimen>
-    <dimen name="widget_corner_radius_small">20dp</dimen>
 
     <!-- Widget padding -->
-    <dimen name="widget_padding">16dp</dimen>
-    <dimen name="widget_padding_small">12dp</dimen>
     <dimen name="widget_padding_compact">8dp</dimen>
 
     <!-- Widget content spacing -->
-    <dimen name="widget_spacing">8dp</dimen>
-    <dimen name="widget_spacing_small">4dp</dimen>
-    <dimen name="widget_spacing_large">12dp</dimen>
 
     <!-- Progress bar -->
-    <dimen name="widget_progress_bar_height">8dp</dimen>
-    <dimen name="widget_progress_bar_height_small">6dp</dimen>
     <dimen name="widget_progress_bar_corner">4dp</dimen>
 
     <!-- Circular progress -->
-    <dimen name="widget_circular_progress_size">56dp</dimen>
-    <dimen name="widget_circular_progress_size_small">40dp</dimen>
-    <dimen name="widget_circular_progress_stroke">6dp</dimen>
-    <dimen name="widget_circular_progress_stroke_small">4dp</dimen>
 
     <!-- Button dimensions -->
-    <dimen name="widget_button_min_height">48dp</dimen>
-    <dimen name="widget_button_min_width">48dp</dimen>
     <dimen name="widget_button_corner_radius">12dp</dimen>
-    <dimen name="widget_button_padding">12dp</dimen>
 
     <!-- Icon sizes -->
-    <dimen name="widget_icon_size">24dp</dimen>
-    <dimen name="widget_icon_size_small">20dp</dimen>
 
     <!-- Text sizes (following Material type scale) -->
-    <dimen name="widget_text_headline">22sp</dimen>
-    <dimen name="widget_text_title">16sp</dimen>
-    <dimen name="widget_text_body">14sp</dimen>
-    <dimen name="widget_text_label">12sp</dimen>
     <dimen name="widget_text_caption">11sp</dimen>
 </resources>
