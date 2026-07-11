@@ -322,6 +322,10 @@ class WaterIntakeRepository(
         return dailySummaryDao.getSummariesForRange(startDate, endDate)
     }
 
+    fun getAllSummaries(): Flow<List<DailySummary>> {
+        return dailySummaryDao.getAllSummaries()
+    }
+
     private suspend fun updateDailySummaryForDate(date: String) = withContext(Dispatchers.IO) {
         try {
             val userProfile = userRepository.userProfile.first()

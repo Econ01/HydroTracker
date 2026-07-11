@@ -961,7 +961,7 @@
 
     <!-- Overview labels -->
     <string name="statistics_label_current_streak">Current Streak</string>
-    <string name="statistics_label_average_daily_intake">Average Daily Intake</string>
+    <string name="statistics_label_average_daily_intake">Daily Average</string>
     <string name="statistics_label_total_intake">Total Intake</string>
     <string name="statistics_label_success_rate">Success Rate</string>
     <string name="statistics_label_days_tracked">Days Tracked</string>
@@ -979,8 +979,13 @@
     <!-- Beverage breakdown -->
     <!-- %1$d = drink count, %2$s = effective volume with unit -->
     <string name="statistics_beverage_detail">%1$d drinks • %2$s effective</string>
-    <!-- %1$d = drink count, %2$s = effective volume with unit -->
-    <string name="statistics_single_beverage_description">%1$d drinks logged • %2$s effective hydration</string>
+    <!-- %1$s = effective volume with unit -->
+    <string name="statistics_beverage_effective_short">%1$s \neffective</string>
+
+    <!-- Container Usage -->
+    <string name="statistics_container_header_container">Container</string>
+    <string name="statistics_container_header_volume">Volume</string>
+    <string name="statistics_container_header_uses">Uses</string>
 
     <!-- Hydration multiplier -->
     <string name="statistics_label_raw_intake">Raw Intake</string>

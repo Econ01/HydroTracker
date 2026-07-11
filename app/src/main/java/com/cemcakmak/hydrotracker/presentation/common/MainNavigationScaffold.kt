@@ -109,6 +109,7 @@ fun MainNavigationScaffold(
     val shouldShowBottomBar = currentKey in setOf(
         NavigationRoutes.Home,
         NavigationRoutes.History,
+        NavigationRoutes.Statistics,
         NavigationRoutes.Settings
     )
 
@@ -459,6 +460,12 @@ enum class NavigationItem(
         labelResId = R.string.nav_history,
         iconRes = R.drawable.leaderboard,
         selectedIconRes = R.drawable.leaderboard_filled
+    ),
+    STATISTICS(
+        key = NavigationRoutes.Statistics,
+        labelResId = R.string.nav_statistics,
+        iconRes = R.drawable.analytics,
+        selectedIconRes = R.drawable.analytics_filled
     ),
     SETTINGS(
         key = NavigationRoutes.Settings,

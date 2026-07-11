@@ -57,7 +57,8 @@ fun <T> BlurMorph(
 fun rememberAnimatedDouble(
     targetValue: Double,
     hapticsEnabled: Boolean = true,
-    animationSpec: AnimationSpec<Float> = tween(durationMillis = 800, easing = EaseInOut)
+    step: Double = 0.2,
+    animationSpec: AnimationSpec<Float> = tween(durationMillis = 1000, easing = EaseInOut)
 ): Float {
     val view = LocalView.current
     val animatable = remember { Animatable(0f) }
@@ -70,10 +71,9 @@ fun rememberAnimatedDouble(
     }
 
     if (hapticsEnabled) {
-        LaunchedEffect(Unit) {
+        LaunchedEffect(step) {
             var lastTick = -1
             snapshotFlow { animatable.value }.collect { animatedValue ->
-                val step = 0.2
                 val currentTick = (animatedValue / step).toInt()
                 if (currentTick != lastTick && animatedValue > 0f) {
                     lastTick = currentTick

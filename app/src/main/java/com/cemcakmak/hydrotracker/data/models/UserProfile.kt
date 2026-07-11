@@ -137,6 +137,5 @@ enum class VolumeUnit(
 ) {
     MILLILITRES(R.string.unit_millilitres, R.string.unit_ml_short, 1.0),
     US_FLUID_OUNCE(R.string.unit_us_fl_oz, R.string.unit_us_fl_oz_short, 29.5735),
-    IMPERIAL_FLUID_OUNCE(R.string.unit_imperial_fl_oz, R.string.unit_imperial_fl_oz_short, 28.4131),
-    US_CUP(R.string.unit_us_cup, R.string.unit_us_cup_short, 236.588)
+    IMPERIAL_FLUID_OUNCE(R.string.unit_imperial_fl_oz, R.string.unit_imperial_fl_oz_short, 28.4131)
 }

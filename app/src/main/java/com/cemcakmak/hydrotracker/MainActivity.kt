@@ -60,6 +60,9 @@ import com.cemcakmak.hydrotracker.presentation.home.HomeScreen
 import com.cemcakmak.hydrotracker.presentation.history.HistoryScreen
 import com.cemcakmak.hydrotracker.presentation.history.HistoryViewModel
 import com.cemcakmak.hydrotracker.presentation.history.HistoryViewModelFactory
+import com.cemcakmak.hydrotracker.presentation.statistics.StatisticsScreen
+import com.cemcakmak.hydrotracker.presentation.statistics.StatisticsViewModel
+import com.cemcakmak.hydrotracker.presentation.statistics.StatisticsViewModelFactory
 import com.cemcakmak.hydrotracker.presentation.settings.SettingsHubScreen
 import com.cemcakmak.hydrotracker.presentation.settings.AboutScreen
 import com.cemcakmak.hydrotracker.presentation.settings.UpdatesScreen
@@ -96,6 +99,7 @@ internal const val TAB_SWITCH_DURATION = 400
 private val TOP_LEVEL_TAB_KEYS: Set<NavigationRoutes> = setOf(
     NavigationRoutes.Home,
     NavigationRoutes.History,
+    NavigationRoutes.Statistics,
     NavigationRoutes.Settings,
 )
 
@@ -260,6 +264,11 @@ fun HydroTrackerApp(
         factory = HistoryViewModelFactory(waterIntakeRepository, userRepository)
     )
     val historyUiState by historyViewModel.uiState.collectAsState()
+
+    val statisticsViewModel: StatisticsViewModel = viewModel(
+        factory = StatisticsViewModelFactory(waterIntakeRepository, userRepository, containerPresetRepository)
+    )
+    val statisticsUiState by statisticsViewModel.uiState.collectAsState()
 
     val appPreferences by userRepository.appPreferences.collectAsState(initial = null)
     val userProfile = appPreferences?.profile
@@ -531,6 +540,16 @@ fun HydroTrackerApp(
                                         waterIntakeRepository.deleteWaterIntake(entry)
                                     }
                                 }
+                            )
+                        }
+
+                        entry<NavigationRoutes.Statistics> {
+                            StatisticsScreen(
+                                uiState = statisticsUiState,
+                                themePreferences = themePreferences,
+                                userProfile = userProfile,
+                                activeBeverages = activeBeverages,
+                                paddingValues = paddingValues
                             )
                         }
 
