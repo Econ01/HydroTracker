@@ -3,6 +3,7 @@ package com.cemcakmak.hydrotracker.data.database.entities
 import android.content.Context
 import androidx.room.*
 import com.cemcakmak.hydrotracker.data.models.BeverageType
+import com.cemcakmak.hydrotracker.data.models.EntrySource
 import com.cemcakmak.hydrotracker.data.models.TimeFormat
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
@@ -63,7 +64,10 @@ data class WaterIntakeEntry(
     val iconType: String = "DRAWABLE",
 
     @ColumnInfo(name = "icon_name", defaultValue = "water_filled")
-    val iconName: String = "water_filled"
+    val iconName: String = "water_filled",
+
+    @ColumnInfo(name = "source", defaultValue = "LOCAL")
+    val source: EntrySource = EntrySource.LOCAL
 ) {
     /**
      * Returns a formatted time string according to the user's [timeFormat] preference.
@@ -87,7 +91,15 @@ data class WaterIntakeEntry(
      * Check if this entry was imported from an external Health Connect app
      */
     fun isExternalEntry(): Boolean {
-        return note?.startsWith("Imported from ") == true
+        return source == EntrySource.HEALTH_CONNECT_EXTERNAL
+    }
+
+    /**
+     * Check if this entry can be mirrored to Health Connect on write/update/delete.
+     * Local entries and our own restored entries are mirrored; external imports are read-only.
+     */
+    fun isSyncableToHealthConnect(): Boolean {
+        return source == EntrySource.LOCAL || source == EntrySource.HEALTH_CONNECT_RESTORED
     }
 
     /**
@@ -121,7 +133,8 @@ data class WaterIntakeEntry(
             beverageType: BeverageType = BeverageType.WATER,
             note: String? = null,
             iconType: String = "DRAWABLE",
-            iconName: String = "water_filled"
+            iconName: String = "water_filled",
+            source: EntrySource = EntrySource.LOCAL
         ): WaterIntakeEntry {
             val now = System.currentTimeMillis()
             val today = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -136,7 +149,8 @@ data class WaterIntakeEntry(
                 note = note,
                 beverageType = beverageType.name,
                 iconType = iconType,
-                iconName = iconName
+                iconName = iconName,
+                source = source
             )
         }
     }

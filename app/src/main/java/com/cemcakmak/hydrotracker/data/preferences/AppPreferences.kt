@@ -22,4 +22,5 @@ data class AppPreferences(
     val theme: ThemePreferences = ThemePreferences(),
     val beverages: BeveragePreferences = BeveragePreferences.default(),
     val hapticsEnabled: Boolean = true,
+    val lastHealthConnectImportTime: Long? = null,
 )

@@ -267,6 +267,8 @@
     <string name="settings_support_desc">Donate and support the app</string>
     <string name="settings_about_desc">Sources, privacy policy and license</string>
     <string name="settings_developer_desc">Debug tools and testing</string>
+    <string name="screen_data_management_title">Data Management</string>
+    <string name="settings_data_management_desc">Export, import and delete your data</string>
 
     <!-- ============================================================================
          Settings — Appearance
@@ -550,6 +552,43 @@
     <string name="beverage_desc_fruit_juice">Fruit juice - enhanced hydration</string>
 
     <!-- ============================================================================
+         Data Management
+         ============================================================================ -->
+    <string name="data_management_backup_header">Import &amp; Export</string>
+    <string name="data_management_delete_header">Delete Data</string>
+    <string name="data_export_csv_title">Export as CSV</string>
+    <string name="data_export_json_title">Export as JSON</string>
+    <string name="data_import_title">Import backup</string>
+    <string name="data_import_desc">Restore entries from a CSV or JSON file</string>
+    <string name="data_import_button">Import</string>
+    <string name="data_export_scope_desc">Exports only HydroTracker entries. Entries imported from other health apps are excluded.</string>
+    <string name="data_delete_before_date_title">Delete entries before date</string>
+    <string name="data_delete_before_date_desc">Remove intake entries on or before a chosen date</string>
+    <string name="data_delete_before_date_inclusive_hint">Selected date is included in the deletion.</string>
+    <string name="data_delete_local_toggle">Delete local entries</string>
+    <string name="data_delete_health_connect_toggle">Delete from Health Connect</string>
+    <string name="data_delete_local_title">Delete local data only</string>
+    <string name="data_delete_local_desc">Remove all app data stored on this device</string>
+    <string name="data_delete_local_message">This will delete all water intake entries, daily summaries, container presets, custom beverages, and your profile. This action cannot be undone.</string>
+    <string name="data_delete_health_connect_title">Delete Health Connect data only</string>
+    <string name="data_delete_health_connect_desc">Remove HydroTracker records from Health Connect</string>
+    <string name="data_delete_health_connect_message">This will delete HydroTracker records from Health Connect. Entries from other apps will not be affected. This action cannot be undone.</string>
+    <string name="data_delete_everything_title">Delete everything</string>
+    <string name="data_delete_everything_desc">Remove all local and Health Connect data</string>
+    <string name="data_delete_everything_message">This will delete all local data and all HydroTracker records from Health Connect, then reset your profile. This action cannot be undone.</string>
+    <!-- %1$d = number of entries exported -->
+    <string name="data_export_success">Exported %1$d entries</string>
+    <!-- %1$s = error message -->
+    <string name="data_export_failed">Export failed: %1$s</string>
+    <!-- %1$d = imported count, %2$d = skipped count -->
+    <string name="data_import_success">Imported %1$d entries, skipped %2$d duplicates</string>
+    <!-- %1$s = error message -->
+    <string name="data_import_failed">Import failed: %1$s</string>
+    <string name="data_delete_success">Data deleted successfully</string>
+    <!-- %1$s = error message -->
+    <string name="data_delete_failed">Delete failed: %1$s</string>
+
+    <!-- ============================================================================
          Health Connect status & badges
          ============================================================================ -->
     <string name="hc_status_error">Error: %1$s</string>
@@ -696,6 +735,7 @@
     <string name="home_snackbar_sync_errors">Sync completed with %1$d errors</string>
     <string name="home_snackbar_up_to_date">Data is up to date</string>
     <string name="home_snackbar_sync_failed">Sync failed: %1$s</string>
+    <string name="home_snackbar_sync_disabled">Health Connect sync is disabled</string>
     <string name="home_snackbar_container_added">Added "%1$s" container</string>
     <string name="home_snackbar_container_updated">Updated "%1$s" container</string>
     <string name="home_snackbar_container_deleted">Deleted "%1$s" container</string>

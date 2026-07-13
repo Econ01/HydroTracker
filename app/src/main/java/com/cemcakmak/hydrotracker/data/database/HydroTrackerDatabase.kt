@@ -17,7 +17,7 @@ import com.cemcakmak.hydrotracker.data.database.entities.CustomBeverageEntity
         ContainerPresetEntity::class,
         CustomBeverageEntity::class
     ],
-    version = 9,
+    version = 10,
     exportSchema = true
 )
 abstract class HydroTrackerDatabase : RoomDatabase() {

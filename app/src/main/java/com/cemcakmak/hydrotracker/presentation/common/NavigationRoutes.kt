@@ -9,7 +9,6 @@ sealed interface NavigationRoutes : NavKey {
     @Serializable data object History : NavigationRoutes
     @Serializable data object Statistics : NavigationRoutes
     @Serializable data object Settings : NavigationRoutes
-    @Serializable data object HealthConnectData : NavigationRoutes
 
     @Serializable data object SettingsAppearance : NavigationRoutes
     @Serializable data object SettingsDisplay : NavigationRoutes
@@ -27,6 +26,7 @@ sealed interface NavigationRoutes : NavKey {
     @Serializable data object SettingsDeveloperHaptics : NavigationRoutes
     @Serializable data object SettingsDeveloperHapticsLab : NavigationRoutes
     @Serializable data object SettingsProfile : NavigationRoutes
+    @Serializable data object SettingsDataManagement : NavigationRoutes
 
     @Serializable
     enum class CropCaller {

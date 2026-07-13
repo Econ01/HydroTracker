@@ -11,14 +11,20 @@ import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
 import com.cemcakmak.hydrotracker.data.models.ContainerPreset
 import com.cemcakmak.hydrotracker.data.models.BeverageType
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
 import java.util.*
 import com.cemcakmak.hydrotracker.widgets.WidgetUpdateHelper
 import com.cemcakmak.hydrotracker.utils.UserDayCalculator
 import com.cemcakmak.hydrotracker.utils.ContainerIconMapper
 import android.content.Context
 import androidx.core.content.edit
+import androidx.health.connect.client.records.HydrationRecord
 import android.content.SharedPreferences
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
+import com.cemcakmak.hydrotracker.health.HealthConnectManager
 import com.cemcakmak.hydrotracker.health.HealthConnectSyncManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -133,10 +139,10 @@ class WaterIntakeRepository(
 
     suspend fun deleteWaterIntake(entry: WaterIntakeEntry): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            if (entry.isExternalEntry()) {
+            if (!entry.isSyncableToHealthConnect()) {
                 Log.d(TAG, "👁️ Hiding external entry: ${entry.amount}ml (ID: ${entry.id}) from ${entry.containerType}")
 
-                // Hide external entries instead of deleting them
+                // External imports are read-only snapshots; hide them locally
                 waterIntakeDao.hideEntry(entry.id)
                 updateDailySummaryForDate(entry.date)
 
@@ -190,6 +196,36 @@ class WaterIntakeRepository(
     }
 
     fun getHiddenEntries(): Flow<List<WaterIntakeEntry>> = waterIntakeDao.getHiddenEntries()
+
+    /**
+     * Returns all non-hidden HydroTracker entries for export.
+     */
+    suspend fun getAllEntriesForExport(): List<WaterIntakeEntry> = withContext(Dispatchers.IO) {
+        waterIntakeDao.getAllEntriesForExportSync()
+    }
+
+    /**
+     * Check whether an entry already exists locally using the same Health Connect record ID or
+     * timestamp/amount window used during Health Connect import.
+     */
+    suspend fun isDuplicateEntry(entry: WaterIntakeEntry): Boolean = withContext(Dispatchers.IO) {
+        val existingEntries = waterIntakeDao.getAllEntriesForDateSync(entry.date)
+
+        if (entry.healthConnectRecordId != null) {
+            if (existingEntries.any { it.healthConnectRecordId == entry.healthConnectRecordId }) {
+                return@withContext true
+            }
+        }
+
+        val timeWindow = 5 * 60 * 1000L
+        val amountTolerance = 10.0
+
+        existingEntries.any { existing ->
+            val timeDiff = kotlin.math.abs(existing.timestamp - entry.timestamp)
+            val amountDiff = kotlin.math.abs(existing.getEffectiveHydrationAmount() - entry.getEffectiveHydrationAmount())
+            timeDiff <= timeWindow && amountDiff <= amountTolerance
+        }
+    }
 
     suspend fun updateWaterIntake(oldEntry: WaterIntakeEntry, newEntry: WaterIntakeEntry): Result<Unit> = withContext(Dispatchers.IO) {
         try {
@@ -418,7 +454,127 @@ class WaterIntakeRepository(
         try {
             waterIntakeDao.deleteAllEntries()
             dailySummaryDao.deleteAllSummaries()
+            WidgetUpdateHelper.updateAllWidgets(context)
             Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Delete all local water intake entries recorded on or before the supplied calendar date.
+     * The cutoff is inclusive and uses the end of the selected day in the local time zone.
+     */
+    suspend fun deleteEntriesBefore(date: LocalDate): Result<Int> = withContext(Dispatchers.IO) {
+        try {
+            val endOfDay = date.atTime(LocalTime.MAX)
+                .atZone(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli()
+
+            // Capture affected dates before deletion so summaries can be recomputed.
+            val affectedDates = waterIntakeDao.getAllEntriesForDateRangeSync(
+                startDate = "1970-01-01",
+                endDate = date.toString()
+            ).map { it.date }.distinct()
+
+            val countBefore = waterIntakeDao.getEntryCount()
+            waterIntakeDao.deleteEntriesBefore(endOfDay)
+            val countAfter = waterIntakeDao.getEntryCount()
+            val deleted = countBefore - countAfter
+
+            affectedDates.forEach { updateDailySummaryForDate(it) }
+
+            WidgetUpdateHelper.updateAllWidgets(context)
+            Result.success(deleted)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Delete HydroTracker records from Health Connect that fall on or before the given calendar date.
+     * Returns the number of records deleted.
+     */
+    suspend fun deleteHealthConnectEntriesBefore(
+        context: Context,
+        date: LocalDate
+    ): Result<Int> = withContext(Dispatchers.IO) {
+        try {
+            if (!HealthConnectManager.isAvailable(context) || !HealthConnectManager.hasPermissions(context)) {
+                return@withContext Result.success(0)
+            }
+
+            val endOfDay = date.atTime(LocalTime.MAX)
+                .atZone(ZoneId.systemDefault())
+                .toInstant()
+
+            val result = HealthConnectManager.readHydrationRecords(context, Instant.EPOCH, endOfDay)
+            if (result.isFailure) {
+                return@withContext Result.failure(
+                    result.exceptionOrNull() ?: Exception("Failed to read Health Connect records")
+                )
+            }
+
+            val hydroTrackerRecords = result.getOrNull()?.filter { record ->
+                record.metadata.dataOrigin.packageName == "com.cemcakmak.hydrotracker" ||
+                    record.metadata.clientRecordId?.startsWith("hydrotracker_") == true
+            } ?: emptyList()
+
+            var deletedCount = 0
+            hydroTrackerRecords.forEach { record ->
+                val recordId = record.metadata.clientRecordId ?: record.metadata.id
+                val deleteResult = HealthConnectManager.deleteHydrationRecord(context, recordId)
+                if (deleteResult.isSuccess) {
+                    deletedCount++
+                }
+            }
+
+            Result.success(deletedCount)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Delete all HydroTracker records from Health Connect.
+     */
+    suspend fun deleteAllHealthConnectData(context: Context): Result<Int> = withContext(Dispatchers.IO) {
+        deleteHealthConnectRecords(context) { true }
+    }
+
+    private suspend fun deleteHealthConnectRecords(
+        context: Context,
+        predicate: (HydrationRecord) -> Boolean
+    ): Result<Int> = withContext(Dispatchers.IO) {
+        try {
+            if (!HealthConnectManager.isAvailable(context) || !HealthConnectManager.hasPermissions(context)) {
+                return@withContext Result.success(0)
+            }
+
+            val result = HealthConnectManager.readHydrationRecords(context, Instant.EPOCH, Instant.now())
+            if (result.isFailure) {
+                return@withContext Result.failure(
+                    result.exceptionOrNull() ?: Exception("Failed to read Health Connect records")
+                )
+            }
+
+            val hydroTrackerRecords = result.getOrNull()?.filter { record ->
+                (record.metadata.dataOrigin.packageName == "com.cemcakmak.hydrotracker" ||
+                    record.metadata.clientRecordId?.startsWith("hydrotracker_") == true) &&
+                    predicate(record)
+            } ?: emptyList()
+
+            var deletedCount = 0
+            hydroTrackerRecords.forEach { record ->
+                val recordId = record.metadata.clientRecordId ?: record.metadata.id
+                val deleteResult = HealthConnectManager.deleteHydrationRecord(context, recordId)
+                if (deleteResult.isSuccess) {
+                    deletedCount++
+                }
+            }
+
+            Result.success(deletedCount)
         } catch (e: Exception) {
             Result.failure(e)
         }

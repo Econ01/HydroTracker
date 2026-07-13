@@ -238,10 +238,10 @@ fun SettingsHubScreen(
                     )
                     add(
                         SettingsCategory(
-                            title = stringResource(R.string.screen_support_title),
-                            description = stringResource(R.string.settings_support_desc),
-                            icon = { Icon(ImageVector.vectorResource(R.drawable.heart_smile_filled), contentDescription = null) },
-                            route = NavigationRoutes.SettingsSupport
+                            title = stringResource(R.string.screen_data_management_title),
+                            description = stringResource(R.string.settings_data_management_desc),
+                            icon = { Icon(ImageVector.vectorResource(R.drawable.save_fill), contentDescription = null) },
+                            route = NavigationRoutes.SettingsDataManagement
                         )
                     )
                     val isUpdateAvailable = updateStatus is UpdateStatus.Available
@@ -331,7 +331,6 @@ private fun ProfileSettingsCategoryCard(
         }
     ) {
         ListItem(
-            headlineContent = { Text(text = stringResource(R.string.nav_profile)) },
             supportingContent = { Text(text = userProfile.name, modifier = nameModifier) },
             leadingContent = {
                     ProfileAvatar(
@@ -340,7 +339,9 @@ private fun ProfileSettingsCategoryCard(
                     size = 44.dp
                 )
             }
-        )
+        ) {
+            Text(text = stringResource(R.string.nav_profile))
+        }
     }
 }
 
@@ -371,14 +372,15 @@ private fun SettingsCategoryCard(
         }
     ) {
         ListItem(
-            headlineContent = { Text(category.title) },
             supportingContent = { Text(category.description) },
             leadingContent = category.icon,
             colors = ListItemDefaults.colors(
                 leadingContentColor = MaterialTheme.colorScheme.primary,
                 contentColor = category.titleColor ?: ListItemDefaults.colors().contentColor
             )
-        )
+        ) {
+            Text(category.title)
+        }
     }
 }
 

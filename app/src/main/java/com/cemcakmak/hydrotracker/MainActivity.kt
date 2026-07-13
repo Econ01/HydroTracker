@@ -70,6 +70,7 @@ import com.cemcakmak.hydrotracker.presentation.settings.WhatsNewBottomSheet
 import com.cemcakmak.hydrotracker.presentation.settings.UpdateAvailableDialog
 import com.cemcakmak.hydrotracker.presentation.settings.AppearanceScreen
 import com.cemcakmak.hydrotracker.presentation.settings.DisplayLocaleScreen
+import com.cemcakmak.hydrotracker.presentation.settings.DataManagementScreen
 import com.cemcakmak.hydrotracker.presentation.settings.HydrationHealthScreen
 import com.cemcakmak.hydrotracker.presentation.settings.QuickAddCustomizationScreen
 import com.cemcakmak.hydrotracker.presentation.settings.ContainerPresetsScreen
@@ -81,7 +82,6 @@ import com.cemcakmak.hydrotracker.presentation.settings.HapticsLabScreen
 import com.cemcakmak.hydrotracker.presentation.settings.HapticsTestScreen
 import com.cemcakmak.hydrotracker.presentation.settings.LicensesScreen
 import com.cemcakmak.hydrotracker.presentation.settings.SupportDevelopmentScreen
-import com.cemcakmak.hydrotracker.presentation.settings.HealthConnectDataScreen
 import com.cemcakmak.hydrotracker.presentation.settings.profile.ProfileSettingsScreen
 import com.cemcakmak.hydrotracker.presentation.settings.profile.crop.CropProfileImageScreen
 import com.cemcakmak.hydrotracker.presentation.common.dialogs.CustomWaterDialog
@@ -751,6 +751,8 @@ fun HydroTrackerApp(
                                 userProfile = userProfile,
                                 userRepository = userRepository,
                                 waterIntakeRepository = waterIntakeRepository,
+                                containerPresetRepository = containerPresetRepository,
+                                customBeverageRepository = customBeverageRepository,
                                 updateRepository = updateRepository,
                                 onNavigateBack = popBackStack,
                                 onNavigateToOnboarding = {
@@ -777,6 +779,17 @@ fun HydroTrackerApp(
                         }
                         entry<NavigationRoutes.SettingsDeveloperHapticsLab> {
                             HapticsLabScreen(
+                                themePreferences = themePreferences,
+                                onNavigateBack = popBackStack
+                            )
+                        }
+
+                        entry<NavigationRoutes.SettingsDataManagement> {
+                            DataManagementScreen(
+                                waterIntakeRepository = waterIntakeRepository,
+                                containerPresetRepository = containerPresetRepository,
+                                customBeverageRepository = customBeverageRepository,
+                                userRepository = userRepository,
                                 themePreferences = themePreferences,
                                 onNavigateBack = popBackStack
                             )
@@ -845,14 +858,7 @@ fun HydroTrackerApp(
                             )
                         }
 
-                        entry<NavigationRoutes.HealthConnectData> {
-                            HealthConnectDataScreen(
-                                waterIntakeRepository = waterIntakeRepository,
-                                userProfile = userProfile,
-                                themePreferences = themePreferences,
-                                onNavigateBack = popBackStack
-                            )
-                        }
+                        
                     }
                 )
                 }

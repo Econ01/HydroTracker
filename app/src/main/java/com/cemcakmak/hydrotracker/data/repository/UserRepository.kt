@@ -49,6 +49,10 @@ class UserRepository(context: Context) {
         dataStore.updateData { it.copy(hapticsEnabled = enabled) }
     }
 
+    suspend fun updateLastHealthConnectImportTime(timeMillis: Long?) {
+        dataStore.updateData { it.copy(lastHealthConnectImportTime = timeMillis) }
+    }
+
     /** Resets all preferences (profile, theme, beverages) back to defaults. */
     suspend fun clearUserProfile() {
         dataStore.updateData { AppPreferences() }

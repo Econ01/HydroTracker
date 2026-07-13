@@ -292,6 +292,46 @@ object HealthConnectManager {
     }
 
     /**
+     * Read hydration records from Health Connect within a bounded time range.
+     */
+    suspend fun readHydrationRecords(context: Context, startTime: Instant, endTime: Instant): Result<List<HydrationRecord>> {
+        return try {
+            Log.d(TAG, "Starting Health Connect read from $startTime to $endTime")
+
+            if (!hasPermissions(context)) {
+                Log.w(TAG, "Cannot read from Health Connect: Missing permissions")
+                return Result.failure(SecurityException("Missing Health Connect permissions"))
+            }
+
+            val healthConnectClient = HealthConnectClient.getOrCreate(context)
+            val allRecords = mutableListOf<HydrationRecord>()
+            var pageToken: String? = null
+            var pageCount = 0
+
+            do {
+                val request = ReadRecordsRequest(
+                    recordType = HydrationRecord::class,
+                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime),
+                    pageToken = pageToken
+                )
+
+                val response = healthConnectClient.readRecords(request)
+                allRecords.addAll(response.records)
+                pageToken = response.pageToken
+                pageCount++
+
+                Log.d(TAG, "📄 Page $pageCount: read ${response.records.size} records, hasMorePages=${pageToken != null}")
+            } while (pageToken != null)
+
+            Log.i(TAG, "✅ Successfully read ${allRecords.size} hydration records across $pageCount page(s)")
+            Result.success(allRecords)
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Error reading hydration records from Health Connect", e)
+            Result.failure(e)
+        }
+    }
+
+    /**
      * Read only external hydration records (not from HydroTracker)
      */
     suspend fun readExternalHydrationRecords(context: Context, since: Instant): Result<List<HydrationRecord>> {
@@ -345,6 +385,7 @@ object HealthConnectManager {
         context: Context,
         record: HydrationRecord,
         sourceName: String?,
+        source: com.cemcakmak.hydrotracker.data.models.EntrySource,
         wakeUpTime: String = "07:00",
         dayEndMode: com.cemcakmak.hydrotracker.data.models.DayEndMode = com.cemcakmak.hydrotracker.data.models.DayEndMode.SLEEP_TIME,
         healthConnectRecordId: String? = null
@@ -358,7 +399,7 @@ object HealthConnectManager {
         )
 
         // Extract a user-friendly source name from the dataOrigin
-        val friendlySourceName = extractFriendlySourceName(sourceName)
+        val friendlySourceName = extractFriendlySourceName(context, sourceName)
 
         // Use provided ID or fallback to Health Connect's UUID
         val recordId = healthConnectRecordId ?: record.metadata.id
@@ -374,96 +415,41 @@ object HealthConnectManager {
             amount = volumeInML,
             timestamp = timestamp,
             date = date,
-            containerType = friendlySourceName, // Use the actual source app name
-            containerVolume = volumeInML, // Use same as amount for external data
+            containerType = friendlySourceName,
+            containerVolume = volumeInML,
             note = context.getString(R.string.health_connect_imported_from, friendlySourceName),
-            healthConnectRecordId = recordId, // Store the Health Connect record ID for deletion
+            healthConnectRecordId = recordId,
             iconType = containerIcon.type.name,
-            iconName = containerIcon.name
+            iconName = containerIcon.name,
+            source = source
         )
     }
 
     /**
-     * Extract a user-friendly app name from Health Connect dataOrigin
+     * Extract a user-friendly app name from Health Connect dataOrigin.
+     * Uses the package manager when possible and falls back to the raw package name.
      */
-    private fun extractFriendlySourceName(dataOrigin: String?): String {
+    private fun extractFriendlySourceName(context: Context, dataOrigin: String?): String {
         if (dataOrigin.isNullOrBlank()) {
             return "Health Connect"
         }
 
         Log.d(TAG, "🔍 Processing dataOrigin: $dataOrigin")
 
-        // The dataOrigin format is typically: DataOrigin(packageName="com.example.app")
-        // Extract the package name from this format
-        val packageName = run {
-            val s = dataOrigin.trim()
+        val packageName = dataOrigin.trim().trim('"', '\'').trimEnd(')')
 
-            // 1) Canonical: DataOrigin(packageName="com.example.app")
-            val m1 = Regex("""DataOrigin\(\s*packageName\s*=\s*["']([^"']+)["']\s*\)?""").find(s)
-
-            // 2) Fallback: packageName=... or package=..., with/without quotes
-            val m2 = m1 ?: Regex("""\b(packageName|package)\s*=\s*["']?([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+)["']?\)?""").find(s)
-
-            // 3) Last resort: first package-like token anywhere
-            val candidate = when {
-                m1 != null -> m1.groupValues[1]
-                m2 != null -> m2.groupValues[2]
-                else -> Regex("""[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+""").find(s)?.value ?: s
-            }
-
-            // Clean common trailing/leading noise (quotes, ) etc.)
-            candidate.trim().trim('"', '\'').trimEnd(')')
-        }
-
-        Log.d(TAG, "📦 Extracted package name: $packageName")
-
-        // Map known package names to user-friendly names
         val cleanName = when {
-            // Samsung Health
-            packageName.equals("com.sec.android.app.shealth", ignoreCase = true) -> "Samsung Health"
-
-            // Google Fit
-            packageName.equals("com.google.android.apps.fitness", ignoreCase = true) -> "Google Fit"
-
-            // Fitbit
-            packageName.equals("com.fitbit.FitbitMobile", ignoreCase = true) -> "Fitbit"
-
-            // MyFitnessPal
-            packageName.equals("com.myfitnesspal.android", ignoreCase = true) -> "MyFitnessPal"
-
-            // Garmin Connect
-            packageName.startsWith("com.garmin", ignoreCase = true) -> "Garmin Connect"
-
-            // Strava
-            packageName.startsWith("com.strava", ignoreCase = true) -> "Strava"
-
-            // Xiaomi Mi Health
-            packageName.equals("com.mi.health", ignoreCase = true) -> "Mi Health"
-
-            // Huawei Health
-            packageName.equals("com.huawei.health", ignoreCase = true) -> "Huawei Health"
-
-            // Our own app (should not happen in external imports)
             packageName.equals("com.cemcakmak.hydrotracker", ignoreCase = true) -> "HydroTracker"
-
-            // Generic extraction from package name
             else -> {
-                val parts = packageName.split(".")
-                when {
-                    parts.size >= 3 -> {
-                        // Try to get the app name from the last part
-                        val appName = parts.last()
-                        appName.replaceFirstChar { it.uppercase() }
-                    }
-                    parts.size == 2 -> {
-                        // Format: com.appname
-                        parts.last().replaceFirstChar { it.uppercase() }
-                    }
-                    else -> {
-                        // Unknown format, use the whole string
-                        packageName.replaceFirstChar { it.uppercase() }
-                    }
-                }
+                val appLabel = runCatching {
+                    context.packageManager.getApplicationLabel(
+                        context.packageManager.getApplicationInfo(packageName, 0)
+                    ).toString()
+                }.getOrNull()
+
+                appLabel ?: packageName.split(".").lastOrNull()
+                    ?.replaceFirstChar { it.uppercase() }
+                    ?: packageName
             }
         }
 

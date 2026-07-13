@@ -25,6 +25,9 @@ interface WaterIntakeDao {
     @Query("SELECT * FROM water_intake_entries WHERE date BETWEEN :startDate AND :endDate AND is_hidden = 0 ORDER BY timestamp DESC")
     fun getEntriesForDateRange(startDate: String, endDate: String): Flow<List<WaterIntakeEntry>>
 
+    @Query("SELECT * FROM water_intake_entries WHERE date BETWEEN :startDate AND :endDate ORDER BY timestamp DESC")
+    suspend fun getAllEntriesForDateRangeSync(startDate: String, endDate: String): List<WaterIntakeEntry>
+
     @Query("SELECT COALESCE(SUM(amount), 0) FROM water_intake_entries WHERE date = :date AND is_hidden = 0")
     fun getTotalIntakeForDate(date: String): Flow<Double>
 
@@ -40,6 +43,9 @@ interface WaterIntakeDao {
     @Query("SELECT * FROM water_intake_entries WHERE is_hidden = 0 ORDER BY timestamp DESC")
     fun getAllEntries(): Flow<List<WaterIntakeEntry>>
 
+    @Query("SELECT * FROM water_intake_entries WHERE is_hidden = 0 ORDER BY timestamp DESC")
+    suspend fun getAllEntriesForExportSync(): List<WaterIntakeEntry>
+
     @Update
     suspend fun updateEntry(entry: WaterIntakeEntry)
 
@@ -51,6 +57,9 @@ interface WaterIntakeDao {
 
     @Query("DELETE FROM water_intake_entries")
     suspend fun deleteAllEntries()
+
+    @Query("DELETE FROM water_intake_entries WHERE timestamp <= :timestampMillis")
+    suspend fun deleteEntriesBefore(timestampMillis: Long)
 
     @Query("UPDATE water_intake_entries SET is_hidden = 1 WHERE id = :entryId")
     suspend fun hideEntry(entryId: Long)

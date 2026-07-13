@@ -210,6 +210,35 @@ object DatabaseInitializer {
         }
     }
 
+    private val MIGRATION_9_10 = object : Migration(9, 10) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            try {
+                println("DatabaseInitializer: Starting migration from version 9 to 10")
+
+                db.execSQL(
+                    "ALTER TABLE water_intake_entries ADD COLUMN source TEXT NOT NULL DEFAULT 'LOCAL'"
+                )
+
+                // Existing entries that were imported from other apps carry a Health Connect
+                // record id that is not one of our client record ids. Tag them accordingly so
+                // they are not re-written to Health Connect.
+                db.execSQL(
+                    """
+                    UPDATE water_intake_entries
+                    SET source = 'HEALTH_CONNECT_EXTERNAL'
+                    WHERE health_connect_record_id IS NOT NULL
+                      AND health_connect_record_id NOT LIKE 'hydrotracker_%'
+                    """.trimIndent()
+                )
+
+                println("DatabaseInitializer: Migration 9→10 completed. Added source column.")
+            } catch (e: Exception) {
+                println("DatabaseInitializer: Error during migration 9→10: ${e.message}")
+                throw e
+            }
+        }
+    }
+
     private val MIGRATION_8_9 = object : Migration(8, 9) {
         override fun migrate(db: SupportSQLiteDatabase) {
             try {
@@ -249,7 +278,7 @@ object DatabaseInitializer {
     val ALL_MIGRATIONS: Array<Migration> = arrayOf(
         MIGRATION_1_2, MIGRATION_1_3, MIGRATION_2_3, MIGRATION_3_4,
         MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8,
-        MIGRATION_8_9
+        MIGRATION_8_9, MIGRATION_9_10
     )
 
     fun getDatabase(context: Context): HydroTrackerDatabase {

@@ -60,6 +60,7 @@ import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
 import com.cemcakmak.hydrotracker.utils.UserDayCalculator
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import android.widget.Toast
 import com.cemcakmak.hydrotracker.presentation.common.sheets.AddContainerPresetBottomSheet
@@ -168,8 +169,10 @@ fun HomeScreen(
     var showEditPresetSheet by remember { mutableStateOf(false) }
     var presetToEdit by remember { mutableStateOf<ContainerPreset?>(null) }
 
-    // Pull-to-refresh state
+    // Pull-to-refresh state driven by Health Connect sync manager
+    // Local isRefreshing enforces a minimum visible duration for smoother UX.
     var isRefreshing by remember { mutableStateOf(false) }
+    val isSyncing by waterIntakeRepository.getSyncManager().isSyncing.collectAsState()
     val pullToRefreshState = rememberPullToRefreshState()
 
     // Message templates for toast feedback on failure or important confirmations.
@@ -180,6 +183,7 @@ fun HomeScreen(
     val syncErrorsMessageTemplate = stringResource(R.string.home_snackbar_sync_errors)
     val upToDateMessage = stringResource(R.string.home_snackbar_up_to_date)
     val syncFailedMessageTemplate = stringResource(R.string.home_snackbar_sync_failed)
+    val syncDisabledMessage = stringResource(R.string.home_snackbar_sync_disabled)
     val containerAddedTemplate = stringResource(R.string.home_snackbar_container_added)
     val containerUpdatedTemplate = stringResource(R.string.home_snackbar_container_updated)
     val containerDeletedTemplate = stringResource(R.string.home_snackbar_container_deleted)
@@ -253,53 +257,82 @@ fun HomeScreen(
     // Function to perform manual sync with Health Connect
     fun performManualSync() {
         coroutineScope.launch {
-            if (userProfile.healthConnectSyncEnabled) {
-                isRefreshing = true
-                try {
-                    // Import external hydration data from the last 30 days
-                    val since = Instant.now().minus(30, ChronoUnit.DAYS)
+            if (!userProfile.healthConnectSyncEnabled) {
+                Toast.makeText(
+                    context,
+                    syncDisabledMessage,
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@launch
+            }
 
-                    waterIntakeRepository.getSyncManager().importExternalHydrationData(context, waterIntakeRepository.getUserRepository(), waterIntakeRepository, since) { imported, errors ->
-                        coroutineScope.launch {
-                            // Always show loading for at least 1.5 seconds for better UX
-                            delay(1500.milliseconds)
+            isRefreshing = true
+            val refreshStartTime = System.currentTimeMillis()
 
-                            when {
-                                imported > 0 -> {
-                                    Toast.makeText(
-                                        context,
-                                        syncedMessageTemplate.format(imported),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                                errors > 0 -> {
-                                    Toast.makeText(
-                                        context,
-                                        syncErrorsMessageTemplate.format(errors),
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                }
-                                else -> {
-                                    Toast.makeText(
-                                        context,
-                                        upToDateMessage,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-                            isRefreshing = false
+            try {
+                // Import external hydration data from the last 30 days
+                val since = Instant.now().minus(30, ChronoUnit.DAYS)
+
+                waterIntakeRepository.getSyncManager().importExternalHydrationData(
+                    context,
+                    waterIntakeRepository.getUserRepository(),
+                    waterIntakeRepository,
+                    since
+                ) { imported, errors ->
+                    coroutineScope.launch {
+                        // Keep the refresh indicator visible for at least 1.5 seconds
+                        val elapsed = System.currentTimeMillis() - refreshStartTime
+                        val remaining = 1500L - elapsed
+                        if (remaining > 0) delay(remaining.milliseconds)
+
+                        // Defensive: ensure the sync manager has fully idled before hiding
+                        if (isSyncing) {
+                            waterIntakeRepository.getSyncManager().isSyncing.first { !it }
                         }
+
+                        when {
+                            imported > 0 -> {
+                                Toast.makeText(
+                                    context,
+                                    syncedMessageTemplate.format(imported),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            errors > 0 -> {
+                                Toast.makeText(
+                                    context,
+                                    syncErrorsMessageTemplate.format(errors),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                            else -> {
+                                Toast.makeText(
+                                    context,
+                                    upToDateMessage,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                        isRefreshing = false
                     }
-                } catch (e: Exception) {
-                    // Show loading for at least 1.5 seconds even on error
-                    delay(1500.milliseconds)
-                    Toast.makeText(
-                        context,
-                        syncFailedMessageTemplate.format(e.message ?: ""),
-                        Toast.LENGTH_LONG
-                    ).show()
-                    isRefreshing = false
                 }
+            } catch (e: Exception) {
+                // Keep the refresh indicator visible for at least 1.5 seconds even on error
+                val elapsed = System.currentTimeMillis() - refreshStartTime
+                val remaining = 1500L - elapsed
+                if (remaining > 0) delay(remaining.milliseconds)
+
+                // Defensive: ensure the sync manager has fully idled before hiding
+                if (isSyncing) {
+                    waterIntakeRepository.getSyncManager().isSyncing.first { !it }
+                }
+
+                Toast.makeText(
+                    context,
+                    syncFailedMessageTemplate.format(e.message ?: ""),
+                    Toast.LENGTH_LONG
+                ).show()
+                isRefreshing = false
             }
         }
     }
@@ -1190,6 +1223,10 @@ private class PreviewWaterIntakeDao : WaterIntakeDao {
     override suspend fun getAllEntriesForDateSync(date: String): List<WaterIntakeEntry> = previewEntries
     override fun getEntriesForDateRange(startDate: String, endDate: String): Flow<List<WaterIntakeEntry>> =
         flowOf(previewEntries)
+    override suspend fun getAllEntriesForDateRangeSync(startDate: String, endDate: String): List<WaterIntakeEntry> =
+        previewEntries
+    override suspend fun getAllEntriesForExportSync(): List<WaterIntakeEntry> = previewEntries
+    override suspend fun deleteEntriesBefore(timestampMillis: Long) {}
     override fun getTotalIntakeForDate(date: String): Flow<Double> = flowOf(1350.0)
     override suspend fun getEntryCountForDate(date: String): Int = previewEntries.size
     override suspend fun getEntryCount(): Int = previewEntries.size

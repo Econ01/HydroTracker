@@ -23,7 +23,6 @@ package com.cemcakmak.hydrotracker.presentation.settings
 import android.app.AlarmManager
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.core.animateDp
@@ -81,7 +80,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.cemcakmak.hydrotracker.R
-import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
+import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
+import com.cemcakmak.hydrotracker.data.database.repository.CustomBeverageRepository
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
 import com.cemcakmak.hydrotracker.data.database.repository.WaterProgress
 import com.cemcakmak.hydrotracker.data.models.ActivityLevel
@@ -104,10 +104,8 @@ import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.Instant
-import java.time.LocalDate
 import java.time.temporal.ChronoUnit
-
-private const val HC_DEBUG_TAG = "HealthConnectDebug"
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Developer / debug tools
@@ -120,6 +118,8 @@ fun DeveloperOptionsScreen(
     userProfile: UserProfile? = null,
     userRepository: UserRepository? = null,
     waterIntakeRepository: WaterIntakeRepository? = null,
+    containerPresetRepository: ContainerPresetRepository? = null,
+    customBeverageRepository: CustomBeverageRepository? = null,
     updateRepository: UpdateRepository? = null,
     onNavigateBack: () -> Unit = {},
     onNavigateToOnboarding: () -> Unit = {},
@@ -198,46 +198,6 @@ fun DeveloperOptionsScreen(
                 // Device Info
                 DeviceInfoSection(themePreferences = themePreferences)
 
-                // Data
-                DevSection("Data") {
-                    DeveloperActionCard(
-                        index = 0,
-                        size = 3,
-                        title = "Reset Onboarding",
-                        description = "Clear user data and restart onboarding",
-                        icon = ImageVector.vectorResource(R.drawable.reset_exposure_filled),
-                        onClick = {
-                            haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                            showResetDialog = true
-                        }
-                    )
-                    DeveloperActionCard(
-                        index = 1,
-                        size = 3,
-                        title = "Clear All Data",
-                        description = "Remove all stored preferences and water data",
-                        icon = ImageVector.vectorResource(R.drawable.delete_fill),
-                        isLoading = busy == "Clear All Data",
-                        onClick = {
-                            haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                            showClearDialog = true
-                        }
-                    )
-                    DeveloperActionCard(
-                        index = 2,
-                        size = 3,
-                        title = "Inject Sample Data",
-                        description = "Generate realistic intake history",
-                        icon = ImageVector.vectorResource(R.drawable.data_object_filled),
-                        showChevron = true,
-                        isLoading = isInjecting,
-                        onClick = {
-                            haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                            showInjectDialog = true
-                        }
-                    )
-                }
-
                 // Haptics
                 DevSection("Haptics") {
                     DeveloperActionCard(
@@ -266,107 +226,294 @@ fun DeveloperOptionsScreen(
                     )
                 }
 
-                // Health Connect testing (only when supported AND sync enabled)
-                if (isPreview ||
-                    (HealthConnectManager.isVersionSupported() && userProfile?.healthConnectSyncEnabled == true)
-                ) {
+                // Data
+                DevSection("Data") {
+                    DeveloperActionCard(
+                        index = 0,
+                        size = 4,
+                        title = "Reset Onboarding",
+                        description = "Clear user data and restart onboarding",
+                        icon = ImageVector.vectorResource(R.drawable.reset_exposure_filled),
+                        onClick = {
+                            haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                            showResetDialog = true
+                        }
+                    )
+                    DeveloperActionCard(
+                        index = 1,
+                        size = 4,
+                        title = "Clear All Data",
+                        description = "Remove all stored preferences, water data, presets and beverages",
+                        icon = ImageVector.vectorResource(R.drawable.delete_fill),
+                        isLoading = busy == "Clear All Data",
+                        onClick = {
+                            haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                            showClearDialog = true
+                        }
+                    )
+                    DeveloperActionCard(
+                        index = 2,
+                        size = 4,
+                        title = "Inject Sample Data",
+                        description = "Generate realistic intake history",
+                        icon = ImageVector.vectorResource(R.drawable.data_object_filled),
+                        showChevron = true,
+                        isLoading = isInjecting,
+                        onClick = {
+                            haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                            showInjectDialog = true
+                        }
+                    )
+                    DeveloperActionCard(
+                        index = 3,
+                        size = 4,
+                        title = "Show Entry Source Counts",
+                        description = "Count LOCAL / EXTERNAL / RESTORED entries",
+                        icon = ImageVector.vectorResource(R.drawable.analytics_filled),
+                        onClick = {
+                            haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                            runWithToast("Show Entry Source Counts") {
+                                val entries = waterIntakeRepository?.getAllEntriesForExport() ?: emptyList()
+                                val local = entries.count { it.source == com.cemcakmak.hydrotracker.data.models.EntrySource.LOCAL }
+                                val external = entries.count { it.source == com.cemcakmak.hydrotracker.data.models.EntrySource.HEALTH_CONNECT_EXTERNAL }
+                                val restored = entries.count { it.source == com.cemcakmak.hydrotracker.data.models.EntrySource.HEALTH_CONNECT_RESTORED }
+                                "LOCAL: $local, EXTERNAL: $external, RESTORED: $restored"
+                            }
+                        }
+                    )
+                }
+
+                // Health Connect testing
+                if (isPreview || HealthConnectManager.isVersionSupported()) {
                     DevSection("Health Connect testing") {
-                        val hcActions = listOf(
-                            DevAction(
-                                title = "Test Write",
-                                description = "Write a 250 ml test entry to Health Connect",
-                                icon = ImageVector.vectorResource(R.drawable.cloud_upload_filled)
-                            ) {
-                                runWithToast("Test Write") {
-                                    val entry = WaterIntakeEntry(
-                                        amount = 250.0,
-                                        timestamp = System.currentTimeMillis(),
-                                        date = LocalDate.now().toString(),
-                                        containerType = "Debug Test",
-                                        containerVolume = 250.0,
-                                        note = "Health Connect Debug Test Entry"
-                                    )
-                                    val result = HealthConnectManager.writeHydrationRecord(context, entry)
-                                    result.fold(
-                                        onSuccess = {
-                                            Log.i(HC_DEBUG_TAG, "Test write result: $it")
-                                            "Health Connect write succeeded"
-                                        },
-                                        onFailure = {
-                                            Log.e(HC_DEBUG_TAG, "Test write failed", it)
-                                            "Health Connect write failed: ${it.message}"
-                                        }
-                                    )
-                                }
-                            },
-                            DevAction(
-                                title = "Test Read",
-                                description = "Read recent hydration records from Health Connect",
-                                ImageVector.vectorResource(R.drawable.cloud_download_filled)
-                            ) {
-                                runWithToast("Test Read") {
-                                    val since = Instant.now().minus(1, ChronoUnit.DAYS)
-                                    val result = HealthConnectManager.readHydrationRecords(context, since)
-                                    result.fold(
-                                        onSuccess = { records ->
-                                            Log.i(HC_DEBUG_TAG, "Found ${records.size} records since yesterday")
-                                            records.forEach { record ->
-                                                Log.d(HC_DEBUG_TAG, "Record: ${record.volume.inMilliliters}ml at ${record.startTime}")
-                                            }
-                                            "Read ${records.size} record(s) from Health Connect"
-                                        },
-                                        onFailure = {
-                                            Log.e(HC_DEBUG_TAG, "Test read failed", it)
-                                            "Health Connect read failed: ${it.message}"
-                                        }
-                                    )
-                                }
-                            },
-                            DevAction(
-                                title = "Test Import",
-                                description = "Import external hydration data (last 7 days)",
-                                icon = ImageVector.vectorResource(R.drawable.directory_sync_filled)
-                            ) {
-                                if (busy != null) return@DevAction
-                                if (userRepository == null || waterIntakeRepository == null) {
-                                    Toast.makeText(context, "Import unavailable: repositories missing", Toast.LENGTH_LONG).show()
-                                    return@DevAction
-                                }
-                                busy = "Test Import"
-                                val since = Instant.now().minus(7, ChronoUnit.DAYS)
-                                Log.i(HC_DEBUG_TAG, "🔄 Starting import test for last 7 days...")
-                                HealthConnectSyncManager.importExternalHydrationData(context, userRepository, waterIntakeRepository, since) { imported, errors ->
-                                    Log.i(HC_DEBUG_TAG, "📊 Import test result: $imported imported, $errors errors")
+                        val hcActions = buildList {
+                            add(
+                                DevAction(
+                                    title = "Test Add & Sync",
+                                    description = "Add a local entry and sync it to Health Connect",
+                                    icon = ImageVector.vectorResource(R.drawable.cloud_upload_filled)
+                                ) {
+                                    if (busy != null) return@DevAction
+                                    if (userRepository == null || waterIntakeRepository == null) {
+                                        Toast.makeText(context, "Test unavailable: repositories missing", Toast.LENGTH_LONG).show()
+                                        return@DevAction
+                                    }
+                                    busy = "Test Add & Sync"
                                     scope.launch {
-                                        Toast.makeText(
-                                            context,
-                                            "Import complete: $imported imported, $errors error(s)",
-                                            Toast.LENGTH_LONG
-                                        ).show()
+                                        val preset = com.cemcakmak.hydrotracker.data.models.ContainerPreset(
+                                            name = "Debug Test",
+                                            volume = 250.0,
+                                            isDefault = false
+                                        )
+                                        val result = waterIntakeRepository.addWaterIntake(
+                                            amount = 250.0,
+                                            containerPreset = preset,
+                                            note = "Health Connect Debug Test Entry"
+                                        )
+                                        val message = if (result.isSuccess) {
+                                            "Added and synced 250 ml test entry"
+                                        } else {
+                                            "Test failed: ${result.exceptionOrNull()?.message}"
+                                        }
+                                        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                                         busy = null
                                     }
                                 }
-                            },
-                            DevAction(
-                                title = "Check Status",
-                                description = "Verify Health Connect availability and permissions",
-                                icon = ImageVector.vectorResource(R.drawable.health_and_safety_filled)
-                            ) {
-                                runWithToast("Check Status") {
-                                    val available = HealthConnectManager.isAvailable(context)
-                                    val hasPermissions = HealthConnectManager.hasPermissions(context)
-                                    val status = HealthConnectManager.getStatusMessage(context)
-                                    Log.i(HC_DEBUG_TAG, "=== Health Connect Status Check ===")
-                                    Log.i(HC_DEBUG_TAG, "Available: $available")
-                                    Log.i(HC_DEBUG_TAG, "Has Permissions: $hasPermissions")
-                                    Log.i(HC_DEBUG_TAG, "Status: $status")
-                                    HealthConnectManager.debugPermissions()
-                                    "$status (available: $available, permissions: $hasPermissions)"
+                            )
+                            add(
+                                DevAction(
+                                    title = "Test Read All",
+                                    description = "Read all hydration records from the last day",
+                                    icon = ImageVector.vectorResource(R.drawable.cloud_download_filled)
+                                ) {
+                                    runWithToast("Test Read All") {
+                                        val since = Instant.now().minus(1, ChronoUnit.DAYS)
+                                        val result = HealthConnectManager.readHydrationRecords(context, since)
+                                        result.fold(
+                                            onSuccess = { records ->
+                                                "Read ${records.size} record(s) from Health Connect"
+                                            },
+                                            onFailure = {
+                                                "Health Connect read failed: ${it.message}"
+                                            }
+                                        )
+                                    }
                                 }
-                            }
-                        )
+                            )
+                            add(
+                                DevAction(
+                                    title = "Test Read External",
+                                    description = "Read records from other health apps",
+                                    icon = ImageVector.vectorResource(R.drawable.cloud_download_filled)
+                                ) {
+                                    runWithToast("Test Read External") {
+                                        val since = Instant.now().minus(7, ChronoUnit.DAYS)
+                                        val result = HealthConnectManager.readExternalHydrationRecords(context, since)
+                                        result.fold(
+                                            onSuccess = { records ->
+                                                "Found ${records.size} external record(s)"
+                                            },
+                                            onFailure = {
+                                                "External read failed: ${it.message}"
+                                            }
+                                        )
+                                    }
+                                }
+                            )
+                            add(
+                                DevAction(
+                                    title = "Test Read HydroTracker",
+                                    description = "Read HydroTracker's own records for restore",
+                                    icon = ImageVector.vectorResource(R.drawable.cloud_download_filled)
+                                ) {
+                                    runWithToast("Test Read HydroTracker") {
+                                        val since = Instant.now().minus(30, ChronoUnit.DAYS)
+                                        val result = HealthConnectManager.readHydroTrackerRecords(context, since)
+                                        result.fold(
+                                            onSuccess = { records ->
+                                                "Found ${records.size} HydroTracker record(s)"
+                                            },
+                                            onFailure = {
+                                                "HydroTracker read failed: ${it.message}"
+                                            }
+                                        )
+                                    }
+                                }
+                            )
+                            add(
+                                DevAction(
+                                    title = "Test Import External",
+                                    description = "Import external hydration data (last 7 days)",
+                                    icon = ImageVector.vectorResource(R.drawable.sync_filled)
+                                ) {
+                                    if (busy != null) return@DevAction
+                                    if (userRepository == null || waterIntakeRepository == null) {
+                                        Toast.makeText(context, "Import unavailable: repositories missing", Toast.LENGTH_LONG).show()
+                                        return@DevAction
+                                    }
+                                    busy = "Test Import External"
+                                    val since = Instant.now().minus(7, ChronoUnit.DAYS)
+                                    HealthConnectSyncManager.importExternalHydrationData(context, userRepository, waterIntakeRepository, since) { imported, errors ->
+                                        scope.launch {
+                                            Toast.makeText(
+                                                context,
+                                                "Import complete: $imported imported, $errors error(s)",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                            busy = null
+                                        }
+                                    }
+                                }
+                            )
+                            add(
+                                DevAction(
+                                    title = "Test Restore HydroTracker",
+                                    description = "Restore HydroTracker history from Health Connect",
+                                    icon = ImageVector.vectorResource(R.drawable.sync_filled)
+                                ) {
+                                    if (busy != null) return@DevAction
+                                    if (userRepository == null || waterIntakeRepository == null) {
+                                        Toast.makeText(context, "Restore unavailable: repositories missing", Toast.LENGTH_LONG).show()
+                                        return@DevAction
+                                    }
+                                    busy = "Test Restore HydroTracker"
+                                    val since = Instant.now().minus(30, ChronoUnit.DAYS)
+                                    HealthConnectSyncManager.restoreHydroTrackerHistory(context, userRepository, waterIntakeRepository, since) { imported, skipped ->
+                                        scope.launch {
+                                            Toast.makeText(
+                                                context,
+                                                "Restore complete: $imported imported, $skipped skipped",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                            busy = null
+                                        }
+                                    }
+                                }
+                            )
+                            add(
+                                DevAction(
+                                    title = "Trigger App Launch Sync",
+                                    description = "Run the incremental external import manually",
+                                    icon = ImageVector.vectorResource(R.drawable.sync_filled)
+                                ) {
+                                    if (busy != null) return@DevAction
+                                    if (userRepository == null || waterIntakeRepository == null) {
+                                        Toast.makeText(context, "Sync unavailable: repositories missing", Toast.LENGTH_LONG).show()
+                                        return@DevAction
+                                    }
+                                    busy = "Trigger App Launch Sync"
+                                    HealthConnectSyncManager.performAppLaunchSync(context, userRepository, waterIntakeRepository)
+                                    scope.launch {
+                                        kotlinx.coroutines.delay(1500.milliseconds)
+                                        Toast.makeText(context, "App launch sync triggered", Toast.LENGTH_SHORT).show()
+                                        busy = null
+                                    }
+                                }
+                            )
+                            add(
+                                DevAction(
+                                    title = "Reset Last Sync Time",
+                                    description = "Force the next import to start from the beginning",
+                                    icon = ImageVector.vectorResource(R.drawable.restart_alt_filled)
+                                ) {
+                                    if (busy != null) return@DevAction
+                                    if (userRepository == null) {
+                                        Toast.makeText(context, "Reset unavailable: repository missing", Toast.LENGTH_LONG).show()
+                                        return@DevAction
+                                    }
+                                    busy = "Reset Last Sync Time"
+                                    scope.launch {
+                                        userRepository.updateLastHealthConnectImportTime(null)
+                                        Toast.makeText(context, "Last sync time reset", Toast.LENGTH_SHORT).show()
+                                        busy = null
+                                    }
+                                }
+                            )
+                            add(
+                                DevAction(
+                                    title = "Check Status",
+                                    description = "Verify Health Connect availability and permissions",
+                                    icon = ImageVector.vectorResource(R.drawable.health_and_safety_filled)
+                                ) {
+                                    runWithToast("Check Status") {
+                                        val available = HealthConnectManager.isAvailable(context)
+                                        val hasPermissions = HealthConnectManager.hasPermissions(context)
+                                        val status = HealthConnectManager.getStatusMessage(context)
+                                        HealthConnectManager.debugPermissions()
+                                        "$status (available: $available, permissions: $hasPermissions)"
+                                    }
+                                }
+                            )
+                        }
                         DevActionList(hcActions, busy)
                     }
+                }
+
+                // Backup testing
+                DevSection("Backup testing") {
+                    val backupActions = listOf(
+                        DevAction(
+                            title = "Test Export JSON",
+                            description = "Export entries to a temporary JSON file",
+                            icon = ImageVector.vectorResource(R.drawable.save_fill)
+                        ) {
+                            runWithToast("Test Export JSON") {
+                                val entries = waterIntakeRepository?.getAllEntriesForExport() ?: emptyList()
+                                "${entries.size} entries ready for JSON export"
+                            }
+                        },
+                        DevAction(
+                            title = "Test Export CSV",
+                            description = "Export entries to a temporary CSV file",
+                            icon = ImageVector.vectorResource(R.drawable.save_fill)
+                        ) {
+                            runWithToast("Test Export CSV") {
+                                val entries = waterIntakeRepository?.getAllEntriesForExport() ?: emptyList()
+                                "${entries.size} entries ready for CSV export"
+                            }
+                        }
+                    )
+                    DevActionList(backupActions, busy)
                 }
 
                 // Notifications
@@ -401,7 +548,7 @@ fun DeveloperOptionsScreen(
                             DevAction(
                                 title = "Send Fun Notification",
                                 description = "Show a daily hydration fact",
-                                icon = ImageVector.vectorResource(R.drawable.star_rate_filled)
+                                icon = ImageVector.vectorResource(R.drawable.notification_add_filled)
                             ) {
                                 runWithToast("Send Fun Notification") {
                                     HydroNotificationService(context).showFunFact()
@@ -603,13 +750,15 @@ fun DeveloperOptionsScreen(
     if (showClearDialog) {
         ConfirmActionDialog(
             title = "Clear all data?",
-            message = "This permanently removes all stored preferences and water intake data. This cannot be undone.",
+            message = "This permanently removes all stored preferences, water intake data, container presets and custom beverages. This cannot be undone.",
             confirmLabel = "Clear",
             onConfirm = {
                 showClearDialog = false
                 runWithToast("Clear All Data") {
                     userRepository?.clearUserProfile()
                     waterIntakeRepository?.clearAllData()
+                    containerPresetRepository?.resetToDefaults()
+                    customBeverageRepository?.deleteAll()
                     "All data cleared"
                 }
             },
