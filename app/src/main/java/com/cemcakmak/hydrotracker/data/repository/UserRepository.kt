@@ -53,6 +53,10 @@ class UserRepository(context: Context) {
         dataStore.updateData { it.copy(lastHealthConnectImportTime = timeMillis) }
     }
 
+    suspend fun updateWidgetPreviewRevision(revision: Int) {
+        dataStore.updateData { it.copy(widgetPreviewRevision = revision) }
+    }
+
     /** Resets all preferences (profile, theme, beverages) back to defaults. */
     suspend fun clearUserProfile() {
         dataStore.updateData { AppPreferences() }

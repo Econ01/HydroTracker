@@ -138,6 +138,12 @@ dependencies {
     // Health Connect
     implementation(libs.androidx.health.connect)
 
+    // Jetpack Glance (home-screen widgets)
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
+    implementation(libs.androidx.glance.preview)
+    debugImplementation(libs.androidx.glance.appwidget.preview)
+
     // Google Play Store
     implementation(libs.review.ktx)
     implementation(libs.app.update.ktx)

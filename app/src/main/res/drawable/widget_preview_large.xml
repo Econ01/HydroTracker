@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Static picker preview for the Large widget, used on Android 14 and below (on Android 15+
+  the system shows a live generated preview instead, see WidgetPreviewPublisher).
+  Depicts the single tall layout at the 330x180 hero size in the HYDRO light palette:
+  header, progress ring at 43%, and the three quick-add cards. Text is simulated with
+  rounded bars (vector drawables cannot render text); icon glyphs reuse the real
+  Material Symbol path data from water_drop_filled / glass_cup_filled /
+  water_bottle_filled / water_bottle_large_filled.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="330dp"
+    android:height="180dp"
+    android:viewportWidth="330"
+    android:viewportHeight="180">
+
+    <!-- Widget background (HYDRO light surface, close to the dynamic light scheme) -->
+    <path
+        android:pathData="M16,0 L314,0 Q330,0 330,16 L330,164 Q330,180 314,180 L16,180 Q0,180 0,164 L0,16 Q0,0 16,0 Z"
+        android:fillColor="#EAF7FF"/>
+
+    <!-- Header: drop glyph + app-name bar -->
+    <group
+        android:translateX="16"
+        android:translateY="9.9"
+        android:scaleX="0.016667"
+        android:scaleY="0.016667">
+        <path
+            android:pathData="M251.5,786Q160,692 160,552q0,-62 28,-124t70,-119q42,-57 91,-107t91,-87q8,-8 18.5,-11.5T480,100q11,0 21.5,3.5T520,115q42,37 91,87t91,107q42,57 70,119t28,124q0,140 -91.5,234T480,880q-137,0 -228.5,-94ZM491,760q12,-1 20.5,-9.5T520,730q0,-14 -9,-22.5t-23,-7.5q-41,3 -87,-22.5T343,585q-2,-11 -10.5,-18t-19.5,-7q-14,0 -23,10.5t-6,24.5q17,91 80,130t127,35Z"
+            android:fillColor="#0077BE"/>
+    </group>
+    <path
+        android:pathData="M37,17.9 L122,17.9"
+        android:strokeWidth="7"
+        android:strokeColor="#191C1E"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+
+    <!-- Progress ring: track, 43% arc from 6 o'clock clockwise, centre percentage bar -->
+    <path
+        android:pathData="M87.5,101 m-60.1,0 a60.1,60.1 0 1,1 120.2,0 a60.1,60.1 0 1,1 -120.2,0"
+        android:strokeWidth="18"
+        android:strokeColor="#D5EEFF"
+        android:fillColor="#00000000"/>
+    <path
+        android:pathData="M87.5,161.1 A60.1,60.1 0 0 1 62.1,46.5"
+        android:strokeWidth="18"
+        android:strokeColor="#0077BE"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+    <path
+        android:pathData="M62,101 L113,101"
+        android:strokeWidth="12"
+        android:strokeColor="#191C1E"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+
+    <!-- Quick-add card 1: Glass (primary) -->
+    <path
+        android:pathData="M184,31.9 L301,31.9 Q314,31.9 314,44.9 L314,59.63 Q314,72.63 301,72.63 L184,72.63 Q171,72.63 171,59.63 L171,44.9 Q171,31.9 184,31.9 Z"
+        android:fillColor="#BFE4FF"/>
+    <path
+        android:pathData="M186.1,37.62 L196.6,37.62 Q206,37.62 206,47.02 L206,57.52 Q206,66.92 196.6,66.92 L186.1,66.92 Q176.7,66.92 176.7,57.52 L176.7,47.02 Q176.7,37.62 186.1,37.62 Z"
+        android:fillColor="#0077BE"/>
+    <group
+        android:translateX="183.3"
+        android:translateY="44.22"
+        android:scaleX="0.01677"
+        android:scaleY="0.01677">
+        <path
+            android:pathData="M279,880q-31,0 -53.5,-20T200,809l-69,-630q-5,-40 22,-69.5t67,-29.5h520q40,0 67,29.5t22,69.5l-69,630q-3,31 -25.5,51T681,880L279,880ZM263,640h435l52,-480L210,160l53,480Z"
+            android:fillColor="#FFFFFF"/>
+    </group>
+    <path
+        android:pathData="M213.3,42.9 L243.3,42.9"
+        android:strokeWidth="5"
+        android:strokeColor="#001F2C"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+    <path
+        android:pathData="M213.3,61.4 L268.3,61.4"
+        android:strokeWidth="8"
+        android:strokeColor="#001F2C"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+
+    <!-- Quick-add card 2: Bottle (secondary) -->
+    <path
+        android:pathData="M184,80.63 L301,80.63 Q314,80.63 314,93.63 L314,108.37 Q314,121.37 301,121.37 L184,121.37 Q171,121.37 171,108.37 L171,93.63 Q171,80.63 184,80.63 Z"
+        android:fillColor="#91D3FF"/>
+    <path
+        android:pathData="M186.1,86.35 L196.6,86.35 Q206,86.35 206,95.75 L206,106.25 Q206,115.65 196.6,115.65 L186.1,115.65 Q176.7,115.65 176.7,106.25 L176.7,95.75 Q176.7,86.35 186.1,86.35 Z"
+        android:fillColor="#00A6BF"/>
+    <group
+        android:translateX="183.3"
+        android:translateY="92.95"
+        android:scaleX="0.01677"
+        android:scaleY="0.01677">
+        <path
+            android:pathData="M393,880q-31,0 -54,-20.5T313,808l-31,-346q-1,-10 3.5,-18.5T299,430q8,-5 14,-12t6,-17q0,-9 -4,-16.5T303,372q-10,-5 -15,-15.5t-2,-21.5l26,-105q3,-14 14,-22t25,-8h109v-40h-20q-17,0 -28.5,-11.5T400,120q0,-17 11.5,-28.5T440,80h120q17,0 28.5,11.5T600,120q0,17 -11.5,28.5T560,160h-20v40h109q14,0 24.5,8t13.5,22l27,105q3,11 -2,21.5T697,372q-8,4 -12.5,11t-4.5,16q0,11 5.5,18.5T700,430q9,5 14,13.5t4,18.5l-31,345q-3,31 -26,52t-54,21L393,880Z"
+            android:fillColor="#FFFFFF"/>
+    </group>
+    <path
+        android:pathData="M213.3,91.6 L247.3,91.6"
+        android:strokeWidth="5"
+        android:strokeColor="#002B3C"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+    <path
+        android:pathData="M213.3,110.1 L268.3,110.1"
+        android:strokeWidth="8"
+        android:strokeColor="#002B3C"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+
+    <!-- Quick-add card 3: Large Bottle (tertiary) -->
+    <path
+        android:pathData="M184,129.37 L301,129.37 Q314,129.37 314,142.37 L314,157.1 Q314,170.1 301,170.1 L184,170.1 Q171,170.1 171,157.1 L171,142.37 Q171,129.37 184,129.37 Z"
+        android:fillColor="#D5EEFF"/>
+    <path
+        android:pathData="M186.1,135.09 L196.6,135.09 Q206,135.09 206,144.49 L206,154.99 Q206,164.39 196.6,164.39 L186.1,164.39 Q176.7,164.39 176.7,154.99 L176.7,144.49 Q176.7,135.09 186.1,135.09 Z"
+        android:fillColor="#37ABE8"/>
+    <group
+        android:translateX="183.3"
+        android:translateY="141.69"
+        android:scaleX="0.01677"
+        android:scaleY="0.01677">
+        <path
+            android:pathData="M280,880q-33,0 -56.5,-23.5T200,800v-80q0,-33 23.5,-56.5T280,640v-200q-33,0 -56.5,-23.5T200,360v-80q0,-33 23.5,-56.5T280,200h120v-40q-17,0 -28.5,-11.5T360,120q0,-17 11.5,-28.5T400,80h160q17,0 28.5,11.5T600,120q0,17 -11.5,28.5T560,160v40h120q33,0 56.5,23.5T760,280v80q0,33 -23.5,56.5T680,440v200q33,0 56.5,23.5T760,720v80q0,33 -23.5,56.5T680,880L280,880Z"
+            android:fillColor="#FFFFFF"/>
+    </group>
+    <path
+        android:pathData="M213.3,140.4 L277.3,140.4"
+        android:strokeWidth="5"
+        android:strokeColor="#001F2E"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+    <path
+        android:pathData="M213.3,158.9 L239.3,158.9"
+        android:strokeWidth="8"
+        android:strokeColor="#001F2E"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+</vector>

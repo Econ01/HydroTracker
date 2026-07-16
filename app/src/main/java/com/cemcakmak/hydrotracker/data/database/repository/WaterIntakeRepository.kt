@@ -16,7 +16,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.util.*
-import com.cemcakmak.hydrotracker.widgets.WidgetUpdateHelper
+import com.cemcakmak.hydrotracker.widgets.HydroWidgetUpdater
 import com.cemcakmak.hydrotracker.utils.UserDayCalculator
 import com.cemcakmak.hydrotracker.utils.ContainerIconMapper
 import android.content.Context
@@ -81,7 +81,7 @@ class WaterIntakeRepository(
         val dayEndMode = userProfile.dayEndMode
         if (UserDayCalculator.hasNewUserDayStarted(lastCheckTime, wakeUpTime, dayEndMode)) {
             // New user day has started, update widgets to reflect reset
-            WidgetUpdateHelper.updateAllWidgets(context)
+            HydroWidgetUpdater.updateAll(context)
             
             // Store the new check time
             prefs.edit { putLong("last_day_check_time", currentTime) }
@@ -122,7 +122,7 @@ class WaterIntakeRepository(
 
             // Update widgets after successful water intake
             Log.d(TAG, "🔄 Updating widgets...")
-            WidgetUpdateHelper.updateAllWidgets(context)
+            HydroWidgetUpdater.updateAll(context)
 
             // Sync to Health Connect if enabled with UI feedback
             Log.d(TAG, "🏥 Initiating Health Connect sync...")
@@ -148,7 +148,7 @@ class WaterIntakeRepository(
 
                 // Update widgets after hiding
                 Log.d(TAG, "🔄 Updating widgets...")
-                WidgetUpdateHelper.updateAllWidgets(context)
+                HydroWidgetUpdater.updateAll(context)
 
                 Log.i(TAG, "👁️ External entry hidden successfully: ${entry.amount}ml")
                 Result.success(Unit)
@@ -161,7 +161,7 @@ class WaterIntakeRepository(
 
                 // Update widgets after successful deletion
                 Log.d(TAG, "🔄 Updating widgets...")
-                WidgetUpdateHelper.updateAllWidgets(context)
+                HydroWidgetUpdater.updateAll(context)
 
                 // Handle Health Connect delete using proper API
                 Log.d(TAG, "🏥 Deleting entry from Health Connect...")
@@ -185,7 +185,7 @@ class WaterIntakeRepository(
 
             // Update widgets after unhiding
             Log.d(TAG, "🔄 Updating widgets...")
-            WidgetUpdateHelper.updateAllWidgets(context)
+            HydroWidgetUpdater.updateAll(context)
 
             Log.i(TAG, "👁️ Water intake unhidden successfully: ${entry.amount}ml")
             Result.success(Unit)
@@ -235,7 +235,7 @@ class WaterIntakeRepository(
 
             // Update widgets after successful update
             Log.d(TAG, "🔄 Updating widgets...")
-            WidgetUpdateHelper.updateAllWidgets(context)
+            HydroWidgetUpdater.updateAll(context)
 
             // Re-sync updated entry to Health Connect using delete + add pattern
             Log.d(TAG, "🏥 Re-syncing updated entry to Health Connect...")
@@ -358,7 +358,7 @@ class WaterIntakeRepository(
 
         // Update widgets after importing
         Log.d(TAG, "🔄 Updating widgets after import...")
-        WidgetUpdateHelper.updateAllWidgets(context)
+        HydroWidgetUpdater.updateAll(context)
 
         Log.i(TAG, "✅ Imported entry saved with ID: $entryId")
         entryId
@@ -454,7 +454,7 @@ class WaterIntakeRepository(
         try {
             waterIntakeDao.deleteAllEntries()
             dailySummaryDao.deleteAllSummaries()
-            WidgetUpdateHelper.updateAllWidgets(context)
+            HydroWidgetUpdater.updateAll(context)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -485,7 +485,7 @@ class WaterIntakeRepository(
 
             affectedDates.forEach { updateDailySummaryForDate(it) }
 
-            WidgetUpdateHelper.updateAllWidgets(context)
+            HydroWidgetUpdater.updateAll(context)
             Result.success(deleted)
         } catch (e: Exception) {
             Result.failure(e)

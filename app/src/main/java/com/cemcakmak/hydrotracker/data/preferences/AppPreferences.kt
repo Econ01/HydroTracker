@@ -23,4 +23,5 @@ data class AppPreferences(
     val beverages: BeveragePreferences = BeveragePreferences.default(),
     val hapticsEnabled: Boolean = true,
     val lastHealthConnectImportTime: Long? = null,
+    val widgetPreviewRevision: Int = 0,
 )

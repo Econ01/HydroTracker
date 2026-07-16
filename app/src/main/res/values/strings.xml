@@ -59,16 +59,19 @@
 
     <!-- ============================================================================
          Widgets
-         android:label values shown in the home-screen widget picker, plus the text
-         rendered inside the widgets and their fallback/loading states.
+         android:label value shown in the home-screen widget picker, plus the text
+         rendered inside the Glance widget.
          ============================================================================ -->
-    <string name="widget_compact_label">HydroTracker Compact</string>
-    <string name="widget_progress_label">HydroTracker Progress</string>
     <string name="widget_large_label">HydroTracker Large</string>
-    <string name="widget_progress_description">Shows your daily hydration progress</string>
-    <string name="widget_tap_to_open">Tap to open HydroTracker</string>
-    <string name="widget_updated_at">Updated %1$s</string>
-    <string name="widget_loading">Loading…</string>
+    <string name="widget_large_description">Track hydration and add water with one tap</string>
+    <string name="widget_goal_format">of %1$s</string>
+    <string name="widget_of_goal_format">%1$s of %2$s</string>
+    <string name="widget_goal_reached">Goal reached!</string>
+    <string name="widget_quick_add_cd">Add %1$s</string>
+    <string name="widget_daily_hydration">Daily Hydration</string>
+    <string name="widget_card_glass">Glass</string>
+    <string name="widget_card_bottle">Bottle</string>
+    <string name="widget_card_large_bottle">Large Bottle</string>
 
     <!-- ============================================================================
          Settings: About
@@ -709,6 +712,7 @@
     <!-- ============================================================================
          Markdown components
          ============================================================================ -->
+    <string name="markdown_loading">Loading…</string>
     <string name="markdown_error_loading">Error loading %1$s: %2$s</string>
     <string name="markdown_version_prefix">Version %1$s</string>
     <string name="markdown_section_added">Added</string>

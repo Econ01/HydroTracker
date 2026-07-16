@@ -79,7 +79,7 @@ internal fun MarkdownBottomSheet(
 ) {
     val context = LocalContext.current
     val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
-    val loadingText = stringResource(R.string.widget_loading)
+    val loadingText = stringResource(R.string.markdown_loading)
     val errorTemplate = stringResource(R.string.markdown_error_loading)
     var content by remember { mutableStateOf(loadingText) }
 

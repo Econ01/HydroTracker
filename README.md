@@ -53,13 +53,9 @@
 - **Multi-App Support:** Import data from Samsung Health, Google Fit, Fitbit, Garmin, Strava, and other health apps (*As long as they use Health Connect API*)
 - **External Entry Management:** Identify and manage entries from different sources. The app can **read** messy data from other apps that you have
 
-### Home Screen Widgets
-Available widgets:
-- HydroProgress Widget (4x1)
-- HydroCompact Widget (2x1)
-- HydroLarge Widget (4x2)
-
-All of them supports:
+### Home Screen Widget
+HydroTracker Large Widget (4x2):
+- Progress ring with quick-add action cards
 - Dynamic Theming
 - Real-Time Updates
 

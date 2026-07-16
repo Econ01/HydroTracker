@@ -27,7 +27,8 @@ import com.google.android.material.color.MaterialColors
 import com.google.android.material.color.utilities.TonalPalette
 
 // HydroTracker Light Colour Scheme
-private val HydroLightColorScheme = lightColorScheme(
+// internal: also consumed by the Glance widget theme as the non-dynamic fallback.
+internal val HydroLightColorScheme = lightColorScheme(
     primary = md_theme_light_primary,
     onPrimary = md_theme_light_onPrimary,
     primaryContainer = md_theme_light_primaryContainer,
@@ -57,7 +58,8 @@ private val HydroLightColorScheme = lightColorScheme(
 )
 
 // HydroTracker Dark Colour Scheme
-private val HydroDarkColorScheme = darkColorScheme(
+// internal: also consumed by the Glance widget theme as the non-dynamic fallback.
+internal val HydroDarkColorScheme = darkColorScheme(
     primary = md_theme_dark_primary,
     onPrimary = md_theme_dark_onPrimary,
     primaryContainer = md_theme_dark_primaryContainer,

@@ -208,6 +208,19 @@ class MainActivity : ComponentActivity() {
             applicationContext
         )
 
+        // Publish live widget picker previews (Android 15+); no-op if already published
+        lifecycleScope.launch {
+            com.cemcakmak.hydrotracker.widgets.WidgetPreviewPublisher.publishIfNeeded(
+                applicationContext, userRepository
+            )
+        }
+
+        // Debug builds only: `adb shell am start -n ... --es debug_pin_widget large`
+        // pins the given widget on the home screen for UI testing.
+        if (BuildConfig.DEBUG) {
+            handleDebugPinIntent(intent)
+        }
+
         // Seed default container presets if needed
         lifecycleScope.launch {
             containerPresetRepository.seedDefaultsIfNeeded()
@@ -241,6 +254,37 @@ class MainActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             contrastChangeListener?.let {
                 getSystemService(UiModeManager::class.java).removeContrastChangeListener(it)
+            }
+        }
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        if (BuildConfig.DEBUG) {
+            handleDebugPinIntent(intent)
+        }
+    }
+
+    /**
+     * Debug-only helper: triggers the system widget pin dialoug for the widget named in the
+     * `debug_pin_widget` extra ("large"). Used for emulator UI testing.
+     */
+    private fun handleDebugPinIntent(intent: android.content.Intent) {
+        intent.getStringExtra("debug_pin_widget")?.let { name ->
+            val receiver = when (name.lowercase()) {
+                "large" -> com.cemcakmak.hydrotracker.widgets.HydroLargeWidget::class.java
+                else -> null
+            }
+            val preview = when (name.lowercase()) {
+                "large" -> com.cemcakmak.hydrotracker.widgets.HydroLargeGlanceWidget()
+                else -> null
+            }
+            if (receiver != null) {
+                lifecycleScope.launch {
+                    val pinned = androidx.glance.appwidget.GlanceAppWidgetManager(applicationContext)
+                        .requestPinGlanceAppWidget(receiver, preview)
+                    android.util.Log.d("MainActivity", "📌 Pin request for $name widget: $pinned")
+                }
             }
         }
     }
