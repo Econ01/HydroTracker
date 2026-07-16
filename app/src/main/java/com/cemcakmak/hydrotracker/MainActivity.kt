@@ -215,6 +215,12 @@ class MainActivity : ComponentActivity() {
             )
         }
 
+        // Refresh home-screen widgets so their Glance state is populated (e.g. after an app
+        // upgrade) even before the next data change
+        lifecycleScope.launch {
+            com.cemcakmak.hydrotracker.widgets.HydroWidgetUpdater.updateAll(applicationContext)
+        }
+
         // Debug builds only: `adb shell am start -n ... --es debug_pin_widget large`
         // pins the given widget on the home screen for UI testing.
         if (BuildConfig.DEBUG) {

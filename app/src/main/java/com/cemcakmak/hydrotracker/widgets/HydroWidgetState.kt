@@ -2,6 +2,12 @@ package com.cemcakmak.hydrotracker.widgets
 
 import android.content.Context
 import android.util.Log
+import androidx.datastore.preferences.core.MutablePreferences
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.doublePreferencesKey
+import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.cemcakmak.hydrotracker.data.database.DatabaseInitializer
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
@@ -9,7 +15,9 @@ import kotlinx.coroutines.flow.first
 
 /**
  * Immutable snapshot of everything the home-screen widgets need to render.
- * Loaded fresh on every widget update; the widgets themselves stay stateless.
+ * [HydroWidgetUpdater] loads it on every data change and mirrors it into each widget's
+ * Glance preferences; the widget UI renders from that state store, so recompositions
+ * within a live Glance session always show current data.
  */
 data class HydroWidgetState(
     val currentIntake: Double,
@@ -30,6 +38,44 @@ data class HydroWidgetState(
             volumeUnit = VolumeUnit.MILLILITRES,
         )
     }
+}
+
+// Glance state keys mirroring every [HydroWidgetState] field, stored in the widget's default
+// PreferencesGlanceStateDefinition store — the same store a live session re-reads on update.
+private val KEY_CURRENT_INTAKE = doublePreferencesKey("hydro_widget_current_intake")
+private val KEY_DAILY_GOAL = doublePreferencesKey("hydro_widget_daily_goal")
+private val KEY_PROGRESS = floatPreferencesKey("hydro_widget_progress")
+private val KEY_GOAL_ACHIEVED = booleanPreferencesKey("hydro_widget_goal_achieved")
+private val KEY_REMAINING = doublePreferencesKey("hydro_widget_remaining")
+private val KEY_VOLUME_UNIT = stringPreferencesKey("hydro_widget_volume_unit")
+
+/** Writes this snapshot into the widget's Glance preferences. */
+fun HydroWidgetState.writeTo(prefs: MutablePreferences) {
+    prefs[KEY_CURRENT_INTAKE] = currentIntake
+    prefs[KEY_DAILY_GOAL] = dailyGoal
+    prefs[KEY_PROGRESS] = progress
+    prefs[KEY_GOAL_ACHIEVED] = isGoalAchieved
+    prefs[KEY_REMAINING] = remainingAmount
+    prefs[KEY_VOLUME_UNIT] = volumeUnit.name
+}
+
+/**
+ * Reads a [HydroWidgetState] from the widget's Glance preferences. Missing or invalid values
+ * fall back to [HydroWidgetState.EMPTY], so a widget pinned before the first refresh renders
+ * the same defaults as a load failure.
+ */
+fun Preferences.toHydroWidgetState(): HydroWidgetState {
+    val empty = HydroWidgetState.EMPTY
+    return HydroWidgetState(
+        currentIntake = this[KEY_CURRENT_INTAKE] ?: empty.currentIntake,
+        dailyGoal = this[KEY_DAILY_GOAL] ?: empty.dailyGoal,
+        progress = this[KEY_PROGRESS] ?: empty.progress,
+        isGoalAchieved = this[KEY_GOAL_ACHIEVED] ?: empty.isGoalAchieved,
+        remainingAmount = this[KEY_REMAINING] ?: empty.remainingAmount,
+        volumeUnit = this[KEY_VOLUME_UNIT]
+            ?.let { name -> runCatching { VolumeUnit.valueOf(name) }.getOrNull() }
+            ?: empty.volumeUnit,
+    )
 }
 
 /**

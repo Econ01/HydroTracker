@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.Preferences
 import androidx.glance.ColorFilter
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -28,6 +29,7 @@ import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
+import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -76,10 +78,13 @@ class HydroLargeGlanceWidget : GlanceAppWidget() {
     override val previewSizeMode: PreviewSizeMode = SizeMode.Responsive(SIZES)
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val state = HydroWidgetStateLoader.load(context)
+        // State-driven UI: HydroWidgetUpdater mirrors the latest snapshot into Glance
+        // preferences before every update, and a live session re-reads them here on each
+        // recomposition. Loading directly in provideGlance would only run once per session
+        // and republish stale data for every update within the session's lifetime.
         provideContent {
             HydroWidgetTheme {
-                LargeContent(state)
+                LargeContent(currentState<Preferences>().toHydroWidgetState())
             }
         }
     }
@@ -127,7 +132,7 @@ private data class CardColours(
 )
 
 /** Header height (icon + text) plus the spacer below it, in dp. */
-private val HEADER_BLOCK = 22.dp
+private val HEADER_BLOCK = 24.dp
 
 @Composable
 private fun LargeContent(state: HydroWidgetState) {
@@ -145,7 +150,7 @@ private fun LargeContent(state: HydroWidgetState) {
     val maxRingByWidth = (size.width - (horizontalPadding * 2) - sectionSpacing) / 2
     val ringSize = minOf(bodyHeight, maxRingByWidth).coerceAtLeast(40.dp)
     // Stroke is ~13% of the ring diameter.
-    val strokeWidth = ringSize * 0.16f
+    val strokeWidth = ringSize * 0.15f
     // Curved arc texts only stay legible on a reasonably large ring.
     val showArcTexts = ringSize >= 90.dp
     val percent = (state.progress * 100).toInt()
