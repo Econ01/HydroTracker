@@ -280,46 +280,52 @@ fun HydroTrackerTheme(
         DarkModePreference.DARK -> true
     }
 
-    // Choose colour scheme based on user preference
-    val baseColorScheme = when (themePreferences.colorSource) {
-        ColorSource.DYNAMIC_COLOR -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-            } else {
+    // Choose colour scheme based on user preference. Memoised so that preferences which do not
+    // affect colours (e.g. useBeverageColors, showAmoledBorders) do not trigger an expensive
+    // dynamic-colour / extended-palette rebuild.
+    val colorScheme = remember(darkTheme, themePreferences.colorSource, themePreferences.usePureBlack) {
+        val baseColorScheme = when (themePreferences.colorSource) {
+            ColorSource.DYNAMIC_COLOR -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+                } else {
+                    if (darkTheme) HydroDarkColorScheme else HydroLightColorScheme
+                }
+            }
+
+            ColorSource.HYDRO_THEME -> {
                 if (darkTheme) HydroDarkColorScheme else HydroLightColorScheme
             }
         }
 
-        ColorSource.HYDRO_THEME -> {
-            if (darkTheme) HydroDarkColorScheme else HydroLightColorScheme
+        // Apply pure black mode override if enabled and in dark theme
+        if (themePreferences.usePureBlack && darkTheme) {
+            baseColorScheme.copy(
+                surface = Color.Black,
+                background = Color.Black
+            )
+        } else {
+            baseColorScheme
         }
     }
 
-    // Apply pure black mode override if enabled and in dark theme
-    val colorScheme = if (themePreferences.usePureBlack && darkTheme) {
-        baseColorScheme.copy(
-            surface = Color.Black,
-            background = Color.Black
+    val extendedColors = remember(colorScheme, darkTheme) {
+        extendedColorScheme(
+            successSeed = SuccessSeed,
+            warningSeed = WarningSeed,
+            waterSeed = WaterSeed,
+            coffeeSeed = CoffeeSeed,
+            energyDrinkSeed = EnergyDrinkSeed,
+            fruitJuiceSeed = FruitJuiceSeed,
+            milkSeed = MilkSeed,
+            oralRehydrationSolutionSeed = ORSSeed,
+            softDrinkSeed = SoftDrinkSeed,
+            sportsDrinkSeed = SportsDrinkSeed,
+            teaSeed = TeaSeed,
+            primaryColor = colorScheme.primary,
+            isDark = darkTheme
         )
-    } else {
-        baseColorScheme
     }
-
-    val extendedColors = extendedColorScheme(
-        successSeed = SuccessSeed,
-        warningSeed = WarningSeed,
-        waterSeed = WaterSeed,
-        coffeeSeed = CoffeeSeed,
-        energyDrinkSeed = EnergyDrinkSeed,
-        fruitJuiceSeed = FruitJuiceSeed,
-        milkSeed = MilkSeed,
-        oralRehydrationSolutionSeed = ORSSeed,
-        softDrinkSeed = SoftDrinkSeed,
-        sportsDrinkSeed = SportsDrinkSeed,
-        teaSeed = TeaSeed,
-        primaryColor = colorScheme.primary,
-        isDark = darkTheme
-    )
 
     // Typography follows the user's selected font, rebuilt only when the font changes
     val typography = remember(themePreferences.appFont) {
