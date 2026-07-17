@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import com.cemcakmak.hydrotracker.data.database.dao.WaterIntakeDao
 import com.cemcakmak.hydrotracker.data.database.dao.DailySummaryDao
+import com.cemcakmak.hydrotracker.data.database.dao.MostUsedQuickAddCombo
 import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
 import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
 import com.cemcakmak.hydrotracker.data.models.ContainerPreset
@@ -334,6 +335,15 @@ class WaterIntakeRepository(
 
         QuickAddPresets(primary, secondary)
     }
+
+    /**
+     * Returns the [limit] most frequently logged (container, volume, beverage) combinations,
+     * ranked by entry count. Drives the home-screen widget's quick-add cards.
+     */
+    suspend fun getTopQuickAddCombos(limit: Int = 3): List<MostUsedQuickAddCombo> =
+        withContext(Dispatchers.IO) {
+            waterIntakeDao.getMostUsedQuickAddCombos(limit)
+        }
 
     suspend fun getAllEntriesForDate(date: String): List<WaterIntakeEntry> = withContext(Dispatchers.IO) {
         waterIntakeDao.getAllEntriesForDateSync(date)

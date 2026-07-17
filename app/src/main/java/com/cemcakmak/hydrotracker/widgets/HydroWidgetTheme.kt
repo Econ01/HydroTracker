@@ -1,8 +1,8 @@
 package com.cemcakmak.hydrotracker.widgets
 
+import android.content.Context
 import android.os.Build
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.glance.GlanceComposable
 import androidx.glance.GlanceTheme
 import androidx.glance.color.ColorProvider
@@ -32,13 +32,13 @@ object HydroWidgetColors {
     )
 
     /**
-     * Success colour used for the "goal reached" state.
-     * Matches the in-app success seed colour used by the extended colour scheme.
+     * Success colour used for the "goal reached" state, taken from the extended colour
+     * scheme's success family (harmonized with the widget's primary, light and dark).
      */
-    val success: ColorProvider = ColorProvider(
-        day = Color(0xFF1E8E3E),
-        night = Color(0xFF7BD88F),
-    )
+    fun success(context: Context): ColorProvider {
+        val (light, dark) = widgetExtendedColors(context)
+        return ColorProvider(day = light.success, night = dark.success)
+    }
 }
 
 /**

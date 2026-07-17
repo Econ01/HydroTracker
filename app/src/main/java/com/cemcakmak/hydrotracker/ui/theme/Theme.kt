@@ -239,6 +239,28 @@ private fun extendedColorScheme(
 }
 
 /**
+ * Non-composable access to the extended colour scheme, for surfaces that cannot read
+ * [LocalExtendedColorScheme] (currently the Glance home-screen widget). Uses the same seeds
+ * and harmonization as [HydroTrackerTheme], so widget and app stay in sync.
+ */
+internal fun extendedColorSchemeFor(primaryColor: Color, isDark: Boolean): ExtendedColorScheme =
+    extendedColorScheme(
+        successSeed = SuccessSeed,
+        warningSeed = WarningSeed,
+        waterSeed = WaterSeed,
+        coffeeSeed = CoffeeSeed,
+        energyDrinkSeed = EnergyDrinkSeed,
+        fruitJuiceSeed = FruitJuiceSeed,
+        milkSeed = MilkSeed,
+        oralRehydrationSolutionSeed = ORSSeed,
+        softDrinkSeed = SoftDrinkSeed,
+        sportsDrinkSeed = SportsDrinkSeed,
+        teaSeed = TeaSeed,
+        primaryColor = primaryColor,
+        isDark = isDark
+    )
+
+/**
  * The active [ThemePreferences], provided by [HydroTrackerTheme] so deeply nested components
  * (e.g. shared settings cards) can react to appearance settings without explicit parameters.
  */

@@ -48,9 +48,10 @@ import androidx.glance.semantics.semantics
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import androidx.glance.unit.ColorProvider
 import com.cemcakmak.hydrotracker.MainActivity
 import com.cemcakmak.hydrotracker.R
+import com.cemcakmak.hydrotracker.data.models.BeverageType
+import com.cemcakmak.hydrotracker.data.models.ContainerPreset
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 import com.cemcakmak.hydrotracker.widgets.actions.QuickAddAction
@@ -123,12 +124,52 @@ private val QUICK_ADD_PRESETS = listOf(
     QuickAddPreset(1000.0, "Large Bottle", R.string.widget_card_large_bottle, R.drawable.water_bottle_large_filled),
 )
 
-/** Themed colour set for one quick-add card (container, icon pill, pill content, text). */
-private data class CardColours(
-    val container: ColorProvider,
-    val pill: ColorProvider,
-    val pillContent: ColorProvider,
-    val content: ColorProvider,
+/** Everything a quick-add card needs to render and to fire its action. */
+private data class QuickAddCardModel(
+    val amount: Double,
+    val containerName: String,
+    val beverageName: String,
+    val label: String,
+    @DrawableRes val iconRes: Int,
+    val colours: WidgetCardColours,
+)
+
+/**
+ * Builds a card from a usage-driven slot. Water combos show the container's icon and name
+ * (custom/unknown containers fall back to a generic glass); other beverages show the
+ * beverage's icon and localized name. Colours come from the beverage's extended-palette family.
+ */
+private fun slotCardModel(context: Context, slot: WidgetQuickAddSlot): QuickAddCardModel {
+    val beverage = BeverageType.fromStringOrDefault(slot.beverageName)
+    val (label, iconRes) = if (beverage != BeverageType.WATER) {
+        context.getString(beverage.labelResId) to beverage.iconResFilled
+    } else {
+        val preset = ContainerPreset.getDefaultPresets().firstOrNull { it.name == slot.containerName }
+        val presetLabel = preset?.let { if (it.labelResId != 0) context.getString(it.labelResId) else it.name }
+        (presetLabel ?: slot.containerName) to (preset?.iconRes ?: R.drawable.glass_cup_filled)
+    }
+    return QuickAddCardModel(
+        amount = slot.volume,
+        containerName = slot.containerName,
+        beverageName = beverage.name,
+        label = label,
+        iconRes = iconRes,
+        colours = beverageCardColours(context, slot.beverageName),
+    )
+}
+
+/** Builds a card from one of the hardcoded default presets (used when a slot has no history). */
+private fun presetCardModel(
+    context: Context,
+    preset: QuickAddPreset,
+    colours: WidgetCardColours,
+) = QuickAddCardModel(
+    amount = preset.amount,
+    containerName = preset.container,
+    beverageName = BeverageType.WATER.name,
+    label = context.getString(preset.labelRes),
+    iconRes = preset.iconRes,
+    colours = colours,
 )
 
 /** Header height (icon + text) plus the spacer below it, in dp. */
@@ -160,25 +201,31 @@ private fun LargeContent(state: HydroWidgetState) {
     val cardHeight = ((bodyHeight - (cardGap * 4)) / 3).coerceAtLeast(16.dp)
 
     val cardColours = listOf(
-        CardColours(
+        WidgetCardColours(
             GlanceTheme.colors.primaryContainer,
             GlanceTheme.colors.primary,
             GlanceTheme.colors.onPrimary,
             GlanceTheme.colors.onPrimaryContainer,
         ),
-        CardColours(
+        WidgetCardColours(
             GlanceTheme.colors.secondaryContainer,
             GlanceTheme.colors.secondary,
             GlanceTheme.colors.onSecondary,
             GlanceTheme.colors.onSecondaryContainer,
         ),
-        CardColours(
+        WidgetCardColours(
             GlanceTheme.colors.tertiaryContainer,
             GlanceTheme.colors.tertiary,
             GlanceTheme.colors.onTertiary,
             GlanceTheme.colors.onTertiaryContainer,
         ),
     )
+
+    // Quick-add cards: usage-driven slots when history exists, themed defaults otherwise.
+    val quickAddCards = (0 until QUICK_ADD_SLOT_COUNT).map { index ->
+        state.quickAddSlots.getOrNull(index)?.let { slotCardModel(context, it) }
+            ?: presetCardModel(context, QUICK_ADD_PRESETS[index], cardColours[index])
+    }
 
     Column(
         modifier = GlanceModifier
@@ -252,7 +299,7 @@ private fun LargeContent(state: HydroWidgetState) {
                         Image(
                             provider = ImageProvider(R.drawable.award_star_filled),
                             contentDescription = context.getString(R.string.widget_goal_reached),
-                            colorFilter = ColorFilter.tint(HydroWidgetColors.success),
+                            colorFilter = ColorFilter.tint(HydroWidgetColors.success(context)),
                             modifier = GlanceModifier.size(
                                 (ringSize * 0.25f).coerceAtLeast(16.dp),
                             ),
@@ -277,13 +324,12 @@ private fun LargeContent(state: HydroWidgetState) {
                 modifier = GlanceModifier.defaultWeight(),
                 verticalAlignment = Alignment.Vertical.CenterVertically,
             ) {
-                QUICK_ADD_PRESETS.forEachIndexed { index, preset ->
+                quickAddCards.forEachIndexed { index, card ->
                     if (index > 0) {
                         Spacer(GlanceModifier.height(cardGap))
                     }
                     QuickAddCard(
-                        preset = preset,
-                        colours = cardColours[index],
+                        card = card,
                         height = cardHeight,
                         state = state,
                     )
@@ -295,13 +341,12 @@ private fun LargeContent(state: HydroWidgetState) {
 
 @Composable
 private fun QuickAddCard(
-    preset: QuickAddPreset,
-    colours: CardColours,
+    card: QuickAddCardModel,
     height: Dp,
     state: HydroWidgetState,
 ) {
     val context = LocalContext.current
-    val amountLabel = VolumeUnitConverter.format(context, preset.amount, state.volumeUnit)
+    val amountLabel = VolumeUnitConverter.format(context, card.amount, state.volumeUnit)
     val pillHeight = height * 0.72f
     val pillWidth = height * 0.5f
     val labelFontSize = (height.value * 0.18f).coerceAtLeast(7f).sp
@@ -310,7 +355,7 @@ private fun QuickAddCard(
         modifier = GlanceModifier
             .fillMaxWidth()
             .height(height)
-            .background(colours.container)
+            .background(card.colours.container)
             .cornerRadius(height * 0.38f)
             .semantics {
                 contentDescription = context.getString(R.string.widget_quick_add_cd, amountLabel)
@@ -318,8 +363,9 @@ private fun QuickAddCard(
             .clickable(
                 actionRunCallback<QuickAddAction>(
                     actionParametersOf(
-                        QuickAddAction.KEY_AMOUNT to preset.amount,
-                        QuickAddAction.KEY_CONTAINER to preset.container,
+                        QuickAddAction.KEY_AMOUNT to card.amount,
+                        QuickAddAction.KEY_CONTAINER to card.containerName,
+                        QuickAddAction.KEY_BEVERAGE to card.beverageName,
                     ),
                 ),
             )
@@ -329,23 +375,23 @@ private fun QuickAddCard(
         Box(
             modifier = GlanceModifier
                 .size(pillWidth, pillHeight)
-                .background(colours.pill)
+                .background(card.colours.pill)
                 .cornerRadius(pillHeight * 0.35f),
             contentAlignment = Alignment.Center,
         ) {
             Image(
-                provider = ImageProvider(preset.iconRes),
+                provider = ImageProvider(card.iconRes),
                 contentDescription = null,
-                colorFilter = ColorFilter.tint(colours.pillContent),
+                colorFilter = ColorFilter.tint(card.colours.pillContent),
                 modifier = GlanceModifier.size(pillHeight * 0.45f),
             )
         }
         Spacer(GlanceModifier.width(height * 0.18f))
         Column {
             Text(
-                text = context.getString(preset.labelRes),
+                text = card.label,
                 style = TextStyle(
-                    color = colours.content,
+                    color = card.colours.content,
                     fontSize = labelFontSize,
                     fontWeight = FontWeight.Bold,
                 ),
@@ -354,7 +400,7 @@ private fun QuickAddCard(
             Text(
                 text = amountLabel,
                 style = TextStyle(
-                    color = colours.content,
+                    color = card.colours.content,
                     fontSize = amountFontSize,
                 ),
                 maxLines = 1,

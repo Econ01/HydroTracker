@@ -36,6 +36,7 @@ import com.cemcakmak.hydrotracker.data.database.dao.ContainerPresetDao
 import com.cemcakmak.hydrotracker.data.database.dao.DailySummaryDao
 import com.cemcakmak.hydrotracker.data.database.dao.DailyTotal
 import com.cemcakmak.hydrotracker.data.database.dao.MostUsedContainer
+import com.cemcakmak.hydrotracker.data.database.dao.MostUsedQuickAddCombo
 import com.cemcakmak.hydrotracker.data.database.dao.WaterIntakeDao
 import com.cemcakmak.hydrotracker.data.database.entities.ContainerPresetEntity
 import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
@@ -1243,6 +1244,7 @@ private class PreviewWaterIntakeDao : WaterIntakeDao {
     override suspend fun getDailyTotals(startDate: String, endDate: String): List<DailyTotal> = emptyList()
     override suspend fun getMostUsedContainer(): MostUsedContainer? = null
     override suspend fun getMostUsedContainers(limit: Int): List<MostUsedContainer> = emptyList()
+    override suspend fun getMostUsedQuickAddCombos(limit: Int): List<MostUsedQuickAddCombo> = emptyList()
     override suspend fun getMostRecentEntry(): WaterIntakeEntry? = null
     override suspend fun insertEntry(entry: WaterIntakeEntry): Long = 1L
     override suspend fun insertEntries(entries: List<WaterIntakeEntry>) {}

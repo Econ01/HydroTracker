@@ -103,6 +103,17 @@ suspend fun getMostUsedContainer(): MostUsedContainer?
 """)
 suspend fun getMostUsedContainers(limit: Int): List<MostUsedContainer>
 
+@Query("""
+    SELECT container_type AS containerName, container_volume AS volume,
+           beverage_type AS beverage, COUNT(*) AS count
+    FROM water_intake_entries
+    WHERE is_hidden = 0
+    GROUP BY container_type, container_volume, beverage_type
+    ORDER BY count DESC
+    LIMIT :limit
+""")
+suspend fun getMostUsedQuickAddCombos(limit: Int): List<MostUsedQuickAddCombo>
+
 @Query("SELECT * FROM water_intake_entries WHERE is_hidden = 0 ORDER BY timestamp DESC LIMIT 1")
 suspend fun getMostRecentEntry(): WaterIntakeEntry?
 }
@@ -116,6 +127,14 @@ data class DailyTotal(
 data class MostUsedContainer(
     val name: String,
     val volume: Double,
+    val count: Int
+)
+
+/** A frequently logged (container, volume, beverage) combination, ranked by entry count. */
+data class MostUsedQuickAddCombo(
+    val containerName: String,
+    val volume: Double,
+    val beverage: String,
     val count: Int
 )
 

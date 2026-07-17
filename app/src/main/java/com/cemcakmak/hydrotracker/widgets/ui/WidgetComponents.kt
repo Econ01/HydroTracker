@@ -260,14 +260,14 @@ fun ProgressRing(
 ) {
     val context = LocalContext.current
     val ringColour = if (state.isGoalAchieved) {
-        HydroWidgetColors.success.getColor(context)
+        HydroWidgetColors.success(context).getColor(context)
     } else {
         GlanceTheme.colors.primary.getColor(context)
     }
     val trackColour = GlanceTheme.colors.primaryContainer.getColor(context)
     val arcTitleColour = GlanceTheme.colors.onSurfaceVariant.getColor(context)
     val arcSubtitleColour = if (state.isGoalAchieved) {
-        HydroWidgetColors.success.getColor(context)
+        HydroWidgetColors.success(context).getColor(context)
     } else {
         GlanceTheme.colors.primary.getColor(context)
     }
@@ -354,7 +354,7 @@ private fun ProgressRingGoalPreview() {
             Image(
                 provider = ImageProvider(R.drawable.award_star_filled),
                 contentDescription = null,
-                colorFilter = ColorFilter.tint(HydroWidgetColors.success),
+                colorFilter = ColorFilter.tint(HydroWidgetColors.success(LocalContext.current)),
                 modifier = GlanceModifier.size(30.dp),
             )
         }
