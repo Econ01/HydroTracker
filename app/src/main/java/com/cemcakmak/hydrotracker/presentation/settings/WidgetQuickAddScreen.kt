@@ -1,43 +1,45 @@
 package com.cemcakmak.hydrotracker.presentation.settings
 
-import android.content.Context
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.R
-import com.cemcakmak.hydrotracker.data.database.dao.MostUsedQuickAddCombo
 import com.cemcakmak.hydrotracker.data.database.entities.CustomBeverageEntity
 import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
@@ -47,13 +49,18 @@ import com.cemcakmak.hydrotracker.data.models.PinnedQuickAddSlot
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.data.models.WidgetPreferences
+import com.cemcakmak.hydrotracker.presentation.common.BlurMorph
+import com.cemcakmak.hydrotracker.presentation.common.shapes.SquircleShape
+import com.cemcakmak.hydrotracker.presentation.common.sheets.BeverageIcons
+import com.cemcakmak.hydrotracker.ui.theme.ExtendedColorScheme
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
-import com.cemcakmak.hydrotracker.utils.ContainerIconMapper
+import com.cemcakmak.hydrotracker.ui.theme.extendedColorScheme
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 import kotlinx.coroutines.flow.flowOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+@Suppress("UNUSED_PARAMETER")
 fun WidgetQuickAddScreen(
     themePreferences: ThemePreferences = ThemePreferences(),
     widgetPreferences: WidgetPreferences = WidgetPreferences(),
@@ -64,17 +71,14 @@ fun WidgetQuickAddScreen(
     onWidgetPreferencesChange: (WidgetPreferences) -> Unit = {},
     onNavigateBack: () -> Unit = {},
 ) {
-    val context = LocalContext.current
     val haptics = LocalHapticFeedback.current
-    var pickerSlot by remember { mutableStateOf<Int?>(null) }
 
     val containerPresets by remember(containerPresetRepository) {
         containerPresetRepository?.getAllPresets() ?: flowOf(emptyList())
     }.collectAsState(initial = emptyList())
-    val topCombos by produceState(initialValue = emptyList(), waterIntakeRepository) {
-        // Headroom beyond 3 so auto slots stay filled after de-duplicating against pins.
-        value = waterIntakeRepository?.getTopQuickAddCombos(AUTO_FETCH_LIMIT) ?: emptyList()
-    }
+
+    var pickerSlot by remember { mutableStateOf<Int?>(null) }
+    var pickerMode by remember { mutableStateOf<PickerMode?>(null) }
 
     fun savePin(slot: Int, pin: PinnedQuickAddSlot?) {
         val others = widgetPreferences.pinnedQuickAddSlots.filterNot { it.slot == slot }
@@ -89,162 +93,399 @@ fun WidgetQuickAddScreen(
         themePreferences = themePreferences
     ) {
         Column(
-            modifier = Modifier.padding(top = 24.dp)
+            modifier = Modifier.padding(top = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // Mirror the widget's resolution: pins hold their position; auto slots take the
-            // ranked combos (skipping pinned identities) in order.
-            val pinnedIdentities = widgetPreferences.pinnedQuickAddSlots
-                .map { Triple(it.containerName, it.volume, it.beverageName) }
-                .toSet()
-            val autoCombos = topCombos.filter {
-                Triple(it.containerName, it.volume, it.beverage) !in pinnedIdentities
-            }
-            var nextAuto = 0
-            (0 until SLOT_COUNT).forEach { slot ->
-                val pin = widgetPreferences.pinnedQuickAddSlots.firstOrNull { it.slot == slot }
-                val summary = when {
-                    pin != null -> pinnedSummary(context, pin, volumeUnit)
-                    else -> autoCombos.getOrNull(nextAuto)?.let { combo ->
-                        nextAuto++
-                        stringResource(R.string.widget_quickadd_auto_summary, comboLabel(context, combo))
-                    } ?: stringResource(R.string.widget_quickadd_auto)
-                }
-                SettingsGroupCard(
-                    index = slot,
-                    size = SLOT_COUNT,
-                    onClick = {
-                        haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                        pickerSlot = slot
-                    }
-                ) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                SettingsSectionHeader(stringResource(R.string.widget_quickadd_slot_section_title))
+
+                Column {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(3.dp)
                     ) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.glass_cup_filled),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Column(modifier = Modifier.weight(1f)) {
+                        Surface(
+                            shape = SquircleShape(
+                                topStart = CornerSize(24.dp),
+                                topEnd = CornerSize(10.dp),
+                                bottomEnd = CornerSize(10.dp),
+                                bottomStart = CornerSize(10.dp)
+                            ),
+                            tonalElevation = 2.dp,
+                            color = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier
+                                .weight(3f)
+                                .padding(bottom = 3.dp)
+                        ) {
                             Text(
-                                text = stringResource(R.string.widget_quickadd_slot_title, slot + 1),
-                                style = MaterialTheme.typography.titleMedium
+                                modifier = Modifier
+                                    .weight(2f)
+                                    .padding(horizontal = 8.dp, vertical = 16.dp),
+                                text = stringResource(R.string.statistics_container_header_container),
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.titleMediumEmphasized
                             )
+                        }
+
+                        Surface(
+                            shape = SquircleShape(
+                                topStart = CornerSize(10.dp),
+                                topEnd = CornerSize(24.dp),
+                                bottomEnd = CornerSize(10.dp),
+                                bottomStart = CornerSize(10.dp)
+                            ),
+                            tonalElevation = 2.dp,
+                            color = MaterialTheme.colorScheme.tertiary,
+                            modifier = Modifier
+                                .weight(2f)
+                                .padding(bottom = 3.dp)
+                        ) {
                             Text(
-                                text = summary,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(horizontal = 8.dp, vertical = 16.dp),
+                                text = stringResource(R.string.widget_quickadd_beverage_header),
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.titleMediumEmphasized
                             )
                         }
                     }
+
+                    (0 until SLOT_COUNT).forEach { slot ->
+                        val pin = widgetPreferences.pinnedQuickAddSlots.firstOrNull { it.slot == slot }
+                        QuickAddSlotRow(
+                            pin = pin,
+                            containerPresets = containerPresets,
+                            customBeverages = customBeverages,
+                            isLast = slot == SLOT_COUNT - 1,
+                            onContainerClick = {
+                                haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                pickerSlot = slot
+                                pickerMode = PickerMode.CONTAINER
+                            },
+                            onBeverageClick = if (pin != null) {
+                                {
+                                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                    pickerSlot = slot
+                                    pickerMode = PickerMode.BEVERAGE
+                                }
+                            } else null
+                        )
+
+                    }
                 }
+            }
+
+            Button(
+                onClick = {
+                    haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
+                    onWidgetPreferencesChange(widgetPreferences.copy(pinnedQuickAddSlots = emptyList()))
+                },
+                shapes = ButtonDefaults.shapes(),
+                colors = ButtonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary,
+                    disabledContainerColor = ButtonDefaults.buttonColors().disabledContainerColor,
+                    disabledContentColor = ButtonDefaults.buttonColors().disabledContentColor
+                ),
+                contentPadding = PaddingValues(20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(R.string.widget_quickadd_reset_all),
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
         }
     }
 
     pickerSlot?.let { slot ->
-        ModalBottomSheet(onDismissRequest = { pickerSlot = null }) {
-            QuickAddPicker(
-                slot = slot,
-                currentPin = widgetPreferences.pinnedQuickAddSlots.firstOrNull { it.slot == slot },
-                containerPresets = containerPresets,
-                customBeverages = customBeverages,
-                volumeUnit = volumeUnit,
-                onAuto = {
-                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                    savePin(slot, null)
-                    pickerSlot = null
-                },
-                onPick = { container, beverageName ->
-                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                    savePin(slot, PinnedQuickAddSlot(slot, container.name, container.volume, beverageName))
-                    pickerSlot = null
-                }
-            )
+        when (pickerMode) {
+            PickerMode.CONTAINER -> {
+                val currentPin = widgetPreferences.pinnedQuickAddSlots.firstOrNull { it.slot == slot }
+                ContainerPickerSheet(
+                    currentContainerName = currentPin?.containerName,
+                    containerPresets = containerPresets,
+                    volumeUnit = volumeUnit,
+                    onAuto = {
+                        haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                        savePin(slot, null)
+                        pickerSlot = null
+                    },
+                    onPick = { preset ->
+                        haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                        val beverageName = currentPin?.beverageName ?: BeverageType.WATER.name
+                        savePin(slot, PinnedQuickAddSlot(slot, preset.name, preset.volume, beverageName))
+                        pickerSlot = null
+                    },
+                    onDismiss = { pickerSlot = null }
+                )
+            }
+
+            PickerMode.BEVERAGE -> {
+                val currentPin = widgetPreferences.pinnedQuickAddSlots.firstOrNull { it.slot == slot }
+                BeveragePickerSheet(
+                    currentBeverageName = currentPin?.beverageName,
+                    customBeverages = customBeverages,
+                    onPick = { beverageName ->
+                        haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                        currentPin?.let { pin ->
+                            savePin(slot, pin.copy(beverageName = beverageName))
+                        }
+                        pickerSlot = null
+                    },
+                    onDismiss = { pickerSlot = null }
+                )
+            }
+
+            else -> {}
         }
     }
 }
 
 private const val SLOT_COUNT = 3
-private const val AUTO_FETCH_LIMIT = 10
+private const val AUTO_KEY = "__auto__"
 
-/**
- * Bottom-sheet picker: Auto, then every container preset; choosing a container reveals the
- * beverage chips (Water first, then standard types, then customs) to finish the pin.
- */
-@OptIn(ExperimentalLayoutApi::class)
+private enum class PickerMode {
+    CONTAINER,
+    BEVERAGE
+}
+
 @Composable
-private fun QuickAddPicker(
-    slot: Int,
-    currentPin: PinnedQuickAddSlot?,
+private fun QuickAddSlotRow(
+    pin: PinnedQuickAddSlot?,
     containerPresets: List<ContainerPreset>,
     customBeverages: List<CustomBeverageEntity>,
+    isLast: Boolean,
+    onContainerClick: () -> Unit,
+    onBeverageClick: (() -> Unit)?,
+) {
+    val containerKey = pin?.containerName ?: AUTO_KEY
+    val beverageKey = pin?.beverageName ?: AUTO_KEY
+
+    val beverage = pin?.let { BeverageType.fromStringOrDefault(it.beverageName) }
+    val (targetContainerColor, targetContentColor) = if (beverage != null) {
+        MaterialTheme.extendedColorScheme.colorsFor(beverage)
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant to MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+    }
+    val beverageContainerColor by animateColorAsState(
+        targetValue = targetContainerColor,
+        label = "beverageContainerColor"
+    )
+    val beverageContentColor by animateColorAsState(
+        targetValue = targetContentColor,
+        label = "beverageContentColor"
+    )
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(3.dp)
+    ) {
+        // Container half
+        Surface(
+            onClick = onContainerClick,
+            shape = slotRowShape(isLast, isLeft = true),
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            tonalElevation = 2.dp,
+            modifier = Modifier
+                .weight(3f)
+                .padding(bottom = 3.dp)
+        ) {
+            BlurMorph(targetState = containerKey) { key, blurModifier ->
+                val preset = containerPresets.firstOrNull { it.name == key }
+                val iconRes = preset?.iconRes ?: R.drawable.glass_cup_filled
+                val label = preset?.labelResId?.takeIf { it != 0 }?.let { stringResource(it) }
+                    ?: if (key == AUTO_KEY) stringResource(R.string.widget_quickadd_auto) else key
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .then(blurModifier)
+                        .padding(horizontal = 12.dp, vertical = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(iconRes),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+        }
+
+        // Beverage half
+        Surface(
+            onClick = onBeverageClick ?: {},
+            shape = slotRowShape(isLast, isLeft = false),
+            color = beverageContainerColor,
+            tonalElevation = 2.dp,
+            modifier = Modifier
+                .weight(2f)
+                .padding(bottom = 3.dp)
+        ) {
+            BlurMorph(targetState = beverageKey) { key, blurModifier ->
+                val isAuto = key == AUTO_KEY
+                val custom = customBeverages.firstOrNull { it.name == key }
+                val label = when {
+                    isAuto -> stringResource(R.string.widget_quickadd_auto)
+                    custom != null -> custom.name
+                    else -> stringResource(BeverageType.fromStringOrDefault(key).labelResId)
+                }
+
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .then(blurModifier)
+                        .padding(horizontal = 8.dp, vertical = 16.dp),
+                    text = label,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = beverageContentColor,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ContainerPickerSheet(
+    currentContainerName: String?,
+    containerPresets: List<ContainerPreset>,
     volumeUnit: VolumeUnit,
     onAuto: () -> Unit,
-    onPick: (ContainerPreset, String) -> Unit,
+    onPick: (ContainerPreset) -> Unit,
+    onDismiss: () -> Unit,
 ) {
-    val context = LocalContext.current
-    var pickedContainer by remember(slot) { mutableStateOf<ContainerPreset?>(null) }
-    val scrollState = rememberScrollState()
-    // Bring the beverage step into view once a container is picked.
-    LaunchedEffect(pickedContainer) {
-        if (pickedContainer != null) scrollState.animateScrollTo(scrollState.maxValue)
+    val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.widget_quickadd_container_sheet_title),
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            val itemCount = containerPresets.size + 1
+            SelectableOptionCard(
+                index = 0,
+                size = itemCount,
+                selected = currentContainerName == null,
+                onClick = onAuto
+            ) { contentColor ->
+                Text(
+                    text = stringResource(R.string.widget_quickadd_auto),
+                    color = contentColor
+                )
+            }
+
+            containerPresets.forEachIndexed { index, preset ->
+                SelectableOptionCard(
+                    index = index + 1,
+                    size = itemCount,
+                    selected = currentContainerName == preset.name,
+                    onClick = { onPick(preset) }
+                ) { contentColor ->
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(
+                                preset.iconRes ?: R.drawable.glass_cup_filled
+                            ),
+                            contentDescription = null,
+                            tint = contentColor,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        val presetLabel = preset.labelResId.takeIf { it != 0 }
+                            ?.let { stringResource(it) }
+                            ?: preset.name
+                        Text(
+                            text = "$presetLabel (${formatVolumeText(preset.volume, volumeUnit)})",
+                            color = contentColor
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BeveragePickerSheet(
+    currentBeverageName: String?,
+    customBeverages: List<CustomBeverageEntity>,
+    onPick: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
+    val beverages = remember(customBeverages) {
+        BeverageType.getAllSorted().map { Triple(it.name, it.labelResId, it.iconResFilled) } +
+            customBeverages.map { Triple(it.name, 0, BeverageIcons.resFor(it.iconKey)) }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .verticalScroll(scrollState)
-            .padding(horizontal = 16.dp)
-            .padding(bottom = 32.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState
     ) {
-        Text(
-            text = stringResource(R.string.widget_quickadd_picker_title, slot + 1),
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        PickerRow(
-            iconRes = R.drawable.tune_filled,
-            label = stringResource(R.string.widget_quickadd_auto),
-            selected = currentPin == null,
-            onClick = onAuto
-        )
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-        containerPresets.forEach { preset ->
-            PickerRow(
-                iconRes = preset.iconRes
-                    ?: ContainerIconMapper.getIconByName(preset.iconType, preset.iconName)?.checkedRes
-                    ?: R.drawable.glass_cup_filled,
-                label = "${containerLabel(context, preset.name)} · " +
-                    VolumeUnitConverter.format(context, preset.volume, volumeUnit),
-                selected = pickedContainer?.name == preset.name || currentPin?.containerName == preset.name,
-                onClick = { pickedContainer = preset }
-            )
-        }
-        pickedContainer?.let { container ->
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
             Text(
-                text = stringResource(R.string.widget_quickadd_beverage_header),
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.padding(bottom = 4.dp)
+                text = stringResource(R.string.widget_quickadd_beverage_sheet_title),
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(bottom = 8.dp)
             )
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                val beverages = BeverageType.getAllSorted().map { it.name to it.labelResId } +
-                    customBeverages.map { it.name to 0 }
-                beverages.forEach { (key, labelRes) ->
-                    FilterChip(
-                        selected = currentPin?.beverageName == key,
-                        onClick = { onPick(container, key) },
-                        label = {
-                            Text(text = if (labelRes != 0) stringResource(labelRes) else key)
-                        }
-                    )
+
+            beverages.forEachIndexed { index, (name, labelRes, iconRes) ->
+                SelectableOptionCard(
+                    index = index,
+                    size = beverages.size,
+                    selected = currentBeverageName == name,
+                    onClick = { onPick(name) }
+                ) { contentColor ->
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(iconRes),
+                            contentDescription = null,
+                            tint = contentColor,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            text = if (labelRes != 0) stringResource(labelRes) else name,
+                            color = contentColor
+                        )
+                    }
                 }
             }
         }
@@ -252,78 +493,38 @@ private fun QuickAddPicker(
 }
 
 @Composable
-private fun PickerRow(
-    iconRes: Int,
-    label: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-) {
-    val haptics = LocalHapticFeedback.current
-    SettingsGroupCard(
-        index = 0,
-        size = 1,
-        onClick = {
-            haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-            onClick()
-        }
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = ImageVector.vectorResource(iconRes),
-                contentDescription = null,
-                tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(24.dp)
-            )
-            Text(
-                text = label,
-                style = MaterialTheme.typography.titleSmall,
-                color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.weight(1f)
-            )
-        }
+private fun formatVolumeText(millilitres: Double, volumeUnit: VolumeUnit): String {
+    val displayUnit = remember(millilitres, volumeUnit) {
+        VolumeUnitConverter.selectDisplayUnit(millilitres, volumeUnit)
     }
+    val value = remember(millilitres, displayUnit) {
+        VolumeUnitConverter.formatValue(millilitres, displayUnit)
+    }
+    val unitLabel = stringResource(displayUnit.shortLabelResId)
+    return "$value $unitLabel"
 }
 
-/** Localized container name (default presets carry a string resource; customs use raw text). */
-private fun containerLabel(context: Context, name: String): String {
-    val preset = ContainerPreset.getDefaultPresets().firstOrNull { it.name == name }
-    return when {
-        preset == null -> name
-        preset.labelResId != 0 -> context.getString(preset.labelResId)
-        else -> preset.name
-    }
+private fun ExtendedColorScheme.colorsFor(beverage: BeverageType): Pair<Color, Color> = when (beverage) {
+    BeverageType.WATER -> waterContainer to onWaterContainer
+    BeverageType.COFFEE -> coffeeContainer to onCoffeeContainer
+    BeverageType.TEA -> teaContainer to onTeaContainer
+    BeverageType.SOFT_DRINK -> softDrinkContainer to onSoftDrinkContainer
+    BeverageType.ENERGY_DRINK -> energyDrinkContainer to onEnergyDrinkContainer
+    BeverageType.SPORTS_DRINK -> sportsDrinkContainer to onSportsDrinkContainer
+    BeverageType.ORAL_REHYDRATION_SOLUTION -> oralRehydrationSolutionContainer to onOralRehydrationSolutionContainer
+    BeverageType.MILK -> milkContainer to onMilkContainer
+    BeverageType.FRUIT_JUICE -> fruitJuiceContainer to onFruitJuiceContainer
 }
 
-/** Localized beverage name, or the raw custom beverage name. */
-private fun beverageLabel(context: Context, name: String): String {
-    val type = BeverageType.entries.firstOrNull {
-        it.name == name || it.displayName.equals(name, ignoreCase = true)
-    }
-    return type?.let { context.getString(it.labelResId) } ?: name
-}
-
-/** "Container · Beverage · volume" for a pinned slot. */
-private fun pinnedSummary(context: Context, pin: PinnedQuickAddSlot, volumeUnit: VolumeUnit): String =
-    listOf(
-        containerLabel(context, pin.containerName),
-        beverageLabel(context, pin.beverageName),
-        VolumeUnitConverter.format(context, pin.volume, volumeUnit),
-    ).joinToString(" · ")
-
-/** Smart label for an auto combo, mirroring the widget: beverages by name, water by container. */
-private fun comboLabel(context: Context, combo: MostUsedQuickAddCombo): String {
-    val beverage = BeverageType.fromStringOrDefault(combo.beverage)
-    return if (beverage != BeverageType.WATER) {
-        context.getString(beverage.labelResId)
-    } else {
-        containerLabel(context, combo.containerName)
-    }
+private fun slotRowShape(isLast: Boolean, isLeft: Boolean): Shape {
+    val outer = 24.dp
+    val inner = 10.dp
+    return SquircleShape(
+        topStart = CornerSize(inner),
+        topEnd = CornerSize(inner),
+        bottomStart = CornerSize(if (isLast && isLeft) outer else inner),
+        bottomEnd = CornerSize(if (isLast && !isLeft) outer else inner),
+    )
 }
 
 @Preview(showBackground = true)

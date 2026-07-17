@@ -313,7 +313,7 @@
     <string name="widget_settings_dynamic_desc">Colours from your wallpaper</string>
     <string name="widget_settings_background_header">Background</string>
     <string name="widget_settings_transparent_title">Transparent background</string>
-    <string name="widget_settings_transparent_desc">Show the wallpaper through the widget and hide the header</string>
+    <string name="widget_settings_transparent_desc">Make the background surface transparent</string>
     <string name="widget_settings_pure_black_title">Pure black background</string>
     <string name="widget_settings_pure_black_desc">Use a true black surface in dark mode</string>
     <string name="widget_settings_pure_white_title">Pure white background</string>
@@ -322,10 +322,14 @@
     <string name="widget_settings_quickadd_desc">Choose the three quick-add buttons</string>
     <string name="screen_widget_quickadd_title">Widget quick actions</string>
     <string name="widget_quickadd_slot_title">Button %1$d</string>
-    <string name="widget_quickadd_auto">Auto (most common)</string>
+    <string name="widget_quickadd_auto">Auto</string>
     <string name="widget_quickadd_auto_summary">Auto · %1$s</string>
     <string name="widget_quickadd_picker_title">Choose button %1$d</string>
     <string name="widget_quickadd_beverage_header">Beverage</string>
+    <string name="widget_quickadd_slot_section_title">Quick-add buttons</string>
+    <string name="widget_quickadd_container_sheet_title">Choose container</string>
+    <string name="widget_quickadd_beverage_sheet_title">Choose beverage</string>
+    <string name="widget_quickadd_reset_all">Reset all to automatic</string>
 
     <!-- ============================================================================
          Settings — Notifications

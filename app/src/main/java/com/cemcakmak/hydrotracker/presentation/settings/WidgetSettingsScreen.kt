@@ -258,7 +258,7 @@ private fun WidgetSwitchRow(
         Crossfade(
             targetState = checked,
             animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
-            label = "paletteIcon"
+            label = "widgetSwitchIcon"
         ) { isChecked ->
             Icon(
                 imageVector = if (isChecked) ImageVector.vectorResource(iconResOn) else ImageVector.vectorResource(iconResOff),
