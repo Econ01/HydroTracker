@@ -22,17 +22,23 @@ package com.cemcakmak.hydrotracker.presentation.settings
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -54,19 +60,26 @@ import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.models.AppFont
 import com.cemcakmak.hydrotracker.data.models.ColorSource
@@ -83,6 +96,7 @@ import com.cemcakmak.hydrotracker.utils.OemFontWarning
 @Composable
 fun AppearanceScreen(
     themePreferences: ThemePreferences = ThemePreferences(),
+    wasPop: Boolean = false,
     isHapticsEnabled: Boolean = true,
     onHapticsEnabledChange: (Boolean) -> Unit = {},
     isDynamicColorAvailable: Boolean = true,
@@ -95,79 +109,129 @@ fun AppearanceScreen(
     onNavBarLabelModeChange: (NavBarLabelMode) -> Unit = {},
     isBlurSupported: Boolean = true,
     onEdgeEffectChange: (EdgeEffect) -> Unit = {},
+    onNavigateToWidget: () -> Unit = {},
     onNavigateBack: () -> Unit = {}
 ) {
     var showFontSheet by remember { mutableStateOf(false) }
     var showLabelSheet by remember { mutableStateOf(false) }
     var showEdgeEffectSheet by remember { mutableStateOf(false) }
 
-    SettingsDetailScaffold(
-        title = stringResource(R.string.screen_appearance_title),
-        onNavigateBack = onNavigateBack,
-        themePreferences = themePreferences
-    ) {
-        ThemePreviewCard(themePreferences = themePreferences)
+    val isPreview = LocalInspectionMode.current
+    val shouldApplyDepth = !isPreview && wasPop
 
-        DarkModeSection(
-            darkMode = themePreferences.darkMode,
-            onDarkModeChange = onDarkModeChange
-        )
-
-        ColorSection(
-            themePreferences = themePreferences,
-            isDynamicColorAvailable = isDynamicColorAvailable,
-            onColorSourceChange = onColorSourceChange,
-            onPureBlackChange = onPureBlackChange,
-            onAmoledBordersChange = onAmoledBordersChange
-        )
-
-        NavigationBarSection(
-            autoHide = themePreferences.autoHideNavBar,
-            onAutoHideChange = onAutoHideNavBarChange,
-            labelMode = themePreferences.navBarLabelMode,
-            onOpenLabelSheet = { showLabelSheet = true }
-        )
-
-        HomeScreenSection(
-            edgeEffect = themePreferences.edgeEffect,
-            isBlurSupported = isBlurSupported,
-            onOpenEdgeEffectSheet = { showEdgeEffectSheet = true }
-        )
-
-        FeedbackSection(
-            isHapticsEnabled = isHapticsEnabled,
-            onHapticsEnabledChange = onHapticsEnabledChange
-        )
-
-        FontSection(
-            selectedFont = themePreferences.appFont,
-            onOpenFontSheet = { showFontSheet = true }
-        )
+    val blur by if (shouldApplyDepth) {
+        val animatedContentScope = LocalNavAnimatedContentScope.current
+        animatedContentScope.transition.animateDp(
+            transitionSpec = { tween(400) },
+            label = "quickAddEnterBlur"
+        ) { state ->
+            if (state == EnterExitState.PreEnter) 8.dp else 0.dp
+        }
+    } else {
+        remember { mutableStateOf(0.dp) }
     }
 
-    if (showFontSheet) {
-        FontBottomSheet(
-            selectedFont = themePreferences.appFont,
-            onAppFontChange = onAppFontChange,
-            onDismiss = { showFontSheet = false }
-        )
+    // Depth scrim that clears in sync with the blur as the page comes forward.
+    val scrimAlpha by if (shouldApplyDepth) {
+        val animatedContentScope = LocalNavAnimatedContentScope.current
+        animatedContentScope.transition.animateFloat(
+            transitionSpec = { tween(400) },
+            label = "quickAddEnterScrim"
+        ) { state ->
+            if (state == EnterExitState.PreEnter) 0.4f else 0f
+        }
+    } else {
+        remember { mutableFloatStateOf(0f) }
     }
 
-    if (showLabelSheet) {
-        NavLabelBottomSheet(
-            selected = themePreferences.navBarLabelMode,
-            onSelect = onNavBarLabelModeChange,
-            onDismiss = { showLabelSheet = false }
-        )
+    val scrimColor = if (MaterialTheme.colorScheme.surface.luminance() < 0.5f) {
+        Color.White
+    } else {
+        Color.Black
     }
 
-    if (showEdgeEffectSheet) {
-        EdgeEffectBottomSheet(
-            selected = themePreferences.edgeEffect,
-            isBlurSupported = isBlurSupported,
-            onSelect = onEdgeEffectChange,
-            onDismiss = { showEdgeEffectSheet = false }
-        )
+    Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize().blur(blur)) {
+            SettingsDetailScaffold(
+                title = stringResource(R.string.screen_appearance_title),
+                onNavigateBack = onNavigateBack,
+                themePreferences = themePreferences
+            ) {
+                ThemePreviewCard(themePreferences = themePreferences)
+
+                DarkModeSection(
+                    darkMode = themePreferences.darkMode,
+                    onDarkModeChange = onDarkModeChange
+                )
+
+                ColorSection(
+                    themePreferences = themePreferences,
+                    isDynamicColorAvailable = isDynamicColorAvailable,
+                    onColorSourceChange = onColorSourceChange,
+                    onPureBlackChange = onPureBlackChange,
+                    onAmoledBordersChange = onAmoledBordersChange
+                )
+
+                NavigationBarSection(
+                    autoHide = themePreferences.autoHideNavBar,
+                    onAutoHideChange = onAutoHideNavBarChange,
+                    labelMode = themePreferences.navBarLabelMode,
+                    onOpenLabelSheet = { showLabelSheet = true }
+                )
+
+                HomeScreenSection(
+                    edgeEffect = themePreferences.edgeEffect,
+                    isBlurSupported = isBlurSupported,
+                    onOpenEdgeEffectSheet = { showEdgeEffectSheet = true }
+                )
+
+                FontSection(
+                    selectedFont = themePreferences.appFont,
+                    onOpenFontSheet = { showFontSheet = true }
+                )
+
+                WidgetSection(onNavigateToWidget = onNavigateToWidget)
+
+                FeedbackSection(
+                    isHapticsEnabled = isHapticsEnabled,
+                    onHapticsEnabledChange = onHapticsEnabledChange
+                )
+            }
+
+            if (showFontSheet) {
+                FontBottomSheet(
+                    selectedFont = themePreferences.appFont,
+                    onAppFontChange = onAppFontChange,
+                    onDismiss = { showFontSheet = false }
+                )
+            }
+
+            if (showLabelSheet) {
+                NavLabelBottomSheet(
+                    selected = themePreferences.navBarLabelMode,
+                    onSelect = onNavBarLabelModeChange,
+                    onDismiss = { showLabelSheet = false }
+                )
+            }
+
+            if (showEdgeEffectSheet) {
+                EdgeEffectBottomSheet(
+                    selected = themePreferences.edgeEffect,
+                    isBlurSupported = isBlurSupported,
+                    onSelect = onEdgeEffectChange,
+                    onDismiss = { showEdgeEffectSheet = false }
+                )
+            }
+        }
+
+        if (scrimAlpha > 0f) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .scale(1.3f)
+                    .background(scrimColor.copy(alpha = scrimAlpha))
+            )
+        }
     }
 }
 
@@ -865,6 +929,54 @@ private fun FeedbackSection(
                     } else {
                         null
                     }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun WidgetSection(onNavigateToWidget: () -> Unit) {
+    val haptics = LocalHapticFeedback.current
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        SettingsSectionHeader(stringResource(R.string.appearance_widget_section_title))
+        SettingsGroupCard(
+            index = 0,
+            size = 1,
+            onClick = {
+                haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                onNavigateToWidget()
+            }
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.widgets_filled),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.appearance_widget_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Text(
+                        text = stringResource(R.string.appearance_widget_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.keyboard_arrow_right_filled),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

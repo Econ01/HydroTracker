@@ -3,6 +3,7 @@ package com.cemcakmak.hydrotracker.data.preferences
 import com.cemcakmak.hydrotracker.data.models.BeveragePreferences
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.UserProfile
+import com.cemcakmak.hydrotracker.data.models.WidgetPreferences
 import kotlinx.serialization.Serializable
 
 /**
@@ -21,6 +22,7 @@ data class AppPreferences(
     val profile: UserProfile? = null,
     val theme: ThemePreferences = ThemePreferences(),
     val beverages: BeveragePreferences = BeveragePreferences.default(),
+    val widget: WidgetPreferences = WidgetPreferences(),
     val hapticsEnabled: Boolean = true,
     val lastHealthConnectImportTime: Long? = null,
     val widgetPreviewRevision: Int = 0,

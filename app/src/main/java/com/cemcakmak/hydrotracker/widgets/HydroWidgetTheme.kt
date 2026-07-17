@@ -35,8 +35,8 @@ object HydroWidgetColors {
      * Success colour used for the "goal reached" state, taken from the extended colour
      * scheme's success family (harmonized with the widget's primary, light and dark).
      */
-    fun success(context: Context): ColorProvider {
-        val (light, dark) = widgetExtendedColors(context)
+    fun success(context: Context, useDynamicColors: Boolean = true): ColorProvider {
+        val (light, dark) = widgetExtendedColors(context, useDynamicColors)
         return ColorProvider(day = light.success, night = dark.success)
     }
 }
@@ -46,11 +46,16 @@ object HydroWidgetColors {
  *
  * Passing no colours lets [GlanceTheme] resolve its default, which is the dynamic system
  * colour theme on API 31+. Below API 31 we explicitly supply the HYDRO_THEME palette.
+ * [forceHydroColors] forces the HYDRO_THEME palette on all versions (the user's
+ * "dynamic colours off" widget setting).
  */
 @Composable
-fun HydroWidgetTheme(content: @GlanceComposable @Composable () -> Unit) {
+fun HydroWidgetTheme(
+    forceHydroColors: Boolean = false,
+    content: @GlanceComposable @Composable () -> Unit,
+) {
     GlanceTheme(
-        colors = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        colors = if (!forceHydroColors && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             // Default LocalColors value: DynamicThemeColorProviders (Material You).
             GlanceTheme.colors
         } else {

@@ -11,6 +11,8 @@ sealed interface NavigationRoutes : NavKey {
     @Serializable data object Settings : NavigationRoutes
 
     @Serializable data object SettingsAppearance : NavigationRoutes
+    @Serializable data object SettingsWidget : NavigationRoutes
+    @Serializable data object SettingsWidgetQuickAdd : NavigationRoutes
     @Serializable data object SettingsDisplay : NavigationRoutes
     @Serializable data object SettingsHydration : NavigationRoutes
     @Serializable data object SettingsContainers : NavigationRoutes

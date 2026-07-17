@@ -1,6 +1,7 @@
 package com.cemcakmak.hydrotracker.widgets.ui
 
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -27,6 +28,7 @@ import androidx.glance.LocalContext
 import androidx.glance.appwidget.appWidgetBackground
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.background
+import androidx.glance.color.ColorProvider
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.fillMaxSize
@@ -56,13 +58,48 @@ fun GlanceModifier.systemWidgetCornerRadius(): GlanceModifier =
 /**
  * Standard HydroTracker widget surface: themed widget background, host-provided background
  * drawable and system corner radius. Apply to the root element of every widget.
+ *
+ * Appearance overrides from the widget settings: [transparent] uses a transparent background
+ * drawable resource — MIUI/HyperOS launchers ignore colour-int backgrounds with alpha and
+ * composite their own card behind the widget, but they honour a transparent resource;
+ * [pureBlack] forces the surface to black in dark mode and [pureWhite] to white in light mode.
+ * Non-overridden modes keep Glance's exact widgetBackground, resolved per mode via a
+ * configuration-adjusted context.
  */
 @Composable
-fun GlanceModifier.widgetSurface(): GlanceModifier = this
-    .fillMaxSize()
-    .appWidgetBackground()
-    .background(GlanceTheme.colors.widgetBackground)
-    .systemWidgetCornerRadius()
+fun GlanceModifier.widgetSurface(
+    transparent: Boolean = false,
+    pureBlack: Boolean = false,
+    pureWhite: Boolean = false,
+): GlanceModifier {
+    if (transparent) {
+        return this
+            .fillMaxSize()
+            .background(ImageProvider(R.drawable.widget_transparent_background))
+            .systemWidgetCornerRadius()
+    }
+    val context = LocalContext.current
+    val dayBackground = GlanceTheme.colors.widgetBackground.getColor(context.withNightMode(false))
+    val nightBackground = GlanceTheme.colors.widgetBackground.getColor(context.withNightMode(true))
+    return this
+        .fillMaxSize()
+        .appWidgetBackground()
+        .background(
+            ColorProvider(
+                day = if (pureWhite) Color.White else dayBackground,
+                night = if (pureBlack) Color.Black else nightBackground,
+            ),
+        )
+        .systemWidgetCornerRadius()
+}
+
+/** A copy of this context whose configuration forces the given night mode. */
+private fun Context.withNightMode(night: Boolean): Context {
+    val config = Configuration(resources.configuration)
+    config.uiMode = (config.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or
+        if (night) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO
+    return createConfigurationContext(config)
+}
 
 /**
  * Renders the circular progress ring used by the widgets.
@@ -260,14 +297,14 @@ fun ProgressRing(
 ) {
     val context = LocalContext.current
     val ringColour = if (state.isGoalAchieved) {
-        HydroWidgetColors.success(context).getColor(context)
+        HydroWidgetColors.success(context, state.useDynamicColors).getColor(context)
     } else {
         GlanceTheme.colors.primary.getColor(context)
     }
     val trackColour = GlanceTheme.colors.primaryContainer.getColor(context)
     val arcTitleColour = GlanceTheme.colors.onSurfaceVariant.getColor(context)
     val arcSubtitleColour = if (state.isGoalAchieved) {
-        HydroWidgetColors.success(context).getColor(context)
+        HydroWidgetColors.success(context, state.useDynamicColors).getColor(context)
     } else {
         GlanceTheme.colors.primary.getColor(context)
     }

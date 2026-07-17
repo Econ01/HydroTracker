@@ -60,11 +60,15 @@ private fun ExtendedColorScheme.familyOf(beverage: BeverageType): ColorFamily = 
 
 /**
  * The extended colour scheme in light and dark variants, harmonized with the same primary the
- * widget chrome uses: Material You dynamic colours on API 31+, the HYDRO_THEME palette below.
- * Falls back to the HYDRO primary when dynamic colours are unavailable (e.g. Design previews).
+ * widget chrome uses: Material You dynamic colours on API 31+ (unless [useDynamicColors] is
+ * off), the HYDRO_THEME palette otherwise. Falls back to the HYDRO primary when dynamic
+ * colours are unavailable (e.g. Design previews).
  */
-internal fun widgetExtendedColors(context: Context): Pair<ExtendedColorScheme, ExtendedColorScheme> {
-    val (lightPrimary, darkPrimary) = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+internal fun widgetExtendedColors(
+    context: Context,
+    useDynamicColors: Boolean = true,
+): Pair<ExtendedColorScheme, ExtendedColorScheme> {
+    val (lightPrimary, darkPrimary) = if (useDynamicColors && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         runCatching {
             dynamicLightColorScheme(context).primary to dynamicDarkColorScheme(context).primary
         }.getOrElse {
@@ -82,9 +86,13 @@ internal fun widgetExtendedColors(context: Context): Pair<ExtendedColorScheme, E
  * default theme cards (container = `*Container`, pill = colour, pill content = `on*`,
  * text = `on*Container`). Unknown or custom beverage names fall back to the water family.
  */
-internal fun beverageCardColours(context: Context, beverageName: String): WidgetCardColours {
+internal fun beverageCardColours(
+    context: Context,
+    beverageName: String,
+    useDynamicColors: Boolean = true,
+): WidgetCardColours {
     val beverage = BeverageType.fromStringOrDefault(beverageName)
-    val (light, dark) = widgetExtendedColors(context)
+    val (light, dark) = widgetExtendedColors(context, useDynamicColors)
     val day = light.familyOf(beverage)
     val night = dark.familyOf(beverage)
     return WidgetCardColours(

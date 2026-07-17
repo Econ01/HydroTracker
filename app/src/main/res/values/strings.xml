@@ -303,6 +303,31 @@
     <string name="appearance_preview_latest">Latest</string>
 
     <!-- ============================================================================
+         Settings — Widget (Appearance ▸ Widget)
+         ============================================================================ -->
+    <string name="appearance_widget_section_title">Widgets</string>
+    <string name="appearance_widget_title">Widget Settings</string>
+    <string name="appearance_widget_desc">Change appearance and behaviour</string>
+    <string name="widget_settings_colours_header">Colours</string>
+    <string name="widget_settings_dynamic_title">Dynamic colours</string>
+    <string name="widget_settings_dynamic_desc">Colours from your wallpaper</string>
+    <string name="widget_settings_background_header">Background</string>
+    <string name="widget_settings_transparent_title">Transparent background</string>
+    <string name="widget_settings_transparent_desc">Show the wallpaper through the widget and hide the header</string>
+    <string name="widget_settings_pure_black_title">Pure black background</string>
+    <string name="widget_settings_pure_black_desc">Use a true black surface in dark mode</string>
+    <string name="widget_settings_pure_white_title">Pure white background</string>
+    <string name="widget_settings_pure_white_desc">Use a true white surface in light mode</string>
+    <string name="widget_settings_quickadd_title">Quick actions</string>
+    <string name="widget_settings_quickadd_desc">Choose the three quick-add buttons</string>
+    <string name="screen_widget_quickadd_title">Widget quick actions</string>
+    <string name="widget_quickadd_slot_title">Button %1$d</string>
+    <string name="widget_quickadd_auto">Auto (most common)</string>
+    <string name="widget_quickadd_auto_summary">Auto · %1$s</string>
+    <string name="widget_quickadd_picker_title">Choose button %1$d</string>
+    <string name="widget_quickadd_beverage_header">Beverage</string>
+
+    <!-- ============================================================================
          Settings — Notifications
          ============================================================================ -->
     <string name="action_allow">Allow</string>

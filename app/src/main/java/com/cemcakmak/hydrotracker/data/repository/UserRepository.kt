@@ -4,6 +4,7 @@ import android.content.Context
 import com.cemcakmak.hydrotracker.data.models.BeveragePreferences
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.UserProfile
+import com.cemcakmak.hydrotracker.data.models.WidgetPreferences
 import com.cemcakmak.hydrotracker.data.preferences.AppPreferences
 import com.cemcakmak.hydrotracker.data.preferences.appPreferencesStore
 import kotlinx.coroutines.flow.Flow
@@ -27,6 +28,7 @@ class UserRepository(context: Context) {
     val isOnboardingCompleted: Flow<Boolean> = dataStore.data.map { it.onboardingCompleted }
     val themePreferences: Flow<ThemePreferences> = dataStore.data.map { it.theme }
     val beveragePreferences: Flow<BeveragePreferences> = dataStore.data.map { it.beverages }
+    val widgetPreferences: Flow<WidgetPreferences> = dataStore.data.map { it.widget }
 
     suspend fun saveUserProfile(profile: UserProfile) {
         dataStore.updateData { current ->
@@ -55,6 +57,10 @@ class UserRepository(context: Context) {
 
     suspend fun updateWidgetPreviewRevision(revision: Int) {
         dataStore.updateData { it.copy(widgetPreviewRevision = revision) }
+    }
+
+    suspend fun updateWidgetPreferences(widgetPreferences: WidgetPreferences) {
+        dataStore.updateData { it.copy(widget = widgetPreferences) }
     }
 
     /** Resets all preferences (profile, theme, beverages) back to defaults. */

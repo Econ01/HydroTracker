@@ -51,6 +51,7 @@ import androidx.lifecycle.lifecycleScope
 import com.cemcakmak.hydrotracker.data.models.BeveragePreferences
 import com.cemcakmak.hydrotracker.data.models.ContainerPreset
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
+import com.cemcakmak.hydrotracker.data.models.WidgetPreferences
 import androidx.navigationevent.NavigationEvent
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
 import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
@@ -82,6 +83,8 @@ import com.cemcakmak.hydrotracker.presentation.settings.HapticsLabScreen
 import com.cemcakmak.hydrotracker.presentation.settings.HapticsTestScreen
 import com.cemcakmak.hydrotracker.presentation.settings.LicensesScreen
 import com.cemcakmak.hydrotracker.presentation.settings.SupportDevelopmentScreen
+import com.cemcakmak.hydrotracker.presentation.settings.WidgetQuickAddScreen
+import com.cemcakmak.hydrotracker.presentation.settings.WidgetSettingsScreen
 import com.cemcakmak.hydrotracker.presentation.settings.profile.ProfileSettingsScreen
 import com.cemcakmak.hydrotracker.presentation.settings.profile.crop.CropProfileImageScreen
 import com.cemcakmak.hydrotracker.presentation.common.dialogs.CustomWaterDialog
@@ -334,6 +337,8 @@ fun HydroTrackerApp(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     var wasPop by remember { mutableStateOf(false) }
+    var appearanceWasPop by remember { mutableStateOf(false) }
+    var widgetScreenWasPop by remember { mutableStateOf(false) }
     var quickAddWasPop by remember { mutableStateOf(false) }
     var notificationsWasPop by remember { mutableStateOf(false) }
     var developerOptionsWasPop by remember { mutableStateOf(false) }
@@ -627,6 +632,7 @@ fun HydroTrackerApp(
                         entry<NavigationRoutes.SettingsAppearance> {
                             AppearanceScreen(
                                 themePreferences = themePreferences,
+                                wasPop = appearanceWasPop,
                                 isHapticsEnabled = isHapticsEnabled,
                                 onHapticsEnabledChange = { enabled ->
                                     coroutineScope.launch {
@@ -643,6 +649,47 @@ fun HydroTrackerApp(
                                 onNavBarLabelModeChange = themeViewModel::setNavBarLabelMode,
                                 isBlurSupported = themeViewModel.isBlurSupported(),
                                 onEdgeEffectChange = themeViewModel::setEdgeEffect,
+                                onNavigateToWidget = {
+                                    appearanceWasPop = true
+                                    backStack.add(NavigationRoutes.SettingsWidget)
+                                                     },
+                                onNavigateBack = popBackStack
+                            )
+                        }
+                        entry<NavigationRoutes.SettingsWidget> {
+                            WidgetSettingsScreen(
+                                themePreferences = themePreferences,
+                                wasPop = widgetScreenWasPop,
+                                widgetPreferences = appPreferences?.widget ?: WidgetPreferences(),
+                                isDynamicColorAvailable = themeViewModel.isDynamicColorAvailable(),
+                                onWidgetPreferencesChange = { prefs ->
+                                    coroutineScope.launch {
+                                        userRepository.updateWidgetPreferences(prefs)
+                                        com.cemcakmak.hydrotracker.widgets.HydroWidgetUpdater
+                                            .updateAll(context)
+                                    }
+                                },
+                                onNavigateToQuickAdd = {
+                                    widgetScreenWasPop = true
+                                    backStack.add(NavigationRoutes.SettingsWidgetQuickAdd) },
+                                onNavigateBack = popBackStack
+                            )
+                        }
+                        entry<NavigationRoutes.SettingsWidgetQuickAdd> {
+                            WidgetQuickAddScreen(
+                                themePreferences = themePreferences,
+                                widgetPreferences = appPreferences?.widget ?: WidgetPreferences(),
+                                containerPresetRepository = containerPresetRepository,
+                                customBeverages = customBeverages,
+                                waterIntakeRepository = waterIntakeRepository,
+                                volumeUnit = userProfile?.volumeUnit ?: VolumeUnit.MILLILITRES,
+                                onWidgetPreferencesChange = { prefs ->
+                                    coroutineScope.launch {
+                                        userRepository.updateWidgetPreferences(prefs)
+                                        com.cemcakmak.hydrotracker.widgets.HydroWidgetUpdater
+                                            .updateAll(context)
+                                    }
+                                },
                                 onNavigateBack = popBackStack
                             )
                         }

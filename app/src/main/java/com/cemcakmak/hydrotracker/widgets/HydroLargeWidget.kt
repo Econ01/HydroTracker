@@ -84,8 +84,9 @@ class HydroLargeGlanceWidget : GlanceAppWidget() {
         // recomposition. Loading directly in provideGlance would only run once per session
         // and republish stale data for every update within the session's lifetime.
         provideContent {
-            HydroWidgetTheme {
-                LargeContent(currentState<Preferences>().toHydroWidgetState())
+            val state = currentState<Preferences>().toHydroWidgetState()
+            HydroWidgetTheme(forceHydroColors = !state.useDynamicColors) {
+                LargeContent(state)
             }
         }
     }
@@ -93,7 +94,7 @@ class HydroLargeGlanceWidget : GlanceAppWidget() {
     override suspend fun providePreview(context: Context, widgetCategory: Int) {
         val state = HydroWidgetStateLoader.load(context)
         provideContent {
-            HydroWidgetTheme {
+            HydroWidgetTheme(forceHydroColors = !state.useDynamicColors) {
                 LargeContent(state)
             }
         }
@@ -139,7 +140,11 @@ private data class QuickAddCardModel(
  * (custom/unknown containers fall back to a generic glass); other beverages show the
  * beverage's icon and localized name. Colours come from the beverage's extended-palette family.
  */
-private fun slotCardModel(context: Context, slot: WidgetQuickAddSlot): QuickAddCardModel {
+private fun slotCardModel(
+    context: Context,
+    slot: WidgetQuickAddSlot,
+    useDynamicColors: Boolean,
+): QuickAddCardModel {
     val beverage = BeverageType.fromStringOrDefault(slot.beverageName)
     val (label, iconRes) = if (beverage != BeverageType.WATER) {
         context.getString(beverage.labelResId) to beverage.iconResFilled
@@ -154,7 +159,7 @@ private fun slotCardModel(context: Context, slot: WidgetQuickAddSlot): QuickAddC
         beverageName = beverage.name,
         label = label,
         iconRes = iconRes,
-        colours = beverageCardColours(context, slot.beverageName),
+        colours = beverageCardColours(context, slot.beverageName, useDynamicColors),
     )
 }
 
@@ -184,8 +189,9 @@ private fun LargeContent(state: HydroWidgetState) {
     val verticalPadding = (size.height * 0.055f).coerceIn(6.dp, 10.dp)
     val sectionSpacing = 4.dp
 
-    // Body height available to the ring + cards below the header.
-    val bodyHeight = size.height - (verticalPadding * 2) - HEADER_BLOCK
+    // Body height available to the ring + cards below the header (no header when transparent).
+    val headerBlock = if (state.useTransparentBackground) 0.dp else HEADER_BLOCK
+    val bodyHeight = size.height - (verticalPadding * 2) - headerBlock
 
     // Ring and quick-add column share the content width 1:1; the ring fills the body height.
     val maxRingByWidth = (size.width - (horizontalPadding * 2) - sectionSpacing) / 2
@@ -223,34 +229,40 @@ private fun LargeContent(state: HydroWidgetState) {
 
     // Quick-add cards: usage-driven slots when history exists, themed defaults otherwise.
     val quickAddCards = (0 until QUICK_ADD_SLOT_COUNT).map { index ->
-        state.quickAddSlots.getOrNull(index)?.let { slotCardModel(context, it) }
+        state.quickAddSlots.getOrNull(index)?.let { slotCardModel(context, it, state.useDynamicColors) }
             ?: presetCardModel(context, QUICK_ADD_PRESETS[index], cardColours[index])
     }
 
     Column(
         modifier = GlanceModifier
-            .widgetSurface()
+            .widgetSurface(
+                transparent = state.useTransparentBackground,
+                pureBlack = state.usePureBlack,
+                pureWhite = state.usePureWhite,
+            )
             .clickable(actionStartActivity<MainActivity>())
             .padding(horizontal = horizontalPadding, vertical = verticalPadding),
     ) {
-        Row(verticalAlignment = Alignment.Vertical.CenterVertically) {
-            Image(
-                provider = ImageProvider(R.drawable.water_drop_filled),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(GlanceTheme.colors.secondary),
-                modifier = GlanceModifier.size(16.dp),
-            )
-            Spacer(GlanceModifier.width(5.dp))
-            Text(
-                text = context.getString(R.string.app_name),
-                style = TextStyle(
-                    color = GlanceTheme.colors.secondary,
-                    fontSize = 12.sp,
-                ),
-                maxLines = 1,
-            )
+        if (!state.useTransparentBackground) {
+            Row(verticalAlignment = Alignment.Vertical.CenterVertically) {
+                Image(
+                    provider = ImageProvider(R.drawable.water_drop_filled),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(GlanceTheme.colors.secondary),
+                    modifier = GlanceModifier.size(16.dp),
+                )
+                Spacer(GlanceModifier.width(5.dp))
+                Text(
+                    text = context.getString(R.string.app_name),
+                    style = TextStyle(
+                        color = GlanceTheme.colors.secondary,
+                        fontSize = 12.sp,
+                    ),
+                    maxLines = 1,
+                )
+            }
+            Spacer(GlanceModifier.height(8.dp))
         }
-        Spacer(GlanceModifier.height(8.dp))
 
         Row(
             modifier = GlanceModifier.fillMaxWidth().defaultWeight(),
@@ -299,7 +311,7 @@ private fun LargeContent(state: HydroWidgetState) {
                         Image(
                             provider = ImageProvider(R.drawable.award_star_filled),
                             contentDescription = context.getString(R.string.widget_goal_reached),
-                            colorFilter = ColorFilter.tint(HydroWidgetColors.success(context)),
+                            colorFilter = ColorFilter.tint(HydroWidgetColors.success(context, state.useDynamicColors)),
                             modifier = GlanceModifier.size(
                                 (ringSize * 0.25f).coerceAtLeast(16.dp),
                             ),
