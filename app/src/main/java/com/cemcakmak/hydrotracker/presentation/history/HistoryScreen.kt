@@ -1,230 +1,305 @@
-// ===== FILE: HistoryScreen.kt =====
-// Location: app/src/main/java/com/cemcakmak/hydrotracker/presentation/history/HistoryScreen.kt
+/*
+ *
+ *  * HydroTracker - A modern and private water intake tracking application
+ *  * Copyright (c) 2026 Ali Cem Çakmak
+ *
+ *  * This program is free software: you can redistribute it and/or modify
+ *  * it under the terms of the GNU General Public License as published by
+ *  * the Free Software Foundation, either version 3 of the License, or
+ *  * (at your option) any later version.
+ *
+ *  * This program is distributed in the hope that it will be useful,
+ *  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  * GNU General Public License for more details.
+ *
+ *  * You should have received a copy of the GNU General Public License
+ *  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
 
 package com.cemcakmak.hydrotracker.presentation.history
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import android.os.Build
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.EnterExitState
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.core.EaseOutCubic
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
+import androidx.annotation.StringRes
+import androidx.compose.animation.core.EaseOut
+import androidx.compose.foundation.background
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.Dp
+import androidx.navigation3.runtime.rememberNavBackStack
+import com.cemcakmak.hydrotracker.R
+import com.cemcakmak.hydrotracker.presentation.common.MainNavigationScaffold
+import com.cemcakmak.hydrotracker.presentation.common.MainTabTopAppBar
+import com.cemcakmak.hydrotracker.presentation.common.NavigationRoutes
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
+import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
+import com.cemcakmak.hydrotracker.data.models.ActivityLevel
+import com.cemcakmak.hydrotracker.data.models.AgeGroup
+import com.cemcakmak.hydrotracker.data.models.BeverageType
+import com.cemcakmak.hydrotracker.data.models.DateFormatPattern
+import com.cemcakmak.hydrotracker.data.models.Gender
+import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
-import com.cemcakmak.hydrotracker.utils.WaterCalculator
-import java.text.SimpleDateFormat
-import java.util.*
+import com.cemcakmak.hydrotracker.data.models.VolumeUnit
+import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
+import com.cemcakmak.hydrotracker.data.models.EdgeEffect
+import com.cemcakmak.hydrotracker.presentation.common.BeverageOption
+import com.cemcakmak.hydrotracker.presentation.common.BlurMorph
+import com.cemcakmak.hydrotracker.presentation.common.DailyEntriesSection
+import com.cemcakmak.hydrotracker.presentation.common.dialogs.EditWaterDialog
+import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurState
+import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurStyle
+import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropProgressive
+import com.cemcakmak.hydrotracker.presentation.common.effect.backdropBlur
+import com.cemcakmak.hydrotracker.presentation.common.effect.backdropSource
+import com.cemcakmak.hydrotracker.presentation.common.effect.rememberBackdropBlurState
+import com.cemcakmak.hydrotracker.presentation.common.AnimatedNumber
+import com.cemcakmak.hydrotracker.presentation.common.toOption
+import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.time.temporal.WeekFields
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun HistoryScreen(
-    waterIntakeRepository: WaterIntakeRepository,
+    uiState: HistoryUiState,
     themePreferences: ThemePreferences = ThemePreferences(),
-    onNavigateBack: () -> Unit = {}
+    userProfile: UserProfile? = null,
+    activeBeverages: List<BeverageOption> = BeverageType.getAllSorted().map { it.toOption() },
+    paddingValues: PaddingValues,
+    onPeriodSelected: (TimePeriod) -> Unit,
+    onPreviousPeriod: () -> Unit,
+    onNextPeriod: () -> Unit,
+    onDaySelected: (String) -> Unit,
+    onUpdateEntry: (WaterIntakeEntry, WaterIntakeEntry) -> Unit,
+    onDeleteEntry: (WaterIntakeEntry) -> Unit
 ) {
-    // State for different time periods
-    var selectedPeriod by remember { mutableStateOf(TimePeriod.WEEKLY) }
-    
-    // Navigation state for current week/month/year
-    var currentWeekOffset by remember { mutableIntStateOf(0) } // 0 = current week, -1 = previous week, etc.
-    var currentMonthOffset by remember { mutableIntStateOf(0) } // 0 = current month, -1 = previous month, etc.
-    var currentYearOffset by remember { mutableIntStateOf(0) } // 0 = current year, -1 = previous year, etc.
+    val haptics = LocalHapticFeedback.current
 
-    // Collect ALL historical data from repository (not just last 30 days)
-    val allSummaries by waterIntakeRepository.getAllSummaries().collectAsState(
-        initial = emptyList()
-    )
+    var entryToEdit by remember { mutableStateOf<WaterIntakeEntry?>(null) }
 
+    val volumeUnit = userProfile?.volumeUnit ?: VolumeUnit.MILLILITRES
 
-
-    // Animation states
-    var isVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        isVisible = true
+    val edgeEffectStyle = themePreferences.edgeEffect.let {
+        if (it == EdgeEffect.BLURRED && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            EdgeEffect.TRANSPARENT
+        } else {
+            it
+        }
     }
 
+    // Backdrop captured for the frosted top band
+    val backdropState = rememberBackdropBlurState()
+
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+
     Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "History & Statistics",
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
+            MainTabTopAppBar(
+                titleResId = R.string.nav_history,
+                scrollBehavior = scrollBehavior,
+                blur = 0.dp
             )
         }
-    ) { paddingValues ->
-        LazyColumn(
+    ) { innerPadding ->
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            contentPadding = PaddingValues(16.dp),
         ) {
-            // Period Selector
-            item {
-                AnimatedVisibility(
-                    visible = isVisible,
-                    enter = slideInVertically(
-                        initialOffsetY = { -it / 3 },
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessMedium
-                        )
-                    ) + fadeIn(animationSpec = tween(500))
-                ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .then(
+                        if (edgeEffectStyle == EdgeEffect.BLURRED) {
+                            Modifier
+                                .backdropSource(backdropState)
+                                .background(MaterialTheme.colorScheme.surface)
+                        } else {
+                            Modifier
+                        }
+                    )
+            ) {
+                item {
+                    Spacer(modifier = Modifier.height(innerPadding.calculateTopPadding()))
+                }
+
+                // Period Selector
+                item {
                     PeriodSelector(
-                        selectedPeriod = selectedPeriod,
-                        onPeriodSelected = { 
-                            selectedPeriod = it
-                            // Reset navigation when switching between periods
-                            currentWeekOffset = 0
-                            currentMonthOffset = 0
-                            currentYearOffset = 0
-                        },
-                        currentWeekOffset = currentWeekOffset,
-                        currentMonthOffset = currentMonthOffset,
-                        currentYearOffset = currentYearOffset,
-                        onWeekOffsetChanged = { currentWeekOffset = it },
-                        onMonthOffsetChanged = { currentMonthOffset = it },
-                        onYearOffsetChanged = { currentYearOffset = it },
-                        weekStartDay = themePreferences.weekStartDay
+                        selectedPeriod = uiState.selectedPeriod,
+                        onPeriodSelected = onPeriodSelected,
+                        currentWeekOffset = uiState.weekOffset,
+                        currentMonthOffset = uiState.monthOffset,
+                        currentYearOffset = uiState.yearOffset,
+                        onPreviousPeriod = onPreviousPeriod,
+                        onNextPeriod = onNextPeriod,
+                        weekStartDay = themePreferences.weekStartDay,
+                        dateFormat = themePreferences.dateFormat
                     )
                 }
-            }
 
-            // Main Chart Section
-            item {
-                AnimatedVisibility(
-                    visible = isVisible,
-                    enter = slideInVertically(
-                        initialOffsetY = { it / 3 },
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessLow
-                        )
-                    ) + fadeIn(animationSpec = tween(700, delayMillis = 200))
-                ) {
-                    when (selectedPeriod) {
-                        TimePeriod.WEEKLY -> {
-                            WeeklyChartSection(
-                                selectedPeriod = selectedPeriod,
-                                weekOffset = currentWeekOffset,
-                                summaries = allSummaries,
-                                weekStartDay = themePreferences.weekStartDay
-                            )
+                // Main Chart Section
+                item {
+                    AnimatedContent(
+                        targetState = uiState.selectedPeriod,
+                        modifier = Modifier.fillMaxWidth(),
+                        transitionSpec = {
+                            val direction = when {
+                                targetState.ordinal > initialState.ordinal -> 1
+                                targetState.ordinal < initialState.ordinal -> -1
+                                else -> 0
+                            }
+                            val slideDuration = 600
+
+                            (slideInHorizontally(tween(slideDuration, easing = EaseOutCubic)) { fullWidth ->
+                                fullWidth * direction
+                            } + fadeIn(tween(slideDuration, easing = EaseOutCubic)))
+                                .togetherWith(
+                                    slideOutHorizontally(tween(slideDuration, easing = EaseOutCubic)) { fullWidth ->
+                                        -fullWidth * direction
+                                    } + fadeOut(tween(slideDuration, easing = EaseOutCubic))
+                                )
+                                .using(SizeTransform(clip = false))
+                        },
+                        label = "historyPeriodTransition"
+                    ) { period ->
+                        val blur by transition.animateDp(
+                            transitionSpec = { tween(600, easing = EaseOutCubic) },
+                            label = "historyPeriodBlur"
+                        ) { enterExit ->
+                            if (enterExit == EnterExitState.Visible) 0.dp else 10.dp
                         }
-                        TimePeriod.MONTHLY -> {
-                            MonthlyChartSection(
-                                summaries = allSummaries,
-                                selectedPeriod = selectedPeriod,
-                                monthOffset = currentMonthOffset,
-                                weekStartDay = themePreferences.weekStartDay
-                            )
-                        }
-                        TimePeriod.YEARLY -> {
-                            YearlyChartSection(
-                                summaries = allSummaries,
-                                selectedPeriod = selectedPeriod,
-                                yearOffset = currentYearOffset
-                            )
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .blur(blur, BlurredEdgeTreatment.Unbounded)
+                        ) {
+                            when (period) {
+                                TimePeriod.WEEKLY -> {
+                                    WeeklyChartSection(
+                                        weekOffset = uiState.weekOffset,
+                                        summaries = uiState.summaries,
+                                        stats = uiState.weeklyStats,
+                                        weekStartDay = themePreferences.weekStartDay,
+                                        volumeUnit = volumeUnit,
+                                        animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS,
+                                        onDaySelected = onDaySelected
+                                    )
+                                }
+                                TimePeriod.MONTHLY -> {
+                                    MonthlyChartSection(
+                                        summaries = uiState.summaries,
+                                        stats = uiState.monthlyStats,
+                                        weekStartDay = themePreferences.weekStartDay,
+                                        animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS,
+                                        onDaySelected = onDaySelected
+                                    )
+                                }
+                                TimePeriod.YEARLY -> {
+                                    YearlyChartSection(
+                                        summaries = uiState.summaries,
+                                        stats = uiState.yearlyStats,
+                                        volumeUnit = volumeUnit,
+                                        animationDelayMillis = CHART_ANIMATION_DELAY_MILLIS
+                                    )
+                                }
+                            }
                         }
                     }
                 }
-            }
 
-            // Statistics Overview
-            item {
-                AnimatedVisibility(
-                    visible = isVisible,
-                    enter = slideInVertically(
-                        initialOffsetY = { it / 4 },
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessMedium
-                        )
-                    ) + fadeIn(animationSpec = tween(600, delayMillis = 300))
-                ) {
-                    StatisticsGrid(
-                        summaries = allSummaries
+                // Selected day entries
+                item {
+                    SelectedDayEntries(
+                        selectedDate = uiState.selectedDate,
+                        entries = uiState.selectedDateEntries,
+                        userProfile = userProfile,
+                        themePreferences = themePreferences,
+                        onEdit = { entry ->
+                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            entryToEdit = entry
+                        },
+                        onDelete = { entry ->
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onDeleteEntry(entry)
+                        }
                     )
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(paddingValues.calculateBottomPadding()))
                 }
             }
 
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
+            TopEdgeEffect(
+                style = edgeEffectStyle,
+                backdropState = backdropState,
+                paddingValues = innerPadding,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
 
-            // Goal Achievement
-            item {
-                AnimatedVisibility(
-                    visible = isVisible,
-                    enter = slideInVertically(
-                        initialOffsetY = { it / 4 },
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessMedium
-                        )
-                    ) + fadeIn(animationSpec = tween(600, delayMillis = 400))
-                ) {
-                    GoalAchievementSection(
-                        summaries = allSummaries,
-                        selectedPeriod = selectedPeriod,
-                        weekOffset = currentWeekOffset,
-                        monthOffset = currentMonthOffset,
-                        yearOffset = currentYearOffset,
-                        weekStartDay = themePreferences.weekStartDay
-                    )
-                }
-            }
-
-            // Bottom spacer for navigation bar
-            item {
-                Spacer(modifier = Modifier.height(80.dp))
+            // Edit entry dialogue
+            entryToEdit?.let { entry ->
+                EditWaterDialog(
+                    entry = entry,
+                    themePreferences = themePreferences,
+                    volumeUnit = userProfile?.volumeUnit ?: VolumeUnit.MILLILITRES,
+                    onDismiss = { entryToEdit = null },
+                    onConfirm = { updatedEntry ->
+                        onUpdateEntry(entry, updatedEntry)
+                        entryToEdit = null
+                    },
+                    beverages = activeBeverages
+                )
             }
         }
     }
 }
 
-enum class TimePeriod(val displayName: String, val description: String) {
-    WEEKLY("Weekly", "Week view"),
-    MONTHLY("Monthly", "Month view"),
-    YEARLY("Yearly", "Year view")
+private const val CHART_ANIMATION_DELAY_MILLIS = 200
+
+enum class TimePeriod(@param:StringRes val displayNameResId: Int) {
+    WEEKLY(R.string.history_period_weekly),
+    MONTHLY(R.string.history_period_monthly),
+    YEARLY(R.string.history_period_yearly)
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -235,1160 +310,327 @@ private fun PeriodSelector(
     currentWeekOffset: Int,
     currentMonthOffset: Int,
     currentYearOffset: Int,
-    onWeekOffsetChanged: (Int) -> Unit,
-    onMonthOffsetChanged: (Int) -> Unit,
-    onYearOffsetChanged: (Int) -> Unit,
-    weekStartDay: WeekStartDay
+    onPreviousPeriod: () -> Unit,
+    onNextPeriod: () -> Unit,
+    weekStartDay: WeekStartDay,
+    dateFormat: DateFormatPattern
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            // Period Type Selection with ToggleButton
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                TimePeriod.entries.forEach { period ->
-                    val isSelected = selectedPeriod == period
-
-                    val haptics = LocalHapticFeedback.current
-                    
-                    ToggleButton(
-                        checked = isSelected,
-                        onCheckedChange = { onPeriodSelected(period)
-                            haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)},
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = period.displayName,
-                                style = MaterialTheme.typography.labelLargeEmphasized
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Haptic feedback for button clicks
-            val haptics = LocalHapticFeedback.current
-            
-            // Navigation Controls
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                FilledIconButton(
-                    onClick = {
-                        when (selectedPeriod) {
-                            TimePeriod.WEEKLY -> onWeekOffsetChanged(currentWeekOffset - 1)
-                            TimePeriod.MONTHLY -> onMonthOffsetChanged(currentMonthOffset - 1)
-                            TimePeriod.YEARLY -> onYearOffsetChanged(currentYearOffset - 1)
-                        }
-                        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
-                    },
-                    shapes = IconButtonDefaults.shapes(),
-                    colors = IconButtonDefaults.filledIconButtonColors()
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Previous ${selectedPeriod.displayName.lowercase()}"
-                    )
-                }
-                
-                Text(
-                    text = getCurrentPeriodText(selectedPeriod, currentWeekOffset, currentMonthOffset, currentYearOffset, weekStartDay),
-                    style = MaterialTheme.typography.titleMediumEmphasized,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center
-                )
-                
-                IconButton(
-                    onClick = {
-                        when (selectedPeriod) {
-                            TimePeriod.WEEKLY -> onWeekOffsetChanged(currentWeekOffset + 1)
-                            TimePeriod.MONTHLY -> onMonthOffsetChanged(currentMonthOffset + 1)
-                            TimePeriod.YEARLY -> onYearOffsetChanged(currentYearOffset + 1)
-                        }
-                        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
-                    },
-                    shapes = IconButtonDefaults.shapes(),
-                    colors = IconButtonDefaults.filledIconButtonColors(),
-                    enabled = when (selectedPeriod) {
-                        TimePeriod.WEEKLY -> currentWeekOffset < 0
-                        TimePeriod.MONTHLY -> currentMonthOffset < 0
-                        TimePeriod.YEARLY -> currentYearOffset < 0
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = "Next ${selectedPeriod.displayName.lowercase()}"
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun WeeklyChartSection(
-    selectedPeriod: TimePeriod,
-    weekOffset: Int,
-    summaries: List<DailySummary> = emptyList(),
-    weekStartDay: WeekStartDay = WeekStartDay.MONDAY
-) {
-    var selectedDayData by remember { mutableStateOf<com.cemcakmak.hydrotracker.data.database.dao.DailyTotal?>(null) }
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text(
-                text = getCurrentPeriodText(selectedPeriod, weekOffset, 0, 0, weekStartDay),
-                style = MaterialTheme.typography.titleLargeEmphasized
-            )
-
-            // Filter summaries for the selected week and convert to DailyTotal format
-            val filteredSummaries = filterSummariesByPeriod(summaries, selectedPeriod, weekOffset, 0, 0, weekStartDay)
-            
-            // Create a complete week with all 7 days, filling in missing days with 0 data
-            val (startOfWeek) = getWeekDateRange(weekOffset, weekStartDay)
-            val filteredDailyTotals = mutableListOf<com.cemcakmak.hydrotracker.data.database.dao.DailyTotal>()
-            
-            for (i in 0..6) {
-                val currentDate = startOfWeek.plusDays(i.toLong())
-                val dateString = currentDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                val summary = filteredSummaries.find { it.date == dateString }
-                
-                filteredDailyTotals.add(
-                    com.cemcakmak.hydrotracker.data.database.dao.DailyTotal(
-                        date = dateString,
-                        totalAmount = summary?.totalIntake ?: 0.0,
-                        entryCount = summary?.entryCount ?: 0
-                    )
-                )
-            }
-            
-            if (filteredDailyTotals.isNotEmpty()) {
-                val haptics = LocalHapticFeedback.current
-                // Simple bar chart representation
-                WeeklyBarChart(
-                    dailyTotals = filteredDailyTotals,
-                    onBarClick = { dayTotal -> selectedDayData = dayTotal
-                        haptics.performHapticFeedback(HapticFeedbackType.ContextClick)}
-                )
-                
-                // Inline detail panel with animation
-                AnimatedVisibility(
-                    visible = selectedDayData != null,
-                    enter = slideInVertically(
-                        initialOffsetY = { -it / 2 },
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessMedium
-                        )
-                    ) + fadeIn(animationSpec = tween(300)),
-                    exit = slideOutVertically(
-                        targetOffsetY = { -it / 2 },
-                        animationSpec = tween(200)
-                    ) + fadeOut(animationSpec = tween(200))
-                ) {
-                    selectedDayData?.let { dayData ->
-                        InlineDetailPanel(
-                            data = ChartDetailData(
-                                date = dayData.date,
-                                amount = dayData.totalAmount,
-                                goal = null,
-                                goalPercentage = null
-                            ),
-                            onDismiss = { selectedDayData = null }
-                        )
-                    }
-                }
-
-                // Period-specific summary
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    val totalAmount = filteredDailyTotals.sumOf { it.totalAmount }
-                    val daysWithData = filteredDailyTotals.count { it.totalAmount > 0.0 }
-                    val avgAmount = if (daysWithData > 0) totalAmount / daysWithData else 0.0
-                    val bestAmount = filteredDailyTotals.maxOfOrNull { it.totalAmount } ?: 0.0
-                    
-                    WeeklyStatItem(
-                        label = "Total",
-                        value = WaterCalculator.formatWaterAmount(totalAmount)
-                    )
-                    WeeklyStatItem(
-                        label = "Average",
-                        value = WaterCalculator.formatWaterAmount(avgAmount)
-                    )
-                    WeeklyStatItem(
-                        label = "Best Day",
-                        value = WaterCalculator.formatWaterAmount(bestAmount)
-                    )
-                }
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "No data available for this week",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun WeeklyBarChart(
-    dailyTotals: List<com.cemcakmak.hydrotracker.data.database.dao.DailyTotal>,
-    onBarClick: (com.cemcakmak.hydrotracker.data.database.dao.DailyTotal) -> Unit
-) {
-    if (dailyTotals.isEmpty()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "No data available",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        return
-    }
-
-    val maxAmount = dailyTotals.maxOfOrNull { it.totalAmount } ?: 1.0
-
     Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+            .padding(top = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        // Bar chart
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(120.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.Bottom
-        ) {
-            dailyTotals.forEach { dayTotal ->
-                val height = ((dayTotal.totalAmount / maxAmount) * 120).dp
+        val haptics = LocalHapticFeedback.current
 
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(height)
-                            .clip(MaterialTheme.shapes.small)
-                            .clickable { onBarClick(dayTotal) }
-                            .background(
-                                color = MaterialTheme.colorScheme.primary
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (height > 30.dp) {
-                            Text(
-                                text = WaterCalculator.formatWaterAmount(dayTotal.totalAmount),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                }
-            }
-        }
-        
-        Spacer(modifier = Modifier.height(2.dp))
-
-        // Day labels
+        // Period Type Selection with ToggleButton
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            dailyTotals.forEach { dayTotal ->
-                Text(
-                    text = dayTotal.date.takeLast(2), // Show day number
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+            TimePeriod.entries.forEach { period ->
+                val isSelected = selectedPeriod == period
+
+                ToggleButton(
                     modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun WeeklyStatItem(
-    label: String,
-    value: String
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
-
-@Composable
-private fun YearlyChartSection(
-    summaries: List<DailySummary>,
-    selectedPeriod: TimePeriod,
-    yearOffset: Int
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text(
-                text = getPeriodTitle(selectedPeriod),
-                style = MaterialTheme.typography.titleLargeEmphasized
-            )
-
-            val filteredSummaries = filterSummariesByPeriod(summaries, selectedPeriod, weekOffset = 0, monthOffset = 0, yearOffset = yearOffset)
-            
-            if (filteredSummaries.isNotEmpty()) {
-                // Yearly visualization - all days of the year
-                YearlyHeatmap(
-                    summaries = filteredSummaries,
-                    onCellClick = { _ -> 
-                        // Cell click handler for future use
-                    }
-                )
-
-                // Yearly stats
-                val totalDays = filteredSummaries.size
-                val goalAchievedDays = filteredSummaries.count { it.goalAchieved }
-                val totalIntake = filteredSummaries.sumOf { it.totalIntake }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    checked = isSelected,
+                    onCheckedChange = { onPeriodSelected(period)
+                        haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)}
                 ) {
-                    WeeklyStatItem(
-                        label = "Days Tracked",
-                        value = "$totalDays"
-                    )
-                    WeeklyStatItem(
-                        label = "Goals Met",
-                        value = "$goalAchievedDays"
-                    )
-                    WeeklyStatItem(
-                        label = "Total Intake",
-                        value = "${(totalIntake / 1000).toInt()}L"
-                    )
-                }
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "No data available for this year",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun YearlyHeatmap(
-    summaries: List<DailySummary>,
-    onCellClick: (DailySummary) -> Unit
-) {
-    // Create a map for quick lookup of summaries by date
-    val summaryMap = summaries.associateBy { it.date }
-    
-    // Generate all days of the year
-    val yearToShow = if (summaries.isNotEmpty()) {
-        LocalDate.parse(summaries.first().date).year
-    } else {
-        LocalDate.now().year
-    }
-    
-    val startOfYear = LocalDate.of(yearToShow, 1, 1)
-    val daysInYear = if (startOfYear.isLeapYear) 366 else 365
-    
-    // Generate all dates in the year
-    val allDates = (0 until daysInYear).map { dayIndex ->
-        startOfYear.plusDays(dayIndex.toLong())
-    }
-
-    Column(
-        verticalArrangement = Arrangement.spacedBy(3.dp),
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Dynamic grid layout
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 12.dp),
-            contentPadding = PaddingValues(4.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
-            modifier = Modifier.heightIn(max = 400.dp)
-        ) {
-            items(allDates) { date ->
-                val dateString = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                val summary = summaryMap[dateString]
-
-                Box(
-                    modifier = Modifier
-                        .size(12.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .clickable(enabled = summary != null) { 
-                            summary?.let { onCellClick(it) }
-                        }
-                        .background(
-                            when {
-                                summary == null -> MaterialTheme.colorScheme.surfaceVariant
-                                summary.goalAchieved -> MaterialTheme.colorScheme.primary
-                                summary.goalPercentage >= 0.8f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                                summary.goalPercentage >= 0.6f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                                summary.goalPercentage >= 0.4f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
-                                summary.goalPercentage >= 0.2f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
-                                else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                            }
-                        )
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Legend
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Less",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(3.dp)
-            ) {
-                listOf(0.1f, 0.25f, 0.4f, 0.6f, 0.8f, 1.0f).forEach { alpha ->
-                    Box(
-                        modifier = Modifier
-                            .size(12.dp)
-                            .clip(MaterialTheme.shapes.small)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = alpha))
-                    )
-                }
-            }
-            Text(
-                text = "More",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-
-@Composable
-private fun MonthlyChartSection(
-    summaries: List<DailySummary>,
-    selectedPeriod: TimePeriod,
-    monthOffset: Int,
-    weekStartDay: WeekStartDay = WeekStartDay.MONDAY
-) {
-    var selectedSummary by remember { mutableStateOf<DailySummary?>(null) }
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text(
-                text = getPeriodTitle(selectedPeriod),
-                style = MaterialTheme.typography.titleLargeEmphasized
-            )
-
-            val filteredSummaries = filterSummariesByPeriod(summaries, selectedPeriod, weekOffset = 0, monthOffset, 0)
-            
-            if (filteredSummaries.isNotEmpty()) {
-                val haptics = LocalHapticFeedback.current
-                // Monthly heatmap-style visualization
-                MonthlyHeatmap(
-                    summaries = filteredSummaries,
-                    onCellClick = { summary -> selectedSummary = summary
-                        haptics.performHapticFeedback(HapticFeedbackType.ContextClick)},
-                    weekStartDay = weekStartDay
-                )
-                
-                // Inline detail panel with animation
-                AnimatedVisibility(
-                    visible = selectedSummary != null,
-                    enter = slideInVertically(
-                        initialOffsetY = { -it / 2 },
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessMedium
-                        )
-                    ) + fadeIn(animationSpec = tween(300)),
-                    exit = slideOutVertically(
-                        targetOffsetY = { -it / 2 },
-                        animationSpec = tween(200)
-                    ) + fadeOut(animationSpec = tween(200))
-                ) {
-                    selectedSummary?.let { summary ->
-                        InlineDetailPanel(
-                            data = ChartDetailData(
-                                date = summary.date,
-                                amount = summary.totalIntake,
-                                goal = summary.dailyGoal,
-                                goalPercentage = summary.goalPercentage
-                            ),
-                            onDismiss = { selectedSummary = null }
-                        )
-                    }
-                }
-
-                // Monthly stats
-                val totalDays = filteredSummaries.size
-                val goalAchievedDays = filteredSummaries.count { it.goalAchieved }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    WeeklyStatItem(
-                        label = "Days Tracked",
-                        value = "$totalDays"
-                    )
-                    WeeklyStatItem(
-                        label = "Goals Met",
-                        value = "$goalAchievedDays"
-                    )
-                    WeeklyStatItem(
-                        label = "Success Rate",
-                        value = "${((goalAchievedDays.toFloat() / totalDays) * 100).toInt()}%"
-                    )
-                }
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "No data available for the last 30 days",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun MonthlyHeatmap(
-    summaries: List<DailySummary>,
-    onCellClick: (DailySummary) -> Unit,
-    weekStartDay: WeekStartDay = WeekStartDay.MONDAY
-) {
-    // Create a map for quick lookup and determine the month being displayed
-    val summaryMap = summaries.associateBy { it.date }
-    
-    // Get the month/year being displayed
-    val monthYear = if (summaries.isNotEmpty()) {
-        val firstDate = LocalDate.parse(summaries.first().date)
-        firstDate.withDayOfMonth(1)
-    } else {
-        LocalDate.now().withDayOfMonth(1)
-    }
-
-    Column(
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        MonthlyCalendarGrid(
-            monthYear = monthYear,
-            summaryMap = summaryMap,
-            onCellClick = onCellClick,
-            weekStartDay = weekStartDay
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        // Legend
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Less",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(3.dp)
-            ) {
-                listOf(0.1f, 0.25f, 0.4f, 0.6f, 0.8f, 1.0f).forEach { alpha ->
-                    Box(
-                        modifier = Modifier
-                            .size(18.dp)
-                            .clip(MaterialTheme.shapes.small)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = alpha))
-                    )
-                }
-            }
-            Text(
-                text = "More",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-@Composable
-private fun MonthlyCalendarGrid(
-    monthYear: LocalDate,
-    summaryMap: Map<String, DailySummary>,
-    onCellClick: (DailySummary) -> Unit,
-    weekStartDay: WeekStartDay = WeekStartDay.MONDAY
-) {
-    // Use the user's preferred week start day
-    val weekFields = WeekFields.of(weekStartDay.dayOfWeek, 1)
-    
-    // Get first day of month and its day of week
-    val firstDayOfMonth = monthYear.withDayOfMonth(1)
-    val lastDayOfMonth = monthYear.withDayOfMonth(monthYear.lengthOfMonth())
-    
-    // Find the first day to display (might be from previous month)
-    val startOfCalendar = firstDayOfMonth.with(weekFields.dayOfWeek(), 1)
-    
-    // Find the last day to display (might be from next month)
-    val endOfCalendar = lastDayOfMonth.with(weekFields.dayOfWeek(), 7)
-    
-    // Generate all days for the calendar grid
-    val calendarDays = mutableListOf<LocalDate>()
-    var currentDate = startOfCalendar
-    while (!currentDate.isAfter(endOfCalendar)) {
-        calendarDays.add(currentDate)
-        currentDate = currentDate.plusDays(1)
-    }
-    
-    // Group into weeks
-    val weeks = calendarDays.chunked(7)
-
-    Column(
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        // Day headers based on week start day
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            val dayHeaders = if (weekStartDay == WeekStartDay.SUNDAY) {
-                listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
-            } else {
-                listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-            }
-            
-            dayHeaders.forEach { dayName ->
-                Text(
-                    text = dayName,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-        
-        // Calendar weeks
-        weeks.forEach { week ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                week.forEach { date ->
-                    val dateString = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                    val summary = summaryMap[dateString]
-                    val isCurrentMonth = date.month == monthYear.month
-                    
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .aspectRatio(1f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(28.dp)
-                                .clip(MaterialTheme.shapes.small)
-                                .clickable(enabled = summary != null && isCurrentMonth) { 
-                                    summary?.let { onCellClick(it) }
-                                }
-                                .background(
-                                    when {
-                                        !isCurrentMonth -> Color.Transparent
-                                        summary == null -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                                        summary.goalAchieved -> MaterialTheme.colorScheme.primary
-                                        summary.goalPercentage >= 0.8f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                                        summary.goalPercentage >= 0.6f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                                        summary.goalPercentage >= 0.4f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
-                                        summary.goalPercentage >= 0.2f -> MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
-                                        else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                                    }
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            if (isCurrentMonth) {
-                                Text(
-                                    text = date.dayOfMonth.toString(),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = when {
-                                        summary == null -> MaterialTheme.colorScheme.onSurfaceVariant
-                                        summary.goalPercentage > 0.5f -> MaterialTheme.colorScheme.onPrimary
-                                        else -> MaterialTheme.colorScheme.onSurfaceVariant
-                                    },
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun StatisticsGrid(
-    summaries: List<DailySummary>
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Text(
-            text = "Statistics",
-            style = MaterialTheme.typography.titleLargeEmphasized
-        )
-
-        // Calculate statistics from ALL data (not filtered)
-        val currentStreak = calculateStreak(summaries.sortedByDescending { it.date })
-        val totalIntake = summaries.sumOf { it.totalIntake }
-        val totalDays = summaries.size
-        
-        // Calculate daily average from all data
-        val dailyAverage = if (totalDays > 0) totalIntake / totalDays else 0.0
-        
-        
-        // Grid of stat cards - consistent across all periods
-        Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                StatCard(
-                    modifier = Modifier.weight(1f),
-                    icon = Icons.Default.LocalFireDepartment,
-                    title = "Current Streak",
-                    value = currentStreak.toString(),
-                    subtitle = "days",
-                    color = MaterialTheme.colorScheme.error,
-                )
-
-                StatCard(
-                    modifier = Modifier.weight(1f),
-                    icon = Icons.Default.Stars,
-                    title = "Daily Average",
-                    value = WaterCalculator.formatWaterAmount(dailyAverage).split(" ")[0],
-                    subtitle = WaterCalculator.formatWaterAmount(dailyAverage).split(" ")[1],
-                    color = MaterialTheme.colorScheme.secondary
-                )
-
-                StatCard(
-                    modifier = Modifier.weight(1f),
-                    icon = Icons.Default.WaterDrop,
-                    title = "Total Intake",
-                    value = "${(totalIntake / 1000).toInt()}",
-                    subtitle = "liters",
-                    color = MaterialTheme.colorScheme.tertiary,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun StatCard(
-    modifier: Modifier = Modifier,
-    icon: ImageVector,
-    title: String,
-    value: String,
-    subtitle: String,
-    color: Color,
-) {
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = color,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = value,
-                    style = MaterialTheme.typography.headlineMediumEmphasized,
-                    color = color
-                )
-
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.labelMediumEmphasized,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun GoalAchievementSection(
-    summaries: List<DailySummary>,
-    selectedPeriod: TimePeriod,
-    weekOffset: Int,
-    monthOffset: Int,
-    yearOffset: Int,
-    weekStartDay: WeekStartDay = WeekStartDay.MONDAY
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text(
-                text = "Goal Achievement",
-                style = MaterialTheme.typography.titleLargeEmphasized,
-            )
-
-            val filteredSummaries = filterSummariesByPeriod(summaries, selectedPeriod, weekOffset, monthOffset, yearOffset, weekStartDay)
-            
-            if (filteredSummaries.isNotEmpty()) {
-                val achievementRate = filteredSummaries.count { it.goalAchieved }.toFloat() / filteredSummaries.size
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    // Large achievement percentage
-                    Text(
-                        text = "${(achievementRate * 100).toInt()}%",
-                        style = MaterialTheme.typography.displayMedium,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-
-                    Text(
-                        text = "of days you met your goal",
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-
-                    // Achievement progress bar
-                    LinearWavyProgressIndicator(
-                        progress = { achievementRate },
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.primary,
-                        trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-                        stroke = WavyProgressIndicatorDefaults.linearIndicatorStroke,
-                        trackStroke = WavyProgressIndicatorDefaults.linearTrackStroke,
-                        amplitude = WavyProgressIndicatorDefaults.indicatorAmplitude,
-                        wavelength = WavyProgressIndicatorDefaults.LinearDeterminateWavelength,
-                        waveSpeed = WavyProgressIndicatorDefaults.LinearDeterminateWavelength
-                    )
-                }
-            } else {
-                Text(
-                    text = "Start tracking your water intake to see your goal achievement rate!",
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-            }
-        }
-    }
-}
-
-// Helper functions
-private fun calculateStreak(summaries: List<DailySummary>): Int {
-    var streak = 0
-    val sortedSummaries = summaries.sortedByDescending { it.date }
-
-    for (summary in sortedSummaries) {
-        if (summary.goalAchieved) {
-            streak++
-        } else {
-            break
-        }
-    }
-    return streak
-}
-
-
-
-
-data class ChartDetailData(
-    val date: String,
-    val amount: Double,
-    val goal: Double?,
-    val goalPercentage: Float?
-)
-
-
-@Composable
-private fun InlineDetailPanel(
-    data: ChartDetailData,
-    onDismiss: () -> Unit,
-) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // Header with close button
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = formatDisplayDate(data.date),
-                        style = MaterialTheme.typography.titleMediumEmphasized,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                    val haptics = LocalHapticFeedback.current
-                    FilledIconButton(
-                        onClick = {
-                            haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                            onDismiss()
-                        },
-                        colors = IconButtonDefaults.filledIconButtonColors(),
-                        shapes = IconButtonDefaults.shapes(),
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Close",
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-                }
-                
-                // Content in a more compact layout
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // Water amount - prominent display
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Water Intake",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            text = stringResource(period.displayNameResId),
+                            style = MaterialTheme.typography.labelLarge
                         )
-                        Text(
-                            text = WaterCalculator.formatWaterAmount(data.amount),
-                            style = MaterialTheme.typography.titleLargeEmphasized,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    
-                    // Goal information (if available)
-                    data.goal?.let { goal ->
-                        data.goalPercentage?.let { percentage ->
-                            // Compact progress display
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column {
-                                    Text(
-                                        text = "Goal: ${WaterCalculator.formatWaterAmount(goal)}",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                                    )
-                                    Text(
-                                        text = "Progress: ${(percentage * 100).toInt()}%",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                                    )
-                                }
-                            }
-                            
-                            // Compact progress bar
-                            LinearProgressIndicator(
-                                progress = { percentage.coerceAtMost(1.0f) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(6.dp)
-                                    .clip(MaterialTheme.shapes.small),
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                trackColor = MaterialTheme.colorScheme.surfaceVariant
-                            )
-                        }
                     }
                 }
             }
         }
-    }
 
-private fun formatDisplayDate(dateString: String): String {
-    return try {
-        val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-        val date = inputFormat.parse(dateString)
-        outputFormat.format(date ?: Date())
-    } catch (_: Exception) {
-        dateString
+        // Navigation Controls
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            FilledIconButton(
+                onClick = {
+                    onPreviousPeriod()
+                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                },
+                shapes = IconButtonDefaults.shapes(),
+                colors = IconButtonDefaults.filledIconButtonColors()
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.arrow_back_filled),
+                    contentDescription = stringResource(
+                        R.string.cd_previous_period,
+                        stringResource(selectedPeriod.displayNameResId)
+                    )
+                )
+            }
+
+            data class PeriodTitleState(
+                val period: TimePeriod,
+                val weekOffset: Int,
+                val monthOffset: Int,
+                val yearOffset: Int
+            )
+
+            BlurMorph(
+                targetState = PeriodTitleState(
+                    selectedPeriod,
+                    currentWeekOffset,
+                    currentMonthOffset,
+                    currentYearOffset
+                )
+            ) { state, blurModifier ->
+                Text(
+                    modifier = Modifier
+                        .then(blurModifier)
+                        .padding(horizontal = 12.dp)
+                        .padding(vertical = 8.dp),
+                    text = getCurrentPeriodText(
+                        state.period,
+                        state.weekOffset,
+                        state.monthOffset,
+                        state.yearOffset,
+                        weekStartDay,
+                        dateFormat
+                    ),
+                    style = MaterialTheme.typography.titleMediumEmphasized,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            IconButton(
+                onClick = {
+                    onNextPeriod()
+                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                },
+                shapes = IconButtonDefaults.shapes(),
+                colors = IconButtonDefaults.filledIconButtonColors(),
+                enabled = when (selectedPeriod) {
+                    TimePeriod.WEEKLY -> currentWeekOffset < 0
+                    TimePeriod.MONTHLY -> currentMonthOffset < 0
+                    TimePeriod.YEARLY -> currentYearOffset < 0
+                }
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.arrow_forward_filled),
+                    contentDescription = stringResource(
+                        R.string.cd_next_period,
+                        stringResource(selectedPeriod.displayNameResId)
+                    )
+                )
+            }
+        }
     }
 }
 
+@Composable
+private fun TopEdgeEffect(
+    style: EdgeEffect,
+    backdropState: BackdropBlurState,
+    paddingValues: PaddingValues,
+    modifier: Modifier = Modifier
+) {
+    val bandHeight = paddingValues.calculateTopPadding()
 
+    when (style) {
+        EdgeEffect.TRANSPARENT -> Unit
+        EdgeEffect.SCRIM -> {
+            val scrimColor = MaterialTheme.colorScheme.surface
+            Box(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .height(bandHeight + 20.dp)
+                    .drawBehind {
+                        drawRect(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(scrimColor, Color.Transparent)
+                            )
+                        )
+                    }
+            )
+        }
+        EdgeEffect.BLURRED -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Box(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .height(bandHeight)
+                        .backdropBlur(
+                            state = backdropState,
+                            style = BackdropBlurStyle(
+                                blurRadius = 20.dp,
+                                progressive = BackdropProgressive(
+                                    startFraction = 0f,
+                                    endFraction = 1f
+                                ),
+                                tint = MaterialTheme.colorScheme.surface.copy(0.4f)
+                            )
+                        )
+                )
+            }
+        }
+    }
+}
 
-private fun getCurrentPeriodText(
-    period: TimePeriod, 
-    weekOffset: Int, 
-    monthOffset: Int, 
+@Composable
+internal fun AnimatedStatItem(
+    label: String,
+    targetValue: Double,
+    hapticsEnabled: Boolean = false,
+    formatValue: @Composable (Float) -> String,
+    entryDelayMillis: Int = 0
+) {
+    ChartStatItem(label = label) {
+        AnimatedNumber(
+            targetValue = targetValue,
+            formatValue = formatValue,
+            style = MaterialTheme.typography.titleMediumEmphasized,
+            color = MaterialTheme.colorScheme.primary,
+            animateEntry = false,
+            hapticsEnabled = hapticsEnabled,
+            entryDelayMillis = entryDelayMillis
+        )
+    }
+}
+
+@Composable
+internal fun ChartStatItem(
+    label: String,
+    value: @Composable () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        value()
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.secondary
+        )
+    }
+}
+
+@Composable
+internal fun SelectedDayEntries(
+    selectedDate: String?,
+    entries: List<WaterIntakeEntry>,
+    userProfile: UserProfile?,
+    themePreferences: ThemePreferences,
+    onEdit: (WaterIntakeEntry) -> Unit,
+    onDelete: (WaterIntakeEntry) -> Unit
+) {
+    val fadeSpec = tween<Float>(durationMillis = 600, delayMillis = 100, easing = EaseOut)
+    val blurSpec = tween<Dp>(durationMillis = 800, easing = EaseOut)
+
+    val currentHasRows = selectedDate != null && userProfile != null && entries.isNotEmpty()
+    var prevHadRows by remember { mutableStateOf(false) }
+    LaunchedEffect(selectedDate) { prevHadRows = currentHasRows }
+
+    AnimatedContent(
+        targetState = selectedDate to entries,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp),
+        contentKey = { it.first },
+        transitionSpec = {
+            if (prevHadRows) {
+                (fadeIn(fadeSpec) togetherWith fadeOut(fadeSpec)) using SizeTransform(clip = false)
+            } else {
+                (EnterTransition.None togetherWith fadeOut(tween(200, easing = EaseOut))) using
+                    SizeTransform(clip = false) { _, _ -> snap() }
+            }
+        },
+        label = "selectedDayTransition"
+    ) { day ->
+        val date = day.first
+        val dayEntries = day.second
+        val thisDayHasRows = date != null && userProfile != null && dayEntries.isNotEmpty()
+        val appearedAfterList = remember { prevHadRows }
+        val blur by transition.animateDp(
+            transitionSpec = { blurSpec },
+            label = "selectedDayBlur"
+        ) { state ->
+            when (state) {
+                EnterExitState.PostExit -> if (thisDayHasRows) 16.dp else 0.dp
+                EnterExitState.PreEnter -> if (appearedAfterList) 16.dp else 0.dp
+                EnterExitState.Visible -> 0.dp
+            }
+        }
+
+        Box(modifier = Modifier.blur(blur, BlurredEdgeTreatment.Unbounded)) {
+            if (date == null || userProfile == null) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 34.dp)
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(18.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.format_list_bulleted),
+                        tint = MaterialTheme.colorScheme.secondary,
+                        contentDescription = null
+                    )
+
+                    Text(
+                        text = stringResource(R.string.history_select_day_hint),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            } else {
+                DailyEntriesSection(
+                    entries = dayEntries,
+                    userProfile = userProfile,
+                    themePreferences = themePreferences,
+                    cascadeEntries = !appearedAfterList,
+                    onEdit = onEdit,
+                    onDelete = onDelete,
+                    title = DateTimeFormatters.formatDate(
+                        LocalDate.parse(date),
+                        themePreferences.dateFormat
+                    )
+                )
+            }
+        }
+    }
+}
+
+@Composable
+internal fun getCurrentPeriodText(
+    period: TimePeriod,
+    weekOffset: Int,
+    monthOffset: Int,
     yearOffset: Int,
-    weekStartDay: WeekStartDay = WeekStartDay.MONDAY
+    weekStartDay: WeekStartDay = WeekStartDay.SYSTEM,
+    dateFormat: DateFormatPattern = DateFormatPattern.SYSTEM
 ): String {
     return when (period) {
         TimePeriod.WEEKLY -> {
             val (startOfWeek, endOfWeek) = getWeekDateRange(weekOffset, weekStartDay)
-            
+
             when (weekOffset) {
-                0 -> "This Week"
-                -1 -> "Last Week"
-                else -> "${startOfWeek.format(DateTimeFormatter.ofPattern("MMM d"))} - ${endOfWeek.format(DateTimeFormatter.ofPattern("MMM d"))}"
+                0 -> stringResource(R.string.history_this_week)
+                -1 -> stringResource(R.string.history_last_week)
+                else -> "${DateTimeFormatters.formatDate(startOfWeek, dateFormat)} - ${DateTimeFormatters.formatDate(endOfWeek, dateFormat)}"
             }
         }
         TimePeriod.MONTHLY -> {
             val today = LocalDate.now()
             val targetMonth = today.plusMonths(monthOffset.toLong())
             when (monthOffset) {
-                0 -> "This Month"
-                -1 -> "Last Month"
+                0 -> stringResource(R.string.history_this_month)
+                -1 -> stringResource(R.string.history_last_month)
                 else -> targetMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy"))
             }
         }
@@ -1396,70 +638,150 @@ private fun getCurrentPeriodText(
             val today = LocalDate.now()
             val targetYear = today.plusYears(yearOffset.toLong())
             when (yearOffset) {
-                0 -> "This Year"
-                -1 -> "Last Year"
+                0 -> stringResource(R.string.history_this_year)
+                -1 -> stringResource(R.string.history_last_year)
                 else -> targetYear.format(DateTimeFormatter.ofPattern("yyyy"))
             }
         }
     }
 }
 
-private fun getPeriodTitle(period: TimePeriod): String {
-    return when (period) {
-        TimePeriod.WEEKLY -> "Weekly Overview"
-        TimePeriod.MONTHLY -> "Monthly Overview"
-        TimePeriod.YEARLY -> "Yearly Overview"
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Preview(showBackground = true, name = "History Screen")
+@Composable
+private fun HistoryScreenPreview() {
+    val today = LocalDate.now()
+    val dailyGoal = 2700.0
+    val sampleSummaries = List(35) { index ->
+        val date = today.minusDays(index.toLong())
+        val totalIntake = when (index % 7) {
+            0 -> dailyGoal * 1.10
+            1 -> dailyGoal * 0.95
+            2 -> dailyGoal * 0.75
+            3 -> dailyGoal * 1.05
+            4 -> dailyGoal * 0.50
+            5 -> dailyGoal * 0.85
+            else -> dailyGoal * 1.20
+        }
+        val entryCount = 4 + (index % 5)
+        DailySummary(
+            date = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+            totalIntake = totalIntake,
+            dailyGoal = dailyGoal,
+            goalAchieved = totalIntake >= dailyGoal,
+            goalPercentage = (totalIntake / dailyGoal).toFloat(),
+            entryCount = entryCount,
+            firstIntakeTime = null,
+            lastIntakeTime = null,
+            largestIntake = totalIntake * 0.4,
+            averageIntake = totalIntake / entryCount
+        )
+    }
+
+    val selectedDate = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+
+    val previewUser = UserProfile(
+        name = "Preview User",
+        gender = Gender.MALE,
+        ageGroup = AgeGroup.ADULT_31_50,
+        activityLevel = ActivityLevel.MODERATE,
+        wakeUpTime = "07:00",
+        sleepTime = "23:00",
+        dailyWaterGoal = dailyGoal,
+        reminderInterval = 60,
+        volumeUnit = VolumeUnit.MILLILITRES
+    )
+
+    val sampleEntries = listOf(
+        WaterIntakeEntry(
+            id = 1,
+            amount = 250.0,
+            timestamp = System.currentTimeMillis() - 3_600_000,
+            date = selectedDate,
+            containerType = "Glass",
+            containerVolume = 250.0,
+            beverageType = BeverageType.WATER.name
+        ),
+        WaterIntakeEntry(
+            id = 2,
+            amount = 330.0,
+            timestamp = System.currentTimeMillis() - 7_200_000,
+            date = selectedDate,
+            containerType = "Mug",
+            containerVolume = 330.0,
+            beverageType = BeverageType.COFFEE.name,
+            beverageMultiplier = 0.95
+        ),
+        WaterIntakeEntry(
+            id = 3,
+            amount = 500.0,
+            timestamp = System.currentTimeMillis() - 10_800_000,
+            date = selectedDate,
+            containerType = "Bottle",
+            containerVolume = 500.0,
+            beverageType = BeverageType.WATER.name
+        ),
+        WaterIntakeEntry(
+            id = 4,
+            amount = 500.0,
+            timestamp = System.currentTimeMillis() - 10_800_000,
+            date = selectedDate,
+            containerType = "Bottle",
+            containerVolume = 500.0,
+            beverageType = BeverageType.WATER.name
+        ),
+        WaterIntakeEntry(
+            id = 5,
+            amount = 500.0,
+            timestamp = System.currentTimeMillis() - 10_800_000,
+            date = selectedDate,
+            containerType = "Bottle",
+            containerVolume = 500.0,
+            beverageType = BeverageType.WATER.name
+        )
+    )
+
+    val uiState = HistoryUiState(
+        summaries = sampleSummaries,
+        weeklyStats = WeeklyHistoryStats(
+            totalIntake = sampleSummaries.take(7).sumOf { it.totalIntake },
+            averageIntake = sampleSummaries.take(7).map { it.totalIntake }.average(),
+            bestDayIntake = sampleSummaries.take(7).maxOfOrNull { it.totalIntake } ?: 0.0
+        ),
+        monthlyStats = MonthlyHistoryStats(
+            daysTracked = sampleSummaries.size,
+            goalsMet = sampleSummaries.count { it.goalAchieved },
+            successRate = (sampleSummaries.count { it.goalAchieved }.toDouble() / sampleSummaries.size) * 100.0
+        ),
+        yearlyStats = YearlyHistoryStats(
+            daysTracked = sampleSummaries.size,
+            goalsMet = sampleSummaries.count { it.goalAchieved },
+            totalIntake = sampleSummaries.sumOf { it.totalIntake }
+        ),
+        selectedDate = selectedDate,
+        selectedDateEntries = sampleEntries
+    )
+
+    HydroTrackerTheme {
+        val backStack = rememberNavBackStack(NavigationRoutes.History)
+
+        MainNavigationScaffold(
+            backStack = backStack,
+            currentKey = NavigationRoutes.History,
+            content = { paddingValues ->
+                HistoryScreen(
+                    uiState = uiState,
+                    themePreferences = ThemePreferences(),
+                    userProfile = previewUser,
+                    paddingValues = paddingValues,
+                    onPeriodSelected = {},
+                    onPreviousPeriod = {},
+                    onNextPeriod = {},
+                    onDaySelected = {},
+                    onUpdateEntry = { _, _ -> },
+                    onDeleteEntry = {}
+                )
+            }
+        )
     }
 }
-
-
-private fun getWeekDateRange(weekOffset: Int, weekStartDay: WeekStartDay = WeekStartDay.MONDAY): Pair<LocalDate, LocalDate> {
-    val today = LocalDate.now()
-    val weekFields = WeekFields.of(weekStartDay.dayOfWeek, 1)
-    
-    // Get the start of current week first
-    val currentWeekStart = today.with(weekFields.dayOfWeek(), 1)
-    
-    // Then apply the offset to get the target week
-    val targetWeekStart = currentWeekStart.plusWeeks(weekOffset.toLong())
-    val targetWeekEnd = targetWeekStart.plusDays(6)
-    
-    return Pair(targetWeekStart, targetWeekEnd)
-}
-
-private fun getMonthDateRange(monthOffset: Int): Pair<LocalDate, LocalDate> {
-    val today = LocalDate.now()
-    val targetMonth = today.plusMonths(monthOffset.toLong())
-    val startOfMonth = targetMonth.withDayOfMonth(1)
-    val endOfMonth = targetMonth.withDayOfMonth(targetMonth.lengthOfMonth())
-    return Pair(startOfMonth, endOfMonth)
-}
-
-private fun getYearDateRange(yearOffset: Int): Pair<LocalDate, LocalDate> {
-    val today = LocalDate.now()
-    val targetYear = today.plusYears(yearOffset.toLong())
-    val startOfYear = targetYear.withDayOfYear(1)
-    val endOfYear = targetYear.withDayOfYear(targetYear.lengthOfYear())
-    return Pair(startOfYear, endOfYear)
-}
-
-private fun filterSummariesByPeriod(
-    summaries: List<DailySummary>,
-    period: TimePeriod,
-    weekOffset: Int,
-    monthOffset: Int,
-    yearOffset: Int = 0,
-    weekStartDay: WeekStartDay = WeekStartDay.MONDAY
-): List<DailySummary> {
-    val (startDate, endDate) = when (period) {
-        TimePeriod.WEEKLY -> getWeekDateRange(weekOffset, weekStartDay)
-        TimePeriod.MONTHLY -> getMonthDateRange(monthOffset)
-        TimePeriod.YEARLY -> getYearDateRange(yearOffset)
-    }
-    
-    return summaries.filter { summary ->
-        val summaryDate = LocalDate.parse(summary.date)
-        summaryDate >= startDate && summaryDate <= endDate
-    }
-}
-

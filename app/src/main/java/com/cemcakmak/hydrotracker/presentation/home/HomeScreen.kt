@@ -4,80 +4,128 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.role
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
+import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
-import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.launch
-import com.cemcakmak.hydrotracker.data.models.UserProfile
-import com.cemcakmak.hydrotracker.data.models.ContainerPreset
-import com.cemcakmak.hydrotracker.data.models.BeverageType
-import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
-import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
-import com.cemcakmak.hydrotracker.health.HealthConnectManager
-import com.cemcakmak.hydrotracker.health.HealthConnectSyncManager
-import com.cemcakmak.hydrotracker.data.database.repository.WaterProgress
-import com.cemcakmak.hydrotracker.data.database.repository.TodayStatistics
+import androidx.compose.ui.tooling.preview.Preview
+import com.cemcakmak.hydrotracker.R
+import com.cemcakmak.hydrotracker.data.database.dao.ContainerPresetDao
+import com.cemcakmak.hydrotracker.data.database.dao.DailySummaryDao
+import com.cemcakmak.hydrotracker.data.database.dao.DailyTotal
+import com.cemcakmak.hydrotracker.data.database.dao.MostUsedContainer
+import com.cemcakmak.hydrotracker.data.database.dao.MostUsedQuickAddCombo
+import com.cemcakmak.hydrotracker.data.database.dao.WaterIntakeDao
+import com.cemcakmak.hydrotracker.data.database.entities.ContainerPresetEntity
+import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
 import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
-import com.cemcakmak.hydrotracker.utils.WaterCalculator
-import com.cemcakmak.hydrotracker.presentation.common.HydroSnackbarHost
-import com.cemcakmak.hydrotracker.presentation.common.showSuccessSnackbar
-import com.cemcakmak.hydrotracker.presentation.common.showErrorSnackbar
+import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
+import com.cemcakmak.hydrotracker.data.database.repository.TodayStatistics
+import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
+import com.cemcakmak.hydrotracker.data.models.ActivityLevel
+import com.cemcakmak.hydrotracker.data.models.AgeGroup
+import com.cemcakmak.hydrotracker.data.models.BeverageType
+import com.cemcakmak.hydrotracker.data.models.ContainerPreset
+import com.cemcakmak.hydrotracker.data.models.DayEndMode
+import com.cemcakmak.hydrotracker.data.models.Gender
+import com.cemcakmak.hydrotracker.data.models.ThemePreferences
+import com.cemcakmak.hydrotracker.data.models.UserProfile
+import com.cemcakmak.hydrotracker.data.models.VolumeUnit
+import com.cemcakmak.hydrotracker.data.repository.UserRepository
+import com.cemcakmak.hydrotracker.notifications.HydroNotificationScheduler
+import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
+import com.cemcakmak.hydrotracker.ui.theme.rememberBeverageColorRoles
+import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
+import com.cemcakmak.hydrotracker.utils.UserDayCalculator
+import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
+import android.widget.Toast
+import com.cemcakmak.hydrotracker.presentation.common.sheets.AddContainerPresetBottomSheet
+import com.cemcakmak.hydrotracker.presentation.common.sheets.EditContainerPresetBottomSheet
+import com.cemcakmak.hydrotracker.presentation.common.BeverageOption
+import com.cemcakmak.hydrotracker.presentation.common.toOption
+import com.cemcakmak.hydrotracker.presentation.common.DailyEntriesSection
+import com.cemcakmak.hydrotracker.presentation.common.dialogs.CustomWaterDialog
+import com.cemcakmak.hydrotracker.presentation.common.dialogs.EditWaterDialog
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.drawBehind
+import android.os.Build
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import com.cemcakmak.hydrotracker.data.models.EdgeEffect
+import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurState
+import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropBlurStyle
+import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropProgressive
+import com.cemcakmak.hydrotracker.presentation.common.effect.backdropBlur
+import com.cemcakmak.hydrotracker.presentation.common.effect.backdropSource
+import com.cemcakmak.hydrotracker.presentation.common.effect.rememberBackdropBlurState
+import com.cemcakmak.hydrotracker.presentation.common.AnimatedNumber
+import com.cemcakmak.hydrotracker.presentation.common.EntryAnimationDefaults
+import com.cemcakmak.hydrotracker.presentation.common.shapes.PillShape
+import com.cemcakmak.hydrotracker.presentation.common.shapes.SquircleShape
+import com.cemcakmak.hydrotracker.presentation.common.timeBasedGreeting
+import kotlinx.coroutines.delay
+import java.time.Instant
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.temporal.ChronoUnit
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
     userProfile: UserProfile,
+    themePreferences: ThemePreferences,
     waterIntakeRepository: WaterIntakeRepository,
     containerPresetRepository: ContainerPresetRepository,
-    activeBeverageTypes: List<BeverageType> = BeverageType.getAllSorted(),
-    onNavigateToHistory: () -> Unit = {},
-    onNavigateToSettings: () -> Unit = {},
-    onNavigateToProfile: () -> Unit = {}
+    activeBeverages: List<BeverageOption> = BeverageType.getAllSorted().map { it.toOption() },
+    paddingValues: PaddingValues,
+    showCustomDialog: Boolean = false,
+    onCustomDialogChange: (Boolean) -> Unit = {}
 ) {
     // Check for new user day when HomeScreen is displayed
     LaunchedEffect(Unit) {
         waterIntakeRepository.checkAndHandleNewUserDay()
     }
-    // Collect real-time water intake data from database
-    val todayProgress by waterIntakeRepository.getTodayProgress().collectAsState(
-        initial = WaterProgress(
-            currentIntake = 0.0,
-            dailyGoal = userProfile.dailyWaterGoal,
-            progress = 0f,
-            isGoalAchieved = false,
-            remainingAmount = userProfile.dailyWaterGoal
-        )
-    )
+
+    val scrollState = rememberScrollState()
+
+    // Collect real-time water intake data from database. The initial value is null so the
+    // progress amount is never rendered as 0 while the first emission is still pending.
+    val todayProgress by waterIntakeRepository.getTodayProgress().collectAsState(initial = null)
 
     val todayEntries by waterIntakeRepository.getTodayEntries().collectAsState(initial = emptyList())
 
@@ -101,17 +149,14 @@ fun HomeScreen(
 
     // Coroutine scope for database operations
     val coroutineScope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
+    // Custom entry dialogue state managed by parent for FAB hoisting
 
-    // Custom entry dialog state
-    var showCustomDialog by remember { mutableStateOf(false) }
-
-    // Edit entry dialog state
+    // Edit entry dialogue state
     var showEditDialog by remember { mutableStateOf(false) }
     var entryToEdit by remember { mutableStateOf<WaterIntakeEntry?>(null) }
 
     // Beverage selection state
-    var selectedBeverageType by remember { mutableStateOf(BeverageType.WATER) }
+    var selectedBeverage by remember { mutableStateOf(BeverageType.WATER.toOption()) }
 
     // Container preset management state
     val presets by containerPresetRepository.getAllPresets().collectAsState(initial = emptyList())
@@ -119,36 +164,53 @@ fun HomeScreen(
     var showEditPresetSheet by remember { mutableStateOf(false) }
     var presetToEdit by remember { mutableStateOf<ContainerPreset?>(null) }
 
-    // Pull-to-refresh state
+    // Pull-to-refresh state driven by Health Connect sync manager
+    // Local isRefreshing enforces a minimum visible duration for smoother UX.
     var isRefreshing by remember { mutableStateOf(false) }
+    val isSyncing by waterIntakeRepository.getSyncManager().isSyncing.collectAsState()
     val pullToRefreshState = rememberPullToRefreshState()
+
+    // Message templates for toast feedback on failure or important confirmations.
+    val addFailedMessageTemplate = stringResource(R.string.home_snackbar_add_failed)
+    val deleteFailedMessageTemplate = stringResource(R.string.home_snackbar_delete_failed)
+    val updateFailedMessageTemplate = stringResource(R.string.home_snackbar_update_failed)
+    val syncedMessageTemplate = stringResource(R.string.home_snackbar_synced)
+    val syncErrorsMessageTemplate = stringResource(R.string.home_snackbar_sync_errors)
+    val upToDateMessage = stringResource(R.string.home_snackbar_up_to_date)
+    val syncFailedMessageTemplate = stringResource(R.string.home_snackbar_sync_failed)
+    val syncDisabledMessage = stringResource(R.string.home_snackbar_sync_disabled)
+    val containerAddedTemplate = stringResource(R.string.home_snackbar_container_added)
+    val containerUpdatedTemplate = stringResource(R.string.home_snackbar_container_updated)
+    val containerDeletedTemplate = stringResource(R.string.home_snackbar_container_deleted)
 
     // Function to add water intake to database
     fun addWaterIntake(amount: Double, containerName: String) {
         coroutineScope.launch {
-            val containerPreset = ContainerPreset.getDefaultPresets()
-                .find { it.name == containerName }
-                ?: ContainerPreset(name = "Custom", volume = amount)
+            val containerPreset = presets.find { it.name == containerName }
+                ?: ContainerPreset.getDefaultPresets().find { it.name == containerName }
+                ?: ContainerPreset(
+                    name = containerName,
+                    volume = amount,
+                    iconType = "DRAWABLE",
+                    iconName = "water_filled"
+                )
 
             val result = waterIntakeRepository.addWaterIntake(
                 amount = amount,
                 containerPreset = containerPreset,
-                beverageType = selectedBeverageType
+                beverageKey = selectedBeverage.storageKey,
+                beverageMultiplier = selectedBeverage.storedMultiplier
             )
 
             result.onSuccess {
-                val beverageInfo = if (selectedBeverageType != BeverageType.WATER) {
-                    " ${selectedBeverageType.displayName}"
-                } else {
-                    ""
-                }
-                snackbarHostState.showSuccessSnackbar(
-                    message = "Added ${WaterCalculator.formatWaterAmount(amount)}$beverageInfo!"
-                )
+                // Reschedule the next reminder using a dynamically calculated interval.
+                HydroNotificationScheduler.onWaterEntryAdded(context, userProfile)
             }.onFailure { error ->
-                snackbarHostState.showErrorSnackbar(
-                    message = "Failed to add water: ${error.message}"
-                )
+                Toast.makeText(
+                    context,
+                    addFailedMessageTemplate.format(error.message ?: ""),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -159,13 +221,13 @@ fun HomeScreen(
             val result = waterIntakeRepository.deleteWaterIntake(entry)
             
             result.onSuccess {
-                snackbarHostState.showSuccessSnackbar(
-                    message = "Deleted ${entry.getFormattedAmount()} entry"
-                )
+                // No success toast; the updated UI provides enough feedback.
             }.onFailure { error ->
-                snackbarHostState.showErrorSnackbar(
-                    message = "Failed to delete entry: ${error.message}"
-                )
+                Toast.makeText(
+                    context,
+                    deleteFailedMessageTemplate.format(error.message ?: ""),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -176,13 +238,13 @@ fun HomeScreen(
             val result = waterIntakeRepository.updateWaterIntake(oldEntry, newEntry)
 
             result.onSuccess {
-                snackbarHostState.showSuccessSnackbar(
-                    message = "Updated entry to ${newEntry.getFormattedAmount()}"
-                )
+                // No success toast; the updated UI provides enough feedback.
             }.onFailure { error ->
-                snackbarHostState.showErrorSnackbar(
-                    message = "Failed to update entry: ${error.message}"
-                )
+                Toast.makeText(
+                    context,
+                    updateFailedMessageTemplate.format(error.message ?: ""),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -190,284 +252,276 @@ fun HomeScreen(
     // Function to perform manual sync with Health Connect
     fun performManualSync() {
         coroutineScope.launch {
-            if (userProfile.healthConnectSyncEnabled) {
-                isRefreshing = true
-                try {
-                    // Import external hydration data from the last 30 days
-                    val since = java.time.Instant.now().minus(30, java.time.temporal.ChronoUnit.DAYS)
+            if (!userProfile.healthConnectSyncEnabled) {
+                Toast.makeText(
+                    context,
+                    syncDisabledMessage,
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@launch
+            }
 
-                    waterIntakeRepository.getSyncManager().importExternalHydrationData(context, waterIntakeRepository.getUserRepository(), waterIntakeRepository, since) { imported, errors ->
-                        coroutineScope.launch {
-                            // Always show loading for at least 1.5 seconds for better UX
-                            kotlinx.coroutines.delay(1500)
+            isRefreshing = true
+            val refreshStartTime = System.currentTimeMillis()
 
-                            when {
-                                imported > 0 -> {
-                                    snackbarHostState.showSuccessSnackbar(
-                                        message = "Synced $imported entries from Health Connect"
-                                    )
-                                }
-                                errors > 0 -> {
-                                    snackbarHostState.showErrorSnackbar(
-                                        message = "Sync completed with $errors errors"
-                                    )
-                                }
-                                else -> {
-                                    snackbarHostState.showSuccessSnackbar(
-                                        message = "Data is up to date"
-                                    )
-                                }
-                            }
-                            isRefreshing = false
+            try {
+                // Import external hydration data from the last 30 days
+                val since = Instant.now().minus(30, ChronoUnit.DAYS)
+
+                waterIntakeRepository.getSyncManager().importExternalHydrationData(
+                    context,
+                    waterIntakeRepository.getUserRepository(),
+                    waterIntakeRepository,
+                    since
+                ) { imported, errors ->
+                    coroutineScope.launch {
+                        // Keep the refresh indicator visible for at least 1.5 seconds
+                        val elapsed = System.currentTimeMillis() - refreshStartTime
+                        val remaining = 1500L - elapsed
+                        if (remaining > 0) delay(remaining.milliseconds)
+
+                        // Defensive: ensure the sync manager has fully idled before hiding
+                        if (isSyncing) {
+                            waterIntakeRepository.getSyncManager().isSyncing.first { !it }
                         }
+
+                        when {
+                            imported > 0 -> {
+                                Toast.makeText(
+                                    context,
+                                    syncedMessageTemplate.format(imported),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            errors > 0 -> {
+                                Toast.makeText(
+                                    context,
+                                    syncErrorsMessageTemplate.format(errors),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                            else -> {
+                                Toast.makeText(
+                                    context,
+                                    upToDateMessage,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                        isRefreshing = false
                     }
-                } catch (e: Exception) {
-                    // Show loading for at least 1.5 seconds even on error
-                    kotlinx.coroutines.delay(1500)
-                    snackbarHostState.showErrorSnackbar(
-                        message = "Sync failed: ${e.message}"
-                    )
-                    isRefreshing = false
                 }
-            } else {
-                // Show loading animation even when disabled for consistency
-                kotlinx.coroutines.delay(1500)
-                snackbarHostState.showSnackbar(
-                    message = "Health Connect sync is disabled",
-                    actionLabel = "Enable"
-                ).let { result ->
-                    if (result == SnackbarResult.ActionPerformed) {
-                        onNavigateToSettings()
-                    }
+            } catch (e: Exception) {
+                // Keep the refresh indicator visible for at least 1.5 seconds even on error
+                val elapsed = System.currentTimeMillis() - refreshStartTime
+                val remaining = 1500L - elapsed
+                if (remaining > 0) delay(remaining.milliseconds)
+
+                // Defensive: ensure the sync manager has fully idled before hiding
+                if (isSyncing) {
+                    waterIntakeRepository.getSyncManager().isSyncing.first { !it }
                 }
+
+                Toast.makeText(
+                    context,
+                    syncFailedMessageTemplate.format(e.message ?: ""),
+                    Toast.LENGTH_LONG
+                ).show()
                 isRefreshing = false
             }
         }
     }
 
-    // Animation states
-    var isVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        isVisible = true
-    }
-
     // Animate the progress value
     val animatedProgress by animateFloatAsState(
-        targetValue = todayProgress.progress,
+        targetValue = todayProgress?.progress ?: 0f,
         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
         label = "progress_animation"
     )
 
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    val scrollState = rememberScrollState()
-
-    val elevated by remember {
-        derivedStateOf { scrollBehavior.state.collapsedFraction > 0f }
-    }
-    val animatedElevation by animateDpAsState(
-        targetValue = if (elevated) 6.dp else 0.dp,
-        label = "AppBarElevation"
-    )
-
-    // Track scroll direction for FAB collapse/expand
-    var lastScrollValue by remember { mutableIntStateOf(0) }
-    val fabExpanded by remember {
-        derivedStateOf { 
-            val currentScroll = scrollState.value
-            val isScrollingUp = currentScroll < lastScrollValue
-            val isAtTop = currentScroll <= 0
-            
-            // Update last scroll value for next comparison
-            lastScrollValue = currentScroll
-            
-            // Expand when scrolling up or at the top, collapse when scrolling down
-            isScrollingUp || isAtTop
+    val edgeEffectStyle = themePreferences.edgeEffect.let {
+        if (it == EdgeEffect.BLURRED && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            EdgeEffect.TRANSPARENT
+        } else {
+            it
         }
     }
 
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            Surface(
-                tonalElevation = animatedElevation,
-                shadowElevation = animatedElevation
-            ) {
-                TopAppBar(
-                    scrollBehavior = scrollBehavior,
-                    title = {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Text(
-                                text = "HydroTracker",
-                                style = MaterialTheme.typography.headlineLargeEmphasized,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
+    // Backdrop captured for the frosted top band
+    val backdropState = rememberBackdropBlurState()
 
-                            // Health Connect Sync Status Icon
-                            HealthConnectSyncIcon(
-                                userProfile = userProfile,
-                                waterIntakeRepository = waterIntakeRepository,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    ),
-                    actions = {
-                        IconButton(onClick = onNavigateToSettings) {
-                            Icon(
-                                imageVector = Icons.Default.Settings,
-                                contentDescription = "Settings",
-                                tint = MaterialTheme.colorScheme.onSurface,
-                            )
-                        }
-                    }
-                )
-            }
-        },
-        bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-                    label = { Text("Home") },
-                    selected = true,
-                    alwaysShowLabel = true,
-                    onClick = { }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Analytics, contentDescription = "History") },
-                    label = { Text("History") },
-                    selected = false,
-                    alwaysShowLabel = true,
-                    onClick = onNavigateToHistory
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
-                    label = { Text("Profile") },
-                    selected = false,
-                    alwaysShowLabel = true,
-                    onClick = onNavigateToProfile
-                )
-            }
-        },
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = { showCustomDialog = true
-                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick) },
-                expanded = fabExpanded,
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Add Custom Amount"
-                    )
-                },
-                text = {
-                    Text(
-                        text = "Add Custom",
-                        style = MaterialTheme.typography.labelLargeEmphasized
-                    )
-                }
+    val scaleFraction = {
+        if (isRefreshing) 1f
+        else LinearOutSlowInEasing.transform(pullToRefreshState.distanceFraction).coerceIn(0f, 1f)
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .pullToRefresh(
+                state = pullToRefreshState,
+                isRefreshing = isRefreshing,
+                onRefresh = ::performManualSync
             )
-        },
-        snackbarHost = { HydroSnackbarHost(snackbarHostState) }
-    ) { paddingValues ->
-        PullToRefreshBox(
-            isRefreshing = isRefreshing,
-            onRefresh = ::performManualSync,
+    ) {
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            state = pullToRefreshState
+                .then(
+                    if (edgeEffectStyle == EdgeEffect.BLURRED) {
+                        Modifier
+                            .backdropSource(backdropState)
+                            .background(MaterialTheme.colorScheme.background)
+                    } else {
+                        Modifier
+                    }
+                )
+                .verticalScroll(scrollState),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollState),
-                verticalArrangement = Arrangement.spacedBy(14.dp)
-            ) {
+            Spacer(modifier = Modifier.height(paddingValues.calculateTopPadding()))
 
             // Daily Progress Section
-            AnimatedVisibility(
-                visible = isVisible,
-                enter = slideInVertically(
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessMedium
-                    ),
-                    initialOffsetY = { it / 3 }
-                ) + fadeIn(animationSpec = tween(600, delayMillis = 200))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 24.dp)
+                    .padding(horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Card(
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    ),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(20.dp)
-                    ) {
-                        Text(
-                            text = "Daily Progress",
-                            style = MaterialTheme.typography.headlineLargeEmphasized,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                    // Personal greeting
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = timeBasedGreeting() + " " + userProfile.name,
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
 
-                        // Progress amount display
+                    // Hero title
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(R.string.home_label_daily_progress),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.displaySmallEmphasized,
+                    )
+                }
+
+                // Progress amount display
+                val progress = todayProgress
+                if (progress != null) {
+                    Row(
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+                        AnimatedNumber(
+                            targetValue = progress.currentIntake,
+                            formatValue = { value ->
+                                VolumeUnitConverter.format(context, value.toDouble(), userProfile.volumeUnit)
+                            },
+                            style = MaterialTheme.typography.headlineMedium,
+                            animateEntry = false,
+                            hapticsEnabled = true
+                        )
                         Text(
-                            text = "${todayProgress.getFormattedCurrent()} / ${todayProgress.getFormattedGoal()}",
+                            text = " / ${VolumeUnitConverter.format(context, progress.dailyGoal, userProfile.volumeUnit)}",
                             style = MaterialTheme.typography.headlineMedium,
                             color = MaterialTheme.colorScheme.onSurface
                         )
+                    }
+                } else {
+                    CircularWavyProgressIndicator(
+                        modifier = Modifier.size(32.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.primaryContainer,
+                        stroke = WavyProgressIndicatorDefaults.circularIndicatorStroke,
+                        gapSize = WavyProgressIndicatorDefaults.CircularIndicatorTrackGapSize
+                    )
+                }
 
-                        // Wavy Progress Indicator
-                        LinearWavyProgressIndicator(
-                            progress = { animatedProgress },
-                            modifier = Modifier.fillMaxWidth(),
-                            color = MaterialTheme.colorScheme.primary,
-                            trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-                            stroke = WavyProgressIndicatorDefaults.linearIndicatorStroke,
-                            trackStroke = WavyProgressIndicatorDefaults.linearTrackStroke,
-                            amplitude = WavyProgressIndicatorDefaults.indicatorAmplitude,
-                            wavelength = WavyProgressIndicatorDefaults.LinearDeterminateWavelength,
-                            waveSpeed = WavyProgressIndicatorDefaults.LinearDeterminateWavelength
+                // Wavy Progress Indicator
+                LinearWavyProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth(0.5f)
+                        .scale(scaleX = 2f, scaleY = 2f)
+                        .padding(vertical = 16.dp),
+                    progress = { animatedProgress },
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.primaryContainer,
+                    stroke = WavyProgressIndicatorDefaults.linearIndicatorStroke,
+                    trackStroke = WavyProgressIndicatorDefaults.linearTrackStroke,
+                    gapSize = WavyProgressIndicatorDefaults.LinearIndicatorTrackGapSize,
+                    amplitude = WavyProgressIndicatorDefaults.indicatorAmplitude,
+                    wavelength = WavyProgressIndicatorDefaults.LinearIndeterminateWavelength,
+                    waveSpeed = WavyProgressIndicatorDefaults.LinearIndeterminateWavelength
+                )
+
+                // Motivational message
+                Text(
+                    text = getMotivationalMessage(
+                        todayProgress?.progress ?: 0f,
+                        userProfile,
+                        todayProgress?.isGoalAchieved ?: false
+                    ),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                // Additional stats row
+                if (todayStatistics.entryCount > 0) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        AnimatedStatItem(
+                            label = stringResource(R.string.home_label_entries),
+                            targetValue = todayStatistics.entryCount.toDouble(),
+                            formatValue = { it.toInt().toString() }
                         )
-
-                        // Motivational message
-                        Text(
-                            text = getMotivationalMessage(todayProgress.progress, userProfile, todayProgress.isGoalAchieved),
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-
-                        // Additional stats row
-                        if (todayStatistics.entryCount > 0) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly
-                            ) {
-                                StatChip(
-                                    label = "Entries",
-                                    value = "${todayStatistics.entryCount}"
+                        todayStatistics.firstIntakeTime?.let { timestamp ->
+                            val firstIntakeTime = Instant.ofEpochMilli(timestamp)
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalTime()
+                            AnimatedStatItem(
+                                label = stringResource(R.string.home_label_first_intake),
+                                targetValue = (firstIntakeTime.hour * 60 + firstIntakeTime.minute).toDouble(),
+                                formatValue = { minutes ->
+                                    DateTimeFormatters.formatTime(
+                                        context,
+                                        LocalTime.of(
+                                            (minutes.toInt() / 60).coerceIn(0, 23),
+                                            (minutes.toInt() % 60).coerceIn(0, 59)
+                                        ),
+                                        themePreferences.timeFormat
+                                    )
+                                }
+                            )
+                        }
+                        if (todayStatistics.entryCount > 1) {
+                            todayStatistics.lastIntakeTime?.let { timestamp ->
+                                val latestIntakeTime = Instant.ofEpochMilli(timestamp)
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalTime()
+                                AnimatedStatItem(
+                                    label = stringResource(R.string.home_label_latest_intake),
+                                    targetValue = (latestIntakeTime.hour * 60 + latestIntakeTime.minute).toDouble(),
+                                    formatValue = { minutes ->
+                                        DateTimeFormatters.formatTime(
+                                            context,
+                                            LocalTime.of(
+                                                (minutes.toInt() / 60).coerceIn(0, 23),
+                                                (minutes.toInt() % 60).coerceIn(0, 59)
+                                            ),
+                                            themePreferences.timeFormat
+                                        )
+                                    }
                                 )
-                                if (todayStatistics.firstIntakeTime != null) {
-                                    StatChip(
-                                        label = "First",
-                                        value = todayStatistics.firstIntakeTime!!
-                                    )
-                                }
-                                if (todayStatistics.lastIntakeTime != null && todayStatistics.entryCount > 1) {
-                                    StatChip(
-                                        label = "Latest",
-                                        value = todayStatistics.lastIntakeTime!!
-                                    )
-                                }
                             }
                         }
                     }
@@ -477,166 +531,150 @@ fun HomeScreen(
             Card (
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(),
+                    .fillMaxHeight()
+                    .padding(top = 24.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer
                 ),
                 shape = MaterialTheme.shapes.extraLargeIncreased
             ){
-                AnimatedVisibility(
-                    visible = isVisible,
-                    enter = slideInVertically(
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessMedium
-                        ),
-                        initialOffsetY = { it / 2 }
-                    ) + fadeIn(animationSpec = tween(600, delayMillis = 400))
-                ) {
-                    // +1 for the "Add" button at the end
-                    val carouselItemCount = presets.size + 1
-                    val carouselState = rememberCarouselState { carouselItemCount }
+                // +1 for the "Add" button at the end
+                val carouselItemCount = presets.size + 1
+                val carouselState = rememberCarouselState { carouselItemCount }
 
-                    Column(
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                        .padding(horizontal = 16.dp)
+                        .animateContentSize()
+                        .graphicsLayer(clip = false),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // Beverage Selection Section
+                    BeverageSelectionSection(
+                        selectedBeverage = selectedBeverage,
+                        onBeverageChange = { beverage ->
+                            selectedBeverage = beverage
+                            haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                        },
+                        beverages = activeBeverages,
+                        useBeverageColors = themePreferences.useBeverageColors,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    HorizontalUncontainedCarousel(
+                        state = carouselState,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 16.dp, bottom = 12.dp)
-                            .padding(horizontal = 20.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Text(
-                            text = "Quick Select",
-                            style = MaterialTheme.typography.titleLargeEmphasized,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-
-                        HorizontalMultiBrowseCarousel(
-                            state = carouselState,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(135.dp),
-                            preferredItemWidth = 130.dp,
-                            itemSpacing = 8.dp,
-                        ) { index ->
-                            if (index < presets.size) {
-                                val preset = presets[index]
-                                CarouselWaterCard(
-                                    preset = preset,
-                                    onClick = {
-                                        addWaterIntake(preset.volume, preset.name)
-                                        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
-                                    },
-                                    onLongPress = {
-                                        presetToEdit = preset
-                                        showEditPresetSheet = true
-                                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    },
-                                    modifier = Modifier
-                                        .height(130.dp)
-                                        .maskClip(MaterialTheme.shapes.extraLarge)
-                                )
-                            } else {
-                                // Add button at the end
-                                AddContainerCard(
-                                    onClick = {
-                                        showAddPresetSheet = true
-                                        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
-                                    },
-                                    modifier = Modifier
-                                        .height(130.dp)
-                                        .maskClip(MaterialTheme.shapes.extraLarge)
-                                )
-                            }
+                            .height(155.dp),
+                        itemWidth = 150.dp,
+                        itemSpacing = 8.dp,
+                    ) { index ->
+                        if (index < presets.size) {
+                            val preset = presets[index]
+                            CarouselWaterCard(
+                                preset = preset,
+                                userProfile = userProfile,
+                                selectedBeverageKey = selectedBeverage.storageKey,
+                                useBeverageColors = themePreferences.useBeverageColors,
+                                onClick = {
+                                    addWaterIntake(preset.volume, preset.name)
+                                    haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                                },
+                                onLongPress = {
+                                    presetToEdit = preset
+                                    showEditPresetSheet = true
+                                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                },
+                                modifier = Modifier
+                                    .height(150.dp)
+                                    .maskClip(SquircleShape())
+                            )
+                        } else {
+                            // Add button at the end
+                            AddContainerCard(
+                                selectedBeverageKey = selectedBeverage.storageKey,
+                                useBeverageColors = themePreferences.useBeverageColors,
+                                onClick = {
+                                    showAddPresetSheet = true
+                                    haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                                },
+                                modifier = Modifier
+                                    .height(150.dp)
+                                    .maskClip(SquircleShape())
+                            )
                         }
-
-                        // Beverage Selection Section
-                        BeverageSelectionSection(
-                            selectedBeverageType = selectedBeverageType,
-                            onBeverageTypeChange = { beverageType ->
-                                selectedBeverageType = beverageType
-                                haptics.performHapticFeedback(HapticFeedbackType.Confirm)
-                            },
-                            beverageTypes = activeBeverageTypes,
-                            modifier = Modifier.fillMaxWidth()
-                        )
                     }
+
+                    // Effective hydration info for non-water beverages
+                    EffectiveHydrationInfoCard(
+                        selectedBeverage = selectedBeverage,
+                        beverages = activeBeverages,
+                        useBeverageColors = themePreferences.useBeverageColors,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
 
                 // Recent Entries Section
-                if (todayEntries.isNotEmpty()) {
-                    AnimatedVisibility(
-                        visible = isVisible,
-                        enter = slideInVertically(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessMedium
-                            ),
-                            initialOffsetY = { it / 2 }
-                        ) + fadeIn(animationSpec = tween(600, delayMillis = 500))
-                    ) {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer
-                            )
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(20.dp),
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                Text(
-                                    text = "Recent Entries",
-                                    style = MaterialTheme.typography.titleLargeEmphasized,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                )
-
-                                todayEntries.forEach { entry ->
-                                    key(entry.id) {
-                                        RecentEntryItem(
-                                            entry = entry,
-                                            onEdit = { entry ->
-                                                entryToEdit = entry
-                                                showEditDialog = true
-                                            },
-                                            onDelete = { entryToDelete ->
-                                                deleteWaterIntake(entryToDelete)
-                                            }
-                                        )
-                                        HorizontalDivider()
-                                    }
-                                }
-                            }
-                        }
+                DailyEntriesSection(
+                    entries = todayEntries,
+                    userProfile = userProfile,
+                    themePreferences = themePreferences,
+                    tonalElevation = 0.dp,
+                    onEdit = { entry ->
+                        entryToEdit = entry
+                        showEditDialog = true
+                    },
+                    onDelete = { entryToDelete ->
+                        deleteWaterIntake(entryToDelete)
                     }
-                }
+                )
             }
 
-            // Bottom spacing for FAB
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(paddingValues.calculateBottomPadding()))
+        }
+
+        TopEdgeEffect(
+            style = edgeEffectStyle,
+            backdropState = backdropState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
+
+        Box(
+            modifier = Modifier.align(Alignment.TopCenter).graphicsLayer {
+                scaleX = scaleFraction()
+                scaleY = scaleFraction()
             }
+        ) {
+            PullToRefreshDefaults.LoadingIndicator(state= pullToRefreshState, isRefreshing = isRefreshing)
         }
     }
 
-    // Custom Water Entry Dialog
+    // Custom Water Entry Dialogue
     if (showCustomDialog) {
         CustomWaterDialog(
-            onDismiss = { showCustomDialog = false },
+            onDismiss = { onCustomDialogChange(false) },
             onConfirm = { amount ->
                 addWaterIntake(amount, "Custom")
-                showCustomDialog = false
+                onCustomDialogChange(false)
             },
-            selectedBeverageType = selectedBeverageType,
-            onBeverageTypeChange = { newType ->
-                selectedBeverageType = newType
+            selectedBeverage = selectedBeverage,
+            onBeverageChange = { newBeverage ->
+                selectedBeverage = newBeverage
             },
-            beverageTypes = activeBeverageTypes
+            volumeUnit = userProfile.volumeUnit,
+            beverages = activeBeverages,
+            useBeverageColors = themePreferences.useBeverageColors
         )
     }
 
-    // Edit Water Entry Dialog
+    // Edit Water Entry Dialogue
     if (showEditDialog && entryToEdit != null) {
         EditWaterDialog(
             entry = entryToEdit!!,
+            themePreferences = themePreferences,
+            volumeUnit = userProfile.volumeUnit,
             onDismiss = {
                 showEditDialog = false
                 entryToEdit = null
@@ -646,21 +684,24 @@ fun HomeScreen(
                 showEditDialog = false
                 entryToEdit = null
             },
-            beverageTypes = activeBeverageTypes
+            beverages = activeBeverages
         )
     }
 
     // Add Container Preset Bottom Sheet
     if (showAddPresetSheet) {
         AddContainerPresetBottomSheet(
+            volumeUnit = userProfile.volumeUnit,
             onDismiss = { showAddPresetSheet = false },
-            onAdd = { name, volume ->
+            onAdd = { name, volume, iconType, iconName ->
                 coroutineScope.launch {
-                    containerPresetRepository.addPreset(name, volume)
+                    containerPresetRepository.addPreset(name, volume, iconType, iconName)
                     showAddPresetSheet = false
-                    snackbarHostState.showSuccessSnackbar(
-                        message = "Added \"$name\" container"
-                    )
+                    Toast.makeText(
+                        context,
+                        containerAddedTemplate.format(name),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         )
@@ -670,18 +711,21 @@ fun HomeScreen(
     if (showEditPresetSheet && presetToEdit != null) {
         EditContainerPresetBottomSheet(
             preset = presetToEdit!!,
+            volumeUnit = userProfile.volumeUnit,
             onDismiss = {
                 showEditPresetSheet = false
                 presetToEdit = null
             },
-            onSave = { name, volume ->
+            onSave = { name, volume, iconType, iconName ->
                 coroutineScope.launch {
-                    containerPresetRepository.updatePreset(presetToEdit!!.id, name, volume)
+                    containerPresetRepository.updatePreset(presetToEdit!!.id, name, volume, iconType, iconName)
                     showEditPresetSheet = false
                     presetToEdit = null
-                    snackbarHostState.showSuccessSnackbar(
-                        message = "Updated \"$name\" container"
-                    )
+                    Toast.makeText(
+                        context,
+                        containerUpdatedTemplate.format(name),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             },
             onDelete = {
@@ -690,1078 +734,210 @@ fun HomeScreen(
                     containerPresetRepository.deletePreset(presetToEdit!!.id)
                     showEditPresetSheet = false
                     presetToEdit = null
-                    snackbarHostState.showSuccessSnackbar(
-                        message = "Deleted \"$deletedName\" container"
-                    )
+                    Toast.makeText(
+                        context,
+                        containerDeletedTemplate.format(deletedName),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         )
+    }
+}
+
+/**
+ * Top-edge treatment for the Home screen, chosen by the user's [EdgeEffect] setting:
+ *  - [EdgeEffect.TRANSPARENT]: nothing (content runs edge-to-edge under the status bar).
+ *  - [EdgeEffect.SCRIM]: a plain surface→transparent gradient fade.
+ *  - [EdgeEffect.BLURRED]: a variable-radius backdrop blur of the captured content.
+ *
+ * The band is fixed height (status bar + app bar area) and sits above the content but below the app bar title.
+ */
+@Composable
+private fun TopEdgeEffect(
+    style: EdgeEffect,
+    backdropState: BackdropBlurState,
+    modifier: Modifier = Modifier
+) {
+    val bandHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 40.dp
+
+    when (style) {
+        EdgeEffect.TRANSPARENT -> Unit
+        EdgeEffect.SCRIM -> {
+            val scrimColor = MaterialTheme.colorScheme.surface
+            Box(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .height(bandHeight)
+                    .drawBehind {
+                        drawRect(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(scrimColor, Color.Transparent)
+                            )
+                        )
+                    }
+            )
+        }
+        EdgeEffect.BLURRED -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Box(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .height(bandHeight)
+                        .backdropBlur(
+                            state = backdropState,
+                            style = BackdropBlurStyle(
+                                blurRadius = 10.dp,
+                                progressive = BackdropProgressive(
+                                    startFraction = 0f,
+                                    endFraction = 1f
+                                ),
+                                tint = MaterialTheme.colorScheme.surface.copy(0.3f)
+                            )
+                        )
+                )
+            }
+        }
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CarouselWaterCard(
+    modifier: Modifier = Modifier,
     preset: ContainerPreset,
+    userProfile: UserProfile,
+    selectedBeverageKey: String = BeverageType.WATER.name,
+    useBeverageColors: Boolean = false,
     onClick: () -> Unit,
-    onLongPress: () -> Unit = {},
-    modifier: Modifier = Modifier
+    onLongPress: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val beverageColors = rememberBeverageColorRoles(
+        beverageKey = selectedBeverageKey,
+        useBeverageColors = useBeverageColors
+    )
+    val containerColor by animateColorAsState(
+        targetValue = beverageColors.color,
+        animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
+        label = "carousel_card_container_color"
+    )
+    val contentColor by animateColorAsState(
+        targetValue = beverageColors.onColor,
+        animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
+        label = "carousel_card_content_color"
+    )
+
     Box(
         modifier = modifier
-            .clip(MaterialTheme.shapes.extraLarge)
-            .background(MaterialTheme.colorScheme.primaryContainer)
+            .clip(SquircleShape())
+            .background(containerColor)
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongPress
             ),
         contentAlignment = Alignment.Center,
-    ) {
+) {
+        val presetLabel = if (preset.labelResId != 0) {
+            stringResource(preset.labelResId)
+        } else {
+            preset.name
+        }
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceEvenly,
+            verticalArrangement = Arrangement.spacedBy(12.dp, alignment = Alignment.CenterVertically),
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 10.dp, bottom = 10.dp)
         ) {
             when {
                 preset.iconRes != null -> {
                     Icon(
                         painter = painterResource(preset.iconRes),
-                        contentDescription = preset.name,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
-                preset.icon != null -> {
-                    Icon(
-                        imageVector = preset.icon,
-                        contentDescription = preset.name,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        contentDescription = presetLabel,
+                        tint = contentColor,
                         modifier = Modifier.size(32.dp)
                     )
                 }
                 else -> {
                     Icon(
                         imageVector = Icons.Default.WaterDrop,
-                        contentDescription = preset.name,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        contentDescription = presetLabel,
+                        tint = contentColor,
                         modifier = Modifier.size(32.dp)
                     )
                 }
             }
 
-            Text(
-                text = preset.name,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                textAlign = TextAlign.Center,
-                maxLines = 2
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = presetLabel,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = contentColor,
+                    maxLines = 2
+                )
 
-            Text(
-                text = preset.getFormattedVolume(),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
+                Text(
+                    text = preset.getFormattedVolume(context, userProfile.volumeUnit),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = contentColor
+                )
+            }
         }
     }
 }
 
 @Composable
 fun AddContainerCard(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    selectedBeverageKey: String = BeverageType.WATER.name,
+    useBeverageColors: Boolean = false,
+    onClick: () -> Unit
 ) {
+    val beverageColors = rememberBeverageColorRoles(
+        beverageKey = selectedBeverageKey,
+        useBeverageColors = useBeverageColors
+    )
+    val containerColor by animateColorAsState(
+        targetValue = beverageColors.containerColor,
+        animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
+        label = "carousel_card_container_color"
+    )
+    val contentColor by animateColorAsState(
+        targetValue = beverageColors.onContainerColor,
+        animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
+        label = "carousel_card_content_color"
+    )
+
     Box(
         modifier = modifier
-            .clip(MaterialTheme.shapes.extraLarge)
-            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+            .clip(SquircleShape())
+            .background(containerColor)
             .clickable { onClick() },
         contentAlignment = Alignment.Center,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp, alignment = Alignment.CenterVertically),
+            modifier = Modifier.fillMaxSize()
         ) {
             Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add container",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                imageVector = ImageVector.vectorResource(R.drawable.add_filled),
+                contentDescription = stringResource(R.string.cd_add_container),
+                tint = contentColor,
                 modifier = Modifier.size(32.dp)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
-
             Text(
-                text = "Add",
+                text = stringResource(R.string.home_add_container_label),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = contentColor,
                 textAlign = TextAlign.Center
             )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun CustomWaterDialog(
-    onDismiss: () -> Unit,
-    onConfirm: (Double) -> Unit,
-    selectedBeverageType: BeverageType,
-    onBeverageTypeChange: (BeverageType) -> Unit,
-    beverageTypes: List<BeverageType> = BeverageType.getAllSorted()
-) {
-    var amountText by remember { mutableStateOf("") }
-    var isError by remember { mutableStateOf(false) }
-
-    Dialog(onDismissRequest = onDismiss) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.extraLargeIncreased,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text(
-                    text = "Add Custom Amount",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-
-                // Beverage Type Selection Dropdown
-                var beverageExpanded by remember { mutableStateOf(false) }
-
-                ExposedDropdownMenuBox(
-                    expanded = beverageExpanded,
-                    onExpandedChange = { beverageExpanded = !beverageExpanded }
-                ) {
-                    OutlinedTextField(
-                        value = selectedBeverageType.displayName,
-                        onValueChange = { },
-                        readOnly = true,
-                        label = { Text("Beverage Type") },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(selectedBeverageType.iconRes),
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        },
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = beverageExpanded)
-                        },
-                        modifier = Modifier
-                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                            .fillMaxWidth()
-                    )
-
-                    ExposedDropdownMenu(
-                        expanded = beverageExpanded,
-                        onDismissRequest = { beverageExpanded = false }
-                    ) {
-                        beverageTypes.forEach { beverageType ->
-                            DropdownMenuItem(
-                                text = {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(beverageType.iconRes),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(20.dp)
-                                        )
-                                        Column {
-                                            Text(
-                                                text = beverageType.displayName,
-                                                style = MaterialTheme.typography.bodyLarge
-                                            )
-                                            Text(
-                                                text = "${(beverageType.hydrationMultiplier * 100).toInt()}% hydration",
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                        }
-                                    }
-                                },
-                                onClick = {
-                                    onBeverageTypeChange(beverageType)
-                                    beverageExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-
-                // Show selected beverage info
-                if (selectedBeverageType != BeverageType.WATER) {
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Text(
-                                text = "Selected: ${selectedBeverageType.displayName}",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Medium
-                            )
-                            Text(
-                                text = selectedBeverageType.description,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                text = "Hydration effectiveness: ${(selectedBeverageType.hydrationMultiplier * 100).toInt()}%",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    }
-                }
-
-                OutlinedTextField(
-                    value = amountText,
-                    onValueChange = {
-                        amountText = it
-                        isError = false
-                    },
-                    label = { Text("Amount (ml)") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    isError = isError,
-                    supportingText = if (isError) {
-                        { Text("Please enter a valid amount (1-5000 ml)") }
-                    } else null,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(onClick = onDismiss) {
-                        Text("Cancel")
-                    }
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Button(
-                        shapes = ButtonDefaults.shapes(),
-                        onClick = {
-                            val amount = amountText.toDoubleOrNull()
-                            if (amount != null && amount > 0 && amount <= 5000) {
-                                onConfirm(amount)
-                            } else {
-                                isError = true
-                            }
-                        }
-                    ) {
-                        Text("Add")
-                    }
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun EditWaterDialog(
-    entry: WaterIntakeEntry,
-    onDismiss: () -> Unit,
-    onConfirm: (WaterIntakeEntry) -> Unit,
-    beverageTypes: List<BeverageType> = BeverageType.getAllSorted()
-) {
-    var amountText by remember { mutableStateOf(entry.amount.toString()) }
-    var containerType by remember { mutableStateOf(entry.containerType) }
-    var selectedBeverageType by remember {
-        mutableStateOf(
-            entry.getBeverageType().let { t -> if (t in beverageTypes) t else BeverageType.WATER }
-        )
-    }
-    var isError by remember { mutableStateOf(false) }
-
-    // Time picker state
-    var showTimePicker by remember { mutableStateOf(false) }
-    val calendar = remember {
-        java.util.Calendar.getInstance().apply {
-            timeInMillis = entry.timestamp
-        }
-    }
-    var selectedHour by remember { mutableIntStateOf(calendar.get(java.util.Calendar.HOUR_OF_DAY)) }
-    var selectedMinute by remember { mutableIntStateOf(calendar.get(java.util.Calendar.MINUTE)) }
-
-    val timePickerState = rememberTimePickerState(
-        initialHour = selectedHour,
-        initialMinute = selectedMinute,
-        is24Hour = true
-    )
-
-    val presets = remember { ContainerPreset.getDefaultPresets() }
-    val isExternalEntry = entry.isExternalEntry()
-
-    Dialog(onDismissRequest = onDismiss) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.extraLargeIncreased,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text(
-                    text = if (isExternalEntry) "External Water Entry" else "Edit Water Entry",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-
-                // Warning message for external entries
-                if (isExternalEntry) {
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Info,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onErrorContainer
-                            )
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = "Entry from another app",
-                                    style = MaterialTheme.typography.titleSmall,
-                                    fontWeight = FontWeight.Medium,
-                                    color = MaterialTheme.colorScheme.onErrorContainer
-                                )
-                                Text(
-                                    text = "This entry was imported from another health app and cannot be edited. You can only view its details.",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onErrorContainer
-                                )
-                            }
-                        }
-                    }
-                }
-
-                // Container type dropdown (disabled for external entries)
-                var expanded by remember { mutableStateOf(false) }
-
-                ExposedDropdownMenuBox(
-                    expanded = expanded && !isExternalEntry,
-                    onExpandedChange = { if (!isExternalEntry) expanded = !expanded }
-                ) {
-                    OutlinedTextField(
-                        value = containerType,
-                        onValueChange = { },
-                        readOnly = true,
-                        enabled = !isExternalEntry,
-                        label = { Text("Container Type") },
-                        trailingIcon = {
-                            if (!isExternalEntry) {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                            }
-                        },
-                        modifier = Modifier
-                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                            .fillMaxWidth()
-                    )
-
-                    if (!isExternalEntry) {
-                        ExposedDropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
-                            presets.forEach { preset ->
-                                DropdownMenuItem(
-                                    text = { Text(preset.name) },
-                                    onClick = {
-                                        containerType = preset.name
-                                        amountText = preset.volume.toString()
-                                        expanded = false
-                                    }
-                                )
-                            }
-                            DropdownMenuItem(
-                                text = { Text("Custom") },
-                                onClick = {
-                                    containerType = "Custom"
-                                    expanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-
-                // Beverage Type Selection Dropdown (disabled for external entries)
-                if (!isExternalEntry) {
-                    var beverageExpanded by remember { mutableStateOf(false) }
-
-                    ExposedDropdownMenuBox(
-                        expanded = beverageExpanded,
-                        onExpandedChange = { beverageExpanded = !beverageExpanded }
-                    ) {
-                        OutlinedTextField(
-                            value = selectedBeverageType.displayName,
-                            onValueChange = { },
-                            readOnly = true,
-                            label = { Text("Beverage Type") },
-                            leadingIcon = {
-                                Icon(
-                                    painter = painterResource(selectedBeverageType.iconRes),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            },
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = beverageExpanded)
-                            },
-                            modifier = Modifier
-                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                                .fillMaxWidth()
-                        )
-
-                        ExposedDropdownMenu(
-                            expanded = beverageExpanded,
-                            onDismissRequest = { beverageExpanded = false }
-                        ) {
-                            beverageTypes.forEach { beverageType ->
-                                DropdownMenuItem(
-                                    text = {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                        ) {
-                                            Icon(
-                                                painter = painterResource(beverageType.iconRes),
-                                                contentDescription = null,
-                                                modifier = Modifier.size(20.dp)
-                                            )
-                                            Column {
-                                                Text(
-                                                    text = beverageType.displayName,
-                                                    style = MaterialTheme.typography.bodyLarge
-                                                )
-                                                Text(
-                                                    text = "${(beverageType.hydrationMultiplier * 100).toInt()}% hydration",
-                                                    style = MaterialTheme.typography.bodySmall,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                )
-                                            }
-                                        }
-                                    },
-                                    onClick = {
-                                        selectedBeverageType = beverageType
-                                        beverageExpanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-
-                // Time picker field (disabled for external entries)
-                Box(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    OutlinedTextField(
-                        value = String.format(java.util.Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute),
-                        onValueChange = { },
-                        readOnly = true,
-                        enabled = !isExternalEntry,
-                        label = { Text("Time") },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Schedule,
-                                contentDescription = null
-                            )
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    // Invisible clickable overlay to capture clicks
-                    if (!isExternalEntry) {
-                        Box(
-                            modifier = Modifier
-                                .matchParentSize()
-                                .clickable { showTimePicker = true }
-                        )
-                    }
-                }
-
-                // Amount field (disabled for external entries)
-                OutlinedTextField(
-                    value = amountText,
-                    onValueChange = {
-                        if (!isExternalEntry) {
-                            amountText = it
-                            isError = false
-                        }
-                    },
-                    enabled = !isExternalEntry,
-                    label = { Text("Amount (ml)") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    isError = isError && !isExternalEntry,
-                    supportingText = if (isError && !isExternalEntry) {
-                        { Text("Please enter a valid amount (1-5000 ml)") }
-                    } else null,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(onClick = onDismiss) {
-                        Text(if (isExternalEntry) "Close" else "Cancel")
-                    }
-
-                    if (!isExternalEntry) {
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        Button(
-                            shapes = ButtonDefaults.shapes(),
-                            onClick = {
-                                val amount = amountText.toDoubleOrNull()
-                                if (amount != null && amount > 0 && amount <= 5000) {
-                                    // Calculate new timestamp with selected time
-                                    val newCalendar = java.util.Calendar.getInstance().apply {
-                                        timeInMillis = entry.timestamp
-                                        set(java.util.Calendar.HOUR_OF_DAY, selectedHour)
-                                        set(java.util.Calendar.MINUTE, selectedMinute)
-                                        set(java.util.Calendar.SECOND, 0)
-                                        set(java.util.Calendar.MILLISECOND, 0)
-                                    }
-
-                                    val updatedEntry = entry.copy(
-                                        amount = amount,
-                                        containerType = containerType,
-                                        beverageType = selectedBeverageType.name,
-                                        timestamp = newCalendar.timeInMillis
-                                    )
-                                    onConfirm(updatedEntry)
-                                } else {
-                                    isError = true
-                                }
-                            }
-                        ) {
-                            Text("Update")
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // Time Picker Dialog
-    if (showTimePicker) {
-        Dialog(onDismissRequest = { showTimePicker = false }) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = MaterialTheme.shapes.extraLargeIncreased,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            ) {
-                Column(
-                    modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Text(
-                        text = "Select Time",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    TimePicker(
-                        state = timePickerState,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        TextButton(onClick = { showTimePicker = false }) {
-                            Text("Cancel")
-                        }
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        Button(
-                            shapes = ButtonDefaults.shapes(),
-                            onClick = {
-                                selectedHour = timePickerState.hour
-                                selectedMinute = timePickerState.minute
-                                showTimePicker = false
-                            }
-                        ) {
-                            Text("OK")
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun StatChip(
-    label: String,
-    value: String
-) {
-    Surface(
-        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
-        shape = MaterialTheme.shapes.small,
-        modifier = Modifier.padding(horizontal = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = value,
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
-        }
-    }
-}
-
-@Composable
-private fun RecentEntryItem(
-    entry: WaterIntakeEntry,
-    onEdit: (WaterIntakeEntry) -> Unit = {},
-    onDelete: (WaterIntakeEntry) -> Unit = {}
-) {
-    // Find a matching preset to fetch its icon (res or vector)
-    val preset = remember(entry.containerType) {
-        ContainerPreset.getDefaultPresets()
-            .firstOrNull { it.name == entry.containerType }
-    }
-
-    var showDeleteDialog by remember { mutableStateOf(false) }
-    val hapticFeedback = LocalHapticFeedback.current
-
-    val dismissState = rememberSwipeToDismissBoxState(
-        initialValue = SwipeToDismissBoxValue.Settled,
-        positionalThreshold = { distance -> distance * 0.5f }
-    )
-
-    // Handle state changes and actions
-    LaunchedEffect(dismissState.currentValue) {
-        when (dismissState.currentValue) {
-            SwipeToDismissBoxValue.StartToEnd -> {
-                // Right swipe - Edit
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                onEdit(entry)
-                // Reset to center after action
-                kotlinx.coroutines.delay(100)
-                dismissState.snapTo(SwipeToDismissBoxValue.Settled)
-            }
-            SwipeToDismissBoxValue.EndToStart -> {
-                // Left swipe - Show delete confirmation
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                showDeleteDialog = true
-                // Reset to center after showing dialog
-                kotlinx.coroutines.delay(100)
-                dismissState.snapTo(SwipeToDismissBoxValue.Settled)
-            }
-            SwipeToDismissBoxValue.Settled -> {
-                // No action needed
-            }
-        }
-    }
-
-    SwipeToDismissBox(
-        state = dismissState,
-        modifier = Modifier.fillMaxWidth(),
-        backgroundContent = {
-            val direction = dismissState.dismissDirection
-            val alignment = when (direction) {
-                SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
-                SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
-                SwipeToDismissBoxValue.Settled -> Alignment.Center
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        color = when (direction) {
-                            SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primaryContainer
-                            SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.errorContainer
-                            SwipeToDismissBoxValue.Settled -> MaterialTheme.colorScheme.surface
-                        },
-                        shape = MaterialTheme.shapes.extraLargeIncreased
-                    )
-                    .padding(horizontal = 20.dp),
-                contentAlignment = alignment
-            ) {
-                when (direction) {
-                    SwipeToDismissBoxValue.StartToEnd -> {
-                        // Edit action
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = "Edit entry",
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Text(
-                                text = "Edit",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    }
-                    SwipeToDismissBoxValue.EndToStart -> {
-                        // Delete action
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(
-                                text = "Delete",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onErrorContainer,
-                                fontWeight = FontWeight.Medium
-                            )
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete entry",
-                                tint = MaterialTheme.colorScheme.onErrorContainer,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    }
-                    SwipeToDismissBoxValue.Settled -> {
-                        // No action
-                    }
-                }
-            }
-        }
-    ) {
-        // Main list item content
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.extraLargeIncreased,
-            color = MaterialTheme.colorScheme.surfaceContainer
-        ) {
-            ListItem(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                colors = ListItemDefaults.colors(
-                    MaterialTheme.colorScheme.surfaceContainer
-                ),
-                leadingContent = {
-                    Surface(
-                        shape = MaterialTheme.shapes.large,
-                        color = MaterialTheme.colorScheme.primaryContainer,
-                        tonalElevation = 2.dp,
-                        modifier = Modifier.size(56.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            when {
-                                preset?.iconRes != null -> {
-                                    Icon(
-                                        painter = painterResource(preset.iconRes),
-                                        contentDescription = preset.name,
-                                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                }
-                                preset?.icon != null -> {
-                                    Icon(
-                                        imageVector = preset.icon,
-                                        contentDescription = preset.name,
-                                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                }
-                                else -> {
-                                    Icon(
-                                        imageVector = Icons.Default.WaterDrop,
-                                        contentDescription = entry.containerType,
-                                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                },
-                headlineContent = {
-                    Text(
-                        text = entry.containerType,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                },
-                supportingContent = {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(2.dp)
-                    ) {
-                        Text(
-                            text = entry.getFormattedTime(),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        if (entry.getBeverageType() != BeverageType.WATER) {
-                            Text(
-                                text = "${entry.getBeverageType().displayName} • ${entry.getFormattedEffectiveAmount()} effective",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-                },
-                trailingContent = {
-                    Column(
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        Text(
-                            text = entry.getFormattedAmount(),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            text = "Edit → • ← Delete",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.outline,
-                            modifier = Modifier.padding(top = 2.dp)
-                        )
-                    }
-                }
-            )
-        }
-    }
-
-    // Delete confirmation dialog
-    if (showDeleteDialog) {
-        DeleteConfirmationDialog(
-            entry = entry,
-            onConfirm = {
-                onDelete(entry)
-                showDeleteDialog = false
-            },
-            onDismiss = {
-                showDeleteDialog = false
-            }
-        )
-    }
-}
-
-@Composable
-private fun DeleteConfirmationDialog(
-    entry: WaterIntakeEntry,
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    Dialog(onDismissRequest = onDismiss) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.extraLargeIncreased,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete",
-                        tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Text(
-                        text = "Delete Entry",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-
-                Text(
-                    text = "Are you sure you want to delete this ${entry.getFormattedAmount()} ${entry.containerType} entry?",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                Text(
-                    text = "This action cannot be undone.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(onClick = onDismiss) {
-                        Text("Cancel")
-                    }
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Button(
-                        onClick = onConfirm,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.error
-                        ),
-                        shapes = ButtonDefaults.shapes()
-                    ) {
-                        Text(
-                            text = "Delete",
-                            color = MaterialTheme.colorScheme.onError
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-private fun getMotivationalMessage(progress: Float, userProfile: UserProfile, isGoalAchieved: Boolean): String {
-    return when {
-        isGoalAchieved -> "🎉 Amazing! You've reached your daily goal!"
-        progress >= 0.75f -> "💪 You're doing great! Almost there!"
-        progress >= 0.5f -> "🌟 Halfway there! Keep up the good work!"
-        progress >= 0.25f -> "👍 Good start! Stay consistent!"
-        else -> userProfile.activityLevel.getHydrationTip()
-    }
-}
-
-@Composable
-private fun HealthConnectSyncIcon(
-    userProfile: UserProfile,
-    waterIntakeRepository: WaterIntakeRepository,
-    modifier: Modifier = Modifier
-) {
-    val context = LocalContext.current
-    var syncStatus by remember { mutableStateOf(HealthConnectSyncManager.SyncStatus.DISABLED) }
-
-    // Get the HealthConnectSyncManager from the waterIntakeRepository
-    val syncManager = remember { waterIntakeRepository.getSyncManager() }
-
-    // Monitor sync state from the actual sync manager
-    val isSyncing by syncManager.isSyncing.collectAsState()
-
-    // Check sync status
-    LaunchedEffect(userProfile.healthConnectSyncEnabled) {
-        if (!userProfile.healthConnectSyncEnabled) {
-            syncStatus = HealthConnectSyncManager.SyncStatus.DISABLED
-            return@LaunchedEffect
-        }
-
-        syncStatus = try {
-            when {
-                !HealthConnectManager.isAvailable(context) -> HealthConnectSyncManager.SyncStatus.UNAVAILABLE
-                !HealthConnectManager.hasPermissions(context) -> HealthConnectSyncManager.SyncStatus.NO_PERMISSIONS
-                else -> HealthConnectSyncManager.SyncStatus.READY
-            }
-        } catch (_: Exception) {
-            HealthConnectSyncManager.SyncStatus.ERROR
-        }
-    }
-
-    // Animated sync indicator with smooth transitions
-    AnimatedContent(
-        targetState = Pair(syncStatus, isSyncing),
-        transitionSpec = {
-            fadeIn(animationSpec = tween(500)) togetherWith
-            fadeOut(animationSpec = tween(500))
-        },
-        modifier = modifier,
-        label = "sync_icon_transition"
-    ) { (status, syncing) ->
-        when (status) {
-            HealthConnectSyncManager.SyncStatus.READY -> {
-                if (syncing) {
-                    // Outlined primary colored cloud for active syncing
-                    Icon(
-                        imageVector = Icons.Outlined.Cloud,
-                        contentDescription = "Health Connect syncing",
-                        modifier = Modifier.fillMaxSize(),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                } else {
-                    // Filled rounded onSurface colored cloud for synced state
-                    Icon(
-                        imageVector = Icons.Rounded.Cloud,
-                        contentDescription = "Health Connect synced",
-                        modifier = Modifier.fillMaxSize(),
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
-            HealthConnectSyncManager.SyncStatus.DISABLED -> {
-                // No icon when disabled
-            }
-            HealthConnectSyncManager.SyncStatus.UNAVAILABLE,
-            HealthConnectSyncManager.SyncStatus.NO_PERMISSIONS -> {
-                // Warning icon for issues
-                Icon(
-                    imageVector = Icons.Default.CloudOff,
-                    contentDescription = "Health Connect not available",
-                    modifier = Modifier.fillMaxSize(),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            HealthConnectSyncManager.SyncStatus.ERROR -> {
-                // Error icon
-                Icon(
-                    imageVector = Icons.Default.ErrorOutline,
-                    contentDescription = "Health Connect error",
-                    modifier = Modifier.fillMaxSize(),
-                    tint = MaterialTheme.colorScheme.error
-                )
-            }
         }
     }
 }
@@ -1769,150 +945,384 @@ private fun HealthConnectSyncIcon(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun BeverageSelectionSection(
-    selectedBeverageType: BeverageType,
-    onBeverageTypeChange: (BeverageType) -> Unit,
-    beverageTypes: List<BeverageType> = BeverageType.getAllSorted(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    selectedBeverage: BeverageOption,
+    onBeverageChange: (BeverageOption) -> Unit,
+    beverages: List<BeverageOption> = BeverageType.getAllSorted().map { it.toOption() },
+    useBeverageColors: Boolean = false,
 ) {
     val haptics = LocalHapticFeedback.current
 
-    val safeSelected = if (selectedBeverageType in beverageTypes) selectedBeverageType else beverageTypes.first()
-    LaunchedEffect(beverageTypes) {
-        if (selectedBeverageType !in beverageTypes) onBeverageTypeChange(BeverageType.WATER)
+    val safeSelected = if (selectedBeverage in beverages) selectedBeverage else beverages.first()
+    LaunchedEffect(beverages) {
+        if (selectedBeverage !in beverages) onBeverageChange(beverages.firstOrNull { it.isWater } ?: beverages.first())
     }
 
-    Column(
-        modifier = modifier.padding(horizontal = 5.dp, vertical = 5.dp),
-        verticalArrangement = Arrangement.spacedBy(5.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+    // Horizontally scrollable connected toggle-button group
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
     ) {
-        // Horizontally scrollable chips
-        LazyRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(horizontal = 4.dp)
-        ) {
-            items(beverageTypes) { beverageType ->
-                val isSelected = safeSelected == beverageType
+        beverages.forEach { beverage ->
+            val isSelected = safeSelected == beverage
 
-                FilterChip(
-                    shape = if (isSelected){
-                        MaterialTheme.shapes.medium
-                    } else {
-                        MaterialTheme.shapes.extraLarge
-                    },
-                    onClick = {
-                        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
-                        onBeverageTypeChange(beverageType)
-                    },
-                    label = {
-                        if (isSelected){
-                            Text(
-                                text = beverageType.displayName,
-                                style = MaterialTheme.typography.labelMediumEmphasized,
-                                textAlign = TextAlign.Center
-                            )
-                        } else {
-                            Text(
-                                text = beverageType.displayName,
-                                style = MaterialTheme.typography.labelMedium,
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    },
-                    leadingIcon = {
-                        if (isSelected){
-                            Icon(
-                                painter = painterResource(beverageType.iconResFilled),
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        } else {
-                            Icon(
-                                painter = painterResource(beverageType.iconRes),
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-                    },
-                    selected = isSelected,
-                    modifier = Modifier.animateItem()
-                )
+            val labelText = if (beverage.hasLabelRes) {
+                stringResource(beverage.labelResId)
+            } else {
+                beverage.displayName
             }
-        }
 
-        // Show selected beverage info with animation
-        AnimatedVisibility(
-            visible = safeSelected != BeverageType.WATER,
-            enter = expandVertically(
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessLow
-                ),
-                expandFrom = Alignment.Top
-            ) + scaleIn(
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessLow
-                ),
-                initialScale = 0.8f,
-                transformOrigin = TransformOrigin(0.5f, 0f)
-            ),
-            exit = shrinkVertically(
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioNoBouncy,
-                    stiffness = Spring.StiffnessMedium
-                ),
-                shrinkTowards = Alignment.Top
-            ) + scaleOut(
-                animationSpec = tween(150),
-                targetScale = 0.9f,
-                transformOrigin = TransformOrigin(0.5f, 0f)
+            val beverageColors = rememberBeverageColorRoles(
+                beverageKey = beverage.storageKey,
+                useBeverageColors = useBeverageColors
             )
-        ) {
-            Card(
-                shape = MaterialTheme.shapes.extraLarge,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                ),
+            val checkedContainerColor by animateColorAsState(
+                targetValue = beverageColors.color,
+                animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
+                label = "beverage_toggle_container_color"
+            )
+            val checkedContentColor by animateColorAsState(
+                targetValue = beverageColors.onColor,
+                animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
+                label = "beverage_toggle_content_color"
+            )
+
+            ToggleButton(
                 modifier = Modifier
-                    .padding(horizontal = 10.dp)
+                    .semantics { role = Role.RadioButton },
+                checked = isSelected,
+                onCheckedChange = {
+                    haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
+                    onBeverageChange(beverage)
+                },
+                colors = ToggleButtonDefaults.toggleButtonColors(
+                    checkedContainerColor = checkedContainerColor,
+                    checkedContentColor = checkedContentColor,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
             ) {
                 Row(
-                    modifier = Modifier
-                        .padding(12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Info,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Effective Hydration: ",
-                            style = MaterialTheme.typography.titleSmall,
+                    Crossfade(
+                        targetState = isSelected,
+                        animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
+                        label = "containerSelectionToggleIcon"
+                    ) { selected ->
+                        Icon(
+                            painter = painterResource(
+                                if (selected) beverage.iconResFilled else beverage.iconRes
+                            ),
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
                         )
-                        AnimatedContent(
-                            targetState = (safeSelected.hydrationMultiplier * 100).toInt(),
-                            transitionSpec = {
-                                slideInVertically { height -> height } + fadeIn() togetherWith
-                                slideOutVertically { height -> -height } + fadeOut()
-                            },
-                            label = "hydration_percentage"
-                        ) { percentage ->
-                            Text(
-                                text = "$percentage%",
-                                style = MaterialTheme.typography.titleSmall,
-                            )
-                        }
                     }
+
+                    Text(
+                        text = labelText,
+                        style = if (isSelected) {
+                            MaterialTheme.typography.labelMediumEmphasized
+                        } else {
+                            MaterialTheme.typography.labelMedium
+                        }
+                    )
                 }
             }
         }
     }
 }
+
+/**
+ * Displays the effective hydration percentage for the selected non-water beverage.
+ * Intended to appear below the preset carousel.
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun EffectiveHydrationInfoCard(
+    modifier: Modifier = Modifier,
+    selectedBeverage: BeverageOption,
+    beverages: List<BeverageOption> = BeverageType.getAllSorted().map { it.toOption() },
+    useBeverageColors: Boolean = false,
+) {
+    val safeSelected = if (selectedBeverage in beverages) selectedBeverage else beverages.first()
+
+    AnimatedVisibility(
+        modifier = modifier,
+        visible = !safeSelected.isWater,
+        enter = scaleIn(
+            animationSpec = MaterialTheme.motionScheme.slowSpatialSpec(),
+            initialScale = 0.3f,
+            transformOrigin = TransformOrigin(0.5f, 0f)
+        ) + fadeIn(animationSpec = MaterialTheme.motionScheme.slowEffectsSpec()),
+        exit = scaleOut(
+            animationSpec = MaterialTheme.motionScheme.slowSpatialSpec(),
+            targetScale = 0.3f,
+            transformOrigin = TransformOrigin(0.5f, 0f)
+        ) + fadeOut(animationSpec = MaterialTheme.motionScheme.slowEffectsSpec())
+    ) {
+        EffectiveHydrationCardContent(
+            safeSelected = safeSelected,
+            useBeverageColors = useBeverageColors
+        )
+    }
+}
+
+/**
+ * The actual content of the effective-hydration info card.
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun EffectiveHydrationCardContent(
+    modifier: Modifier = Modifier,
+    safeSelected: BeverageOption,
+    useBeverageColors: Boolean = false,
+) {
+    val beverageColors = rememberBeverageColorRoles(
+        beverageKey = safeSelected.storageKey,
+        useBeverageColors = useBeverageColors
+    )
+
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        Surface(
+            modifier = modifier
+                .widthIn(max = 280.dp),
+            shape = PillShape,
+            color = beverageColors.containerColor,
+            contentColor = beverageColors.onContainerColor
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.info_filled),
+                    contentDescription = null,
+                    tint = beverageColors.onContainerColor,
+                    modifier = Modifier.size(18.dp)
+                )
+
+                AnimatedNumber(
+                    targetValue = (safeSelected.hydrationMultiplier * 100),
+                    formatValue = { value ->
+                        stringResource(R.string.home_label_effective_hydration, value.toInt())
+                    },
+                    style = MaterialTheme.typography.titleSmall,
+                    hapticsEnabled = false,
+                    entryDelayMillis = EntryAnimationDefaults.DELAY_MS
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun AnimatedStatItem(
+    label: String,
+    targetValue: Double,
+    hapticsEnabled: Boolean = false,
+    formatValue: @Composable (Float) -> String,
+    entryDelayMillis: Int = 0
+) {
+    ChartStatItem(label = label) {
+        AnimatedNumber(
+            targetValue = targetValue,
+            formatValue = formatValue,
+            style = MaterialTheme.typography.titleMediumEmphasized,
+            color = MaterialTheme.colorScheme.primary,
+            hapticsEnabled = hapticsEnabled,
+            animateEntry = false,
+            entryDelayMillis = entryDelayMillis
+        )
+    }
+}
+
+@Composable
+private fun ChartStatItem(
+    label: String,
+    value: @Composable () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        value()
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.secondary
+        )
+    }
+}
+
+@Composable
+private fun getMotivationalMessage(progress: Float, userProfile: UserProfile, isGoalAchieved: Boolean): String {
+    return when {
+        isGoalAchieved -> stringResource(R.string.home_motivation_goal_achieved)
+        progress >= 0.75f -> stringResource(R.string.home_motivation_almost_there)
+        progress >= 0.5f -> stringResource(R.string.home_motivation_halfway)
+        progress >= 0.25f -> stringResource(R.string.home_motivation_good_start)
+        else -> stringResource(userProfile.activityLevel.hydrationTipResId)
+    }
+}
+//region Preview
+
+/** Static user profile used by the HomeScreen preview. */
+private val previewUserProfile = UserProfile(
+    name = "Preview User",
+    gender = Gender.MALE,
+    ageGroup = AgeGroup.ADULT_31_50,
+    activityLevel = ActivityLevel.MODERATE,
+    wakeUpTime = "07:00",
+    sleepTime = "23:00",
+    dailyWaterGoal = 2700.0,
+    reminderInterval = 60,
+    volumeUnit = VolumeUnit.MILLILITRES,
+    healthConnectSyncEnabled = false
+)
+
+/** Fixed sample entries shown in the preview. */
+private val previewEntries: List<WaterIntakeEntry>
+    get() {
+        val now = System.currentTimeMillis()
+        val date = UserDayCalculator.getCurrentUserDayString(
+            dayEndTime = "23:00",
+            dayEndMode = DayEndMode.SLEEP_TIME
+        )
+        return listOf(
+            WaterIntakeEntry(
+                id = 1,
+                amount = 300.0,
+                timestamp = now - 3_600_000 * 4,
+                date = date,
+                containerType = "Medium Glass",
+                containerVolume = 200.0,
+                beverageType = BeverageType.WATER.name,
+                iconType = "DRAWABLE",
+                iconName = "water_medium"
+            ),
+            WaterIntakeEntry(
+                id = 2,
+                amount = 500.0,
+                timestamp = now - 3_600_000 * 2,
+                date = date,
+                containerType = "Water Bottle",
+                containerVolume = 500.0,
+                beverageType = BeverageType.WATER.name,
+                iconType = "DRAWABLE",
+                iconName = "water_bottle"
+            ),
+            WaterIntakeEntry(
+                id = 3,
+                amount = 550.0,
+                timestamp = now - 3_600_000,
+                date = date,
+                containerType = "Coffee Cup",
+                containerVolume = 100.0,
+                beverageType = BeverageType.COFFEE.name,
+                beverageMultiplier = BeverageType.COFFEE.hydrationMultiplier,
+                iconType = "DRAWABLE",
+                iconName = "local_cafe"
+            )
+        )
+    }
+
+/** Preview-time DAO that returns static water intake data. */
+private class PreviewWaterIntakeDao : WaterIntakeDao {
+    override fun getEntriesForDate(date: String): Flow<List<WaterIntakeEntry>> = flowOf(previewEntries)
+    override suspend fun getEntriesForDateSync(date: String): List<WaterIntakeEntry> = previewEntries
+    override suspend fun getAllEntriesForDateSync(date: String): List<WaterIntakeEntry> = previewEntries
+    override fun getEntriesForDateRange(startDate: String, endDate: String): Flow<List<WaterIntakeEntry>> =
+        flowOf(previewEntries)
+    override suspend fun getAllEntriesForDateRangeSync(startDate: String, endDate: String): List<WaterIntakeEntry> =
+        previewEntries
+    override suspend fun getAllEntriesForExportSync(): List<WaterIntakeEntry> = previewEntries
+    override suspend fun getAllEntriesSync(): List<WaterIntakeEntry> = previewEntries
+    override suspend fun deleteEntriesBefore(timestampMillis: Long) {}
+    override suspend fun countEntriesBefore(timestampMillis: Long): Int = previewEntries.size
+    override fun getTotalIntakeForDate(date: String): Flow<Double> = flowOf(1350.0)
+    override suspend fun getEntryCountForDate(date: String): Int = previewEntries.size
+    override suspend fun getEntryCount(): Int = previewEntries.size
+    override fun getLast30DaysEntries(): Flow<List<WaterIntakeEntry>> = flowOf(previewEntries)
+    override fun getAllEntries(): Flow<List<WaterIntakeEntry>> = flowOf(previewEntries)
+    override suspend fun updateEntry(entry: WaterIntakeEntry) {}
+    override suspend fun updateEntries(entries: List<WaterIntakeEntry>) {}
+    override suspend fun deleteEntry(entry: WaterIntakeEntry) {}
+    override suspend fun deleteEntryById(entryId: Long) {}
+    override suspend fun deleteAllEntries() {}
+    override suspend fun hideEntry(entryId: Long) {}
+    override suspend fun unhideEntry(entryId: Long) {}
+    override fun getHiddenEntries(): Flow<List<WaterIntakeEntry>> = flowOf(emptyList())
+    override suspend fun getDailyTotals(startDate: String, endDate: String): List<DailyTotal> = emptyList()
+    override suspend fun getMostUsedContainer(): MostUsedContainer? = null
+    override suspend fun getMostUsedContainers(limit: Int): List<MostUsedContainer> = emptyList()
+    override suspend fun getMostUsedQuickAddCombos(limit: Int): List<MostUsedQuickAddCombo> = emptyList()
+    override suspend fun getMostRecentEntry(): WaterIntakeEntry? = null
+    override suspend fun insertEntry(entry: WaterIntakeEntry): Long = 1L
+    override suspend fun insertEntries(entries: List<WaterIntakeEntry>) {}
+}
+
+/** Preview-time DAO that returns empty summaries. */
+private class PreviewDailySummaryDao : DailySummaryDao {
+    override suspend fun insertSummary(summary: DailySummary) {}
+    override suspend fun insertSummaries(summaries: List<DailySummary>) {}
+    override fun getSummaryForDate(date: String): Flow<DailySummary?> = flowOf(null)
+    override fun getSummariesForRange(startDate: String, endDate: String): Flow<List<DailySummary>> =
+        flowOf(emptyList())
+    override fun getLast30DaysSummaries(): Flow<List<DailySummary>> = flowOf(emptyList())
+    override fun getAllSummaries(): Flow<List<DailySummary>> = flowOf(emptyList())
+    override suspend fun updateSummary(summary: DailySummary) {}
+    override suspend fun deleteSummaryForDate(date: String) {}
+    override suspend fun deleteAllSummaries() {}
+}
+
+/** Preview-time DAO that seeds the default container presets. */
+private class PreviewContainerPresetDao : ContainerPresetDao {
+    private val defaultEntities = ContainerPresetRepository.getDefaultPresetEntities()
+
+    override fun getAllPresets(): Flow<List<ContainerPresetEntity>> = flowOf(defaultEntities)
+    override suspend fun getAllPresetsSync(): List<ContainerPresetEntity> = defaultEntities
+    override suspend fun getPresetById(id: Long): ContainerPresetEntity? = defaultEntities.find { it.id == id }
+    override suspend fun insertPreset(preset: ContainerPresetEntity): Long = 1L
+    override suspend fun insertPresets(presets: List<ContainerPresetEntity>) {}
+    override suspend fun updatePreset(preset: ContainerPresetEntity) {}
+    override suspend fun deletePresetById(id: Long) {}
+    override suspend fun deleteAllPresets() {}
+    override suspend fun getPresetCount(): Int = defaultEntities.size
+    override suspend fun getMaxDisplayOrder(): Int = defaultEntities.size
+    override suspend fun updateDisplayOrder(id: Long, displayOrder: Int) {}
+    override suspend fun reorderPresets(orderedIds: List<Long>) {}
+}
+
+@Preview(showBackground = true, name = "Home Screen")
+@Composable
+private fun HomeScreenPreview() {
+    val context = LocalContext.current
+    val waterRepository = WaterIntakeRepository(
+        waterIntakeDao = PreviewWaterIntakeDao(),
+        dailySummaryDao = PreviewDailySummaryDao(),
+        userRepository = UserRepository(context),
+        context = context
+    )
+    val containerRepository = ContainerPresetRepository(PreviewContainerPresetDao())
+
+    HydroTrackerTheme {
+        HomeScreen(
+            userProfile = previewUserProfile,
+            themePreferences = ThemePreferences(),
+            waterIntakeRepository = waterRepository,
+            containerPresetRepository = containerRepository,
+            paddingValues = PaddingValues(0.dp)
+        )
+    }
+}
+
+//endregion

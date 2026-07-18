@@ -7,10 +7,10 @@ import com.cemcakmak.hydrotracker.data.database.entities.ContainerPresetEntity
 @Dao
 interface ContainerPresetDao {
 
-    @Query("SELECT * FROM container_presets ORDER BY volume ASC")
+    @Query("SELECT * FROM container_presets ORDER BY display_order ASC")
     fun getAllPresets(): Flow<List<ContainerPresetEntity>>
 
-    @Query("SELECT * FROM container_presets ORDER BY volume ASC")
+    @Query("SELECT * FROM container_presets ORDER BY display_order ASC")
     suspend fun getAllPresetsSync(): List<ContainerPresetEntity>
 
     @Query("SELECT * FROM container_presets WHERE id = :id")
@@ -36,4 +36,15 @@ interface ContainerPresetDao {
 
     @Query("SELECT COALESCE(MAX(display_order), 0) FROM container_presets")
     suspend fun getMaxDisplayOrder(): Int
+
+    @Query("UPDATE container_presets SET display_order = :displayOrder WHERE id = :id")
+    suspend fun updateDisplayOrder(id: Long, displayOrder: Int)
+
+    /** Persist a new ordering by writing each preset's index as its display_order. */
+    @Transaction
+    suspend fun reorderPresets(orderedIds: List<Long>) {
+        orderedIds.forEachIndexed { index, id ->
+            updateDisplayOrder(id, index)
+        }
+    }
 }

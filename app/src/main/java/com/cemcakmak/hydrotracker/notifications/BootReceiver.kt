@@ -23,8 +23,7 @@ class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             Intent.ACTION_BOOT_COMPLETED,
-            Intent.ACTION_MY_PACKAGE_REPLACED,
-            Intent.ACTION_PACKAGE_REPLACED -> {
+            Intent.ACTION_MY_PACKAGE_REPLACED -> {
                 Log.d(TAG, "Received ${intent.action}, rescheduling notifications")
                 rescheduleNotifications(context)
             }
@@ -41,6 +40,9 @@ class BootReceiver : BroadcastReceiver() {
                     if (NotificationPermissionManager.hasNotificationPermission(context)) {
                         Log.d(TAG, "Rescheduling notifications for user")
                         HydroNotificationScheduler.startNotifications(context, userProfile)
+                        if (userProfile.funFactsEnabled) {
+                            HydroNotificationScheduler.scheduleFunFact(context, userProfile)
+                        }
                     } else {
                         Log.d(TAG, "Notification permission not granted, skipping reschedule")
                     }

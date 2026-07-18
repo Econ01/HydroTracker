@@ -1,5 +1,7 @@
 package com.cemcakmak.hydrotracker.presentation.onboarding
 
+import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
@@ -11,10 +13,14 @@ import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cemcakmak.hydrotracker.R
+import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 
 /**
@@ -35,6 +41,8 @@ enum class OnboardingStep {
 @Composable
 fun OnboardingScreen(
     onNavigateToHome: () -> Unit = {},
+    onNavigateToCrop: (Uri) -> Unit = {},
+    themePreferences: ThemePreferences = ThemePreferences(),
     viewModel: OnboardingViewModel = viewModel()
 ) {
     val currentStep by viewModel.currentStep.collectAsState()
@@ -61,6 +69,10 @@ fun OnboardingScreen(
             println("DEBUG: OnboardingViewModel reports completion, calling navigation callback")
             onNavigateToHome()
         }
+    }
+
+    BackHandler(enabled = canGoBack && !isAnimating) {
+        viewModel.previousStep()
     }
 
     // Animate the progress value
@@ -98,7 +110,7 @@ fun OnboardingScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = "Back"
+                                    contentDescription = stringResource(R.string.cd_back)
                                 )
                             }
                         }
@@ -168,41 +180,43 @@ fun OnboardingScreen(
                     OnboardingStep.GENDER -> GenderStep(
                         selectedGender = userProfile.gender,
                         onGenderSelected = { viewModel.updateGender(it) },
-                        title = viewModel.getStepTitle(),
-                        description = viewModel.getStepDescription()
+                        title = stringResource(viewModel.getStepTitleRes()),
+                        description = stringResource(viewModel.getStepDescriptionRes())
                     )
                     OnboardingStep.AGE -> AgeStep(
                         selectedAgeGroup = userProfile.ageGroup,
                         onAgeGroupSelected = { viewModel.updateAgeGroup(it) },
-                        title = viewModel.getStepTitle(),
-                        description = viewModel.getStepDescription()
+                        title = stringResource(viewModel.getStepTitleRes()),
+                        description = stringResource(viewModel.getStepDescriptionRes())
                     )
                     OnboardingStep.ACTIVITY -> ActivityStep(
                         selectedActivityLevel = userProfile.activityLevel,
                         onActivityLevelSelected = { viewModel.updateActivityLevel(it) },
-                        title = viewModel.getStepTitle(),
-                        description = viewModel.getStepDescription()
+                        title = stringResource(viewModel.getStepTitleRes()),
+                        description = stringResource(viewModel.getStepDescriptionRes())
                     )
                     OnboardingStep.SCHEDULE -> ScheduleStep(
                         wakeUpTime = userProfile.wakeUpTime,
                         sleepTime = userProfile.sleepTime,
                         onWakeUpTimeChanged = { viewModel.updateWakeUpTime(it) },
                         onSleepTimeChanged = { viewModel.updateSleepTime(it) },
-                        title = viewModel.getStepTitle(),
-                        description = viewModel.getStepDescription()
+                        title = stringResource(viewModel.getStepTitleRes()),
+                        description = stringResource(viewModel.getStepDescriptionRes())
                     )
                     OnboardingStep.PROFILE_SETUP -> ProfileSetupStep(
                         name = userProfile.name,
-                        profileImageUri = userProfile.profileImagePath?.let { android.net.Uri.parse(it) },
+                        profileImageUri = userProfile.profileImagePath?.toUri(),
                         onNameChanged = { viewModel.updateName(it) },
                         onImageSelected = { uri -> viewModel.updateProfileImage(uri) },
-                        title = viewModel.getStepTitle(),
-                        description = viewModel.getStepDescription()
+                        onNavigateToCrop = onNavigateToCrop,
+                        title = stringResource(viewModel.getStepTitleRes()),
+                        description = stringResource(viewModel.getStepDescriptionRes())
                     )
                     OnboardingStep.GOAL -> GoalStep(
                         userProfile = userProfile,
-                        title = viewModel.getStepTitle(),
-                        description = viewModel.getStepDescription()
+                        themePreferences = themePreferences,
+                        title = stringResource(viewModel.getStepTitleRes()),
+                        description = stringResource(viewModel.getStepDescriptionRes())
                     )
                     OnboardingStep.COMPLETE -> CompleteStep(
                         userProfile = userProfile,
@@ -232,7 +246,10 @@ fun OnboardingScreen(
                         modifier = Modifier.width(120.dp)
                     ) {
                         Text(
-                            text = if (currentStep == OnboardingStep.GOAL) "Finish" else "Next",
+                            text = stringResource(
+                                if (currentStep == OnboardingStep.GOAL) R.string.onboarding_finish
+                                else R.string.action_next
+                            ),
                             fontWeight = FontWeight.SemiBold
                         )
                     }
@@ -247,7 +264,8 @@ fun OnboardingScreen(
 fun OnboardingScreenPreview() {
     HydroTrackerTheme {
         OnboardingScreen(
-            onNavigateToHome = {}
+            onNavigateToHome = {},
+            onNavigateToCrop = {}
         )
     }
 }

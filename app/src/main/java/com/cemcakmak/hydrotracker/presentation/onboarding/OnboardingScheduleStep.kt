@@ -16,11 +16,16 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.cemcakmak.hydrotracker.R
+import com.cemcakmak.hydrotracker.data.models.ThemePreferences
+import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
+import androidx.compose.ui.platform.LocalContext
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -35,7 +40,8 @@ fun ScheduleStep(
     onWakeUpTimeChanged: (String) -> Unit,
     onSleepTimeChanged: (String) -> Unit,
     title: String,
-    description: String
+    description: String,
+    themePreferences: ThemePreferences = ThemePreferences()
 ) {
     var showWakeUpPicker by remember { mutableStateOf(false) }
     var showSleepPicker by remember { mutableStateOf(false) }
@@ -63,16 +69,18 @@ fun ScheduleStep(
 
         // Wake-Up Card
         TimeSelectionCard(
-            label = "Wake-Up Time",
+            label = stringResource(R.string.onboarding_wake_label),
             time = wakeUpTime,
             icon = Icons.Default.WbSunny,
+            themePreferences = themePreferences
         ) { showWakeUpPicker = true }
 
         // Sleep Card
         TimeSelectionCard(
-            label = "Sleep Time",
+            label = stringResource(R.string.onboarding_sleep_label),
             time = sleepTime,
-            icon = Icons.Default.Bedtime
+            icon = Icons.Default.Bedtime,
+            themePreferences = themePreferences
         ) { showSleepPicker = true }
 
         // Preview Timeline
@@ -82,8 +90,8 @@ fun ScheduleStep(
     // Time Pickers
     if (showWakeUpPicker) {
         ExpressiveTimePickerDialog(
-            title = "Wake Up Time",
-            subtitle = "Choose your wake-up time",
+            title = stringResource(R.string.onboarding_wake_picker_title),
+            subtitle = stringResource(R.string.onboarding_wake_picker_subtitle),
             icon = Icons.Default.WbSunny,
             accentColor = MaterialTheme.colorScheme.primary,
             onDismiss = { showWakeUpPicker = false },
@@ -98,8 +106,8 @@ fun ScheduleStep(
 
     if (showSleepPicker) {
         ExpressiveTimePickerDialog(
-            title = "Sleep Time",
-            subtitle = "Choose your sleep time",
+            title = stringResource(R.string.onboarding_sleep_picker_title),
+            subtitle = stringResource(R.string.onboarding_sleep_picker_subtitle),
             icon = Icons.Default.Bedtime,
             accentColor = MaterialTheme.colorScheme.secondary,
             onDismiss = { showSleepPicker = false },
@@ -133,8 +141,10 @@ fun TimeSelectionCard(
     label: String,
     time: String,
     icon: ImageVector,
+    themePreferences: ThemePreferences = ThemePreferences(),
     onClick: () -> Unit
 ) {
+    val context = LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -155,7 +165,7 @@ fun TimeSelectionCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Analog clock
+            // Analogue clock
             AnalogClock(time = time, size = 50.dp)
 
             // Text Section
@@ -171,7 +181,7 @@ fun TimeSelectionCard(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = time,
+                    text = DateTimeFormatters.formatTimeString(context, time, themePreferences.timeFormat),
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -209,7 +219,7 @@ fun AnalogClock(time: String, size: Dp) {
     val formatter = DateTimeFormatter.ofPattern("HH:mm")
     val localTime = try {
         LocalTime.parse(time, formatter)
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         LocalTime.of(7, 0)
     }
 
@@ -281,7 +291,11 @@ private fun DayDurationPreview(wakeUpTime: String, sleepTime: String) {
             color = MaterialTheme.colorScheme.primary
         )
         Text(
-            text = "Awake for ${awakeHours.toInt()}h ${((awakeHours % 1) * 60).toInt()}m",
+            text = stringResource(
+                R.string.onboarding_awake_duration,
+                awakeHours.toInt(),
+                ((awakeHours % 1) * 60).toInt()
+            ),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -375,11 +389,11 @@ private fun ExpressiveTimePickerDialog(
                 colors = ButtonDefaults.buttonColors(containerColor = accentColor),
                 shapes = ButtonDefaults.shapes(),
             ) {
-                Text(text = "Set Time", fontWeight = FontWeight.SemiBold)
+                Text(text = stringResource(R.string.time_picker_set), fontWeight = FontWeight.SemiBold)
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
         }
     )
 }
@@ -412,7 +426,7 @@ private fun calculateAwakeHours(wakeUpTime: String, sleepTime: String): Double {
         }
 
         awakeMinutes / 3600.0
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         16.0 // fallback
     }
 }

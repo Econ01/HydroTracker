@@ -4,10 +4,10 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -23,16 +23,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import com.cemcakmak.hydrotracker.data.models.UserProfile
-import com.cemcakmak.hydrotracker.data.models.Gender
-import com.cemcakmak.hydrotracker.data.models.AgeGroup
-import com.cemcakmak.hydrotracker.data.models.ActivityLevel
+import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.utils.ImageUtils
 import java.io.File
 
@@ -43,11 +41,12 @@ fun ProfileSetupStep(
     profileImageUri: Uri? = null,
     onNameChanged: (String) -> Unit,
     onImageSelected: (Uri?) -> Unit,
+    onNavigateToCrop: (Uri) -> Unit,
     title: String,
     description: String
 ) {
     val context = LocalContext.current
-    val bottomSheetState = rememberModalBottomSheetState()
+    val bottomSheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
     var showBottomSheet by remember { mutableStateOf(false) }
     
     // Camera launcher
@@ -55,14 +54,10 @@ fun ProfileSetupStep(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
-            // The camera image was saved to a temporary file, now save it properly
+            // Pass the temporary file URI to the cropper.
             val tempFile = File(context.cacheDir, "temp_profile_photo.jpg")
             if (tempFile.exists()) {
-                val savedPath = ImageUtils.saveProfileImage(context, Uri.fromFile(tempFile))
-                if (savedPath != null) {
-                    onImageSelected(Uri.parse(savedPath))
-                }
-                tempFile.delete() // Clean up temp file
+                onNavigateToCrop(Uri.fromFile(tempFile))
             }
         }
         showBottomSheet = false
@@ -86,14 +81,11 @@ fun ProfileSetupStep(
     
     // Image picker launcher
     val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
+        contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         uri?.let { selectedUri ->
-            // Save the image to local storage
-            val savedPath = ImageUtils.saveProfileImage(context, selectedUri)
-            if (savedPath != null) {
-                onImageSelected(Uri.parse(savedPath))
-            }
+            // Pass the original URI to the cropper.
+            onNavigateToCrop(selectedUri)
         }
         showBottomSheet = false
     }
@@ -127,7 +119,7 @@ fun ProfileSetupStep(
                                 } else {
                                     ImageUtils.loadProfileImageBitmap(context)
                                 }
-                            } catch (e: Exception) {
+                            } catch (_: Exception) {
                                 null
                             }
                         }
@@ -147,7 +139,7 @@ fun ProfileSetupStep(
                             if (profileBitmap != null) {
                                 Image(
                                     bitmap = profileBitmap.asImageBitmap(),
-                                    contentDescription = "Profile Photo",
+                                    contentDescription = stringResource(R.string.cd_profile_photo),
                                     modifier = Modifier
                                         .fillMaxSize()
                                         .clip(CircleShape),
@@ -160,12 +152,12 @@ fun ProfileSetupStep(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Person,
-                                        contentDescription = "Add Photo",
+                                        contentDescription = stringResource(R.string.profile_add_photo),
                                         modifier = Modifier.size(40.dp),
                                         tint = MaterialTheme.colorScheme.onPrimaryContainer
                                     )
                                     Text(
-                                        text = "Add Photo",
+                                        text = stringResource(R.string.profile_add_photo),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                                         textAlign = TextAlign.Center
@@ -183,7 +175,7 @@ fun ProfileSetupStep(
                             onImageSelected(null) 
                         }
                     ) {
-                        Text("Remove Photo")
+                        Text(stringResource(R.string.profile_remove_photo))
                     }
                 }
             }
@@ -193,7 +185,7 @@ fun ProfileSetupStep(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "What should we call you?",
+                    text = stringResource(R.string.profile_name_prompt),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -206,10 +198,10 @@ fun ProfileSetupStep(
                             onNameChanged(newName)
                         }
                     },
-                    label = { Text("Your name") },
-                    placeholder = { Text("Enter your name") },
+                    label = { Text(stringResource(R.string.profile_name_label)) },
+                    placeholder = { Text(stringResource(R.string.profile_name_placeholder)) },
                     supportingText = { 
-                        Text("${name.length}/15 characters")
+                        Text(stringResource(R.string.character_count, name.length, 15))
                     },
                     isError = name.isBlank(),
                     keyboardOptions = KeyboardOptions(
@@ -221,7 +213,7 @@ fun ProfileSetupStep(
                 
                 if (name.isBlank()) {
                     Text(
-                        text = "Name is required to continue",
+                        text = stringResource(R.string.profile_name_required),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.error
                     )
@@ -243,7 +235,7 @@ fun ProfileSetupStep(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "Select Profile Photo",
+                    text = stringResource(R.string.profile_select_photo),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -252,7 +244,13 @@ fun ProfileSetupStep(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { imagePickerLauncher.launch("image/*") },
+                        .clickable {
+                            imagePickerLauncher.launch(
+                                PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
+                        },
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
@@ -272,12 +270,12 @@ fun ProfileSetupStep(
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
                             Text(
-                                text = "Choose from Gallery",
+                                text = stringResource(R.string.profile_choose_gallery),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Medium
                             )
                             Text(
-                                text = "Select an existing photo",
+                                text = stringResource(R.string.profile_choose_gallery_desc),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -326,12 +324,12 @@ fun ProfileSetupStep(
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
                             Text(
-                                text = "Take Photo",
+                                text = stringResource(R.string.profile_take_photo),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Medium
                             )
                             Text(
-                                text = "Use your camera to take a new photo",
+                                text = stringResource(R.string.profile_take_photo_desc),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -356,6 +354,7 @@ fun ProfileSetupStepPreview() {
         profileImageUri = imageUri,
         onNameChanged = { name = it },
         onImageSelected = { imageUri = it },
+        onNavigateToCrop = { imageUri = it },
         title = "Complete Your Profile",
         description = "Add your name and a profile photo to personalize your experience."
     )

@@ -19,9 +19,10 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Android-API%2026+-green.svg" alt="API Level">
-  <img src="https://img.shields.io/badge/Kotlin-2.0.21-blue.svg" alt="Kotlin Version">
+  <img src="https://img.shields.io/badge/dynamic/toml?url=https://raw.githubusercontent.com/Econ01/HydroTracker/master/gradle/libs.versions.toml&query=$.versions.kotlin&label=Kotlin&color=blue" alt="Kotlin Version">
   <img src="https://img.shields.io/badge/License-GPL%20v3-orange.svg" alt="License">
-  <img src="https://img.shields.io/badge/Compose-BOM%202025.07.00-purple.svg" alt="Compose Version">
+  <img src="https://img.shields.io/badge/dynamic/toml?url=https://raw.githubusercontent.com/Econ01/HydroTracker/master/gradle/libs.versions.toml&query=$.versions.composeBom&label=Compose%20BOM&color=purple" alt="Compose Version">
+  <a href="https://github.com/Econ01/HydroTracker/actions/workflows/unit-tests.yml"><img src="https://github.com/Econ01/HydroTracker/actions/workflows/unit-tests.yml/badge.svg" alt="Unit Tests"></a>
 </p>
 
 <p align="center">
@@ -52,13 +53,9 @@
 - **Multi-App Support:** Import data from Samsung Health, Google Fit, Fitbit, Garmin, Strava, and other health apps (*As long as they use Health Connect API*)
 - **External Entry Management:** Identify and manage entries from different sources. The app can **read** messy data from other apps that you have
 
-### Home Screen Widgets
-Available widgets:
-- HydroProgress Widget (4x1)
-- HydroCompact Widget (2x1)
-- HydroLarge Widget (4x2)
-
-All of them supports:
+### Home Screen Widget
+HydroTracker Large Widget (4x2):
+- Progress ring with quick-add action cards
 - Dynamic Theming
 - Real-Time Updates
 

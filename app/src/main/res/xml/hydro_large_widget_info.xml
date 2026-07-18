@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- targetCellWidth/Height are API 31+ hints for the default placement span; older
+     platforms ignore unknown provider attributes and fall back to minWidth/minHeight. -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:description="@string/app_name"
-    android:initialKeyguardLayout="@layout/widget_hydro_large"
-    android:initialLayout="@layout/widget_hydro_large"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:targetApi="s"
+    android:description="@string/widget_large_description"
+    android:initialLayout="@layout/glance_default_loading_layout"
     android:minWidth="250dp"
     android:minHeight="110dp"
     android:minResizeWidth="180dp"
     android:minResizeHeight="110dp"
-    android:previewImage="@drawable/ic_launcher_foreground"
-    android:previewLayout="@layout/widget_hydro_large"
+    android:previewImage="@drawable/widget_preview_large"
     android:resizeMode="horizontal|vertical"
     android:targetCellWidth="4"
     android:targetCellHeight="2"

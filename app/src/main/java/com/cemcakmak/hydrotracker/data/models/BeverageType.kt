@@ -1,6 +1,7 @@
 package com.cemcakmak.hydrotracker.data.models
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.cemcakmak.hydrotracker.R
 
 /**
@@ -10,11 +11,16 @@ import com.cemcakmak.hydrotracker.R
  * research study and Beverage Hydration Index (BHI) data.
  */
 enum class BeverageType(
+    // NOTE: displayName/description are the STABLE English identity used for DB lookup
+    // (fromDisplayName), legacy matching and sorting. They are NOT for UI display anymore —
+    // use labelResId/descriptionResId with stringResource() in Compose.
     val displayName: String,
     val hydrationMultiplier: Double,
     @param:DrawableRes val iconRes: Int,
     @param:DrawableRes val iconResFilled: Int,
-    val description: String
+    val description: String,
+    @param:StringRes val labelResId: Int,
+    @param:StringRes val descriptionResId: Int
 ) {
     // Water (baseline)
     WATER(
@@ -22,7 +28,9 @@ enum class BeverageType(
         hydrationMultiplier = 1.0,
         iconRes = R.drawable.water,
         iconResFilled = R.drawable.water_filled,
-        description = "Pure water - baseline hydration"
+        description = "Pure water - baseline hydration",
+        labelResId = R.string.beverage_water,
+        descriptionResId = R.string.beverage_desc_water
     ),
 
     // Coffee (1.0x)
@@ -31,7 +39,9 @@ enum class BeverageType(
         hydrationMultiplier = 1.0,
         iconRes = R.drawable.coffee,
         iconResFilled = R.drawable.coffee_filled,
-        description = "Coffee - equivalent to water"
+        description = "Coffee - equivalent to water",
+        labelResId = R.string.beverage_coffee,
+        descriptionResId = R.string.beverage_desc_coffee
     ),
 
     // Tea (1.0x)
@@ -40,7 +50,9 @@ enum class BeverageType(
         hydrationMultiplier = 1.0,
         iconRes = R.drawable.tea,
         iconResFilled = R.drawable.tea_filled,
-        description = "Tea - equivalent to water"
+        description = "Tea - equivalent to water",
+        labelResId = R.string.beverage_tea,
+        descriptionResId = R.string.beverage_desc_tea
     ),
 
     // Soft Drink (1.0x)
@@ -49,7 +61,9 @@ enum class BeverageType(
         hydrationMultiplier = 1.0,
         iconRes = R.drawable.soft_drink,
         iconResFilled = R.drawable.soft_drink_filled,
-        description = "Soft drink - equivalent to water"
+        description = "Soft drink - equivalent to water",
+        labelResId = R.string.beverage_soft_drink,
+        descriptionResId = R.string.beverage_desc_soft_drink
     ),
 
     // Energy Drink (1.0x)
@@ -58,7 +72,9 @@ enum class BeverageType(
         hydrationMultiplier = 1.0,
         iconRes = R.drawable.energy_drink,
         iconResFilled = R.drawable.energy_drink_filled,
-        description = "Energy drink - equivalent to water"
+        description = "Energy drink - equivalent to water",
+        labelResId = R.string.beverage_energy_drink,
+        descriptionResId = R.string.beverage_desc_energy_drink
     ),
 
     // Sports Drink (1.1x)
@@ -67,7 +83,9 @@ enum class BeverageType(
         hydrationMultiplier = 1.1,
         iconRes = R.drawable.sports_drink,
         iconResFilled = R.drawable.sports_drink_filled,
-        description = "Sports drink - slightly enhanced hydration"
+        description = "Sports drink - slightly enhanced hydration",
+        labelResId = R.string.beverage_sports_drink,
+        descriptionResId = R.string.beverage_desc_sports_drink
     ),
 
     // Oral Rehydration Solution (1.5x)
@@ -76,7 +94,9 @@ enum class BeverageType(
         hydrationMultiplier = 1.5,
         iconRes = R.drawable.oral_rehydration_solution,
         iconResFilled = R.drawable.oral_rehydration_solution_filled,
-        description = "Oral rehydration solution - superior hydration"
+        description = "Oral rehydration solution - superior hydration",
+        labelResId = R.string.beverage_ors,
+        descriptionResId = R.string.beverage_desc_ors
     ),
 
     // Milk (1.5x)
@@ -85,7 +105,9 @@ enum class BeverageType(
         hydrationMultiplier = 1.5,
         iconRes = R.drawable.milk,
         iconResFilled = R.drawable.milk_filled,
-        description = "Milk - superior hydration"
+        description = "Milk - superior hydration",
+        labelResId = R.string.beverage_milk,
+        descriptionResId = R.string.beverage_desc_milk
     ),
 
     // Fruit Juice (1.3x)
@@ -94,7 +116,9 @@ enum class BeverageType(
         hydrationMultiplier = 1.3,
         iconRes = R.drawable.fruit_juice,
         iconResFilled = R.drawable.fruit_juice_filled,
-        description = "Fruit juice - enhanced hydration"
+        description = "Fruit juice - enhanced hydration",
+        labelResId = R.string.beverage_fruit_juice,
+        descriptionResId = R.string.beverage_desc_fruit_juice
     );
 
     companion object {

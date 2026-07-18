@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 
 /**
  * Manages Health Connect synchronization operations
@@ -34,8 +35,15 @@ object HealthConnectSyncManager {
             _isSyncing.value = true
             Log.d(TAG, "🔄 Setting isSyncing = true for regular sync")
             try {
+                // Only local or restored entries are mirrored to Health Connect
+                if (!entry.isSyncableToHealthConnect()) {
+                    Log.d(TAG, "⏭️ Sync skipped: Entry source ${entry.source} is not mirrored to Health Connect")
+                    _isSyncing.value = false
+                    return@launch
+                }
+
                 // Check if user has sync enabled
-                val userProfile = userRepository.userProfile.value
+                val userProfile = userRepository.userProfile.first()
                 if (userProfile?.healthConnectSyncEnabled != true) {
                     Log.d(TAG, "⏭️ Sync skipped: Health Connect sync disabled in user settings")
                     _isSyncing.value = false
@@ -83,8 +91,6 @@ object HealthConnectSyncManager {
                 Log.e(TAG, "💥 Unexpected error during Health Connect sync", e)
                 Log.e(TAG, "Entry details: amount=${entry.amount}ml, date=${entry.date}")
             } finally {
-                // Add a small delay to ensure the sync state is visible to users
-                kotlinx.coroutines.delay(800)
                 _isSyncing.value = false
                 Log.d(TAG, "🔄 Setting isSyncing = false for regular sync")
             }
@@ -103,7 +109,7 @@ object HealthConnectSyncManager {
             Log.d(TAG, "🔄 Setting isSyncing = true for import sync")
             try {
                 // Check if user has sync enabled
-                val userProfile = userRepository.userProfile.value
+                val userProfile = userRepository.userProfile.first()
                 if (userProfile?.healthConnectSyncEnabled != true) {
                     Log.d(TAG, "⏭️ Import skipped: Health Connect sync disabled")
                     _isSyncing.value = false
@@ -143,13 +149,17 @@ object HealthConnectSyncManager {
                 var errorCount = 0
 
                 // Process each external record with conflict resolution
-                val wakeUpTime = userRepository.userProfile.value?.wakeUpTime ?: "07:00"
+                val dayEndTime = userProfile.sleepTime
+                val dayEndMode = userProfile.dayEndMode
                 externalRecords.forEach { record ->
                     try {
                         val waterIntakeEntry = HealthConnectManager.hydrationRecordToWaterIntakeEntry(
+                            context,
                             record,
                             record.metadata.dataOrigin.toString(),
-                            wakeUpTime
+                            com.cemcakmak.hydrotracker.data.models.EntrySource.HEALTH_CONNECT_EXTERNAL,
+                            dayEndTime,
+                            dayEndMode
                         )
 
                         // Check for potential duplicates using timestamp and amount
@@ -177,17 +187,18 @@ object HealthConnectSyncManager {
                 Log.i(TAG, "📊 Import completed: $importedCount entries imported, $errorCount errors")
                 onImportComplete(importedCount, errorCount)
 
-                // Update last sync time if we imported anything
-                if (importedCount > 0) {
-                    _lastSyncTime.value = System.currentTimeMillis()
+                val now = System.currentTimeMillis()
+                _lastSyncTime.value = now
+
+                // Record the import checkpoint so the next app-launch sync only reads new data.
+                if (errorCount == 0) {
+                    userRepository.updateLastHealthConnectImportTime(now)
                 }
 
             } catch (e: Exception) {
                 Log.e(TAG, "💥 Unexpected error during Health Connect import", e)
                 onImportComplete(0, 1)
             } finally {
-                // Add a small delay to ensure the sync state is visible to users
-                kotlinx.coroutines.delay(800)
                 _isSyncing.value = false
                 Log.d(TAG, "🔄 Setting isSyncing = false for import sync")
             }
@@ -204,7 +215,7 @@ object HealthConnectSyncManager {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 // Check if user has sync enabled
-                val userProfile = userRepository.userProfile.value
+                val userProfile = userRepository.userProfile.first()
                 if (userProfile?.healthConnectSyncEnabled != true) {
                     Log.d(TAG, "⏭️ App launch sync skipped: Health Connect sync disabled")
                     return@launch
@@ -218,8 +229,13 @@ object HealthConnectSyncManager {
 
                 Log.i(TAG, "🔄 Performing app launch sync for external hydration data...")
 
-                // Import external data from the last 7 days to catch any missed entries
-                val since = java.time.Instant.now().minus(7, java.time.temporal.ChronoUnit.DAYS)
+                val preferences = userRepository.appPreferences.first()
+                val lastSync = preferences.lastHealthConnectImportTime
+                val since = if (lastSync != null) {
+                    java.time.Instant.ofEpochMilli(lastSync).minusSeconds(300)
+                } else {
+                    java.time.Instant.EPOCH
+                }
 
                 importExternalHydrationData(context, userRepository, waterIntakeRepository, since) { imported, errors ->
                     if (imported > 0) {
@@ -254,7 +270,7 @@ object HealthConnectSyncManager {
             Log.d(TAG, "🔄 Setting isSyncing = true for restore sync")
             try {
                 // Check if user has sync enabled
-                val userProfile = userRepository.userProfile.value
+                val userProfile = userRepository.userProfile.first()
                 if (userProfile?.healthConnectSyncEnabled != true) {
                     Log.d(TAG, "⏭️ Restore skipped: Health Connect sync disabled")
                     _isSyncing.value = false
@@ -294,7 +310,8 @@ object HealthConnectSyncManager {
                 var importedCount = 0
                 var skippedCount = 0
 
-                val wakeUpTime = userRepository.userProfile.value?.wakeUpTime ?: "07:00"
+                val dayEndTime = userProfile.sleepTime
+                val dayEndMode = userProfile.dayEndMode
                 hydroTrackerRecords.forEach { record ->
                     try {
                         // For HydroTracker records, prefer our clientRecordId so it matches
@@ -302,9 +319,12 @@ object HealthConnectSyncManager {
                         val recordIdForLocalStorage = record.metadata.clientRecordId ?: record.metadata.id
 
                         val waterIntakeEntry = HealthConnectManager.hydrationRecordToWaterIntakeEntry(
+                            context,
                             record,
                             record.metadata.dataOrigin.toString(),
-                            wakeUpTime,
+                            com.cemcakmak.hydrotracker.data.models.EntrySource.HEALTH_CONNECT_RESTORED,
+                            dayEndTime,
+                            dayEndMode,
                             healthConnectRecordId = recordIdForLocalStorage
                         )
 
@@ -339,7 +359,6 @@ object HealthConnectSyncManager {
                 Log.e(TAG, "💥 Unexpected error during HydroTracker history restore", e)
                 onComplete(0, 0)
             } finally {
-                kotlinx.coroutines.delay(800)
                 _isSyncing.value = false
                 Log.d(TAG, "🔄 Setting isSyncing = false for restore sync")
             }
@@ -357,8 +376,14 @@ object HealthConnectSyncManager {
             _isSyncing.value = true
             Log.d(TAG, "🔄 Setting isSyncing = true for update sync")
             try {
+                // Only syncable entries are mirrored to Health Connect
+                if (!updatedEntry.isSyncableToHealthConnect()) {
+                    Log.d(TAG, "⏭️ Update sync skipped: Updated entry source ${updatedEntry.source} is not mirrored")
+                    return@launch
+                }
+
                 // Check if user has sync enabled
-                val userProfile = userRepository.userProfile.value
+                val userProfile = userRepository.userProfile.first()
                 if (userProfile?.healthConnectSyncEnabled != true) {
                     Log.d(TAG, "⏭️ Update sync skipped: Health Connect sync disabled")
                     return@launch
@@ -374,7 +399,7 @@ object HealthConnectSyncManager {
 
                 // Step 1: Delete the old record if it has a Health Connect record ID
                 val oldHealthConnectRecordId = oldEntry.healthConnectRecordId
-                if (oldHealthConnectRecordId != null) {
+                if (oldHealthConnectRecordId != null && oldEntry.isSyncableToHealthConnect()) {
                     Log.d(TAG, "🗑️ Deleting old record from Health Connect: $oldHealthConnectRecordId")
                     val deleteResult = HealthConnectManager.deleteHydrationRecord(context,oldHealthConnectRecordId)
 
@@ -408,8 +433,6 @@ object HealthConnectSyncManager {
             } catch (e: Exception) {
                 Log.e(TAG, "💥 Unexpected error during update sync", e)
             } finally {
-                // Add a small delay to ensure the sync state is visible to users
-                kotlinx.coroutines.delay(800)
                 _isSyncing.value = false
                 Log.d(TAG, "🔄 Setting isSyncing = false for update sync")
             }
@@ -428,8 +451,14 @@ object HealthConnectSyncManager {
         CoroutineScope(Dispatchers.IO).launch {
             _isSyncing.value = true
             try {
+                // External imports are read-only snapshots; do not delete them from Health Connect
+                if (!deletedEntry.isSyncableToHealthConnect()) {
+                    Log.d(TAG, "⏭️ Delete handling skipped: Entry source ${deletedEntry.source} is not mirrored")
+                    return@launch
+                }
+
                 // Check if user has sync enabled
-                val userProfile = userRepository.userProfile.value
+                val userProfile = userRepository.userProfile.first()
                 if (userProfile?.healthConnectSyncEnabled != true) {
                     Log.d(TAG, "⏭️ Delete handling skipped: Health Connect sync disabled")
                     return@launch
@@ -473,25 +502,16 @@ object HealthConnectSyncManager {
             } catch (e: Exception) {
                 Log.e(TAG, "💥 Error during Health Connect delete", e)
             } finally {
-                kotlinx.coroutines.delay(800)
                 _isSyncing.value = false
             }
         }
-    }
-
-    enum class SyncStatus {
-        READY,
-        DISABLED,
-        UNAVAILABLE,
-        NO_PERMISSIONS,
-        ERROR
     }
 
     /**
      * Check if an entry is a potential duplicate based on timestamp and amount
      * Uses a tolerance window to account for slight time differences
      *
-     * ARCHITECTURAL NOTE: This function uses the stored [date] field (user-day) as the
+     * ARCHITECTURAL NOTE: This function uses the stored [WaterIntakeEntry.date] field (user-day) as the
      * single source of truth for date-based queries. It does NOT recompute the date from
      * the timestamp to avoid inconsistencies with UserDayCalculator logic. Time display
      * formatting is a UI concern and must remain separate from deduplication logic.
@@ -500,7 +520,7 @@ object HealthConnectSyncManager {
         return try {
             // Use the entry's pre-computed date field (user-day) as the single source of truth.
             // Recomputing from timestamp via toLocalDate() would produce a different result
-            // for entries before wake-up time, causing us to query the wrong date.
+            // for entries before the configured day boundary, causing us to query the wrong date.
             val entryDate = newEntry.date
 
             // Get all entries for the same user-day (including hidden ones to prevent re-import)
@@ -583,14 +603,13 @@ object HealthConnectSyncManager {
         return try {
             Log.d(TAG, "🔍 Searching for Health Connect record matching: ${entry.amount}ml at ${entry.timestamp}")
 
-            // Search in a 5-minute window around the entry timestamp
             val entryTime = java.time.Instant.ofEpochMilli(entry.timestamp)
-            val startTime = entryTime.minusSeconds(150) // 2.5 minutes before
-            val endTime = entryTime.plusSeconds(150)     // 2.5 minutes after
+            val startTime = entryTime.minusSeconds(150)
+            val endTime = entryTime.plusSeconds(150)
 
             Log.d(TAG, "⏰ Search window: $startTime to $endTime")
 
-            val result = HealthConnectManager.readHydrationRecords(context, startTime)
+            val result = HealthConnectManager.readHydrationRecords(context, startTime, endTime)
             if (result.isFailure) {
                 Log.e(TAG, "❌ Failed to search Health Connect: ${result.exceptionOrNull()?.message}")
                 return null
@@ -599,17 +618,21 @@ object HealthConnectSyncManager {
             val records = result.getOrNull() ?: emptyList()
             Log.d(TAG, "📋 Found ${records.size} records in time window")
 
-            // Look for a record that matches volume and is within our time window
+            // Only consider HydroTracker's own records. Searching external records could delete
+            // another app's hydration data by accident.
             val matchingRecord = records.find { record ->
+                val isFromHydroTracker = record.metadata.dataOrigin.packageName == "com.cemcakmak.hydrotracker" ||
+                    record.metadata.clientRecordId?.startsWith("hydrotracker_") == true
+                if (!isFromHydroTracker) return@find false
+
                 val recordTime = record.startTime
                 val recordVolume = record.volume.inMilliliters
                 val timeDiff = kotlin.math.abs(recordTime.toEpochMilli() - entry.timestamp)
 
-                // Match criteria: same volume (±1ml) and within 5 minutes
                 val volumeMatch = kotlin.math.abs(recordVolume - entry.amount) <= 1.0
-                val timeMatch = timeDiff <= 300_000 // 5 minutes in milliseconds
+                val timeMatch = timeDiff <= 300_000
 
-                Log.d(TAG, "🔍 Record check: ${recordVolume}ml at $recordTime, volume match: $volumeMatch, time match: $timeMatch")
+                Log.d(TAG, "🔍 HydroTracker record check: ${recordVolume}ml at $recordTime, volume match: $volumeMatch, time match: $timeMatch")
 
                 volumeMatch && timeMatch
             }

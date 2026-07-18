@@ -3,184 +3,139 @@
 
 package com.cemcakmak.hydrotracker.notifications
 
+import android.content.Context
+import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.models.ReminderStyle
-import kotlin.random.Random
+import com.cemcakmak.hydrotracker.data.models.VolumeUnit
+import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 
 /**
  * Provides creative and personalized notification content
- * Including water puns, facts, and motivational messages
+ * Including water puns, facts, and motivational messages.
+ *
+ * All user-facing text is loaded from resources so it can be translated.
  */
 object NotificationContentProvider {
 
     /**
-     * Get notification content based on user's reminder style and progress
+     * Get notification content based on user's reminder style and progress.
      */
     fun getNotificationContent(
+        context: Context,
         reminderStyle: ReminderStyle,
-        userName: String? = null,
         currentProgress: Float = 0f,
-        dailyGoal: Double = 2700.0
+        dailyGoal: Double = 2700.0,
+        volumeUnit: VolumeUnit = VolumeUnit.MILLILITRES
     ): NotificationContent {
         return when (reminderStyle) {
-            ReminderStyle.GENTLE -> getGentleContent(userName, currentProgress, dailyGoal)
-            ReminderStyle.MOTIVATING -> getMotivatingContent(userName, currentProgress, dailyGoal)
-            ReminderStyle.MINIMAL -> getMinimalContent(currentProgress, dailyGoal)
+            ReminderStyle.GENTLE -> getGentleContent(context, currentProgress)
+            ReminderStyle.MOTIVATING -> getMotivatingContent(context, currentProgress)
+            ReminderStyle.MINIMAL -> getMinimalContent(context, currentProgress, dailyGoal, volumeUnit)
         }
     }
 
-    private fun getGentleContent(userName: String?, progress: Float, goal: Double): NotificationContent {
-        val titles = listOf(
-            "💧 Gentle Hydration Reminder",
-            "🌊 Time for Some Water",
-            "💙 Your Body is Calling",
-            "🌸 Gentle Hydration Break",
-            "💧 Soft Reminder from HydroTracker"
-        )
-
-        val messages = when {
-            progress < 0.25f -> listOf(
-                "Your body would love some refreshing water right now ✨",
-                "How about a sip of something refreshing? 💧",
-                "A gentle reminder to nurture yourself with water 🌱",
-                "Time to give your body the hydration it deserves 💙",
-                "Let's start building that healthy hydration habit 🌊"
+    /**
+     * Get a preview of notification content for the settings screen.
+     * Returns decomposed title, message, and extra content (fact/pun) without
+     * combining them into a single body string.
+     */
+    fun getNotificationPreview(context: Context, reminderStyle: ReminderStyle): NotificationPreview {
+        return when (reminderStyle) {
+            ReminderStyle.GENTLE -> NotificationPreview(
+                title = context.resources.getStringArray(R.array.notification_gentle_titles).random(),
+                message = context.resources.getStringArray(getGentleMessageArray(0.3f)).random(),
+                extraContent = ""
             )
-            progress < 0.5f -> listOf(
-                "You're making great progress! Keep it flowing 🌊",
-                "Halfway there! Your body appreciates every drop 💧",
-                "Looking good! Time for another refreshing moment ✨",
-                "Your hydration journey is flowing beautifully 🌸",
-                "Keep up the wonderful work! Another sip awaits 💙"
+            ReminderStyle.MOTIVATING -> NotificationPreview(
+                title = context.resources.getStringArray(R.array.notification_motivating_titles).random(),
+                message = context.resources.getStringArray(getMotivatingMessageArray(0.3f)).random(),
+                extraContent = ""
             )
-            progress < 0.75f -> listOf(
-                "Almost there! You're doing wonderfully 🌟",
-                "Your dedication to hydration is inspiring! 💧",
-                "So close to your goal! Keep flowing forward 🌊",
-                "Your body is thanking you for this care 💙",
-                "Beautiful progress! Just a bit more to go ✨"
-            )
-            else -> listOf(
-                "You're so close to achieving your daily goal! 🎉",
-                "Final stretch! Your consistency is amazing 💧",
-                "Almost at the finish line! You've got this 🌟",
-                "Your dedication today has been incredible 💙",
-                "One more push to complete your hydration victory! 🏆"
+            ReminderStyle.MINIMAL -> NotificationPreview(
+                title = context.resources.getStringArray(R.array.notification_minimal_titles).random(),
+                message = context.getString(R.string.notification_minimal_message_mid),
+                extraContent = ""
             )
         }
+    }
 
-        val funFacts = getRandomWaterFact()
+    private fun getGentleContent(
+        context: Context,
+        progress: Float
+    ): NotificationContent {
+        val title = context.resources.getStringArray(R.array.notification_gentle_titles).random()
+        val message = context.resources.getStringArray(getGentleMessageArray(progress)).random()
 
         return NotificationContent(
-            title = titles.random(),
-            message = "${messages.random()}\n\n💡 $funFacts",
+            title = title,
+            message = message,
             progress = progress
         )
     }
 
-    private fun getMotivatingContent(userName: String?, progress: Float, goal: Double): NotificationContent {
-        val titles = listOf(
-            "💪 Hydration Champion!",
-            "🚀 Water Warrior Alert!",
-            "⚡ Power Up with H2O!",
-            "🏆 Hydration Hero Time!",
-            "🔥 Fuel Your Success!"
-        )
+    private fun getGentleMessageArray(progress: Float): Int = when {
+        progress < 0.25f -> R.array.notification_gentle_messages_low
+        progress < 0.5f -> R.array.notification_gentle_messages_mid
+        progress < 0.75f -> R.array.notification_gentle_messages_high
+        else -> R.array.notification_gentle_messages_final
+    }
 
-        val messages = when {
-            progress < 0.25f -> listOf(
-                "Time to CRUSH your hydration goals! Let's GO! 🚀",
-                "Your SUCCESS starts with the next sip! 💪",
-                "Champions hydrate! Are you ready to DOMINATE? ⚡",
-                "FUEL your potential with premium H2O! 🔥",
-                "Winners stay hydrated! Time to LEVEL UP! 🏆"
-            )
-            progress < 0.5f -> listOf(
-                "UNSTOPPABLE! You're building momentum! 🚀",
-                "CRUSHING IT! Halfway to hydration victory! 💪",
-                "POWERFUL progress! Keep that energy flowing! ⚡",
-                "AMAZING work! You're on fire today! 🔥",
-                "CHAMPION mindset! Push forward! 🏆"
-            )
-            progress < 0.75f -> listOf(
-                "INCREDIBLE dedication! Victory is within reach! 🚀",
-                "OUTSTANDING! You're in the winner's zone! 💪",
-                "PHENOMENAL! Final quarter - you've got this! ⚡",
-                "EXCELLENCE in action! Keep dominating! 🔥",
-                "LEGENDARY persistence! Almost at the summit! 🏆"
-            )
-            else -> listOf(
-                "FINAL PUSH! Greatness awaits! 🚀",
-                "SO CLOSE to TOTAL VICTORY! 💪",
-                "MAXIMUM effort for MAXIMUM results! ⚡",
-                "ULTIMATE hydration hero! Finish strong! 🔥",
-                "LEGENDARY status incoming! Complete the mission! 🏆"
-            )
+    private fun getMotivatingContent(
+        context: Context,
+        progress: Float
+    ): NotificationContent {
+        val title = context.resources.getStringArray(R.array.notification_motivating_titles).random()
+        val message = context.resources.getStringArray(getMotivatingMessageArray(progress)).random()
+
+        return NotificationContent(
+            title = title,
+            message = message,
+            progress = progress
+        )
+    }
+
+    private fun getMotivatingMessageArray(progress: Float): Int = when {
+        progress < 0.25f -> R.array.notification_motivating_messages_low
+        progress < 0.5f -> R.array.notification_motivating_messages_mid
+        progress < 0.75f -> R.array.notification_motivating_messages_high
+        else -> R.array.notification_motivating_messages_final
+    }
+
+    private fun getMinimalContent(
+        context: Context,
+        progress: Float,
+        goal: Double,
+        volumeUnit: VolumeUnit
+    ): NotificationContent {
+        val message = when {
+            progress < 0.5f -> context.getString(R.string.notification_minimal_message_low)
+            progress < 0.8f -> context.getString(R.string.notification_minimal_message_mid)
+            else -> {
+                val remaining = ((1 - progress) * goal)
+                val remainingText = VolumeUnitConverter.format(context, remaining, volumeUnit)
+                context.getString(R.string.notification_minimal_remaining, remainingText)
+            }
         }
 
-        val puns = getRandomWaterPun()
-
         return NotificationContent(
-            title = titles.random(),
-            message = "${messages.random()}\n\n😄 $puns",
+            title = context.resources.getStringArray(R.array.notification_minimal_titles).random(),
+            message = message,
             progress = progress
         )
     }
 
-    private fun getMinimalContent(progress: Float, goal: Double): NotificationContent {
-        val remaining = ((1 - progress) * goal).toInt()
-
+    /**
+     * Get a daily fun fact for the fun-facts notification channel.
+     */
+    fun getFunFactContent(context: Context): NotificationContent {
+        val fact = context.resources.getStringArray(R.array.notification_facts).random()
         return NotificationContent(
-            title = "💧 Water reminder",
-            message = when {
-                progress < 0.5f -> "Time to hydrate"
-                progress < 0.8f -> "Continue hydrating"
-                else -> "${remaining}ml remaining"
-            },
-            progress = progress
+            title = context.getString(R.string.notification_fun_fact_title),
+            message = fact,
+            progress = -1f
         )
     }
 
-    private fun getRandomWaterFact(): String {
-        val facts = listOf(
-            "Your brain is 75% water - feed it well!",
-            "Water helps regulate your body temperature",
-            "Proper hydration can improve your mood and concentration",
-            "Your muscles are 75% water",
-            "Water helps transport nutrients throughout your body",
-            "Staying hydrated can boost your energy levels",
-            "Water helps your kidneys filter waste efficiently",
-            "Proper hydration supports healthy skin",
-            "Your blood is 90% water",
-            "Water helps lubricate your joints",
-            "Hydration can improve your physical performance",
-            "Water aids in digestion and nutrient absorption",
-            "Staying hydrated helps maintain healthy blood pressure",
-            "Water helps prevent kidney stones",
-            "Your heart works more efficiently when you're hydrated"
-        )
-        return facts.random()
-    }
-
-    private fun getRandomWaterPun(): String {
-        val puns = listOf(
-            "Water you waiting for? Let's hydrate!",
-            "Don't let your hydration goals go down the drain!",
-            "H2-Oh yeah! Time for water!",
-            "You're one in a mill-ion! Stay hydrated!",
-            "Water wonderful day to stay hydrated!",
-            "Sea what happens when you drink more water!",
-            "Don't be a drip - drink up!",
-            "Water pressure? We prefer hydration pleasure!",
-            "Make waves with your hydration game!",
-            "Pool your energy and drink some water!",
-            "Current mood: Needs more water!",
-            "Tide yourself over with some H2O!",
-            "Water good choice to stay hydrated!",
-            "Flow with the hydration rhythm!",
-            "Sink or swim - we choose hydrate!"
-        )
-        return puns.random()
-    }
 }
 
 /**
@@ -190,4 +145,14 @@ data class NotificationContent(
     val title: String,
     val message: String,
     val progress: Float
+)
+
+/**
+ * Data class for notification preview content shown in settings.
+ * Decomposed so title, message, and extra content (fact/pun) can be displayed separately.
+ */
+data class NotificationPreview(
+    val title: String,
+    val message: String,
+    val extraContent: String
 )

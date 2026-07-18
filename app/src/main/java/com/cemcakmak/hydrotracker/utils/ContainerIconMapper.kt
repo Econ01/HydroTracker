@@ -1,27 +1,24 @@
 package com.cemcakmak.hydrotracker.utils
 
 import com.cemcakmak.hydrotracker.R
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocalCafe
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.annotation.DrawableRes
 
 /**
  * Icon types for container presets
  */
 enum class IconType {
-    VECTOR,    // Material Icons (ImageVector)
     DRAWABLE   // Custom drawable resources
 }
 
 /**
- * Container icon configuration
+ * Container icon configuration. Both checked (filled) and unchecked (outlined) drawable
+ * resources are provided so the icon can be used in selectable UI such as toggle buttons.
  */
 data class ContainerIcon(
     val type: IconType,
     val name: String,
-    val vectorIcon: ImageVector? = null,
-    @DrawableRes val drawableRes: Int? = null
+    @DrawableRes val uncheckedRes: Int,
+    @DrawableRes val checkedRes: Int
 )
 
 /**
@@ -33,19 +30,54 @@ object ContainerIconMapper {
      * All available icons in order of volume (smallest to largest)
      */
     private val iconsByVolume = listOf(
-        ContainerIcon(IconType.VECTOR, "LocalCafe", vectorIcon = Icons.Default.LocalCafe),
-        ContainerIcon(IconType.DRAWABLE, "glass_cup", drawableRes = R.drawable.glass_cup),
-        ContainerIcon(IconType.DRAWABLE, "water_loss", drawableRes = R.drawable.water_loss),
-        ContainerIcon(IconType.DRAWABLE, "water_medium", drawableRes = R.drawable.water_medium),
-        ContainerIcon(IconType.DRAWABLE, "water_full", drawableRes = R.drawable.water_full),
-        ContainerIcon(IconType.DRAWABLE, "water_bottle", drawableRes = R.drawable.water_bottle),
-        ContainerIcon(IconType.DRAWABLE, "water_bottle_large", drawableRes = R.drawable.water_bottle_large)
+        ContainerIcon(
+            IconType.DRAWABLE,
+            "local_cafe",
+            uncheckedRes = R.drawable.local_cafe,
+            checkedRes = R.drawable.local_cafe_filled
+        ),
+        ContainerIcon(
+            IconType.DRAWABLE,
+            "glass_cup",
+            uncheckedRes = R.drawable.glass_cup,
+            checkedRes = R.drawable.glass_cup_filled
+        ),
+        ContainerIcon(
+            IconType.DRAWABLE,
+            "water_loss",
+            uncheckedRes = R.drawable.water_loss,
+            checkedRes = R.drawable.water_loss_filled
+        ),
+        ContainerIcon(
+            IconType.DRAWABLE,
+            "water_medium",
+            uncheckedRes = R.drawable.water_medium,
+            checkedRes = R.drawable.water_medium_filled
+        ),
+        ContainerIcon(
+            IconType.DRAWABLE,
+            "water_full",
+            uncheckedRes = R.drawable.water_full,
+            checkedRes = R.drawable.water_full_filled
+        ),
+        ContainerIcon(
+            IconType.DRAWABLE,
+            "water_bottle",
+            uncheckedRes = R.drawable.water_bottle,
+            checkedRes = R.drawable.water_bottle_filled
+        ),
+        ContainerIcon(
+            IconType.DRAWABLE,
+            "water_bottle_large",
+            uncheckedRes = R.drawable.water_bottle_large,
+            checkedRes = R.drawable.water_bottle_large_filled
+        )
     )
 
     /**
      * Volume thresholds for icon selection (upper bounds)
      * Maps volume ranges to icons based on the plan:
-     * - ≤125ml → LocalCafe
+     * - ≤125ml → local_café
      * - 126-162ml → glass_cup
      * - 163-187ml → water_loss
      * - 188-250ml → water_medium
@@ -54,7 +86,7 @@ object ContainerIconMapper {
      * - >750ml → water_bottle_large
      */
     private val volumeThresholds = listOf(
-        125.0 to 0,   // LocalCafe
+        125.0 to 0,   // local_cafe
         162.0 to 1,   // glass_cup
         187.0 to 2,   // water_loss
         250.0 to 3,   // water_medium
@@ -85,42 +117,7 @@ object ContainerIconMapper {
     }
 
     /**
-     * Get icon type string for storage
-     */
-    fun getIconType(icon: ContainerIcon): String = icon.type.name
-
-    /**
-     * Get icon name string for storage
-     */
-    fun getIconName(icon: ContainerIcon): String = icon.name
-
-    /**
-     * Get all available icons (useful for icon picker if needed in future)
+     * Get all available icons (useful for icon picker)
      */
     fun getAllIcons(): List<ContainerIcon> = iconsByVolume
-
-    /**
-     * Get the drawable resource ID for a given icon name (for DRAWABLE type)
-     */
-    fun getDrawableResId(iconName: String): Int? {
-        return when (iconName) {
-            "glass_cup" -> R.drawable.glass_cup
-            "water_loss" -> R.drawable.water_loss
-            "water_medium" -> R.drawable.water_medium
-            "water_full" -> R.drawable.water_full
-            "water_bottle" -> R.drawable.water_bottle
-            "water_bottle_large" -> R.drawable.water_bottle_large
-            else -> null
-        }
-    }
-
-    /**
-     * Get the ImageVector for a given icon name (for VECTOR type)
-     */
-    fun getVectorIcon(iconName: String): ImageVector? {
-        return when (iconName) {
-            "LocalCafe" -> Icons.Default.LocalCafe
-            else -> null
-        }
-    }
 }

@@ -36,15 +36,7 @@ captures/
 
 # IntelliJ
 *.iml
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/gradle.xml
-.idea/assetWizardSettings.xml
-.idea/dictionaries
-.idea/libraries
-.idea/caches
-.idea/modules.xml
-.idea/navEditor.xml
+.idea/
 
 # Keystore files
 *.jks
@@ -87,9 +79,6 @@ lint/tmp/
 # Windows
 Thumbs.db
 ehthumbs.db
-
-# Logs
-*.log
 
 # Coverage directory
 coverage/

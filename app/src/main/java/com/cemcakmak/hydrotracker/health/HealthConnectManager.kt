@@ -13,6 +13,7 @@ import androidx.health.connect.client.records.metadata.Device
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.health.connect.client.units.Volume
+import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
 import java.time.Instant
 import java.time.ZoneOffset
@@ -156,9 +157,8 @@ object HealthConnectManager {
 
             // Create volume using effective hydration amount (considers beverage type multiplier)
             val effectiveAmount = entry.getEffectiveHydrationAmount()
-            val volumeInMilliliters = effectiveAmount
-            Log.d(TAG, "Using effective volume: ${volumeInMilliliters}ml (raw: ${entry.amount}ml, beverage: ${entry.getBeverageType().displayName}, multiplier: ${entry.getBeverageType().hydrationMultiplier})")
-            Log.d(TAG, "Type check - effectiveAmount: $effectiveAmount (${effectiveAmount::class.simpleName}), volumeInMilliliters: $volumeInMilliliters (${volumeInMilliliters::class.simpleName})")
+            Log.d(TAG, "Using effective volume: ${effectiveAmount}ml (raw: ${entry.amount}ml, beverage: ${entry.getBeverageType().displayName}, multiplier: ${entry.getBeverageType().hydrationMultiplier})")
+            Log.d(TAG, "Type check - effectiveAmount: $effectiveAmount (${effectiveAmount::class.simpleName}), volumeInMilliliters: $effectiveAmount (${effectiveAmount::class.simpleName})")
 
             // Create unique ID for tracking this record
             val uniqueId = "hydrotracker_${entry.id}_${System.currentTimeMillis()}"
@@ -169,15 +169,15 @@ object HealthConnectManager {
                 startZoneOffset = ZoneOffset.systemDefault().rules.getOffset(startTime),
                 endTime = endTime,
                 endZoneOffset = ZoneOffset.systemDefault().rules.getOffset(endTime),
-                volume = Volume.milliliters(volumeInMilliliters),
+                volume = Volume.milliliters(effectiveAmount),
                 metadata = Metadata.manualEntry(
                     device = Device(type = Device.TYPE_PHONE),
                     clientRecordId = uniqueId
                 )
             )
 
-            Log.d(TAG, "Created HydrationRecord: startTime=$startTime, endTime=$endTime, volume=${volumeInMilliliters}ml")
-            Log.d(TAG, "Volume object created: ${Volume.milliliters(volumeInMilliliters)} (${Volume.milliliters(volumeInMilliliters).inMilliliters}ml)")
+            Log.d(TAG, "Created HydrationRecord: startTime=$startTime, endTime=$endTime, volume=${effectiveAmount}ml")
+            Log.d(TAG, "Volume object created: ${Volume.milliliters(effectiveAmount)} (${Volume.milliliters(effectiveAmount).inMilliliters}ml)")
 
             // Write to Health Connect
             Log.d(TAG, "Writing HydrationRecord to Health Connect...")
@@ -187,7 +187,7 @@ object HealthConnectManager {
             // Return the custom ID we set in metadata for tracking
             Log.d(TAG, "Health Connect record ID: $uniqueId")
 
-            Log.i(TAG, "✅ Successfully wrote hydration record to Health Connect: ${volumeInMilliliters}ml effective (${entry.amount}ml ${entry.getBeverageType().displayName})")
+            Log.i(TAG, "✅ Successfully wrote hydration record to Health Connect: ${effectiveAmount}ml effective (${entry.amount}ml ${entry.getBeverageType().displayName})")
             Result.success(uniqueId)
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error writing hydration record to Health Connect", e)
@@ -292,6 +292,46 @@ object HealthConnectManager {
     }
 
     /**
+     * Read hydration records from Health Connect within a bounded time range.
+     */
+    suspend fun readHydrationRecords(context: Context, startTime: Instant, endTime: Instant): Result<List<HydrationRecord>> {
+        return try {
+            Log.d(TAG, "Starting Health Connect read from $startTime to $endTime")
+
+            if (!hasPermissions(context)) {
+                Log.w(TAG, "Cannot read from Health Connect: Missing permissions")
+                return Result.failure(SecurityException("Missing Health Connect permissions"))
+            }
+
+            val healthConnectClient = HealthConnectClient.getOrCreate(context)
+            val allRecords = mutableListOf<HydrationRecord>()
+            var pageToken: String? = null
+            var pageCount = 0
+
+            do {
+                val request = ReadRecordsRequest(
+                    recordType = HydrationRecord::class,
+                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime),
+                    pageToken = pageToken
+                )
+
+                val response = healthConnectClient.readRecords(request)
+                allRecords.addAll(response.records)
+                pageToken = response.pageToken
+                pageCount++
+
+                Log.d(TAG, "📄 Page $pageCount: read ${response.records.size} records, hasMorePages=${pageToken != null}")
+            } while (pageToken != null)
+
+            Log.i(TAG, "✅ Successfully read ${allRecords.size} hydration records across $pageCount page(s)")
+            Result.success(allRecords)
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Error reading hydration records from Health Connect", e)
+            Result.failure(e)
+        }
+    }
+
+    /**
      * Read only external hydration records (not from HydroTracker)
      */
     suspend fun readExternalHydrationRecords(context: Context, since: Instant): Result<List<HydrationRecord>> {
@@ -342,20 +382,24 @@ object HealthConnectManager {
      * Convert HydrationRecord to WaterIntakeEntry format
      */
     fun hydrationRecordToWaterIntakeEntry(
+        context: Context,
         record: HydrationRecord,
         sourceName: String?,
-        wakeUpTime: String = "07:00",
+        source: com.cemcakmak.hydrotracker.data.models.EntrySource,
+        dayEndTime: String = "23:00",
+        dayEndMode: com.cemcakmak.hydrotracker.data.models.DayEndMode = com.cemcakmak.hydrotracker.data.models.DayEndMode.SLEEP_TIME,
         healthConnectRecordId: String? = null
     ): WaterIntakeEntry {
         val volumeInML = record.volume.inMilliliters
         val timestamp = record.startTime.toEpochMilli()
         val date = com.cemcakmak.hydrotracker.utils.UserDayCalculator.getUserDayStringForTimestamp(
             timestamp,
-            wakeUpTime
+            dayEndTime,
+            dayEndMode
         )
 
         // Extract a user-friendly source name from the dataOrigin
-        val friendlySourceName = extractFriendlySourceName(sourceName)
+        val friendlySourceName = extractFriendlySourceName(context, sourceName)
 
         // Use provided ID or fallback to Health Connect's UUID
         val recordId = healthConnectRecordId ?: record.metadata.id
@@ -366,98 +410,46 @@ object HealthConnectManager {
         Log.d(TAG, "📦 Package: ${record.metadata.dataOrigin.packageName}")
         Log.d(TAG, "💾 Using record ID for local storage: $recordId")
 
+        val containerIcon = com.cemcakmak.hydrotracker.utils.ContainerIconMapper.getIconForVolume(volumeInML)
         return WaterIntakeEntry(
             amount = volumeInML,
             timestamp = timestamp,
             date = date,
-            containerType = friendlySourceName, // Use the actual source app name
-            containerVolume = volumeInML, // Use same as amount for external data
-            note = "Imported from $friendlySourceName",
-            healthConnectRecordId = recordId // Store the Health Connect record ID for deletion
+            containerType = friendlySourceName,
+            containerVolume = volumeInML,
+            note = context.getString(R.string.health_connect_imported_from, friendlySourceName),
+            healthConnectRecordId = recordId,
+            iconType = containerIcon.type.name,
+            iconName = containerIcon.name,
+            source = source
         )
     }
 
     /**
-     * Extract a user-friendly app name from Health Connect dataOrigin
+     * Extract a user-friendly app name from Health Connect dataOrigin.
+     * Uses the package manager when possible and falls back to the raw package name.
      */
-    private fun extractFriendlySourceName(dataOrigin: String?): String {
+    private fun extractFriendlySourceName(context: Context, dataOrigin: String?): String {
         if (dataOrigin.isNullOrBlank()) {
             return "Health Connect"
         }
 
         Log.d(TAG, "🔍 Processing dataOrigin: $dataOrigin")
 
-        // The dataOrigin format is typically: DataOrigin(packageName="com.example.app")
-        // Extract the package name from this format
-        val packageName = run {
-            val s = dataOrigin.trim()
+        val packageName = dataOrigin.trim().trim('"', '\'').trimEnd(')')
 
-            // 1) Canonical: DataOrigin(packageName="com.example.app")
-            val m1 = Regex("""DataOrigin\(\s*packageName\s*=\s*["']([^"']+)["']\s*\)?""").find(s)
-
-            // 2) Fallback: packageName=... or package=..., with/without quotes
-            val m2 = m1 ?: Regex("""\b(packageName|package)\s*=\s*["']?([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+)["']?\)?""").find(s)
-
-            // 3) Last resort: first package-like token anywhere
-            val candidate = when {
-                m1 != null -> m1.groupValues[1]
-                m2 != null -> m2.groupValues[2]
-                else -> Regex("""[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+""").find(s)?.value ?: s
-            }
-
-            // Clean common trailing/leading noise (quotes, ) etc.)
-            candidate.trim().trim('"', '\'').trimEnd(')')
-        }
-
-        Log.d(TAG, "📦 Extracted package name: $packageName")
-
-        // Map known package names to user-friendly names
         val cleanName = when {
-            // Samsung Health
-            packageName.equals("com.sec.android.app.shealth", ignoreCase = true) -> "Samsung Health"
-
-            // Google Fit
-            packageName.equals("com.google.android.apps.fitness", ignoreCase = true) -> "Google Fit"
-
-            // Fitbit
-            packageName.equals("com.fitbit.FitbitMobile", ignoreCase = true) -> "Fitbit"
-
-            // MyFitnessPal
-            packageName.equals("com.myfitnesspal.android", ignoreCase = true) -> "MyFitnessPal"
-
-            // Garmin Connect
-            packageName.startsWith("com.garmin", ignoreCase = true) -> "Garmin Connect"
-
-            // Strava
-            packageName.startsWith("com.strava", ignoreCase = true) -> "Strava"
-
-            // Xiaomi Mi Health
-            packageName.equals("com.mi.health", ignoreCase = true) -> "Mi Health"
-
-            // Huawei Health
-            packageName.equals("com.huawei.health", ignoreCase = true) -> "Huawei Health"
-
-            // Our own app (should not happen in external imports)
             packageName.equals("com.cemcakmak.hydrotracker", ignoreCase = true) -> "HydroTracker"
-
-            // Generic extraction from package name
             else -> {
-                val parts = packageName.split(".")
-                when {
-                    parts.size >= 3 -> {
-                        // Try to get the app name from the last part
-                        val appName = parts.last()
-                        appName.replaceFirstChar { it.uppercase() }
-                    }
-                    parts.size == 2 -> {
-                        // Format: com.appname
-                        parts.last().replaceFirstChar { it.uppercase() }
-                    }
-                    else -> {
-                        // Unknown format, use the whole string
-                        packageName.replaceFirstChar { it.uppercase() }
-                    }
-                }
+                val appLabel = runCatching {
+                    context.packageManager.getApplicationLabel(
+                        context.packageManager.getApplicationInfo(packageName, 0)
+                    ).toString()
+                }.getOrNull()
+
+                appLabel ?: packageName.split(".").lastOrNull()
+                    ?.replaceFirstChar { it.uppercase() }
+                    ?: packageName
             }
         }
 
@@ -513,13 +505,13 @@ object HealthConnectManager {
         return when {
             !isAvailable(context) -> {
                 when (HealthConnectClient.getSdkStatus(context)) {
-                    HealthConnectClient.SDK_UNAVAILABLE -> "Health Connect is not available on this device"
-                    HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED -> "Health Connect app needs to be updated"
-                    else -> "Health Connect is not available"
+                    HealthConnectClient.SDK_UNAVAILABLE -> context.getString(R.string.health_connect_status_unavailable)
+                    HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED -> context.getString(R.string.health_connect_status_update_required)
+                    else -> context.getString(R.string.health_connect_status_unavailable)
                 }
             }
-            !hasPermissions(context) -> "Permissions not granted for Health Connect"
-            else -> "Health Connect is ready"
+            !hasPermissions(context) -> context.getString(R.string.health_connect_status_no_permissions)
+            else -> context.getString(R.string.health_connect_status_ready)
         }
     }
 }

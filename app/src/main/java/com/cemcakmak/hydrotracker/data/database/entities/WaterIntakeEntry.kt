@@ -1,12 +1,15 @@
 package com.cemcakmak.hydrotracker.data.database.entities
 
+import android.content.Context
 import androidx.room.*
 import com.cemcakmak.hydrotracker.data.models.BeverageType
-import java.text.NumberFormat
+import com.cemcakmak.hydrotracker.data.models.EntrySource
+import com.cemcakmak.hydrotracker.data.models.TimeFormat
+import com.cemcakmak.hydrotracker.data.models.VolumeUnit
+import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
+import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 import java.time.Instant
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import java.util.Locale
 
 @Entity(
@@ -48,52 +51,55 @@ data class WaterIntakeEntry(
     val isHidden: Boolean = false,
 
     @ColumnInfo(name = "beverage_type")
-    val beverageType: String = BeverageType.WATER.name
+    val beverageType: String = BeverageType.WATER.name,
+
+    // Effectiveness captured at log time for custom beverages. Null for preset/legacy rows,
+    // which fall back to the BeverageType enum multiplier.
+    @ColumnInfo(name = "beverage_multiplier")
+    val beverageMultiplier: Double? = null,
+
+    // Container icon captured at log time so recent entries keep the correct icon even if the
+    // preset is edited or deleted later.
+    @ColumnInfo(name = "icon_type", defaultValue = "DRAWABLE")
+    val iconType: String = "DRAWABLE",
+
+    @ColumnInfo(name = "icon_name", defaultValue = "water_filled")
+    val iconName: String = "water_filled",
+
+    @ColumnInfo(name = "source", defaultValue = "LOCAL")
+    val source: EntrySource = EntrySource.LOCAL
 ) {
     /**
-     * Returns a formatted time string according to system locale and timezone preferences
+     * Returns a formatted time string according to the user's [timeFormat] preference.
+     * Internal storage continues to use epoch milliseconds; this only affects display.
      */
-    fun getFormattedTime(): String {
+    fun getFormattedTime(context: Context, timeFormat: TimeFormat): String {
         val instant = Instant.ofEpochMilli(timestamp)
-        val localDateTime = instant.atZone(ZoneId.systemDefault())
-
-        // Use system locale and preferences for 12/24 hour format
-        val formatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
-            .withLocale(Locale.getDefault())
-
-        return formatter.format(localDateTime)
+        val localDateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime()
+        return DateTimeFormatters.formatTime(context, localDateTime.toLocalTime(), timeFormat)
     }
 
     /**
-     * Returns a formatted date and time string according to system locale and timezone preferences
+     * Returns the intake amount formatted in the user's preferred [volumeUnit].
+     * Internal storage continues to use millilitres.
      */
-    fun getFormattedDateTime(): String {
-        val instant = Instant.ofEpochMilli(timestamp)
-        val localDateTime = instant.atZone(ZoneId.systemDefault())
-
-        // Use system locale and preferences for date and time format
-        val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.SHORT)
-            .withLocale(Locale.getDefault())
-
-        return formatter.format(localDateTime)
-    }
-
-    fun getFormattedAmount(): String {
-        return if (amount >= 1000) {
-            val liters = amount / 1000
-            val formatter = NumberFormat.getNumberInstance(Locale.getDefault())
-            formatter.maximumFractionDigits = 1
-            "${formatter.format(liters)} L"
-        } else {
-            "${amount.toInt()} ml"
-        }
+    fun getFormattedAmount(context: Context, volumeUnit: VolumeUnit): String {
+        return VolumeUnitConverter.format(context, amount, volumeUnit)
     }
 
     /**
      * Check if this entry was imported from an external Health Connect app
      */
     fun isExternalEntry(): Boolean {
-        return note?.startsWith("Imported from ") == true
+        return source == EntrySource.HEALTH_CONNECT_EXTERNAL
+    }
+
+    /**
+     * Check if this entry can be mirrored to Health Connect on write/update/delete.
+     * Local entries and our own restored entries are mirrored; external imports are read-only.
+     */
+    fun isSyncableToHealthConnect(): Boolean {
+        return source == EntrySource.LOCAL || source == EntrySource.HEALTH_CONNECT_RESTORED
     }
 
     /**
@@ -104,25 +110,19 @@ data class WaterIntakeEntry(
     }
 
     /**
-     * Get the effective hydration amount considering beverage type multiplier
+     * Get the effective hydration amount considering beverage type multiplier.
+     * Custom beverages store their multiplier on the entry; presets/legacy rows use the enum.
      */
     fun getEffectiveHydrationAmount(): Double {
-        return amount * getBeverageType().hydrationMultiplier
+        return amount * (beverageMultiplier ?: getBeverageType().hydrationMultiplier)
     }
 
     /**
-     * Get formatted effective hydration amount
+     * Get formatted effective hydration amount in the user's preferred [volumeUnit].
+     * Internal storage continues to use millilitres.
      */
-    fun getFormattedEffectiveAmount(): String {
-        val effectiveAmount = getEffectiveHydrationAmount()
-        return if (effectiveAmount >= 1000) {
-            val liters = effectiveAmount / 1000
-            val formatter = NumberFormat.getNumberInstance(Locale.getDefault())
-            formatter.maximumFractionDigits = 1
-            "${formatter.format(liters)} L"
-        } else {
-            "${effectiveAmount.toInt()} ml"
-        }
+    fun getFormattedEffectiveAmount(context: Context, volumeUnit: VolumeUnit): String {
+        return VolumeUnitConverter.format(context, getEffectiveHydrationAmount(), volumeUnit)
     }
 
     companion object {
@@ -131,7 +131,10 @@ data class WaterIntakeEntry(
             containerType: String,
             containerVolume: Double,
             beverageType: BeverageType = BeverageType.WATER,
-            note: String? = null
+            note: String? = null,
+            iconType: String = "DRAWABLE",
+            iconName: String = "water_filled",
+            source: EntrySource = EntrySource.LOCAL
         ): WaterIntakeEntry {
             val now = System.currentTimeMillis()
             val today = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -144,7 +147,10 @@ data class WaterIntakeEntry(
                 containerType = containerType,
                 containerVolume = containerVolume,
                 note = note,
-                beverageType = beverageType.name
+                beverageType = beverageType.name,
+                iconType = iconType,
+                iconName = iconName,
+                source = source
             )
         }
     }

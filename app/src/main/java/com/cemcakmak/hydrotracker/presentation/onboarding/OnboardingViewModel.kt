@@ -2,7 +2,9 @@ package com.cemcakmak.hydrotracker.presentation.onboarding
 
 import android.app.Application
 import android.util.Log
+import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
+import com.cemcakmak.hydrotracker.R
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,11 +14,12 @@ import com.cemcakmak.hydrotracker.data.models.*
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
 import com.cemcakmak.hydrotracker.notifications.NotificationPermissionManager
 import com.cemcakmak.hydrotracker.notifications.HydroNotificationScheduler
+import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 import com.cemcakmak.hydrotracker.utils.WaterCalculator
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * ViewModel for managing onboarding flow state and user profile creation
- * Follows Material Design 3 Expressive principles with smooth state transitions
  * Integrated with UserRepository for data persistence and notification system
  */
 class OnboardingViewModel(
@@ -94,7 +97,7 @@ class OnboardingViewModel(
             updateNavigationState()
 
             // Simulate animation duration
-            kotlinx.coroutines.delay(300)
+            kotlinx.coroutines.delay(300.milliseconds)
             _isAnimating.value = false
         }
     }
@@ -120,7 +123,7 @@ class OnboardingViewModel(
             _currentStep.value = previousStep
             updateNavigationState()
 
-            kotlinx.coroutines.delay(300)
+            kotlinx.coroutines.delay(300.milliseconds)
             _isAnimating.value = false
         }
     }
@@ -143,7 +146,7 @@ class OnboardingViewModel(
         updateNavigationState()
     }
 
-    /** Update wake up time */
+    /** Update wake-up time */
     fun updateWakeUpTime(time: String) {
         _userProfile.value = _userProfile.value.copy(wakeUpTime = time)
         updateNavigationState()
@@ -173,7 +176,6 @@ class OnboardingViewModel(
 
         val dailyGoal = WaterCalculator.calculateDailyWaterGoal(
             gender = profile.gender,
-            ageGroup = profile.ageGroup,
             activityLevel = profile.activityLevel,
             weight = profile.weight,
             hydrationStandard = profile.hydrationStandard
@@ -182,7 +184,9 @@ class OnboardingViewModel(
         val reminderInterval = WaterCalculator.calculateReminderInterval(
             wakeUpTime = profile.wakeUpTime,
             sleepTime = profile.sleepTime,
-            dailyGoal = dailyGoal
+            dailyGoal = dailyGoal,
+            reminderIntervalMode = profile.reminderIntervalMode,
+            customReminderInterval = profile.customReminderInterval
         )
 
         _userProfile.value = _userProfile.value.copy(
@@ -196,8 +200,10 @@ class OnboardingViewModel(
         println("DEBUG: OnboardingViewModel.completeOnboarding() called")
 
         viewModelScope.launch {
+            val context = getApplication<Application>()
             val completedProfile = _userProfile.value.copy(
-                isOnboardingCompleted = true
+                isOnboardingCompleted = true,
+                volumeUnit = VolumeUnitConverter.defaultUnitForLocale(context.resources.configuration.locales.get(0))
             )
 
             println("DEBUG: Saving completed profile to repository.")
@@ -212,7 +218,6 @@ class OnboardingViewModel(
             println("DEBUG: OnboardingViewModel - Profile completion status: ${completedProfile.isOnboardingCompleted}")
 
             // NEW: Start notifications if permission is granted
-            val context = getApplication<Application>()
             if (NotificationPermissionManager.hasNotificationPermission(context)) {
                 println("DEBUG: Starting notifications after onboarding completion")
                 HydroNotificationScheduler.startNotifications(context, completedProfile)
@@ -237,7 +242,7 @@ class OnboardingViewModel(
             OnboardingStep.SCHEDULE -> true // Times are always valid (have defaults)
             OnboardingStep.PROFILE_SETUP -> _userProfile.value.name.isNotBlank() // Name is required
             OnboardingStep.GOAL -> true
-            OnboardingStep.COMPLETE -> false // No next step after complete
+            OnboardingStep.COMPLETE -> false // No, next step after complete
         }
     }
 
@@ -255,31 +260,33 @@ class OnboardingViewModel(
         }
     }
 
-    /** Get step title for current step */
-    fun getStepTitle(): String {
+    /** String resource for the current step's title. Resolved with stringResource() in the UI. */
+    @StringRes
+    fun getStepTitleRes(): Int {
         return when (_currentStep.value) {
-            OnboardingStep.WELCOME -> "Welcome to HydroTracker"
-            OnboardingStep.GENDER -> "Tell us about yourself"
-            OnboardingStep.AGE -> "What's your age group?"
-            OnboardingStep.ACTIVITY -> "How active are you?"
-            OnboardingStep.SCHEDULE -> "When are you awake?"
-            OnboardingStep.PROFILE_SETUP -> "Complete Your Profile"
-            OnboardingStep.GOAL -> "Your personalized goal"
-            OnboardingStep.COMPLETE -> "You're all set!"
+            OnboardingStep.WELCOME -> R.string.onboarding_welcome_title
+            OnboardingStep.GENDER -> R.string.onboarding_gender_title
+            OnboardingStep.AGE -> R.string.onboarding_age_title
+            OnboardingStep.ACTIVITY -> R.string.onboarding_activity_title
+            OnboardingStep.SCHEDULE -> R.string.onboarding_schedule_title
+            OnboardingStep.PROFILE_SETUP -> R.string.onboarding_profile_title
+            OnboardingStep.GOAL -> R.string.onboarding_goal_title
+            OnboardingStep.COMPLETE -> R.string.onboarding_complete_title
         }
     }
 
-    /** Get step description for current step */
-    fun getStepDescription(): String {
+    /** String resource for the current step's description. Resolved with stringResource() in the UI. */
+    @StringRes
+    fun getStepDescriptionRes(): Int {
         return when (_currentStep.value) {
-            OnboardingStep.WELCOME -> "We'll personalize the app for you."
-            OnboardingStep.GENDER -> "Choose the option that best describes you."
-            OnboardingStep.AGE -> "Select your age range."
-            OnboardingStep.ACTIVITY -> "Pick your general daily activity level."
-            OnboardingStep.SCHEDULE -> "Tell us your wake and sleep times."
-            OnboardingStep.PROFILE_SETUP -> "Add your name and a profile photo to personalize your experience."
-            OnboardingStep.GOAL -> "Review your calculated goal."
-            OnboardingStep.COMPLETE -> "Tap the button to start hydrating!"
+            OnboardingStep.WELCOME -> R.string.onboarding_welcome_description
+            OnboardingStep.GENDER -> R.string.onboarding_gender_description
+            OnboardingStep.AGE -> R.string.onboarding_age_description
+            OnboardingStep.ACTIVITY -> R.string.onboarding_activity_description
+            OnboardingStep.SCHEDULE -> R.string.onboarding_schedule_description
+            OnboardingStep.PROFILE_SETUP -> R.string.onboarding_profile_description
+            OnboardingStep.GOAL -> R.string.onboarding_goal_description
+            OnboardingStep.COMPLETE -> R.string.onboarding_complete_description
         }
     }
 }

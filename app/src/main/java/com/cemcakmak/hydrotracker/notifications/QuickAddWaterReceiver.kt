@@ -6,12 +6,13 @@ package com.cemcakmak.hydrotracker.notifications
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import androidx.core.app.NotificationManagerCompat
+import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.DatabaseInitializer
 import com.cemcakmak.hydrotracker.data.models.ContainerPreset
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /**
@@ -22,16 +23,21 @@ class QuickAddWaterReceiver : BroadcastReceiver() {
 
     companion object {
         const val ACTION_QUICK_ADD_WATER = "com.cemcakmak.hydrotracker.QUICK_ADD_WATER"
-        const val QUICK_ADD_AMOUNT = 250.0 // Default quick add amount in ml
+        const val EXTRA_CONTAINER_VOLUME = "extra_container_volume"
+        const val EXTRA_CONTAINER_NAME = "extra_container_name"
+        private const val DEFAULT_QUICK_ADD_AMOUNT = 250.0
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == ACTION_QUICK_ADD_WATER) {
-            addQuickWater(context)
+            val amount = intent.getDoubleExtra(EXTRA_CONTAINER_VOLUME, DEFAULT_QUICK_ADD_AMOUNT)
+            val name = intent.getStringExtra(EXTRA_CONTAINER_NAME)
+                ?: context.getString(R.string.notification_quick_add_preset_name)
+            addQuickWater(context, amount, name)
         }
     }
 
-    private fun addQuickWater(context: Context) {
+    private fun addQuickWater(context: Context, amount: Double, containerName: String) {
         // Use coroutine scope for database operations
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -44,30 +50,37 @@ class QuickAddWaterReceiver : BroadcastReceiver() {
 
                 // Create a preset for quick add
                 val quickAddPreset = ContainerPreset(
-                    name = "Quick Add",
-                    volume = QUICK_ADD_AMOUNT,
+                    name = containerName,
+                    volume = amount,
                     isDefault = false
                 )
 
                 // Add water to database
                 val result = waterIntakeRepository.addWaterIntake(
-                    amount = QUICK_ADD_AMOUNT,
+                    amount = amount,
                     containerPreset = quickAddPreset,
-                    note = "Added from notification"
+                    note = context.getString(R.string.notification_quick_add_note)
                 )
 
                 result.onSuccess {
-                    // Cancel the notification after successful addition
-                    val notificationManager = NotificationManagerCompat.from(context)
-                    notificationManager.cancel(HydroNotificationService.NOTIFICATION_ID)
-
-                    // Show a brief success notification
-                    showSuccessNotification(context)
-
-                    // Reschedule next reminder
-                    val userProfile = userRepository.userProfile.value
+                    // Show a brief feedback notification with the updated progress
+                    val userProfile = userRepository.userProfile.first()
                     if (userProfile != null) {
-                        HydroNotificationScheduler.scheduleNextReminder(context, userProfile)
+                        val updatedProgress = waterIntakeRepository.getTodayProgress().first()
+
+                        HydroNotificationService(context).showQuickAddFeedbackNotification(
+                            userProfile,
+                            updatedProgress,
+                            amount
+                        )
+
+                        // Reschedule next reminder with a dynamically calculated interval
+                        HydroNotificationScheduler.onWaterEntryAdded(
+                            context,
+                            userProfile,
+                            userRepository = userRepository,
+                            waterIntakeRepository = waterIntakeRepository
+                        )
                     }
                 }
 
@@ -81,24 +94,4 @@ class QuickAddWaterReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun showSuccessNotification(context: Context) {
-        val notificationService = HydroNotificationService(context)
-
-        // Create a simple success notification that auto-dismisses
-        val successNotification = android.app.Notification.Builder(context, HydroNotificationService.CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_menu_save) // System checkmark icon
-            .setContentTitle("💧 Water Added!")
-            .setContentText("Added 250ml to your daily intake")
-            .setAutoCancel(true)
-            .setTimeoutAfter(3000) // Auto dismiss after 3 seconds
-            .setPriority(android.app.Notification.PRIORITY_LOW)
-            .build()
-
-        val notificationManager = NotificationManagerCompat.from(context)
-        try {
-            notificationManager.notify(9999, successNotification) // Different ID for success notification
-        } catch (e: SecurityException) {
-            println("Cannot show success notification: ${e.message}")
-        }
-    }
 }

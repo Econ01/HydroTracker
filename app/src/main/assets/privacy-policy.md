@@ -107,8 +107,7 @@ HydroTracker requests the following permissions to provide its functionality:
 
 ### Camera and Photo Permissions:
 - **CAMERA:** To take profile photos directly within the app
-- **READ_MEDIA_IMAGES:** To select existing photos from your device gallery for your profile
-- **READ_MEDIA_VISUAL_USER_SELECTED:** To access only the specific photos you choose (Android 14+)
+- **Android Photo Picker:** To select an existing photo from your device gallery for your profile. The picker grants the app temporary access only to the specific photo you choose; no broad storage permissions are used.
 
 All permissions can be managed through your device settings, and the app will function with limited features if certain permissions are denied.
 

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!--
+        MissingTranslation fires only when a non-default values-XX/ file exists and is missing
+        a key that is present in the base values/strings.xml. It does NOT fire when no
+        translation directories exist at all.
+
+        With Crowdin, make sure you either:
+        - configure Crowdin to download only 100% translated files, or
+        - maintain a lint-baseline.xml for known missing strings, or
+        - temporarily lower this severity to "warning" while translations are in progress.
+    -->
+    <issue id="MissingTranslation" severity="error" />
+    <!-- Warn (don't fail) if a translation has a key not present in the base values/. -->
+    <issue id="ExtraTranslation" severity="warning" />
+</lint>

@@ -4,21 +4,28 @@
 
     <!-- Permissions needed for notifications -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="33" />
-    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission
+        android:name="android.permission.USE_EXACT_ALARM"
+        tools:ignore="RestrictedPermission" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Internet access for checking app updates (GitHub releases) -->
+    <uses-permission android:name="android.permission.INTERNET" />
     
     <!-- Permissions for profile photo capture and selection -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
 
     <!-- Health Connect permissions -->
-    <uses-permission android:name="android.permission.health.READ_HYDRATION" />
-    <uses-permission android:name="android.permission.health.WRITE_HYDRATION" />
+    <uses-permission
+        android:name="android.permission.health.READ_HYDRATION"
+        tools:ignore="RestrictedPermission" />
+    <uses-permission
+        android:name="android.permission.health.WRITE_HYDRATION"
+        tools:ignore="RestrictedPermission" />
 
     <!-- Health Connect capability declaration -->
     <queries>
@@ -39,10 +46,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HydroTracker"
         android:enableOnBackInvokedCallback="true"
+        android:localeConfig="@xml/locales_config"
         tools:targetApi="33" >
         <activity
             android:name=".MainActivity"
-            android:exported="true" >
+            android:exported="true"
+            android:configChanges="uiMode|density|fontScale|locale|layoutDirection|screenSize|smallestScreenSize|screenLayout|orientation|keyboardHidden|navigation" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -77,8 +86,13 @@
             android:name=".notifications.QuickAddWaterReceiver"
             android:enabled="true"
             android:exported="false" />
-        
-        <!-- Boot receiver to reschedule notifications after device restart -->
+
+        <receiver
+            android:name=".notifications.FunFactReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
+        <!-- Boot receiver to reschedule notifications after device restart or app update -->
         <receiver
             android:name=".notifications.BootReceiver"
             android:enabled="true"
@@ -86,61 +100,24 @@
             <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-                <action android:name="android.intent.action.PACKAGE_REPLACED" />
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
 
-        <!-- HydroTracker Compact Widget (1x1) -->
-        <receiver
-            android:name=".widgets.HydroCompactWidget"
-            android:enabled="true"
-            android:exported="true"
-            android:label="HydroTracker Compact">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/hydro_compact_widget_info" />
-        </receiver>
-
-        <!-- HydroTracker Progress Widget (4x1) -->
-        <receiver
-            android:name=".widgets.HydroProgressWidget"
-            android:enabled="true"
-            android:exported="true"
-            android:label="HydroTracker Progress">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/hydro_progress_widget_info" />
-        </receiver>
-
-        <!-- HydroTracker Large Widget (4x4) -->
+        <!-- HydroTracker Large Widget (4x2) -->
         <receiver
             android:name=".widgets.HydroLargeWidget"
             android:enabled="true"
             android:exported="true"
-            android:label="HydroTracker Large">
+            android:label="@string/widget_large_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.cemcakmak.hydrotracker.QUICK_ADD" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/hydro_large_widget_info" />
         </receiver>
 
-        <!-- Widget Update Service -->
-        <service
-            android:name=".widgets.WidgetUpdateService"
-            android:enabled="true"
-            android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-            
         <!-- File Provider for camera image capture -->
         <provider
             android:name="androidx.core.content.FileProvider"

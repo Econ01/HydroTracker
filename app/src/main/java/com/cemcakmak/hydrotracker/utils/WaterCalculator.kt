@@ -1,13 +1,16 @@
 package com.cemcakmak.hydrotracker.utils
 
+import android.content.Context
 import android.util.Log
 import com.cemcakmak.hydrotracker.data.models.ActivityLevel
-import com.cemcakmak.hydrotracker.data.models.AgeGroup
 import com.cemcakmak.hydrotracker.data.models.Gender
 import com.cemcakmak.hydrotracker.data.models.HydrationStandard
+import com.cemcakmak.hydrotracker.data.models.ReminderIntervalMode
+import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import kotlin.math.max
+import kotlin.math.roundToInt
 
 /**
  * Utility class for calculating daily water intake goals based on scientific research
@@ -27,7 +30,6 @@ object WaterCalculator {
      * Calculates daily water intake goal based on user profile
      *
      * @param gender User's gender
-     * @param ageGroup User's age group
      * @param activityLevel User's activity level
      * @param weight User's weight in kg (optional for more precise calculation)
      * @param hydrationStandard EFSA (default) or IOM standards
@@ -35,7 +37,6 @@ object WaterCalculator {
      */
     fun calculateDailyWaterGoal(
         gender: Gender,
-        ageGroup: AgeGroup,
         activityLevel: ActivityLevel,
         weight: Double? = null,
         hydrationStandard: HydrationStandard = HydrationStandard.EFSA
@@ -82,36 +83,80 @@ object WaterCalculator {
     /**
      * Calculates optimal reminder interval based on awake hours and daily goal
      *
-     * @param wakeUpTime Wake up time in HH:mm format
+     * @param wakeUpTime Wake-up time in HH:mm format
      * @param sleepTime Sleep time in HH:mm format
      * @param dailyGoal Daily water goal in milliliters
+     * @param reminderIntervalMode Auto or Custom mode
+     * @param customReminderInterval User-defined interval in minutes (used only in Custom mode)
      * @return Optimal reminder interval in minutes
      */
     fun calculateReminderInterval(
         wakeUpTime: String,
         sleepTime: String,
-        dailyGoal: Double
+        dailyGoal: Double,
+        reminderIntervalMode: ReminderIntervalMode = ReminderIntervalMode.AUTOMATIC,
+        customReminderInterval: Int = 60
     ): Int {
+        if (reminderIntervalMode == ReminderIntervalMode.CUSTOM) {
+            return customReminderInterval.coerceAtLeast(1)
+        }
+
         val awakeHours = calculateAwakeHours(wakeUpTime, sleepTime)
 
         Log.d("Awake Hours", "Awake hours: $awakeHours")
 
-        // Target 8-12 reminders per day for optimal hydration
-        val targetReminders = when {
-            dailyGoal < 2000 -> 8 // Lower goal = fewer reminders
-            dailyGoal < 3000 -> 10 // Medium goal = medium reminders
-            else -> 12 // High goal = more frequent reminders
-        }
+        // Glass-based reminder count: one reminder per ~300ml glass
+        val targetReminders = (dailyGoal / 300.0).roundToInt().coerceAtLeast(1)
 
         val intervalMinutes = ((awakeHours * 60) / targetReminders).toInt()
 
-        return intervalMinutes
+        return intervalMinutes.coerceAtLeast(1)
+    }
+
+    /**
+     * Calculates a dynamic reminder interval based on how much water is still needed and how
+     * much awake time remains. This ensures users receive enough reminders to reach their goal
+     * even if they log only small amounts.
+     *
+     * @param remainingAmountMl Millilitres still needed to reach the daily goal.
+     * @param remainingAwakeMinutes Minutes left until sleep time.
+     * @param reminderIntervalMode Auto or Custom mode.
+     * @param customReminderInterval User-defined interval in minutes (used only in Custom mode).
+     * @param averageDrinkSizeMl Estimated drink size for interval calculation (default 300 ml).
+     * @return Interval in minutes.
+     */
+    fun calculateDynamicReminderInterval(
+        remainingAmountMl: Double,
+        remainingAwakeMinutes: Double,
+        reminderIntervalMode: ReminderIntervalMode = ReminderIntervalMode.AUTOMATIC,
+        customReminderInterval: Int = 60,
+        averageDrinkSizeMl: Double = 300.0
+    ): Int {
+        if (reminderIntervalMode == ReminderIntervalMode.CUSTOM) {
+            return customReminderInterval.coerceAtLeast(1)
+        }
+
+        if (remainingAmountMl <= 0 || remainingAwakeMinutes <= 0) {
+            return calculateReminderInterval(
+                wakeUpTime = "07:00",
+                sleepTime = "23:00",
+                dailyGoal = 2000.0,
+                reminderIntervalMode = ReminderIntervalMode.AUTOMATIC
+            )
+        }
+
+        val remindersNeeded = (remainingAmountMl / averageDrinkSizeMl).coerceAtLeast(1.0)
+        val intervalMinutes = (remainingAwakeMinutes / remindersNeeded).toInt()
+
+        val minInterval = 15
+        val maxInterval = 180
+        return intervalMinutes.coerceIn(minInterval, maxInterval)
     }
 
     /**
      * Calculates awake hours from wake up and sleep times
      */
-    private fun calculateAwakeHours(wakeUpTime: String, sleepTime: String): Double {
+    fun calculateAwakeHours(wakeUpTime: String, sleepTime: String): Double {
         return try {
             val formatter = DateTimeFormatter.ofPattern("HH:mm")
             val wakeUp = LocalTime.parse(wakeUpTime, formatter)
@@ -134,23 +179,14 @@ object WaterCalculator {
     }
 
     /**
-     * Formats water amount for display
+     * Formats water amount for display in the user's preferred [volumeUnit].
      *
-     * @param amountMl Amount in milliliters
-     * @return Formatted string (e.g., "2.5 L" or "750 ml")
+     * @param context Context for resolving unit labels.
+     * @param amountMl Amount in milliliters.
+     * @param volumeUnit The user's preferred display unit.
+     * @return Formatted string (e.g., "750 ml" or "25.4 fl oz").
      */
-    fun formatWaterAmount(amountMl: Double): String {
-        return when {
-            amountMl >= 1000 -> "${(amountMl / 1000).format(1)} L"
-            else -> "${amountMl.toInt()} ml"
-        }
-    }
-
-
-    /**
-     * Extension function to format Double with specified decimal places
-     */
-    private fun Double.format(decimals: Int): String {
-        return "%.${decimals}f".format(this)
+    fun formatWaterAmount(context: Context, amountMl: Double, volumeUnit: VolumeUnit): String {
+        return VolumeUnitConverter.format(context, amountMl, volumeUnit)
     }
 }

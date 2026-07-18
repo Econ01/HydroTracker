@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Languages the app ships translations for. Android 13+ reads this for the system
+    "App languages" picker. Add a <locale> here when a values-XX/ translation lands
+    (and keep AppLocale.SUPPORTED_TAGS in sync).
+-->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en" />
+</locale-config>

@@ -6,6 +6,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
 import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
+import com.cemcakmak.hydrotracker.data.database.repository.CustomBeverageRepository
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
 
 object DatabaseInitializer {
@@ -168,6 +169,118 @@ object DatabaseInitializer {
         }
     }
 
+    private val MIGRATION_6_7 = object : Migration(6, 7) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            try {
+                println("DatabaseInitializer: Starting migration from version 6 to 7")
+
+                // Create the custom_beverages table
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS custom_beverages (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        name TEXT NOT NULL,
+                        hydration_multiplier REAL NOT NULL,
+                        icon_key TEXT NOT NULL
+                    )
+                """)
+
+                println("DatabaseInitializer: Migration 6→7 completed. Created custom_beverages table.")
+
+            } catch (e: Exception) {
+                println("DatabaseInitializer: Error during migration 6→7: ${e.message}")
+                throw e
+            }
+        }
+    }
+
+    private val MIGRATION_7_8 = object : Migration(7, 8) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            try {
+                println("DatabaseInitializer: Starting migration from version 7 to 8")
+
+                // Add nullable beverage_multiplier to water_intake_entries (custom beverage effectiveness)
+                db.execSQL("ALTER TABLE water_intake_entries ADD COLUMN beverage_multiplier REAL")
+
+                println("DatabaseInitializer: Migration 7→8 completed. Added beverage_multiplier column.")
+
+            } catch (e: Exception) {
+                println("DatabaseInitializer: Error during migration 7→8: ${e.message}")
+                throw e
+            }
+        }
+    }
+
+    private val MIGRATION_9_10 = object : Migration(9, 10) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            try {
+                println("DatabaseInitializer: Starting migration from version 9 to 10")
+
+                db.execSQL(
+                    "ALTER TABLE water_intake_entries ADD COLUMN source TEXT NOT NULL DEFAULT 'LOCAL'"
+                )
+
+                // Existing entries that were imported from other apps carry a Health Connect
+                // record id that is not one of our client record ids. Tag them accordingly so
+                // they are not re-written to Health Connect.
+                db.execSQL(
+                    """
+                    UPDATE water_intake_entries
+                    SET source = 'HEALTH_CONNECT_EXTERNAL'
+                    WHERE health_connect_record_id IS NOT NULL
+                      AND health_connect_record_id NOT LIKE 'hydrotracker_%'
+                    """.trimIndent()
+                )
+
+                println("DatabaseInitializer: Migration 9→10 completed. Added source column.")
+            } catch (e: Exception) {
+                println("DatabaseInitializer: Error during migration 9→10: ${e.message}")
+                throw e
+            }
+        }
+    }
+
+    private val MIGRATION_8_9 = object : Migration(8, 9) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            try {
+                println("DatabaseInitializer: Starting migration from version 8 to 9")
+
+                // Add icon columns to water_intake_entries so each entry keeps its container icon.
+                db.execSQL("ALTER TABLE water_intake_entries ADD COLUMN icon_type TEXT NOT NULL DEFAULT 'DRAWABLE'")
+                db.execSQL("ALTER TABLE water_intake_entries ADD COLUMN icon_name TEXT NOT NULL DEFAULT 'water_filled'")
+
+                // Backfill existing rows with an icon derived from their stored container volume.
+                // Thresholds mirror ContainerIconMapper.getIconForVolume().
+                db.execSQL(
+                    """
+                    UPDATE water_intake_entries
+                    SET icon_name = CASE
+                        WHEN container_volume <= 125 THEN 'local_cafe'
+                        WHEN container_volume <= 162 THEN 'glass_cup'
+                        WHEN container_volume <= 187 THEN 'water_loss'
+                        WHEN container_volume <= 250 THEN 'water_medium'
+                        WHEN container_volume <= 400 THEN 'water_full'
+                        WHEN container_volume <= 750 THEN 'water_bottle'
+                        ELSE 'water_bottle_large'
+                    END
+                    """.trimIndent()
+                )
+
+                println("DatabaseInitializer: Migration 8→9 completed. Added icon columns and backfilled existing rows.")
+
+            } catch (e: Exception) {
+                println("DatabaseInitializer: Error during migration 8→9: ${e.message}")
+                throw e
+            }
+        }
+    }
+
+    /** Every shipped schema migration, in order. Exposed so migration tests exercise the real chain. */
+    val ALL_MIGRATIONS: Array<Migration> = arrayOf(
+        MIGRATION_1_2, MIGRATION_1_3, MIGRATION_2_3, MIGRATION_3_4,
+        MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8,
+        MIGRATION_8_9, MIGRATION_9_10
+    )
+
     fun getDatabase(context: Context): HydroTrackerDatabase {
         return database ?: synchronized(this) {
             val instance = Room.databaseBuilder(
@@ -175,7 +288,7 @@ object DatabaseInitializer {
                 HydroTrackerDatabase::class.java,
                 HydroTrackerDatabase.DATABASE_NAME
             )
-                .addMigrations(MIGRATION_1_2, MIGRATION_1_3, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+                .addMigrations(*ALL_MIGRATIONS)
                 // Add fallback strategy for Room 2.8.1 compatibility issues
                 .fallbackToDestructiveMigrationOnDowngrade(true)
                 .build()
@@ -203,50 +316,10 @@ object DatabaseInitializer {
         )
     }
 
-    /**
-     * Validate database connection (simplified version for synchronous use)
-     * Call this method if you suspect database corruption or migration issues
-     */
-    fun validateDatabase(context: Context): Boolean {
-        return try {
-            println("DatabaseInitializer: Validating database...")
-            val db = getDatabase(context)
-
-            // Try to open database connection - this will trigger migrations if needed
-            db.openHelper.readableDatabase.version
-            println("DatabaseInitializer: Database validation successful")
-            true
-        } catch (e: Exception) {
-            println("DatabaseInitializer: Database validation failed: ${e.message}")
-            false
-        }
-    }
-
-    /**
-     * Repair corrupted database by recreating it
-     */
-    fun repairDatabase(context: Context): Boolean {
-        return try {
-            println("DatabaseInitializer: Attempting database repair...")
-
-            // Close existing database connection
-            database?.close()
-            database = null
-
-            // Clear database file and recreate
-            val dbFile = context.getDatabasePath(HydroTrackerDatabase.DATABASE_NAME)
-            if (dbFile.exists()) {
-                dbFile.delete()
-                println("DatabaseInitializer: Deleted corrupted database file")
-            }
-
-            // Force recreation
-            val newDb = getDatabase(context)
-            println("DatabaseInitializer: Database recreated successfully")
-            true
-        } catch (repairError: Exception) {
-            println("DatabaseInitializer: Database repair failed: ${repairError.message}")
-            false
-        }
+    fun getCustomBeverageRepository(context: Context): CustomBeverageRepository {
+        val db = getDatabase(context)
+        return CustomBeverageRepository(
+            customBeverageDao = db.customBeverageDao()
+        )
     }
 }
