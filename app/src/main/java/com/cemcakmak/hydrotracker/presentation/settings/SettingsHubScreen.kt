@@ -482,7 +482,8 @@ fun SettingsHubInteractivePreview() {
                     onNavigateBack = onNavigateBack,
                     onNavigateToOnboarding = {},
                     onNavigateToHapticsTest = {},
-                    onNavigateToHapticsLab = {}
+                    onNavigateToHapticsLab = {},
+                    onNavigateToAnimationMotionLab = {}
                 )
                 NavigationRoutes.SettingsProfile -> ProfileSettingsScreen(
                     userProfile = UserProfile(

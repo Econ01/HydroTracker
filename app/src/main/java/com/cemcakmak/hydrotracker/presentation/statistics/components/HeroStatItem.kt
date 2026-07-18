@@ -22,6 +22,7 @@ package com.cemcakmak.hydrotracker.presentation.statistics.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,11 +39,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
+import com.cemcakmak.hydrotracker.presentation.common.AnimatedNumber
 import com.cemcakmak.hydrotracker.presentation.common.shapes.SquircleShape
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 
@@ -64,22 +63,9 @@ fun HeroStatItem(
     formatValue: @Composable (Float) -> String,
     tooltipText: String? = null,
     suffix: String? = null,
-    suffixStyle: TextStyle = MaterialTheme.typography.headlineSmallEmphasized
+    suffixStyle: TextStyle = MaterialTheme.typography.headlineSmallEmphasized,
+    entryDelayMillis: Int = 0
 ) {
-    val animatedValue = rememberAnimatedDouble(
-        targetValue = value,
-        hapticsEnabled = hapticsEnabled
-    )
-
-    val annotatedValue = buildAnnotatedString {
-        append(formatValue(animatedValue))
-        if (!suffix.isNullOrBlank()) {
-            withStyle(style = suffixStyle.toSpanStyle()) {
-                append(suffix)
-            }
-        }
-    }
-
     val content = @Composable {
         Surface(
             modifier = Modifier
@@ -92,10 +78,18 @@ fun HeroStatItem(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = annotatedValue,
-                    style = MaterialTheme.typography.displaySmallEmphasized
-                )
+                Row(verticalAlignment = Alignment.Bottom) {
+                    AnimatedNumber(
+                        targetValue = value,
+                        formatValue = formatValue,
+                        style = MaterialTheme.typography.displaySmallEmphasized,
+                        suffix = suffix,
+                        suffixStyle = suffixStyle,
+                        animateEntry = false,
+                        hapticsEnabled = hapticsEnabled,
+                        entryDelayMillis = entryDelayMillis
+                    )
+                }
 
                 Text(
                     text = label,

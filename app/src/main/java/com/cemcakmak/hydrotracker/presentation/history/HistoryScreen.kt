@@ -86,7 +86,7 @@ import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropProgressive
 import com.cemcakmak.hydrotracker.presentation.common.effect.backdropBlur
 import com.cemcakmak.hydrotracker.presentation.common.effect.backdropSource
 import com.cemcakmak.hydrotracker.presentation.common.effect.rememberBackdropBlurState
-import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
+import com.cemcakmak.hydrotracker.presentation.common.AnimatedNumber
 import com.cemcakmak.hydrotracker.presentation.common.toOption
 import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
 import java.time.LocalDate
@@ -486,31 +486,31 @@ internal fun AnimatedStatItem(
     label: String,
     targetValue: Double,
     hapticsEnabled: Boolean = false,
-    formatValue: @Composable (Float) -> String
+    formatValue: @Composable (Float) -> String,
+    entryDelayMillis: Int = 0
 ) {
-    val animatedValue = rememberAnimatedDouble(
-        targetValue = targetValue,
-        hapticsEnabled = hapticsEnabled
-    )
-    ChartStatItem(
-        label = label,
-        value = formatValue(animatedValue)
-    )
+    ChartStatItem(label = label) {
+        AnimatedNumber(
+            targetValue = targetValue,
+            formatValue = formatValue,
+            style = MaterialTheme.typography.titleMediumEmphasized,
+            color = MaterialTheme.colorScheme.primary,
+            animateEntry = false,
+            hapticsEnabled = hapticsEnabled,
+            entryDelayMillis = entryDelayMillis
+        )
+    }
 }
 
 @Composable
 internal fun ChartStatItem(
     label: String,
-    value: String
+    value: @Composable () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleMediumEmphasized,
-            color = MaterialTheme.colorScheme.primary
-        )
+        value()
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,

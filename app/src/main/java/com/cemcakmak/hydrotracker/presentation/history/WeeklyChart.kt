@@ -79,6 +79,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.dao.DailyTotal
+import com.cemcakmak.hydrotracker.presentation.common.EntryAnimationDefaults
 import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.data.models.WeekStartDay
@@ -157,7 +158,8 @@ internal fun WeeklyChartSection(
                 AnimatedStatItem(
                     label = stringResource(R.string.history_stat_total),
                     targetValue = stats.totalIntake / 1000.0,
-                    formatValue = { VolumeUnitConverter.format(context, it.toDouble() * 1000.0, volumeUnit) }
+                    formatValue = { VolumeUnitConverter.format(context, it.toDouble() * 1000.0, volumeUnit) },
+                    entryDelayMillis = EntryAnimationDefaults.DELAY_MS
                 )
 
                 VerticalDivider(
@@ -170,7 +172,8 @@ internal fun WeeklyChartSection(
                     label = stringResource(R.string.history_stat_average),
                     targetValue = stats.averageIntake / 1000.0,
                     hapticsEnabled = true,
-                    formatValue = { VolumeUnitConverter.format(context, it.toDouble() * 1000.0, volumeUnit) }
+                    formatValue = { VolumeUnitConverter.format(context, it.toDouble() * 1000.0, volumeUnit) },
+                    entryDelayMillis = EntryAnimationDefaults.DELAY_MS
                 )
 
                 VerticalDivider(
@@ -182,7 +185,8 @@ internal fun WeeklyChartSection(
                 AnimatedStatItem(
                     label = stringResource(R.string.history_stat_best_day),
                     targetValue = stats.bestDayIntake / 1000.0,
-                    formatValue = { VolumeUnitConverter.format(context, it.toDouble() * 1000.0, volumeUnit) }
+                    formatValue = { VolumeUnitConverter.format(context, it.toDouble() * 1000.0, volumeUnit) },
+                    entryDelayMillis = EntryAnimationDefaults.DELAY_MS
                 )
             }
         } else {

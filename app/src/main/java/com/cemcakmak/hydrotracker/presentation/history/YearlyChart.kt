@@ -60,6 +60,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.entities.DailySummary
+import com.cemcakmak.hydrotracker.presentation.common.EntryAnimationDefaults
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.ui.theme.extendedColorScheme
@@ -102,7 +103,8 @@ internal fun YearlyChartSection(
                     label = stringResource(R.string.history_stat_days_tracked),
                     targetValue = stats.daysTracked.toDouble(),
                     hapticsEnabled = true,
-                    formatValue = { it.toInt().toString() }
+                    formatValue = { it.toInt().toString() },
+                    entryDelayMillis = EntryAnimationDefaults.DELAY_MS
                 )
 
                 VerticalDivider(
@@ -114,7 +116,8 @@ internal fun YearlyChartSection(
                 AnimatedStatItem(
                     label = stringResource(R.string.history_stat_goals_met),
                     targetValue = stats.goalsMet.toDouble(),
-                    formatValue = { it.toInt().toString() }
+                    formatValue = { it.toInt().toString() },
+                    entryDelayMillis = EntryAnimationDefaults.DELAY_MS
                 )
 
                 VerticalDivider(
@@ -126,7 +129,8 @@ internal fun YearlyChartSection(
                 AnimatedStatItem(
                     label = stringResource(R.string.history_stat_total_intake),
                     targetValue = stats.totalIntake,
-                    formatValue = { VolumeUnitConverter.format(context, it.toDouble(), volumeUnit) }
+                    formatValue = { VolumeUnitConverter.format(context, it.toDouble(), volumeUnit) },
+                    entryDelayMillis = EntryAnimationDefaults.DELAY_MS
                 )
             }
         } else {

@@ -22,6 +22,7 @@ package com.cemcakmak.hydrotracker.presentation.statistics.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -35,13 +36,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
-import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
+import com.cemcakmak.hydrotracker.presentation.common.AnimatedNumber
 import com.cemcakmak.hydrotracker.presentation.common.shapes.SquircleShape
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.ui.theme.extendedColorScheme
@@ -61,22 +60,10 @@ fun TotalIntakePill(
     label: String,
     totalIntake: Double,
     volumeUnit: VolumeUnit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    entryDelayMillis: Int = 0
 ) {
     val displayUnit = VolumeUnitConverter.MetricEquivalent.LITRE.toDisplayUnit(volumeUnit)
-
-    val animatedValue = rememberAnimatedDouble(
-        targetValue = totalIntake,
-        hapticsEnabled = true,
-        step = displayUnit.toMillilitresFactor
-    )
-
-    val annotatedValue = buildAnnotatedString {
-        append(VolumeUnitConverter.formatValue(animatedValue.toDouble(), displayUnit))
-        withStyle(style = MaterialTheme.typography.headlineSmallEmphasized.toSpanStyle()) {
-            append(stringResource(displayUnit.shortLabelResId))
-        }
-    }
 
     Surface(
         modifier = modifier
@@ -96,11 +83,19 @@ fun TotalIntakePill(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = annotatedValue,
-                style = MaterialTheme.typography.displayLargeEmphasized,
-                color = MaterialTheme.extendedColorScheme.onSuccessContainer
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                AnimatedNumber(
+                    modifier = Modifier.alignByBaseline(),
+                    targetValue = totalIntake,
+                    formatValue = { value -> VolumeUnitConverter.formatValue(value.toDouble(), displayUnit) },
+                    style = MaterialTheme.typography.displayLargeEmphasized,
+                    color = MaterialTheme.extendedColorScheme.onSuccessContainer,
+                    suffix = stringResource(displayUnit.shortLabelResId),
+                    suffixStyle = MaterialTheme.typography.headlineSmallEmphasized,
+                    hapticsEnabled = true,
+                    entryDelayMillis = entryDelayMillis
+                )
+            }
 
             Text(
                 text = label,

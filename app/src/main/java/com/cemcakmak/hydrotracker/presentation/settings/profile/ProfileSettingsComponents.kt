@@ -27,8 +27,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.core.EaseInOut
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -112,7 +110,9 @@ import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.presentation.common.timeBasedGreeting
 import com.cemcakmak.hydrotracker.presentation.common.LocalNavAnimatedVisibilityScope
 import com.cemcakmak.hydrotracker.presentation.common.LocalSharedTransitionScope
-import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
+import com.cemcakmak.hydrotracker.presentation.common.AnimatedNumber
+import com.cemcakmak.hydrotracker.presentation.common.EntryAnimationDefaults
+import com.cemcakmak.hydrotracker.presentation.common.RollingNumberConfig
 import com.cemcakmak.hydrotracker.presentation.settings.SelectableOptionCard
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.utils.ImageUtils
@@ -233,14 +233,16 @@ internal fun ProfileHeroPreview(
             ) {
                 AnimatedStatItem(
                     value = todayEntryCount.toDouble(),
-                    label = stringResource(R.string.profile_stat_today_entries)
+                    label = stringResource(R.string.profile_stat_today_entries),
+                    entryDelayMillis = EntryAnimationDefaults.DELAY_MS
                 )
 
                 VerticalDivider(modifier = Modifier.height(52.dp))
 
                 AnimatedStatItem(
                     value = daysTracked.toDouble(),
-                    label = stringResource(R.string.profile_stat_days_tracked)
+                    label = stringResource(R.string.profile_stat_days_tracked),
+                    entryDelayMillis = EntryAnimationDefaults.DELAY_MS
                 )
 
                 VerticalDivider(modifier = Modifier.height(52.dp))
@@ -248,7 +250,8 @@ internal fun ProfileHeroPreview(
                 AnimatedStatItem(
                     value = (todayGoalProgress * 100).toDouble(),
                     suffix = "%",
-                    label = stringResource(R.string.profile_stat_today_goal)
+                    label = stringResource(R.string.profile_stat_today_goal),
+                    entryDelayMillis = EntryAnimationDefaults.DELAY_MS
                 )
             }
         }
@@ -354,21 +357,19 @@ private fun getInitials(name: String): String {
 private fun AnimatedStatItem(
     value: Double,
     label: String,
-    suffix: String = ""
+    suffix: String = "",
+    entryDelayMillis: Int = 0
 ) {
-    val animatedValue = rememberAnimatedDouble(
-        targetValue = value,
-        hapticsEnabled = true,
-        animationSpec = tween(durationMillis = 800, easing = EaseInOut)
-    )
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "${animatedValue.toInt()}$suffix",
+        AnimatedNumber(
+            targetValue = value,
+            formatValue = { v -> "${v.toInt()}$suffix" },
             style = MaterialTheme.typography.headlineSmallEmphasized,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary,
+            hapticsEnabled = true,
+            entryDelayMillis = entryDelayMillis
         )
         Text(
             text = label,
@@ -525,13 +526,6 @@ internal fun DailyGoalBottomSheetContent(
 
     var sliderPosition by remember { mutableFloatStateOf(currentGoalMl.toFloat()) }
 
-    // Animate the displayed value whenever the slider snaps.
-    val animatedGoalMl = rememberAnimatedDouble(
-        targetValue = sliderPosition.toDouble(),
-        hapticsEnabled = false,
-        animationSpec = tween(durationMillis = 150, easing = EaseInOut)
-    )
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -553,10 +547,13 @@ internal fun DailyGoalBottomSheetContent(
         )
 
         // Rolling number headline
-        Text(
-            text = stringResource(R.string.unit_milliliters_format, animatedGoalMl.toInt().toString()),
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
+        AnimatedNumber(
+            targetValue = sliderPosition.toDouble(),
+            formatValue = { v -> stringResource(R.string.unit_milliliters_format, v.toInt().toString()) },
+            style = MaterialTheme.typography.headlineSmallEmphasized,
+            hapticsEnabled = false,
+            animationConfig = RollingNumberConfig(rapidChangeThresholdMs = 150),
+            animateEntry = false,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 

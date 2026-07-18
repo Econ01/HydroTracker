@@ -81,6 +81,7 @@ import com.cemcakmak.hydrotracker.presentation.settings.ReminderIntervalScreen
 import com.cemcakmak.hydrotracker.presentation.settings.DeveloperOptionsScreen
 import com.cemcakmak.hydrotracker.presentation.settings.HapticsLabScreen
 import com.cemcakmak.hydrotracker.presentation.settings.HapticsTestScreen
+import com.cemcakmak.hydrotracker.presentation.settings.AnimationMotionLabScreen
 import com.cemcakmak.hydrotracker.presentation.settings.LicensesScreen
 import com.cemcakmak.hydrotracker.presentation.settings.SupportDevelopmentScreen
 import com.cemcakmak.hydrotracker.presentation.settings.WidgetQuickAddScreen
@@ -870,6 +871,10 @@ fun HydroTrackerApp(
                                 onNavigateToHapticsLab = {
                                     developerOptionsWasPop = true
                                     backStack.add(NavigationRoutes.SettingsDeveloperHapticsLab)
+                                },
+                                onNavigateToAnimationMotionLab = {
+                                    developerOptionsWasPop = true
+                                    backStack.add(NavigationRoutes.SettingsDeveloperMotion)
                                 }
                             )
                         }
@@ -881,6 +886,12 @@ fun HydroTrackerApp(
                         }
                         entry<NavigationRoutes.SettingsDeveloperHapticsLab> {
                             HapticsLabScreen(
+                                themePreferences = themePreferences,
+                                onNavigateBack = popBackStack
+                            )
+                        }
+                        entry<NavigationRoutes.SettingsDeveloperMotion> {
+                            AnimationMotionLabScreen(
                                 themePreferences = themePreferences,
                                 onNavigateBack = popBackStack
                             )

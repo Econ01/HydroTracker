@@ -85,6 +85,7 @@ import com.cemcakmak.hydrotracker.presentation.statistics.components.BeverageDon
 import com.cemcakmak.hydrotracker.presentation.statistics.components.ContainerUsageCard
 import com.cemcakmak.hydrotracker.presentation.statistics.components.OverviewCard
 import com.cemcakmak.hydrotracker.presentation.statistics.components.HeroStatItem
+import com.cemcakmak.hydrotracker.presentation.common.EntryAnimationDefaults
 import com.cemcakmak.hydrotracker.presentation.statistics.components.TotalIntakePill
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.utils.NumberFormatters
@@ -186,7 +187,8 @@ private fun StatisticsContent(
         TotalIntakePill(
             label = stringResource(R.string.statistics_label_total_intake),
             totalIntake = uiState.totalIntake,
-            volumeUnit = volumeUnit
+            volumeUnit = volumeUnit,
+            entryDelayMillis = EntryAnimationDefaults.DELAY_MS
         )
 
         Row(
@@ -207,7 +209,8 @@ private fun StatisticsContent(
                 hapticsEnabled = false,
                 tooltipText = VolumeUnitConverter.format(context, uiState.averageDailyIntake, volumeUnit),
                 formatValue = { VolumeUnitConverter.formatValue(it.toDouble(), averageDailyIntakeDisplayUnit) },
-                suffix = stringResource(averageDailyIntakeDisplayUnit.shortLabelResId)
+                suffix = stringResource(averageDailyIntakeDisplayUnit.shortLabelResId),
+                entryDelayMillis = EntryAnimationDefaults.DELAY_MS
             )
 
             HeroStatItem(
@@ -222,10 +225,10 @@ private fun StatisticsContent(
                 hapticsEnabled = false,
                 tooltipText = stringResource(R.string.percent_format, uiState.goalSuccessRate.toInt()),
                 formatValue = { it.toInt().toString() },
-                suffix = "%"
+                suffix = "%",
+                entryDelayMillis = EntryAnimationDefaults.DELAY_MS
             )
 
-            val daysTrackedParts = NumberFormatters.formatCompactCountParts(uiState.totalTrackedDays.toDouble())
             HeroStatItem(
                 label = stringResource(R.string.statistics_hero_days_tracked),
                 value = uiState.totalTrackedDays.toDouble(),
@@ -237,8 +240,8 @@ private fun StatisticsContent(
                 ),
                 hapticsEnabled = false,
                 tooltipText = uiState.totalTrackedDays.toString(),
-                formatValue = { daysTrackedParts.numericPart },
-                suffix = daysTrackedParts.suffix
+                formatValue = { NumberFormatters.formatCompactCount(it.toDouble()) },
+                entryDelayMillis = EntryAnimationDefaults.DELAY_MS
             )
         }
     }
@@ -260,7 +263,8 @@ private fun StatisticsContent(
     SectionHeader(title = stringResource(R.string.statistics_section_beverages))
     BeverageDonutChart(
         items = resolvedBeverages,
-        volumeUnit = volumeUnit
+        volumeUnit = volumeUnit,
+        entryDelayMillis = EntryAnimationDefaults.DELAY_MS
     )
 
     SectionHeader(title = stringResource(R.string.statistics_section_containers))

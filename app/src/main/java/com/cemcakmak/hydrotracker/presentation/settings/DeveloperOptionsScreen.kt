@@ -124,7 +124,8 @@ fun DeveloperOptionsScreen(
     onNavigateBack: () -> Unit = {},
     onNavigateToOnboarding: () -> Unit = {},
     onNavigateToHapticsTest: () -> Unit = {},
-    onNavigateToHapticsLab: () -> Unit = {}
+    onNavigateToHapticsLab: () -> Unit = {},
+    onNavigateToAnimationMotionLab: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -222,6 +223,22 @@ fun DeveloperOptionsScreen(
                         onClick = {
                             haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
                             onNavigateToHapticsLab()
+                        }
+                    )
+                }
+
+                // Motion
+                DevSection("Motion") {
+                    DeveloperActionCard(
+                        index = 0,
+                        size = 1,
+                        title = "Animation Motion Lab",
+                        description = "Test RollingNumberText and BlurMorph animations",
+                        icon = ImageVector.vectorResource(R.drawable.automation_filled),
+                        showChevron = true,
+                        onClick = {
+                            haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                            onNavigateToAnimationMotionLab()
                         }
                     )
                 }

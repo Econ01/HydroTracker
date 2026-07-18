@@ -69,7 +69,7 @@ import com.cemcakmak.hydrotracker.data.repository.UserRepository
 import com.cemcakmak.hydrotracker.health.HealthConnectManager
 import com.cemcakmak.hydrotracker.health.HealthConnectSyncManager
 import com.cemcakmak.hydrotracker.presentation.common.BlurMorph
-import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
+import com.cemcakmak.hydrotracker.presentation.common.AnimatedNumber
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
@@ -283,18 +283,21 @@ private fun HydrationStatChip(
     value: Double,
     volumeUnit: com.cemcakmak.hydrotracker.data.models.VolumeUnit
 ) {
-    val context = LocalContext.current
-    val animatedValue = rememberAnimatedDouble(targetValue = value)
+    val displayUnit = remember(value, volumeUnit) {
+        VolumeUnitConverter.selectDisplayUnit(value * 1000.0, volumeUnit)
+    }
 
     Column(
         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = VolumeUnitConverter.format(context, animatedValue * 1000.0, volumeUnit),
+        AnimatedNumber(
+            targetValue = value,
+            formatValue = { v -> VolumeUnitConverter.formatValue(v * 1000.0, displayUnit) },
+            suffix = stringResource(displayUnit.shortLabelResId),
             style = MaterialTheme.typography.headlineMediumEmphasized,
             color = MaterialTheme.colorScheme.tertiary,
-            maxLines = 1
+            hapticsEnabled = true
         )
         Text(
             text = label,

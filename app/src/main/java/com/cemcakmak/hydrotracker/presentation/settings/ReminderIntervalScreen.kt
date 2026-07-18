@@ -26,8 +26,6 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.core.EaseInOut
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -71,7 +69,6 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -85,7 +82,7 @@ import com.cemcakmak.hydrotracker.data.models.ReminderIntervalMode
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.presentation.common.BlurMorph
-import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
+import com.cemcakmak.hydrotracker.presentation.common.AnimatedNumber
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
@@ -411,16 +408,12 @@ private fun CustomIntervalPicker(
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        val animatedMinutes = rememberAnimatedDouble(
+        AnimatedNumber(
             targetValue = sliderPosition.toDouble(),
+            formatValue = { value -> formatInterval(value.toInt()) },
+            style = MaterialTheme.typography.headlineSmallEmphasized,
             hapticsEnabled = false,
-            animationSpec = tween(durationMillis = 150, easing = EaseInOut)
-        )
-
-        Text(
-            text = formatInterval(animatedMinutes.toInt()),
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
+            animateEntry = false,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 

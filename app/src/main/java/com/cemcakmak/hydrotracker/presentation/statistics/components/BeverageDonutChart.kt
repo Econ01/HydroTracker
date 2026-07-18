@@ -51,7 +51,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -61,7 +60,7 @@ import com.cemcakmak.hydrotracker.data.models.BeveragePreferences
 import com.cemcakmak.hydrotracker.data.models.BeverageType
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.presentation.common.BlurMorph
-import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
+import com.cemcakmak.hydrotracker.presentation.common.AnimatedNumber
 import com.cemcakmak.hydrotracker.presentation.common.shapes.PillShape
 import com.cemcakmak.hydrotracker.presentation.statistics.BeverageBreakdownItem
 import com.cemcakmak.hydrotracker.ui.theme.ExtendedColorScheme
@@ -91,7 +90,8 @@ fun BeverageDonutChart(
     strokeWidth: Dp = 40.dp,
     selectedStrokeWidthBoost: Dp = 8.dp,
     segmentGap: Dp = 50.dp,
-    explodeDistance: Dp = 20.dp
+    explodeDistance: Dp = 20.dp,
+    entryDelayMillis: Int = 0
 ) {
     val haptics = LocalHapticFeedback.current
     val context = LocalContext.current
@@ -224,11 +224,6 @@ fun BeverageDonutChart(
             }
 
             centreLabelState?.let { labelState ->
-                val animatedAmount = rememberAnimatedDouble(
-                    targetValue = labelState.item.effectiveAmount,
-                    hapticsEnabled = false
-                )
-
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
@@ -245,16 +240,18 @@ fun BeverageDonutChart(
                         }
                     }
 
-                    Text(
-                        text = stringResource(
-                            R.string.statistics_beverage_effective_short,
-                            VolumeUnitConverter.format(context, animatedAmount.toDouble(), volumeUnit)
-                        ),
-                        textAlign = TextAlign.Center,
+                    AnimatedNumber(
+                        targetValue = labelState.item.effectiveAmount,
+                        formatValue = { value ->
+                            stringResource(
+                                R.string.statistics_beverage_effective_short,
+                                VolumeUnitConverter.format(context, value.toDouble(), volumeUnit)
+                            )
+                        },
                         style = MaterialTheme.typography.headlineSmallEmphasized,
                         color = labelState.color,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+                        hapticsEnabled = false,
+                        entryDelayMillis = entryDelayMillis
                     )
                 }
             }

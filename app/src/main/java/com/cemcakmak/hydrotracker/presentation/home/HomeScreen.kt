@@ -44,7 +44,6 @@ import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
 import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
 import com.cemcakmak.hydrotracker.data.database.repository.TodayStatistics
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
-import com.cemcakmak.hydrotracker.data.database.repository.WaterProgress
 import com.cemcakmak.hydrotracker.data.models.ActivityLevel
 import com.cemcakmak.hydrotracker.data.models.AgeGroup
 import com.cemcakmak.hydrotracker.data.models.BeverageType
@@ -93,7 +92,8 @@ import com.cemcakmak.hydrotracker.presentation.common.effect.BackdropProgressive
 import com.cemcakmak.hydrotracker.presentation.common.effect.backdropBlur
 import com.cemcakmak.hydrotracker.presentation.common.effect.backdropSource
 import com.cemcakmak.hydrotracker.presentation.common.effect.rememberBackdropBlurState
-import com.cemcakmak.hydrotracker.presentation.common.rememberAnimatedDouble
+import com.cemcakmak.hydrotracker.presentation.common.AnimatedNumber
+import com.cemcakmak.hydrotracker.presentation.common.EntryAnimationDefaults
 import com.cemcakmak.hydrotracker.presentation.common.shapes.PillShape
 import com.cemcakmak.hydrotracker.presentation.common.shapes.SquircleShape
 import com.cemcakmak.hydrotracker.presentation.common.timeBasedGreeting
@@ -123,16 +123,9 @@ fun HomeScreen(
 
     val scrollState = rememberScrollState()
 
-    // Collect real-time water intake data from database
-    val todayProgress by waterIntakeRepository.getTodayProgress().collectAsState(
-        initial = WaterProgress(
-            currentIntake = 0.0,
-            dailyGoal = userProfile.dailyWaterGoal,
-            progress = 0f,
-            isGoalAchieved = false,
-            remainingAmount = userProfile.dailyWaterGoal
-        )
-    )
+    // Collect real-time water intake data from database. The initial value is null so the
+    // progress amount is never rendered as 0 while the first emission is still pending.
+    val todayProgress by waterIntakeRepository.getTodayProgress().collectAsState(initial = null)
 
     val todayEntries by waterIntakeRepository.getTodayEntries().collectAsState(initial = emptyList())
 
@@ -341,7 +334,7 @@ fun HomeScreen(
 
     // Animate the progress value
     val animatedProgress by animateFloatAsState(
-        targetValue = todayProgress.progress,
+        targetValue = todayProgress?.progress ?: 0f,
         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
         label = "progress_animation"
     )
@@ -420,19 +413,35 @@ fun HomeScreen(
                 }
 
                 // Progress amount display
-                val animatedCurrentIntake = rememberAnimatedDouble(
-                    targetValue = todayProgress.currentIntake / 1000,
-                    hapticsEnabled = true
-                )
-
-                Text(
-                    text = stringResource(
-                        R.string.progress_current_of_goal_format,
-                        VolumeUnitConverter.format(context, (animatedCurrentIntake * 1000).toDouble(), userProfile.volumeUnit),
-                        VolumeUnitConverter.format(context, todayProgress.dailyGoal, userProfile.volumeUnit)
-                    ),
-                    style = MaterialTheme.typography.headlineMedium
-                )
+                val progress = todayProgress
+                if (progress != null) {
+                    Row(
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+                        AnimatedNumber(
+                            targetValue = progress.currentIntake,
+                            formatValue = { value ->
+                                VolumeUnitConverter.format(context, value.toDouble(), userProfile.volumeUnit)
+                            },
+                            style = MaterialTheme.typography.headlineMedium,
+                            animateEntry = false,
+                            hapticsEnabled = true
+                        )
+                        Text(
+                            text = " / ${VolumeUnitConverter.format(context, progress.dailyGoal, userProfile.volumeUnit)}",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                } else {
+                    CircularWavyProgressIndicator(
+                        modifier = Modifier.size(32.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.primaryContainer,
+                        stroke = WavyProgressIndicatorDefaults.circularIndicatorStroke,
+                        gapSize = WavyProgressIndicatorDefaults.CircularIndicatorTrackGapSize
+                    )
+                }
 
                 // Wavy Progress Indicator
                 LinearWavyProgressIndicator(
@@ -453,7 +462,11 @@ fun HomeScreen(
 
                 // Motivational message
                 Text(
-                    text = getMotivationalMessage(todayProgress.progress, userProfile, todayProgress.isGoalAchieved),
+                    text = getMotivationalMessage(
+                        todayProgress?.progress ?: 0f,
+                        userProfile,
+                        todayProgress?.isGoalAchieved ?: false
+                    ),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -1098,16 +1111,14 @@ private fun EffectiveHydrationCardContent(
                     modifier = Modifier.size(18.dp)
                 )
 
-                val animatedValue = rememberAnimatedDouble(
+                AnimatedNumber(
                     targetValue = (safeSelected.hydrationMultiplier * 100),
-                    hapticsEnabled = false
-                )
-                Text(
-                    text = stringResource(
-                        R.string.home_label_effective_hydration,
-                        animatedValue.toInt()
-                    ),
+                    formatValue = { value ->
+                        stringResource(R.string.home_label_effective_hydration, value.toInt())
+                    },
                     style = MaterialTheme.typography.titleSmall,
+                    hapticsEnabled = false,
+                    entryDelayMillis = EntryAnimationDefaults.DELAY_MS
                 )
             }
         }
@@ -1119,31 +1130,31 @@ private fun AnimatedStatItem(
     label: String,
     targetValue: Double,
     hapticsEnabled: Boolean = false,
-    formatValue: @Composable (Float) -> String
+    formatValue: @Composable (Float) -> String,
+    entryDelayMillis: Int = 0
 ) {
-    val animatedValue = rememberAnimatedDouble(
-        targetValue = targetValue,
-        hapticsEnabled = hapticsEnabled
-    )
-    ChartStatItem(
-        label = label,
-        value = formatValue(animatedValue)
-    )
+    ChartStatItem(label = label) {
+        AnimatedNumber(
+            targetValue = targetValue,
+            formatValue = formatValue,
+            style = MaterialTheme.typography.titleMediumEmphasized,
+            color = MaterialTheme.colorScheme.primary,
+            hapticsEnabled = hapticsEnabled,
+            animateEntry = false,
+            entryDelayMillis = entryDelayMillis
+        )
+    }
 }
 
 @Composable
 private fun ChartStatItem(
     label: String,
-    value: String
+    value: @Composable () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleMediumEmphasized,
-            color = MaterialTheme.colorScheme.primary
-        )
+        value()
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,

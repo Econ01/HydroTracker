@@ -27,6 +27,7 @@ sealed interface NavigationRoutes : NavKey {
     @Serializable data object SettingsDeveloper : NavigationRoutes
     @Serializable data object SettingsDeveloperHaptics : NavigationRoutes
     @Serializable data object SettingsDeveloperHapticsLab : NavigationRoutes
+    @Serializable data object SettingsDeveloperMotion : NavigationRoutes
     @Serializable data object SettingsProfile : NavigationRoutes
     @Serializable data object SettingsDataManagement : NavigationRoutes
 
