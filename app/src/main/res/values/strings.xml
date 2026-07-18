@@ -42,7 +42,6 @@
          ============================================================================ -->
     <string name="unit_milliliters_format">%1$s ml</string>
     <!-- current / goal, e.g. "1.2 L / 2.7 L" -->
-    <string name="progress_current_of_goal_format">%1$s / %2$s</string>
     <string name="percent_format">%1$d%%</string>
     <!-- Character counter, e.g. "12/15 characters"; %1$d = current length, %2$d = max -->
     <string name="character_count">%1$d/%2$d characters</string>
@@ -64,7 +63,6 @@
          ============================================================================ -->
     <string name="widget_large_label">HydroTracker Large</string>
     <string name="widget_large_description">Track hydration and add water with one tap</string>
-    <string name="widget_goal_format">of %1$s</string>
     <string name="widget_of_goal_format">%1$s of %2$s</string>
     <string name="widget_goal_reached">Goal reached!</string>
     <string name="widget_quick_add_cd">Add %1$s</string>
@@ -323,10 +321,7 @@
     <string name="widget_settings_quickadd_title">Quick actions</string>
     <string name="widget_settings_quickadd_desc">Choose the three quick-add buttons</string>
     <string name="screen_widget_quickadd_title">Widget quick actions</string>
-    <string name="widget_quickadd_slot_title">Button %1$d</string>
     <string name="widget_quickadd_auto">Auto</string>
-    <string name="widget_quickadd_auto_summary">Auto · %1$s</string>
-    <string name="widget_quickadd_picker_title">Choose button %1$d</string>
     <string name="widget_quickadd_beverage_header">Beverage</string>
     <string name="widget_quickadd_slot_section_title">Quick-add buttons</string>
     <string name="widget_quickadd_container_sheet_title">Choose container</string>
@@ -341,7 +336,6 @@
     <string name="notif_hydration_reminders">Hydration reminders</string>
     <string name="notif_reminders_active">Reminders are active</string>
     <string name="notif_reminders_paused">Reminders are paused</string>
-    <string name="notif_fun_facts_header">Fun Facts</string>
     <string name="notif_fun_facts">Daily hydration facts</string>
     <string name="notif_fun_facts_active">A fun fact will be sent each day</string>
     <string name="notif_fun_facts_paused">Daily facts are paused</string>
@@ -597,13 +591,11 @@
     <string name="data_export_json_title">Export as JSON</string>
     <string name="data_import_title">Import backup</string>
     <string name="data_import_desc">Restore entries from a CSV or JSON file</string>
-    <string name="data_import_button">Import</string>
     <string name="data_export_scope_desc">Exports only HydroTracker entries. Entries imported from other health apps are excluded.</string>
     <string name="data_delete_before_date_title">Delete entries before date</string>
     <string name="data_delete_before_date_desc">Remove intake entries on or before a chosen date</string>
     <!-- %1$s = formatted cutoff date -->
     <string name="data_delete_before_date_model_title">Delete entries</string>
-    <string name="data_delete_before_date_message">Entries recorded on or before %1$s will be permanently deleted.</string>
     <string name="data_delete_health_connect_include">Include Health Connect</string>
     <string name="data_delete_no_entries_affected">No entries on or before this date</string>
     <!-- Number of entries that will be deleted for the selected cutoff date -->
@@ -757,12 +749,8 @@
     <!-- ============================================================================
          Health Connect Data screen
          ============================================================================ -->
-    <string name="hc_container_line">Container: %1$s (%2$s)</string>
     <!-- %1$s = beverage name, %2$s = effective amount with unit -->
-    <string name="hc_beverage_detail">%1$s • %2$s effective</string>
     <!-- %1$s = beverage name, %2$s = raw amount with unit, %3$s = effective amount with unit -->
-    <string name="hc_beverage_detail_eff">%1$s • %2$s raw → %3$s effective</string>
-    <string name="hc_note_label">Note: %1$s</string>
     <string name="health_connect_status_unavailable">Health Connect is not available on this device</string>
     <string name="health_connect_status_update_required">Health Connect app needs to be updated</string>
     <string name="health_connect_status_no_permissions">Permissions not granted for Health Connect</string>
@@ -990,7 +978,6 @@
          Notifications
          ============================================================================ -->
     <!-- %1$s = the random water fact -->
-    <string name="notification_gentle_fact_prefix">Did you know? %1$s</string>
     <string name="notification_fun_fact_title">Did you know?</string>
     <!-- %1$d = remaining milliliters -->
     <string name="notification_minimal_remaining">%1$s remaining</string>
@@ -1172,27 +1159,5 @@
 
     <!-- Water puns shown with motivating reminders. These are language-dependent word
          play, so they are not translated; each locale should provide its own if desired. -->
-    <string-array name="notification_puns" translatable="false">
-        <item>Water you waiting for? Let\'s hydrate!</item>
-        <item>Don\'t let your hydration goals go down the drain!</item>
-        <item>H2-Oh yeah! Time for water!</item>
-        <item>You\'re one in a mill-ion! Stay hydrated!</item>
-        <item>Water wonderful day to stay hydrated!</item>
-        <item>Sea what happens when you drink more water!</item>
-        <item>Don\'t be a drip — drink up!</item>
-        <item>Water pressure? We prefer hydration pleasure!</item>
-        <item>Make waves with your hydration game!</item>
-        <item>Pool your energy and drink some water!</item>
-        <item>Current mood: Needs more water!</item>
-        <item>Tide yourself over with some H2O!</item>
-        <item>Water good choice to stay hydrated!</item>
-        <item>Flow with the hydration rhythm!</item>
-        <item>Sink or swim — we choose hydrate!</item>
-        <item>Stay hydrated and keep your spirits afloat.</item>
-        <item>Life is better when you\'re well-hydrated.</item>
-        <item>Keep calm and drink water.</item>
-        <item>Hydration is the best medication.</item>
-        <item>A glass a day keeps the fatigue away.</item>
-    </string-array>
 
 </resources>
