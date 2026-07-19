@@ -1117,6 +1117,7 @@ private fun EffectiveHydrationCardContent(
                         stringResource(R.string.home_label_effective_hydration, value.toInt())
                     },
                     style = MaterialTheme.typography.titleSmall,
+                    animateEntry = false,
                     hapticsEnabled = false,
                     entryDelayMillis = EntryAnimationDefaults.DELAY_MS
                 )

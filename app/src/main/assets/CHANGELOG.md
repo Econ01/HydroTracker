@@ -1,3 +1,6 @@
+[1.2]
+- Performance improvements
+
 [1.1]
 Added
 ### Settings
@@ -114,7 +117,7 @@ Changed
 - Switched to squircle shapes throughout the app
 - Smoother tab switch animations with animated top and bottom bars
 - Larger FAB icon with a rotation animation
-- Replaced in-app snackbars with system toast messages
+- Replaced in-app snack-bars with system toast messages
 - Profile photo selection now uses the Android Photo Picker — no storage permission required
 - Overhauled the notification system with goal-aware, progress-centric reminders
 - Improved Health Connect sync with faster imports and a pull-to-refresh indicator on Home
