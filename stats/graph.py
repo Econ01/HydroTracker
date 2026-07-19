@@ -24,9 +24,12 @@ def parse_args():
     return parser.parse_args()
 
 def get_headers(token):
-    headers = {'Accept': 'application/vnd.github.v3.star+json'}
+    headers = {
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2026-03-10',
+    }
     if token:
-        headers['Authorization'] = f'token {token}'
+        headers['Authorization'] = f'Bearer {token}'
     return headers
 
 def fetch_stars_history(repo, token):
@@ -44,7 +47,7 @@ def fetch_stars_history(repo, token):
     while True:
         params = {'per_page': per_page, 'page': page}
         try:
-            r = requests.get(url, headers=headers, params=params)
+            r = requests.get(url, headers=headers, params=params, timeout=30)
             r.raise_for_status()
             data = r.json()
         except requests.exceptions.RequestException as e:
@@ -91,7 +94,7 @@ def fetch_total_downloads(repo, token):
     while True:
         params = {'per_page': per_page, 'page': page}
         try:
-            r = requests.get(url, headers=headers, params=params)
+            r = requests.get(url, headers=headers, params=params, timeout=30)
             r.raise_for_status()
             data = r.json()
         except requests.exceptions.RequestException as e:
