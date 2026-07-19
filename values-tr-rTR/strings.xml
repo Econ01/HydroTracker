@@ -9,20 +9,20 @@
          Reused across the whole app. Do NOT create screen-specific duplicates
          (e.g. home_cancel, dialogue_cancel) — reuse these everywhere.
          ============================================================================ -->
-    <string name="action_cancel">Cancel</string>
-    <string name="action_save">Save</string>
-    <string name="action_delete">Delete</string>
-    <string name="action_add">Add</string>
-    <string name="action_close">Close</string>
-    <string name="action_confirm">Confirm</string>
-    <string name="action_reset">Reset</string>
-    <string name="action_next">Next</string>
-    <string name="action_continue">Continue</string>
+    <string name="action_cancel">İptal</string>
+    <string name="action_save">Kaydet</string>
+    <string name="action_delete">Sil</string>
+    <string name="action_add">Ekle</string>
+    <string name="action_close">Kapat</string>
+    <string name="action_confirm">Onayla</string>
+    <string name="action_reset">Sıfırla</string>
+    <string name="action_next">Sonraki</string>
+    <string name="action_continue">Devam et</string>
     <!-- ============================================================================
          Accessibility content descriptions
          Spoken by TalkBack / screen readers. Keep concise.
          ============================================================================ -->
-    <string name="cd_back">Back</string>
+    <string name="cd_back">Geri</string>
     <string name="cd_delete_entry">Delete entry</string>
     <string name="cd_edit_entry">Edit entry</string>
     <string name="cd_reorder">Reorder</string>
