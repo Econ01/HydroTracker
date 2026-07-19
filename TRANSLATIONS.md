@@ -6,25 +6,19 @@ HydroTracker is translated by volunteers through [Crowdin](https://crowdin.com/p
 
 ## Translation Progress
 
-| Language | Progress |
-|----------|----------|
-| Chinese (Simplified) | [![Chinese (Simplified)](https://badges.crowdin.net/hydrotracker/localized.svg?lang=zh-CN)](https://crowdin.com/project/hydrotracker) |
-| French | [![French](https://badges.crowdin.net/hydrotracker/localized.svg?lang=fr)](https://crowdin.com/project/hydrotracker) |
-| German | [![German](https://badges.crowdin.net/hydrotracker/localized.svg?lang=de)](https://crowdin.com/project/hydrotracker) |
-| Portuguese (Portugal) | [![Portuguese (Portugal)](https://badges.crowdin.net/hydrotracker/localized.svg?lang=pt-PT)](https://crowdin.com/project/hydrotracker) |
-| Spanish | [![Spanish](https://badges.crowdin.net/hydrotracker/localized.svg?lang=es)](https://crowdin.com/project/hydrotracker) |
-| Turkish | [![Turkish](https://badges.crowdin.net/hydrotracker/localized.svg?lang=tr)](https://crowdin.com/project/hydrotracker) |
+<!-- TRANSLATION_PROGRESS_START -->
+*Last updated: 2026-07-19 11:30 UTC*
+
+<img src="docs/translation-progress.svg" alt="Translation progress" width="720">
+<!-- TRANSLATION_PROGRESS_END -->
 
 ## Supported Languages
 
+<!-- SUPPORTED_LANGUAGES_START -->
 HydroTracker currently ships with English as the source language. The following target languages are active on Crowdin:
 
-- Chinese (Simplified)
-- French
-- German
-- Portuguese (Portugal)
-- Spanish
-- Turkish
+- English (source)
+<!-- SUPPORTED_LANGUAGES_END -->
 
 ## Requesting a New Language
 
