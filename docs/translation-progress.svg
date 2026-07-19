@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="300" role="img" aria-label="Translation progress">
+    <rect width="720" height="300" fill="#ffffff"/>
+    <text x="20" y="28" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="18" font-weight="bold" fill="#333333">Translation Progress</text>
+    <text x="20" y="65" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">Chinese Simplified</text>
+    <rect x="220" y="51" width="380" height="18" rx="4" fill="#e0e0e0"/>
+    <text x="612" y="65" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">0%</text>
+    <text x="20" y="105" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">French</text>
+    <rect x="220" y="91" width="380" height="18" rx="4" fill="#e0e0e0"/>
+    <text x="612" y="105" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">0%</text>
+    <text x="20" y="145" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">German</text>
+    <rect x="220" y="131" width="380" height="18" rx="4" fill="#e0e0e0"/>
+    <text x="612" y="145" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">0%</text>
+    <text x="20" y="185" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">Portuguese</text>
+    <rect x="220" y="171" width="380" height="18" rx="4" fill="#e0e0e0"/>
+    <text x="612" y="185" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">0%</text>
+    <text x="20" y="225" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">Spanish</text>
+    <rect x="220" y="211" width="380" height="18" rx="4" fill="#e0e0e0"/>
+    <text x="612" y="225" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">0%</text>
+    <text x="20" y="265" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">Turkish</text>
+    <rect x="220" y="251" width="380" height="18" rx="4" fill="#e0e0e0"/>
+    <text x="612" y="265" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">0%</text>
+</svg>
