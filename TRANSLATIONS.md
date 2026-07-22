@@ -5,7 +5,7 @@ HydroTracker is translated by volunteers through [Crowdin](https://crowdin.com/p
 ## Translation Progress
 
 <!-- TRANSLATION_PROGRESS_START -->
-*Last updated: 2026-07-22 01:22 UTC*
+*Last updated: 2026-07-22 09:41 UTC*
 
 <img src="docs/translation-progress.svg" alt="Translation progress" width="720">
 <!-- TRANSLATION_PROGRESS_END -->
@@ -16,6 +16,12 @@ HydroTracker is translated by volunteers through [Crowdin](https://crowdin.com/p
 HydroTracker currently ships with English as the source language. The following target languages are active on Crowdin:
 
 - English (source)
+- de-DE
+- Spanish
+- fr-FR
+- Portuguese
+- tr-TR
+- Chinese Simplified
 <!-- SUPPORTED_LANGUAGES_END -->
 
 ## Requesting a New Language

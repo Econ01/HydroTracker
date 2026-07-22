@@ -5,5 +5,11 @@
     (and keep AppLocale.SUPPORTED_TAGS in sync).
 -->
 <locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="de-DE" />
     <locale android:name="en" />
+    <locale android:name="es-ES" />
+    <locale android:name="fr-FR" />
+    <locale android:name="pt-PT" />
+    <locale android:name="tr-TR" />
+    <locale android:name="zh-CN" />
 </locale-config>

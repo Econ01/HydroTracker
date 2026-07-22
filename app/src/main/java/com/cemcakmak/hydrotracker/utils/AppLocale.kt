@@ -23,7 +23,7 @@ object AppLocale {
      * res/xml/locales_config.xml. A null/blank tag means "follow the system language".
      * Add a tag here when a values-XX/ translation lands.
      */
-    val SUPPORTED_TAGS: List<String> = listOf("en")
+    val SUPPORTED_TAGS: List<String> = listOf("de-DE", "en", "es-ES", "fr-FR", "pt-PT", "tr-TR", "zh-CN")
 
     private const val PREFS = "app_locale_prefs"
     private const val KEY_TAG = "language_tag"
