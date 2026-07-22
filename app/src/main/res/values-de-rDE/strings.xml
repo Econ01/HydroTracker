@@ -17,97 +17,97 @@
     <string name="action_confirm">Bestätigen</string>
     <string name="action_reset">Zurücksetzen</string>
     <string name="action_next">Nächstes</string>
-    <string name="action_continue">Continue</string>
+    <string name="action_continue">Fortfahren</string>
     <!-- ============================================================================
          Accessibility content descriptions
          Spoken by TalkBack / screen readers. Keep concise.
          ============================================================================ -->
-    <string name="cd_back">Back</string>
-    <string name="cd_delete_entry">Delete entry</string>
-    <string name="cd_edit_entry">Edit entry</string>
-    <string name="cd_reorder">Reorder</string>
-    <string name="cd_profile_photo">Profile photo</string>
-    <string name="cd_water_drop">Water drop</string>
-    <string name="cd_pinned">Pinned</string>
-    <string name="cd_hidden">Hidden</string>
+    <string name="cd_back">Zurück</string>
+    <string name="cd_delete_entry">Eintrag löschen</string>
+    <string name="cd_edit_entry">Eintrag bearbeiten</string>
+    <string name="cd_reorder">Umsortieren</string>
+    <string name="cd_profile_photo">Profilbild</string>
+    <string name="cd_water_drop">Wassertropfen</string>
+    <string name="cd_pinned">Angepinnt</string>
+    <string name="cd_hidden">Ausgeblendet</string>
     <!-- ============================================================================
          Units & number formatting
          Unit suffixes are kept separate from numbers so the value can be formatted
          locale-aware (NumberFormat) and the unit swapped independently.
          ============================================================================ -->
-    <string name="unit_milliliters_format">%1$s ml</string>
+    <string name="unit_milliliters_format">%1$s Milliliter</string>
     <!-- current / goal, e.g. "1.2 L / 2.7 L" -->
     <string name="percent_format">%1$d%%</string>
     <!-- Character counter, e.g. "12/15 characters"; %1$d = current length, %2$d = max -->
-    <string name="character_count">%1$d/%2$d characters</string>
+    <string name="character_count">%1$d/%2$d Zeichen</string>
     <!-- ============================================================================
          Notification channel (Android 8+)
          Channel name/description refresh on each createNotificationChannel() call, so
          translating these values is enough — no channel-id bump required.
          ============================================================================ -->
-    <string name="notification_channel_name">Hydration Reminders</string>
-    <string name="notification_channel_description">Notifications to remind you to stay hydrated</string>
-    <string name="notification_channel_fun_facts_name">Daily Hydration Facts</string>
-    <string name="notification_channel_fun_facts_description">A daily hydration tip or fun fact</string>
+    <string name="notification_channel_name">Trinkerinnerungen</string>
+    <string name="notification_channel_description">Benachrichtigungen, die dich ans Trinken erinnern</string>
+    <string name="notification_channel_fun_facts_name">Tägliche Trink-Fakten</string>
+    <string name="notification_channel_fun_facts_description">Ein täglicher Trinktipp oder Wissenswertes</string>
     <!-- ============================================================================
          Widgets
          android:label value shown in the home-screen widget picker, plus the text
          rendered inside the Glance widget.
          ============================================================================ -->
-    <string name="widget_large_label">HydroTracker Large</string>
-    <string name="widget_large_description">Track hydration and add water with one tap</string>
-    <string name="widget_of_goal_format">%1$s of %2$s</string>
-    <string name="widget_goal_reached">Goal reached!</string>
-    <string name="widget_quick_add_cd">Add %1$s</string>
-    <string name="widget_daily_hydration">Daily Hydration</string>
-    <string name="widget_card_glass">Glass</string>
-    <string name="widget_card_bottle">Bottle</string>
-    <string name="widget_card_large_bottle">Large Bottle</string>
+    <string name="widget_large_label">Hydration-Zähler Groß</string>
+    <string name="widget_large_description">Wasserzufuhr protokollieren und Wasser mit einem Klick hinzufügen</string>
+    <string name="widget_of_goal_format">%1$s Von %2$s</string>
+    <string name="widget_goal_reached">Ziel erreicht!</string>
+    <string name="widget_quick_add_cd">Hinzufügen %1$s</string>
+    <string name="widget_daily_hydration">Tägliche Wasserzufuhr</string>
+    <string name="widget_card_glass">Glas</string>
+    <string name="widget_card_bottle">Flasche</string>
+    <string name="widget_card_large_bottle">Große Flasche</string>
     <!-- ============================================================================
          Settings: About
          ============================================================================ -->
-    <string name="updates_bug_report">Updates &amp; Bug Report</string>
+    <string name="updates_bug_report">Updates &amp; Fehler melden</string>
     <!-- ============================================================================
          Settings: Display &amp; Locale
          ============================================================================ -->
-    <string name="screen_display_locale_title">Display &amp; Locale</string>
-    <string name="display_language_header">Language</string>
-    <string name="display_date_and_time_format_header">Date &amp; Time</string>
-    <string name="display_time_format_header">Time Format</string>
-    <string name="display_volume_unit_header">Volume unit</string>
+    <string name="screen_display_locale_title">Anzeige &amp; Region</string>
+    <string name="display_language_header">Sprache</string>
+    <string name="display_date_and_time_format_header">Datum &amp; Zeit</string>
+    <string name="display_time_format_header">Zeitformat</string>
+    <string name="display_volume_unit_header">Volumeneinheit</string>
     <!-- Language option that follows the device language instead of a fixed one -->
-    <string name="language_system_default">System default</string>
+    <string name="language_system_default">Systemstandard</string>
     <!-- ============================================================================
          Settings: Language & Translation
          ============================================================================ -->
-    <string name="screen_language_title">Language &amp; Translation</string>
-    <string name="language_contribute_title">Contribute</string>
-    <string name="language_crowdin_title">Help translate HydroTracker</string>
-    <string name="language_crowdin_description">Contribute on Crowdin</string>
-    <string name="language_progress_header">Translation progress</string>
-    <string name="language_progress_translated">Translated</string>
-    <string name="language_progress_approved">Approved</string>
+    <string name="screen_language_title">Sprache &amp; Übersetzung</string>
+    <string name="language_contribute_title">Mitwirken</string>
+    <string name="language_crowdin_title">Hilf mit, Hydration-Zähler zu übersetzen</string>
+    <string name="language_crowdin_description">Auf Crowdin mitwirken</string>
+    <string name="language_progress_header">Übersetzungsfortschritt</string>
+    <string name="language_progress_translated">Übersetzt</string>
+    <string name="language_progress_approved">Bestätigt</string>
     <!-- Time format options -->
     <string name="time_format_system">System</string>
-    <string name="time_format_12_hour">12-hour</string>
-    <string name="time_format_24_hour">24-hour</string>
+    <string name="time_format_12_hour">12-Stunden</string>
+    <string name="time_format_24_hour">24-Stunden</string>
     <!-- Date format options -->
     <string name="date_format_system">System</string>
-    <string name="date_format_day_month_year">16 Jun 2026</string>
-    <string name="date_format_month_day_year">Jun 16, 2026</string>
-    <string name="date_format_year_month_day">2026–06–16</string>
+    <string name="date_format_day_month_year">16. Juni 2026</string>
+    <string name="date_format_month_day_year">16. Juni, 2026</string>
+    <string name="date_format_year_month_day">16-06-2026</string>
     <!-- Volume unit options -->
-    <string name="unit_millilitres">Metric</string>
-    <string name="unit_ml_short">ml</string>
-    <string name="unit_us_fl_oz">US fluid ounces</string>
-    <string name="unit_us_fl_oz_short">fl oz</string>
-    <string name="unit_imperial_fl_oz">Imperial fluid ounces</string>
-    <string name="unit_imperial_fl_oz_short">fl oz (UK)</string>
+    <string name="unit_millilitres">Metrisch</string>
+    <string name="unit_ml_short">Milliliter</string>
+    <string name="unit_us_fl_oz">US-Flüssigunzen</string>
+    <string name="unit_us_fl_oz_short">Flüssigunzen</string>
+    <string name="unit_imperial_fl_oz">Imperiale Flüssigunzen</string>
+    <string name="unit_imperial_fl_oz_short">Flüssigunzen (Großbritannien)</string>
     <!-- Display-only volume units (auto-scaling and call-site overrides) -->
-    <string name="unit_litre_short">L</string>
-    <string name="unit_kilolitre_short">kL</string>
-    <string name="unit_megalitre_short">ML</string>
-    <string name="unit_gigalitre_short">GL</string>
+    <string name="unit_litre_short">Liter</string>
+    <string name="unit_kilolitre_short">Kiloliter</string>
+    <string name="unit_megalitre_short">Mega-Liter</string>
+    <string name="unit_gigalitre_short">Giga-Liter</string>
     <string name="unit_us_pint_short">pt</string>
     <string name="unit_us_quart_short">qt</string>
     <string name="unit_us_gallon_short">gal</string>
