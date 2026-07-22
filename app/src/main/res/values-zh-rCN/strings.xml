@@ -77,6 +77,16 @@
     <string name="display_volume_unit_header">Volume unit</string>
     <!-- Language option that follows the device language instead of a fixed one -->
     <string name="language_system_default">System default</string>
+    <!-- ============================================================================
+         Settings: Language & Translation
+         ============================================================================ -->
+    <string name="screen_language_title">Language &amp; Translation</string>
+    <string name="language_contribute_title">Contribute</string>
+    <string name="language_crowdin_title">Help translate HydroTracker</string>
+    <string name="language_crowdin_description">Contribute on Crowdin</string>
+    <string name="language_progress_header">Translation progress</string>
+    <string name="language_progress_translated">Translated</string>
+    <string name="language_progress_approved">Approved</string>
     <!-- Time format options -->
     <string name="time_format_system">System</string>
     <string name="time_format_12_hour">12-hour</string>
