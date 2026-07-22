@@ -347,13 +347,23 @@ private fun WeeklyBarChart(
                             )
 
                             if (targetHeight > minTextHeight.dp) {
+                                val fontScale = LocalDensity.current.fontScale
+
+                                val rawText = VolumeUnitConverter.format(context, dayTotal.totalAmount, volumeUnit)
+                                val displayText = if (fontScale > 1.3f) {
+                                    rawText.replace(" ", "\n")
+                                } else {
+                                    rawText
+                                }
+
                                 Text(
-                                    text = VolumeUnitConverter.format(context, dayTotal.totalAmount, volumeUnit),
-                                    style = MaterialTheme.typography.labelSmallEmphasized,
-                                    color = textColor,
                                     modifier = Modifier
                                         .align(Alignment.BottomCenter)
-                                        .padding(bottom = 6.dp)
+                                        .padding(bottom = 6.dp),
+                                    text = displayText,
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.labelSmallEmphasized,
+                                    color = textColor
                                 )
                             }
                         }
