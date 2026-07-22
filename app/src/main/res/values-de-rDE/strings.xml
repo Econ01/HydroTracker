@@ -9,14 +9,14 @@
          Reused across the whole app. Do NOT create screen-specific duplicates
          (e.g. home_cancel, dialogue_cancel) — reuse these everywhere.
          ============================================================================ -->
-    <string name="action_cancel">Cancel</string>
-    <string name="action_save">Save</string>
-    <string name="action_delete">Delete</string>
-    <string name="action_add">Add</string>
-    <string name="action_close">Close</string>
-    <string name="action_confirm">Confirm</string>
-    <string name="action_reset">Reset</string>
-    <string name="action_next">Next</string>
+    <string name="action_cancel">Abbrechen</string>
+    <string name="action_save">Speichern</string>
+    <string name="action_delete">Löschen</string>
+    <string name="action_add">Hinzufügen</string>
+    <string name="action_close">Schließen</string>
+    <string name="action_confirm">Bestätigen</string>
+    <string name="action_reset">Zurücksetzen</string>
+    <string name="action_next">Nächstes</string>
     <string name="action_continue">Continue</string>
     <!-- ============================================================================
          Accessibility content descriptions
