@@ -17,6 +17,7 @@ Required environment variables:
     CROWDIN_API_TOKEN   Crowdin personal API token
 """
 
+import json
 import os
 import re
 import sys
@@ -32,6 +33,7 @@ APP_LOCALE_KT = PROJECT_ROOT / "app/src/main/java/com/cemcakmak/hydrotracker/uti
 LOCALES_CONFIG_XML = PROJECT_ROOT / "app/src/main/res/xml/locales_config.xml"
 TRANSLATIONS_MD = PROJECT_ROOT / "TRANSLATIONS.md"
 PROGRESS_SVG = PROJECT_ROOT / "docs/translation-progress.svg"
+TRANSLATION_PROGRESS_JSON = PROJECT_ROOT / "app/src/main/assets/translation_progress.json"
 RES_VALUES_DIR = PROJECT_ROOT / "app/src/main/res"
 
 CROWDIN_BASE = "https://api.crowdin.com/api/v2"
@@ -236,6 +238,45 @@ def update_translations_md(progress: list[dict], language_names: dict[str, str],
     print("Updated TRANSLATIONS.md.")
 
 
+def update_translation_progress_json(
+    progress: list[dict], supported_tags: list[str]
+) -> None:
+    """Write app/src/main/assets/translation_progress.json with per-language percentages.
+
+    Crowdin language IDs are matched to supported BCP-47 tags by prefix
+    (e.g. Crowdin 'de' matches app tag 'de-DE').
+    English is the source language and is omitted.
+    """
+    # Build a lookup from Crowdin language ID to progress data.
+    crowdin_by_id = {item["languageId"]: item for item in progress}
+
+    languages: dict[str, dict[str, int]] = {}
+    for tag in supported_tags:
+        if tag == "en":
+            continue
+
+        # Try exact match first, then prefix match.
+        entry = crowdin_by_id.get(tag)
+        if entry is None:
+            prefix = tag.split("-")[0]
+            entry = crowdin_by_id.get(prefix)
+        if entry is None:
+            # No Crowdin data for this tag; skip rather than write zeros.
+            continue
+
+        languages[tag] = {
+            "translated": entry.get("translationProgress", 0),
+            "approved": entry.get("approvalProgress", 0),
+        }
+
+    payload = {"languages": languages}
+    TRANSLATION_PROGRESS_JSON.parent.mkdir(parents=True, exist_ok=True)
+    TRANSLATION_PROGRESS_JSON.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
+    print(f"Updated {TRANSLATION_PROGRESS_JSON.relative_to(PROJECT_ROOT)}.")
+
+
 def main() -> int:
     project_id = os.environ.get("CROWDIN_PROJECT_ID")
     token = os.environ.get("CROWDIN_API_TOKEN")
@@ -269,6 +310,9 @@ def main() -> int:
     print("Updating app locale configuration...")
     update_app_locale(supported_tags)
     update_locales_config(supported_tags)
+
+    print("Updating translation progress JSON...")
+    update_translation_progress_json(progress, supported_tags)
 
     print("Done.")
     return 0

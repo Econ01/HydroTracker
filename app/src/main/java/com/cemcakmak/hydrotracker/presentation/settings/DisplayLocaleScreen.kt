@@ -20,10 +20,16 @@
 
 package com.cemcakmak.hydrotracker.presentation.settings
 
-import androidx.activity.compose.LocalActivity
+import androidx.compose.animation.EnterExitState
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -40,19 +46,26 @@ import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.models.DateFormatPattern
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
@@ -69,36 +82,85 @@ import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 @Composable
 fun DisplayLocaleScreen(
     themePreferences: ThemePreferences = ThemePreferences(),
+    wasPop: Boolean = false,
     userProfile: UserProfile? = null,
     onWeekStartDayChange: (WeekStartDay) -> Unit = {},
     onTimeFormatChange: (TimeFormat) -> Unit = {},
     onDateFormatChange: (DateFormatPattern) -> Unit = {},
     onVolumeUnitChange: (VolumeUnit) -> Unit = {},
+    onNavigateToLanguage: () -> Unit = {},
     onNavigateBack: () -> Unit = {}
 ) {
-    SettingsDetailScaffold(
-        title = stringResource(R.string.screen_display_locale_title),
-        onNavigateBack = onNavigateBack,
-        themePreferences = themePreferences
-    ) {
-        TimeFormatSection(
-            timeFormat = themePreferences.timeFormat,
-            onTimeFormatChange = onTimeFormatChange
-        )
+    val isPreview = LocalInspectionMode.current
+    val shouldApplyDepth = !isPreview && wasPop
 
-        DateAndTimeSection(
-            dateFormat = themePreferences.dateFormat,
-            onDateFormatChange = onDateFormatChange,
-            weekStartDay = themePreferences.weekStartDay,
-            onWeekStartDayChange = onWeekStartDayChange
-        )
+    val blur by if (shouldApplyDepth) {
+        val animatedContentScope = LocalNavAnimatedContentScope.current
+        animatedContentScope.transition.animateDp(
+            transitionSpec = { tween(400) },
+            label = "quickAddEnterBlur"
+        ) { state ->
+            if (state == EnterExitState.PreEnter) 8.dp else 0.dp
+        }
+    } else {
+        remember { mutableStateOf(0.dp) }
+    }
 
-        VolumeUnitSection(
-            volumeUnit = userProfile?.volumeUnit ?: VolumeUnit.MILLILITRES,
-            onVolumeUnitChange = onVolumeUnitChange
-        )
+    // Depth scrim that clears in sync with the blur as the page comes forward.
+    val scrimAlpha by if (shouldApplyDepth) {
+        val animatedContentScope = LocalNavAnimatedContentScope.current
+        animatedContentScope.transition.animateFloat(
+            transitionSpec = { tween(400) },
+            label = "quickAddEnterScrim"
+        ) { state ->
+            if (state == EnterExitState.PreEnter) 0.4f else 0f
+        }
+    } else {
+        remember { mutableFloatStateOf(0f) }
+    }
 
-        LanguageSection()
+    val scrimColor = if (MaterialTheme.colorScheme.surface.luminance() < 0.5f) {
+        Color.White
+    } else {
+        Color.Black
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize().blur(blur)) {
+            SettingsDetailScaffold(
+                title = stringResource(R.string.screen_display_locale_title),
+                onNavigateBack = onNavigateBack,
+                themePreferences = themePreferences
+            ) {
+                TimeFormatSection(
+                    timeFormat = themePreferences.timeFormat,
+                    onTimeFormatChange = onTimeFormatChange
+                )
+
+                DateAndTimeSection(
+                    dateFormat = themePreferences.dateFormat,
+                    onDateFormatChange = onDateFormatChange,
+                    weekStartDay = themePreferences.weekStartDay,
+                    onWeekStartDayChange = onWeekStartDayChange
+                )
+
+                VolumeUnitSection(
+                    volumeUnit = userProfile?.volumeUnit ?: VolumeUnit.MILLILITRES,
+                    onVolumeUnitChange = onVolumeUnitChange
+                )
+
+                LanguageNavigationSection(onNavigateToLanguage = onNavigateToLanguage)
+            }
+        }
+
+        if (scrimAlpha > 0f) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .scale(1.3f)
+                    .background(scrimColor.copy(alpha = scrimAlpha))
+            )
+        }
     }
 }
 
@@ -160,7 +222,7 @@ private fun DateAndTimeSection(
                     }
 
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        imageVector = ImageVector.vectorResource(R.drawable.keyboard_arrow_up_filled),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -217,7 +279,7 @@ private fun DateAndTimeSection(
                     }
 
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        imageVector = ImageVector.vectorResource(R.drawable.keyboard_arrow_up_filled),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -236,10 +298,9 @@ private fun DateAndTimeSection(
 }
 
 @Composable
-private fun LanguageSection() {
+private fun LanguageNavigationSection(onNavigateToLanguage: () -> Unit) {
     val haptics = LocalHapticFeedback.current
     val context = LocalContext.current
-    var showLanguageSheet by remember { mutableStateOf(false) }
 
     // Cache the persisted tag so SharedPreferences is not read on every recomposition.
     val currentTag = remember(context) { AppLocale.currentTag(context) }
@@ -251,7 +312,7 @@ private fun LanguageSection() {
             size = 1,
             onClick = {
                 haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                showLanguageSheet = true
+                onNavigateToLanguage()
             }
         ) {
             Row(
@@ -267,15 +328,24 @@ private fun LanguageSection() {
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
                 )
-                BlurMorph(
-                    modifier = Modifier.weight(1f),
-                    targetState = currentTag
-                ) { state, blurModifier ->
+
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        modifier = blurModifier,
-                        text = languageDisplayName(state),
+                        text = stringResource(R.string.screen_language_title),
                         style = MaterialTheme.typography.titleMedium
                     )
+                    BlurMorph(targetState = currentTag) { state, blurModifier ->
+                        Text(
+                            modifier = blurModifier,
+                            text = if (state == null) {
+                                stringResource(R.string.language_system_default)
+                            } else {
+                                AppLocale.displayName(state)
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
 
                 Icon(
@@ -283,72 +353,6 @@ private fun LanguageSection() {
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            }
-        }
-    }
-
-    if (showLanguageSheet) {
-        LanguageBottomSheet(
-            currentTag = currentTag,
-            onDismiss = { showLanguageSheet = false }
-        )
-    }
-}
-
-@Composable
-private fun languageDisplayName(tag: String?): String {
-    return if (tag == null) {
-        stringResource(R.string.language_system_default)
-    } else {
-        AppLocale.displayName(tag)
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun LanguageBottomSheet(
-    currentTag: String?,
-    onDismiss: () -> Unit
-) {
-    val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
-    val haptics = LocalHapticFeedback.current
-    val activity = LocalActivity.current
-    val context = LocalContext.current
-
-    // null represents "System default"; the rest are the shipped translation tags.
-    val options: List<String?> = remember { listOf(null) + AppLocale.SUPPORTED_TAGS }
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(top = 8.dp, bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            options.forEachIndexed { index, tag ->
-                SelectableOptionCard(
-                    index = index,
-                    size = options.size,
-                    selected = currentTag == tag,
-                    onClick = {
-                        haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
-                        AppLocale.apply(context, tag)
-                        onDismiss()
-                        // Re-create so stringResource lookups pick up the new locale immediately
-                        // across all API levels (deterministic regardless of configChanges).
-                        activity?.recreate()
-                    }
-                ) { contentColor ->
-                    Text(
-                        text = languageDisplayName(tag),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = contentColor
-                    )
-                }
             }
         }
     }
@@ -544,7 +548,7 @@ private fun VolumeUnitSection(
                 }
 
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    imageVector = ImageVector.vectorResource(R.drawable.keyboard_arrow_up_filled),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )

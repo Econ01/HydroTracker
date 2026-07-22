@@ -71,6 +71,7 @@ import com.cemcakmak.hydrotracker.presentation.settings.WhatsNewBottomSheet
 import com.cemcakmak.hydrotracker.presentation.settings.UpdateAvailableDialog
 import com.cemcakmak.hydrotracker.presentation.settings.AppearanceScreen
 import com.cemcakmak.hydrotracker.presentation.settings.DisplayLocaleScreen
+import com.cemcakmak.hydrotracker.presentation.settings.LanguageScreen
 import com.cemcakmak.hydrotracker.presentation.settings.DataManagementScreen
 import com.cemcakmak.hydrotracker.presentation.settings.HydrationHealthScreen
 import com.cemcakmak.hydrotracker.presentation.settings.QuickAddCustomizationScreen
@@ -276,7 +277,7 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * Debug-only helper: triggers the system widget pin dialoug for the widget named in the
+     * Debug-only helper: triggers the system widget pin dialogue for the widget named in the
      * `debug_pin_widget` extra ("large"). Used for emulator UI testing.
      */
     private fun handleDebugPinIntent(intent: android.content.Intent) {
@@ -340,6 +341,7 @@ fun HydroTrackerApp(
     var wasPop by remember { mutableStateOf(false) }
     var appearanceWasPop by remember { mutableStateOf(false) }
     var widgetScreenWasPop by remember { mutableStateOf(false) }
+    var displayLocaleWasPop by remember { mutableStateOf(false) }
     var quickAddWasPop by remember { mutableStateOf(false) }
     var notificationsWasPop by remember { mutableStateOf(false) }
     var developerOptionsWasPop by remember { mutableStateOf(false) }
@@ -701,6 +703,7 @@ fun HydroTrackerApp(
                         entry<NavigationRoutes.SettingsDisplay> {
                             DisplayLocaleScreen(
                                 themePreferences = themePreferences,
+                                wasPop = displayLocaleWasPop,
                                 userProfile = userProfile,
                                 onWeekStartDayChange = themeViewModel::updateWeekStartDay,
                                 onTimeFormatChange = themeViewModel::updateTimeFormat,
@@ -712,6 +715,16 @@ fun HydroTrackerApp(
                                         }
                                     }
                                 },
+                                onNavigateToLanguage = {
+                                    displayLocaleWasPop = true
+                                    backStack.add(NavigationRoutes.SettingsLanguage)
+                                                       },
+                                onNavigateBack = popBackStack
+                            )
+                        }
+                        entry<NavigationRoutes.SettingsLanguage> {
+                            LanguageScreen(
+                                themePreferences = themePreferences,
                                 onNavigateBack = popBackStack
                             )
                         }
