@@ -714,14 +714,14 @@
     <string name="home_snackbar_container_deleted">Deleted \"%1$s\" container</string>
     <!-- Dialogue labels -->
     <string name="home_label_beverage_type">Beverage Type</string>
-    <string name="home_label_amount_ml">Amount (%1$s)</string>
+    <string name="home_label_amount_ml">Menge (%1$s)</string>
     <string name="home_label_container_type">Container Type</string>
     <string name="home_label_time">Zeit</string>
     <!-- %1$s = minimum valid amount, %2$s = maximum valid amount (both with unit) -->
     <string name="home_error_amount_invalid">Please enter a valid amount (%1$s–%2$s)</string>
     <string name="home_label_hydration_effectiveness">Hydration effectiveness: %1$d%%</string>
     <string name="home_label_effective_hydration">Effective Hydration: %1$d%%</string>
-    <string name="home_option_custom">Custom</string>
+    <string name="home_option_custom">Benutzerdefiniert</string>
     <string name="home_beverage_effective_name">%1$s</string>
     <string name="home_beverage_effective_amount">%1$s</string>
     <!-- Content descriptions -->
@@ -736,18 +736,18 @@
     <string name="home_dialog_add_custom_amount">Add Custom Amount</string>
     <string name="home_dialog_edit_entry_title">Edit Water Entry</string>
     <string name="home_dialog_external_entry_title">External Water Entry</string>
-    <string name="home_dialog_select_time">Select Time</string>
+    <string name="home_dialog_select_time">Wähle Zeit</string>
     <string name="home_dialog_delete_message">Are you sure you want to delete this %1$s %2$s entry?</string>
     <string name="home_external_entry_title">Entry from another app</string>
     <string name="home_external_entry_message">This entry was imported from another health app and cannot be edited. You can only view its details.</string>
     <!-- Add Container Card -->
-    <string name="home_add_container_label">Add</string>
+    <string name="home_add_container_label">Hinzufügen</string>
     <!-- Container preset names (stable English key kept for storage; these are display strings) -->
-    <string name="container_coffee_cup">Coffee Cup</string>
-    <string name="container_tea_cup">Tea Cup</string>
-    <string name="container_small_cup">Small Cup</string>
+    <string name="container_coffee_cup">Kaffee Becher</string>
+    <string name="container_tea_cup">Tee Becher</string>
+    <string name="container_small_cup">Kleiner Becher</string>
     <string name="container_medium_glass">Medium Glass</string>
-    <string name="container_large_glass">Large Glass</string>
+    <string name="container_large_glass">Großes Glas</string>
     <string name="container_water_bottle">Water Bottle</string>
     <string name="container_large_bottle">Large Bottle</string>
     <!-- Hydration percentage label, e.g. "80% hydration" -->
@@ -769,13 +769,13 @@
     <!-- Quick stats under the profile header -->
     <string name="profile_stat_today_entries">Today\'s Entries</string>
     <string name="profile_stat_days_tracked">Days Tracked</string>
-    <string name="profile_stat_today_goal">Today\'s Goal</string>
+    <string name="profile_stat_today_goal">Heutiges Ziel</string>
     <!-- Section titles on the Profile screen -->
-    <string name="profile_section_daily_goals">Daily Goals</string>
+    <string name="profile_section_daily_goals">Tägliche Ziele</string>
     <string name="profile_section_personal">Personal</string>
     <!-- Info-row labels -->
-    <string name="profile_label_gender">Gender</string>
-    <string name="profile_label_daily_goal">Daily Water Goal</string>
+    <string name="profile_label_gender">Geschlecht</string>
+    <string name="profile_label_daily_goal">Tägliches Wasserziel</string>
     <string name="profile_label_activity_level">Activity Level</string>
     <!-- e.g. "07:00 - 23:00" -->
     <!-- Profile photo sheet -->
@@ -832,7 +832,7 @@
     <string name="statistics_empty_title">No statistics yet</string>
     <string name="statistics_empty_description">Start logging your water intake to see personalised insights and trends.</string>
     <!-- Section titles -->
-    <string name="statistics_section_overview">Overview</string>
+    <string name="statistics_section_overview">Überblick</string>
     <string name="statistics_section_beverages">Beverage Breakdown</string>
     <string name="statistics_section_containers">Container Usage</string>
     <!-- Hero stats -->
