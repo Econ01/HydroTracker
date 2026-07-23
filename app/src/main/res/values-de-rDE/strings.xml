@@ -108,8 +108,8 @@
     <string name="unit_kilolitre_short">Kiloliter</string>
     <string name="unit_megalitre_short">Mega-Liter</string>
     <string name="unit_gigalitre_short">Giga-Liter</string>
-    <string name="unit_us_pint_short">pt</string>
-    <string name="unit_us_quart_short">qt</string>
+    <string name="unit_us_pint_short">Pint</string>
+    <string name="unit_us_quart_short">Quart</string>
     <string name="unit_us_gallon_short">gal</string>
     <string name="unit_imperial_pint_short">pt</string>
     <string name="unit_imperial_quart_short">qt</string>
