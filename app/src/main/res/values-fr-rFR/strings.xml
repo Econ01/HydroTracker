@@ -578,40 +578,40 @@
     <string name="data_import_failed">Échec de l\'importation : %1$s</string>
     <string name="data_delete_success">Données supprimées avec succès</string>
     <!-- %1$s = error message -->
-    <string name="data_delete_failed">Delete failed: %1$s</string>
+    <string name="data_delete_failed">Échec de la suppression : %1$s</string>
     <!-- ============================================================================
          Health Connect status & badges
          ============================================================================ -->
-    <string name="hc_status_error">Error: %1$s</string>
-    <string name="hc_badge_hidden">Hidden</string>
+    <string name="hc_status_error">Erreur : %1$s</string>
+    <string name="hc_badge_hidden">Caché</string>
     <!-- ============================================================================
          About
          ============================================================================ -->
-    <string name="app_tagline">Open source water intake tracker.</string>
-    <string name="label_version">Version: %1$s</string>
-    <string name="label_build_number">Build Number: %1$d</string>
-    <string name="about_section_contributors">Contributors</string>
-    <string name="about_contributor_role">Creator &amp; maintainer</string>
-    <string name="about_contributor_bio">Indie Android developer focused on clean, privacy-respecting apps.</string>
-    <string name="cd_open_github_profile">Open GitHub profile</string>
-    <string name="about_section_information">Information</string>
-    <string name="about_changelog">Changelog</string>
-    <string name="about_changelog_desc">What\'s new in each version</string>
-    <string name="about_sources">Sources &amp; Research</string>
-    <string name="about_sources_desc">Scientific sources behind the app</string>
-    <string name="about_privacy_policy">Privacy Policy</string>
-    <string name="about_privacy_policy_desc">How your data is handled</string>
-    <string name="about_license">License</string>
-    <string name="about_license_desc">HydroTracker\'s open-source license</string>
-    <string name="about_third_party_licenses">Third-party licenses</string>
-    <string name="about_third_party_licenses_desc">Open-source libraries we depend on</string>
-    <string name="toast_no_app_to_open_link">No app found to open this link</string>
+    <string name="app_tagline">Suivi de consommation d\'eau Open Source.</string>
+    <string name="label_version">Version : %1$s</string>
+    <string name="label_build_number">Numéro de version : %1$d</string>
+    <string name="about_section_contributors">Contributeurs</string>
+    <string name="about_contributor_role">Créateur &amp; mainteneur</string>
+    <string name="about_contributor_bio">Le développeur Indépendant Android s\'est concentré sur des applications propres, respectueuses de la vie privée.</string>
+    <string name="cd_open_github_profile">Ouvrir le profil GitHub</string>
+    <string name="about_section_information">Informations</string>
+    <string name="about_changelog">Journal de modifications</string>
+    <string name="about_changelog_desc">Quoi de neuf dans chaque version</string>
+    <string name="about_sources">Sources &amp; Recherche</string>
+    <string name="about_sources_desc">Sources scientifiques derrière l\'application</string>
+    <string name="about_privacy_policy">Politique de Confidentialité</string>
+    <string name="about_privacy_policy_desc">Comment vos données sont traitées</string>
+    <string name="about_license">Licence</string>
+    <string name="about_license_desc">Licence open-source d\'HydroTracker</string>
+    <string name="about_third_party_licenses">Licences tierces</string>
+    <string name="about_third_party_licenses_desc">Bibliothèques open source dont nous dépendons</string>
+    <string name="toast_no_app_to_open_link">Aucune application n\'a été trouvée pour ouvrir ce lien</string>
     <!-- ============================================================================
          Support Development
          ============================================================================ -->
-    <string name="support_development_hero">HydroTracker is built and maintained by one person, with no ads and no tracking. If it has helped you drink more water, anything you chip in keeps it growing.</string>
-    <string name="support_section_support">Support development</string>
-    <string name="support_github_sponsors_blurb">Support ongoing development</string>
+    <string name="support_development_hero">HydroTracker est construit et entretenu par une seule personne, sans publicité et sans suivi. Si cela vous a aidé à boire plus d\'eau, chaque contribution aide à le faire croître.</string>
+    <string name="support_section_support">Soutenir le développement</string>
+    <string name="support_github_sponsors_blurb">Soutenir le développement en cours</string>
     <string name="support_paypal_blurb">Send a quick donation</string>
     <string name="support_buymeacoffee_blurb">Treat me to a coffee</string>
     <string name="support_section_other_ways">Other ways to help</string>
