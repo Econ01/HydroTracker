@@ -52,13 +52,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
+import com.cemcakmak.hydrotracker.utils.parseLocaleNumber
 import kotlinx.coroutines.delay
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.time.Duration.Companion.milliseconds
 import java.text.DecimalFormatSymbols
-import java.text.NumberFormat
 import java.util.Locale
 
 @Composable
@@ -98,15 +98,6 @@ object EntryAnimationDefaults {
 private fun extractNumericPortion(text: String): String? {
     val match = Regex("""[0-9][\d\s.,\u00A0]*""").find(text)
     return match?.value?.trim()
-}
-
-/** Parses a numeric string formatted for [locale] into a [Double]. */
-private fun parseFormattedNumber(text: String, locale: Locale): Double? {
-    return try {
-        NumberFormat.getNumberInstance(locale).parse(text)?.toDouble()
-    } catch (_: Exception) {
-        null
-    }
 }
 
 /** Counts the number of decimal places shown in [numericText] for [locale]. */
@@ -201,7 +192,7 @@ fun AnimatedNumber(
     val stepCount = entryStepCount.coerceAtLeast(1)
     val numericPortion = remember(finalText) { extractNumericPortion(finalText) }
     val displayValue = remember(numericPortion, locale) {
-        numericPortion?.let { parseFormattedNumber(it, locale) }
+        numericPortion?.let { parseLocaleNumber(it, locale) }
     }
     val decimalPlaces = remember(numericPortion, locale) {
         numericPortion?.let { countDecimalPlaces(it, locale) } ?: 0
