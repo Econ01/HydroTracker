@@ -7,11 +7,12 @@
     <text x="612" y="65" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">0%</text>
     <text x="20" y="105" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">French</text>
     <rect x="220" y="91" width="380" height="18" rx="4" fill="#e0e0e0"/>
-    <text x="612" y="105" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">0%</text>
+    <rect x="220" y="91" width="121" height="18" rx="4" fill="#008080"/>
+    <text x="612" y="105" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">32%</text>
     <text x="20" y="145" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">German</text>
     <rect x="220" y="131" width="380" height="18" rx="4" fill="#e0e0e0"/>
-    <rect x="220" y="131" width="15" height="18" rx="4" fill="#008080"/>
-    <text x="612" y="145" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">4%</text>
+    <rect x="220" y="131" width="49" height="18" rx="4" fill="#008080"/>
+    <text x="612" y="145" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">13%</text>
     <text x="20" y="185" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">Portuguese</text>
     <rect x="220" y="171" width="380" height="18" rx="4" fill="#e0e0e0"/>
     <text x="612" y="185" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">0%</text>
