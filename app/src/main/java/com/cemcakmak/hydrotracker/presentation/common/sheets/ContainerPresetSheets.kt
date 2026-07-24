@@ -55,6 +55,7 @@ import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.utils.ContainerIcon
 import com.cemcakmak.hydrotracker.utils.ContainerIconMapper
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
+import com.cemcakmak.hydrotracker.utils.parseLocaleNumber
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -93,7 +94,7 @@ private fun EditContainerPresetSheetContent(
     // manually chosen one.
     LaunchedEffect(volumeText, volumeUnit) {
         if (!isIconManuallySelected) {
-            val volumeInUserUnit = volumeText.toDoubleOrNull() ?: 0.0
+            val volumeInUserUnit = parseLocaleNumber(volumeText) ?: 0.0
             val volumeInMl = VolumeUnitConverter.toMillilitres(volumeInUserUnit, volumeUnit)
             selectedIcon = ContainerIconMapper.getIconForVolume(
                 if (volumeInMl > 0) volumeInMl else preset.volume
@@ -262,7 +263,7 @@ private fun EditContainerPresetSheetContent(
                     Button(
                         onClick = {
                             val trimmedName = name.trim()
-                            val volumeInUserUnit = volumeText.toDoubleOrNull()
+                            val volumeInUserUnit = parseLocaleNumber(volumeText)
 
                             nameError = trimmedName.isEmpty()
                             val volumeInMl = volumeInUserUnit?.let {
@@ -525,7 +526,7 @@ private fun AddContainerPresetSheetContent(
     // manually chosen one.
     LaunchedEffect(volumeText, volumeUnit) {
         if (!isIconManuallySelected) {
-            val volumeInUserUnit = volumeText.toDoubleOrNull() ?: 250.0
+            val volumeInUserUnit = parseLocaleNumber(volumeText) ?: 250.0
             val volumeInMl = VolumeUnitConverter.toMillilitres(volumeInUserUnit, volumeUnit)
             selectedIcon = ContainerIconMapper.getIconForVolume(volumeInMl)
         }
@@ -625,7 +626,7 @@ private fun AddContainerPresetSheetContent(
             onClick = {
                 haptics.performHapticFeedback(HapticFeedbackType.Confirm)
                 val trimmedName = name.trim()
-                val volumeInUserUnit = volumeText.toDoubleOrNull()
+                val volumeInUserUnit = parseLocaleNumber(volumeText)
 
                 nameError = trimmedName.isEmpty()
                 val volumeInMl = volumeInUserUnit?.let {

@@ -66,6 +66,7 @@ import com.cemcakmak.hydrotracker.presentation.common.BeverageOption
 import com.cemcakmak.hydrotracker.presentation.common.toOption
 import com.cemcakmak.hydrotracker.ui.theme.rememberBeverageColorRoles
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
+import com.cemcakmak.hydrotracker.utils.parseLocaleNumber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -318,7 +319,7 @@ private fun ActionButtons(
             buttonGroupContent = {
                 Button(
                     onClick = {
-                        val amountInUserUnit = amountText.toDoubleOrNull()
+                        val amountInUserUnit = parseLocaleNumber(amountText)
                         if (amountInUserUnit != null && amountInUserUnit > 0) {
                             val amountInMl = VolumeUnitConverter.toMillilitres(amountInUserUnit, volumeUnit)
                             if (amountInMl in minAmountMl..maxAmountMl) {
