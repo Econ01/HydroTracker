@@ -152,7 +152,7 @@ fun EditWaterDialog(
     val isExternalEntry = entry.isExternalEntry()
 
     val handleSave = {
-        val amountInUserUnit = amountText.toDouble()
+        val amountInUserUnit = amountText.replace(",", "").toDouble()
         val amountInMl = VolumeUnitConverter.toMillilitres(amountInUserUnit, volumeUnit)
 
         val newCalendar = Calendar.getInstance().apply {
@@ -600,7 +600,7 @@ private fun ActionButtons(
                 buttonGroupContent = {
                     Button(
                         onClick = {
-                            val amountInUserUnit = amountText.toDoubleOrNull()
+                            val amountInUserUnit = amountText.replace(",", "").toDoubleOrNull()
                             if (amountInUserUnit != null && amountInUserUnit > 0) {
                                 val amountInMl = VolumeUnitConverter.toMillilitres(amountInUserUnit, volumeUnit)
                                 if (amountInMl in minAmountMl..maxAmountMl) {
