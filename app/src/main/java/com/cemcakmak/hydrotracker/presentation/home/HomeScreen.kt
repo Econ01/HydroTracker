@@ -1196,7 +1196,7 @@ private val previewEntries: List<WaterIntakeEntry>
         val now = System.currentTimeMillis()
         val date = UserDayCalculator.getCurrentUserDayString(
             dayEndTime = "23:00",
-            dayEndMode = DayEndMode.SLEEP_TIME
+            dayEndMode = DayEndMode.MIDNIGHT
         )
         return listOf(
             WaterIntakeEntry(

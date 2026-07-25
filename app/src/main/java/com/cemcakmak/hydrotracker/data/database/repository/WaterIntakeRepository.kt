@@ -61,7 +61,7 @@ class WaterIntakeRepository(
     private suspend fun getTodayUserDayString(): String {
         val userProfile = userRepository.userProfile.first()
         val dayEndTime = getDayEndTime(userProfile)
-        val dayEndMode = userProfile?.dayEndMode ?: DayEndMode.SLEEP_TIME
+        val dayEndMode = userProfile?.dayEndMode ?: DayEndMode.MIDNIGHT
         return UserDayCalculator.getCurrentUserDayString(dayEndTime, dayEndMode)
     }
 

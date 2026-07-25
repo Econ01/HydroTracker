@@ -387,7 +387,7 @@ object HealthConnectManager {
         sourceName: String?,
         source: com.cemcakmak.hydrotracker.data.models.EntrySource,
         dayEndTime: String = "23:00",
-        dayEndMode: com.cemcakmak.hydrotracker.data.models.DayEndMode = com.cemcakmak.hydrotracker.data.models.DayEndMode.SLEEP_TIME,
+        dayEndMode: com.cemcakmak.hydrotracker.data.models.DayEndMode = com.cemcakmak.hydrotracker.data.models.DayEndMode.MIDNIGHT,
         healthConnectRecordId: String? = null
     ): WaterIntakeEntry {
         val volumeInML = record.volume.inMilliliters

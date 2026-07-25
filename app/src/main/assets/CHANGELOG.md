@@ -1,3 +1,7 @@
+[1.4]
+Changed
+- Switched the default day-end time mode from **Sleep time** to **Midnight**
+
 [1.3]
 Added
 - 6 new font options added:
