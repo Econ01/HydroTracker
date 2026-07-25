@@ -26,7 +26,7 @@ data class UserProfile(
     val reminderStyle: ReminderStyle = ReminderStyle.GENTLE,
     val hydrationStandard: HydrationStandard = HydrationStandard.EFSA, // Default to EFSA
     val healthConnectSyncEnabled: Boolean = false, // Health Connect data sync setting
-    val dayEndMode: DayEndMode = DayEndMode.SLEEP_TIME,
+    val dayEndMode: DayEndMode = DayEndMode.MIDNIGHT,
     val reminderIntervalMode: ReminderIntervalMode = ReminderIntervalMode.AUTOMATIC,
     val customReminderInterval: Int = 60,
     val volumeUnit: VolumeUnit = VolumeUnit.MILLILITRES, // Display unit for hydration amounts

@@ -556,7 +556,8 @@ fun DeveloperOptionsScreen(
                                     } catch (_: Exception) {
                                         emptyList()
                                     }
-                                    HydroNotificationService(context).showTestNotification(profile, progress, quickAddPresets)
+                                    val showPauseAction = HydroNotificationScheduler.getConsecutiveIgnoredCount(context) >= 2
+                                    HydroNotificationService(context).showTestNotification(profile, progress, quickAddPresets, showPauseAction)
                                     "Test notification sent"
                                 }
                             }
@@ -647,6 +648,39 @@ fun DeveloperOptionsScreen(
                                         val testProfile = userProfile.copy(reminderInterval = 1)
                                         HydroNotificationScheduler.rescheduleNotifications(context, testProfile)
                                         "1-minute interval enabled. Remember to reset when done."
+                                    }
+                                }
+                            )
+                        }
+                        if (userProfile != null) {
+                            add(
+                                DevAction(
+                                    title = "Toggle Reminder Suspension",
+                                    description = "Manually pause or resume reminders until next day",
+                                    icon = ImageVector.vectorResource(R.drawable.notifications_paused_filled)
+                                ) {
+                                    runWithToast("Toggle Reminder Suspension") {
+                                        if (HydroNotificationScheduler.isCurrentlySuspended(context)) {
+                                            HydroNotificationScheduler.resumeReminders(context, userProfile)
+                                            "Reminders resumed"
+                                        } else {
+                                            HydroNotificationScheduler.suspendRemindersUntilNextDay(context, userProfile)
+                                            "Reminders suspended until next day"
+                                        }
+                                    }
+                                }
+                            )
+                            add(
+                                DevAction(
+                                    title = "Simulate Ignored Reminders",
+                                    description = "Set ignored count to 2 so the next notification shows the pause action",
+                                    icon = ImageVector.vectorResource(R.drawable.notification_add_filled)
+                                ) {
+                                    runWithToast("Simulate Ignored Reminders") {
+                                        repeat(2) {
+                                            HydroNotificationScheduler.incrementConsecutiveIgnoredCount(context)
+                                        }
+                                        "Ignored count set to 2"
                                     }
                                 }
                             )

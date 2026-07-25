@@ -154,7 +154,7 @@ private fun legacyProfile(prefs: SharedPreferences): UserProfile? {
         reminderStyle = prefs.getString("reminder_style", null).toEnumOrDefault(ReminderStyle.GENTLE),
         hydrationStandard = prefs.getString("hydration_standard", null).toEnumOrDefault(HydrationStandard.EFSA),
         healthConnectSyncEnabled = prefs.getBoolean("health_connect_sync_enabled", false),
-        dayEndMode = prefs.getString("day_end_mode", null).toEnumOrDefault(DayEndMode.SLEEP_TIME),
+        dayEndMode = prefs.getString("day_end_mode", null).toEnumOrDefault(DayEndMode.MIDNIGHT),
         reminderIntervalMode = prefs.getString("reminder_interval_mode", null).toEnumOrDefault(ReminderIntervalMode.AUTOMATIC),
         customReminderInterval = prefs.getInt("custom_reminder_interval", 60),
     )
