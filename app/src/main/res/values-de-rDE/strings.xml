@@ -81,6 +81,7 @@
          Settings: Language & Translation
          ============================================================================ -->
     <string name="screen_language_title">Sprache &amp; Übersetzung</string>
+    <string name="language_translation_disclaimer">Content is displayed only upon translation approval. Unapproved segments remain hidden.</string>
     <string name="language_contribute_title">Mitwirken</string>
     <string name="language_crowdin_title">Hilf mit, Hydration-Zähler zu übersetzen</string>
     <string name="language_crowdin_description">Auf Crowdin mitwirken</string>
@@ -118,7 +119,7 @@
          Onboarding
          Per-step title + description (shown above each step), plus step controls.
          ============================================================================ -->
-    <string name="onboarding_welcome_title">Welcome to HydroTracker</string>
+    <string name="onboarding_welcome_title">Willkommen zu Hydration-Zähler</string>
     <string name="onboarding_welcome_description">We\'ll personalize the app for you.</string>
     <string name="onboarding_gender_title">Tell us about yourself</string>
     <string name="onboarding_gender_description">Wähle die Option, die dich am besten beschreibt.</string>
@@ -228,7 +229,7 @@
     <string name="nav_home">Home</string>
     <string name="nav_history">Verlauf</string>
     <string name="nav_statistics">Statistics</string>
-    <string name="nav_profile">Profile</string>
+    <string name="nav_profile">Profil</string>
     <string name="nav_settings">Einstellungen</string>
     <string name="nav_add_custom">Add Custom</string>
     <string name="fab_menu_new_beverage">New Beverage</string>
@@ -262,10 +263,10 @@
          ============================================================================ -->
     <string name="appearance_theme_header">Theme</string>
     <string name="appearance_theme_system">System</string>
-    <string name="appearance_theme_light">Light</string>
-    <string name="appearance_theme_dark">Dark</string>
-    <string name="appearance_color_header">Color</string>
-    <string name="appearance_amoled_title">AMOLED Mode</string>
+    <string name="appearance_theme_light">Hell</string>
+    <string name="appearance_theme_dark">Dunkel</string>
+    <string name="appearance_color_header">Farbe</string>
+    <string name="appearance_amoled_title">AMOLED-Schwarz</string>
     <string name="appearance_amoled_desc">True black backgrounds in dark mode</string>
     <string name="appearance_amoled_borders_title">Surface Borders</string>
     <string name="appearance_amoled_borders_desc">Subtle borders around cards in AMOLED mode</string>
@@ -292,15 +293,15 @@
     <string name="appearance_widget_section_title">Widgets</string>
     <string name="appearance_widget_title">Widget Settings</string>
     <string name="appearance_widget_desc">Change appearance and behaviour</string>
-    <string name="widget_settings_colours_header">Colours</string>
+    <string name="widget_settings_colours_header">Farben</string>
     <string name="widget_settings_dynamic_title">Dynamic colours</string>
     <string name="widget_settings_dynamic_desc">Colours from your wallpaper</string>
     <string name="widget_settings_background_header">Hintergrund</string>
     <string name="widget_settings_transparent_title">Transparent background</string>
     <string name="widget_settings_transparent_desc">Make the background surface transparent</string>
-    <string name="widget_settings_pure_black_title">Pure black background</string>
+    <string name="widget_settings_pure_black_title">Rein schwarzer Hintergrund</string>
     <string name="widget_settings_pure_black_desc">Use a true black surface in dark mode</string>
-    <string name="widget_settings_pure_white_title">Pure white background</string>
+    <string name="widget_settings_pure_white_title">Rein weißen Hintergrund</string>
     <string name="widget_settings_pure_white_desc">Use a true white surface in light mode</string>
     <string name="widget_settings_quickadd_title">Quick actions</string>
     <string name="widget_settings_quickadd_desc">Choose the three quick-add buttons</string>
@@ -328,16 +329,16 @@
     <string name="notif_style_gentle_desc">Sanfte, motivierende Erinnerungen</string>
     <string name="notif_style_motivating_desc">Energetic, goal-focused reminders</string>
     <string name="notif_style_minimal_desc">Simple, unobtrusive reminders</string>
-    <string name="notif_permissions_header">Permissions</string>
+    <string name="notif_permissions_header">Berechtigungen</string>
     <string name="notif_permission_title">Notification permission</string>
     <string name="notif_permission_desc">Required to send hydration reminders</string>
     <string name="notif_exact_alarm_title">Exact alarm permission</string>
     <string name="notif_exact_alarm_desc">Required for precise reminder timing</string>
-    <string name="notif_reminder_style_header">Reminder style</string>
+    <string name="notif_reminder_style_header">Erinnerungsart</string>
     <!-- Short reminder-style labels shown on the toggle buttons -->
     <string name="notif_style_gentle_short">Gentle</string>
     <string name="notif_style_motivating_short">Energetic</string>
-    <string name="notif_style_minimal_short">Simple</string>
+    <string name="notif_style_minimal_short">Simpel</string>
     <string name="notif_active_hours_header">Aktive Stunden</string>
     <string name="notif_wake_up">Aufwachen</string>
     <string name="notif_sleep">Schlaf</string>
@@ -348,6 +349,10 @@
     <string name="notif_configure_schedule_desc">Change reminder mode or set a custom interval</string>
     <string name="notif_reminder_interval">Reminder interval</string>
     <string name="notif_scheduled_for">Scheduled for</string>
+    <string name="notif_pause_reminders">Pause reminders for today</string>
+    <string name="notif_pause_reminders_desc">Stop hydration reminders until the next day</string>
+    <string name="notif_resume_reminders">Resume reminders</string>
+    <string name="notif_reminders_paused_desc">Hydration reminders are paused until tomorrow</string>
     <!-- Reminder cadence, e.g. "Every 60 minutes"; %1$d = minutes -->
     <plurals name="every_x_minutes">
         <item quantity="one">Every %1$d minute</item>
@@ -424,10 +429,10 @@
     <string name="hc_data_title">Health Connect Data</string>
     <string name="hc_data_desc">View your synced intake history</string>
     <string name="hc_restore">Restore from Health Connect</string>
-    <string name="hc_restore_confirm">Restore</string>
+    <string name="hc_restore_confirm">Wiederherstellen</string>
     <string name="hc_grant_permissions">Grant Permissions</string>
     <string name="hc_restore_message">Import your past HydroTracker entries from Health Connect. Choose a time range:</string>
-    <string name="hc_restore_all">All history</string>
+    <string name="hc_restore_all">Gesamter Verlauf</string>
     <string name="hc_restore_90days">Letzte 90 Tage</string>
     <!-- %1$d = imported count, %2$d = skipped duplicates -->
     <string name="hc_restored_snackbar">Restored %1$d entries, skipped %2$d duplicates</string>
@@ -492,24 +497,24 @@
     <string name="reminder_interval_mode_automatic">Automatisch</string>
     <string name="reminder_interval_mode_custom">Custom</string>
     <!-- Dark mode preference -->
-    <string name="dark_mode_system">System Default</string>
-    <string name="dark_mode_light">Light Mode</string>
-    <string name="dark_mode_dark">Dark Mode</string>
+    <string name="dark_mode_system">Systemstandard</string>
+    <string name="dark_mode_light">Heller Modus</string>
+    <string name="dark_mode_dark">Dunkler Modus</string>
     <!-- Colour source -->
     <string name="color_source_hydro">HydroTracker Blue</string>
     <string name="color_source_dynamic">Dynamic Colors</string>
     <string name="color_source_dynamic_desc">Colors from your wallpaper</string>
     <!-- Week start day -->
-    <string name="weekday_sunday">Sunday</string>
-    <string name="weekday_monday">Monday</string>
-    <string name="weekday_tuesday">Tuesday</string>
-    <string name="weekday_wednesday">Wednesday</string>
-    <string name="weekday_thursday">Thursday</string>
-    <string name="weekday_friday">Friday</string>
-    <string name="weekday_saturday">Saturday</string>
+    <string name="weekday_sunday">Sonntag</string>
+    <string name="weekday_monday">Montag</string>
+    <string name="weekday_tuesday">Dienstag</string>
+    <string name="weekday_wednesday">Mittwoch</string>
+    <string name="weekday_thursday">Donnerstag</string>
+    <string name="weekday_friday">Freitag</string>
+    <string name="weekday_saturday">Samstag</string>
     <string name="week_start_system">System</string>
     <!-- App font (proper-noun font names are not translated) -->
-    <string name="font_system">System Default</string>
+    <string name="font_system">Systemstandard</string>
     <string name="font_xiaomi_warning">Font styling on HyperOS/MIUI (Xiaomi group devices) does not work as intended due to their custom text engine.</string>
     <!-- Navigation-bar label mode -->
     <string name="navbar_label_always">Always shown</string>
@@ -583,7 +588,7 @@
          Health Connect status & badges
          ============================================================================ -->
     <string name="hc_status_error">Error: %1$s</string>
-    <string name="hc_badge_hidden">Hidden</string>
+    <string name="hc_badge_hidden">Versteckt</string>
     <!-- ============================================================================
          About
          ============================================================================ -->
@@ -595,7 +600,7 @@
     <string name="about_contributor_bio">Indie Android developer focused on clean, privacy-respecting apps.</string>
     <string name="cd_open_github_profile">Open GitHub profile</string>
     <string name="about_section_information">Information</string>
-    <string name="about_changelog">Changelog</string>
+    <string name="about_changelog">Änderungsprotokoll</string>
     <string name="about_changelog_desc">What\'s new in each version</string>
     <string name="about_sources">Sources &amp; Research</string>
     <string name="about_sources_desc">Scientific sources behind the app</string>
@@ -615,7 +620,7 @@
     <string name="support_paypal_blurb">Sende eine schnelle Spende</string>
     <string name="support_buymeacoffee_blurb">Treat me to a coffee</string>
     <string name="support_section_other_ways">Andere Wege zu helfen</string>
-    <string name="support_rate_play_store">Rate on Google Play</string>
+    <string name="support_rate_play_store">Bewerte im Play Store</string>
     <string name="support_rate_play_store_desc">Leave a rating on the Play Store</string>
     <string name="support_share_app">Teile die App</string>
     <string name="support_share_app_desc">Erzähl einem Freund über Hydration-Zähler</string>
@@ -651,11 +656,11 @@
     <string name="updates_button_download">Download update</string>
     <string name="label_version_simple">Version</string>
     <string name="label_build_simple">Build</string>
-    <string name="label_install_method">Install Method</string>
-    <string name="label_source">Source</string>
-    <string name="install_source_manual">Manual</string>
+    <string name="label_install_method">Installationsmethode</string>
+    <string name="label_source">Quelle</string>
+    <string name="install_source_manual">Anleitung</string>
     <string name="install_source_debug">Debug</string>
-    <string name="install_source_github">GitHub</string>
+    <string name="install_source_github">Github</string>
     <string name="toast_could_not_start_update">Couldn\'t start the update</string>
     <!-- ============================================================================
          Licenses
@@ -667,19 +672,19 @@
          ============================================================================ -->
     <string name="whats_new_title">What\'s New</string>
     <string name="whats_new_version">Version %1$s</string>
-    <string name="update_dialog_title">Update Available</string>
-    <string name="update_dialog_current_version">Current version</string>
-    <string name="update_dialog_new_version">New version</string>
+    <string name="update_dialog_title">Update verfügbar</string>
+    <string name="update_dialog_current_version">Aktuelle Version</string>
+    <string name="update_dialog_new_version">Neue Version</string>
     <string name="update_dialog_action_play">Open Google Play to update HydroTracker.</string>
     <string name="update_dialog_action_f_droid">Open the F-Droid app to update HydroTracker.</string>
     <string name="update_dialog_action_github">Download the latest APK from GitHub.</string>
-    <string name="update_button_later">Later</string>
-    <string name="update_button_update">Update</string>
+    <string name="update_button_later">Später</string>
+    <string name="update_button_update">Aktualisierung</string>
     <!-- ============================================================================
          Markdown components
          ============================================================================ -->
-    <string name="markdown_loading">Loading…</string>
-    <string name="markdown_error_loading">Error loading %1$s: %2$s</string>
+    <string name="markdown_loading">Ladet…</string>
+    <string name="markdown_error_loading">Fehler beim Laden %1$s: %2$s</string>
     <string name="markdown_version_prefix">Version %1$s</string>
     <string name="markdown_section_added">Hinzugefügt</string>
     <string name="markdown_section_changed">Geändert</string>
@@ -731,6 +736,7 @@
     <string name="home_label_entries">Entries</string>
     <string name="home_label_first_intake">First</string>
     <string name="home_label_latest_intake">Latest</string>
+    <string name="home_reminders_paused_hint">Reminders paused until tomorrow</string>
     <string name="home_section_recent_entries">Recent Entries</string>
     <!-- Dialogue titles -->
     <string name="home_dialog_add_custom_amount">Add Custom Amount</string>
@@ -748,8 +754,8 @@
     <string name="container_small_cup">Kleiner Becher</string>
     <string name="container_medium_glass">Medium Glass</string>
     <string name="container_large_glass">Großes Glas</string>
-    <string name="container_water_bottle">Water Bottle</string>
-    <string name="container_large_bottle">Large Bottle</string>
+    <string name="container_water_bottle">Wasserflasche</string>
+    <string name="container_large_bottle">Große Flasche</string>
     <!-- Hydration percentage label, e.g. "80% hydration" -->
     <string name="home_label_hydration_percentage">%1$d%% hydration</string>
     <!-- Motivational messages -->
@@ -884,9 +890,10 @@
     <string name="notification_minimal_remaining">%1$s remaining</string>
     <!-- %1$s = formatted amount with unit, e.g. "500 ml" -->
     <string name="notification_action_add">Add %1$s</string>
+    <string name="notification_action_pause_today">Pause for today</string>
     <string name="notification_quick_add_preset_name">Quick Add</string>
     <string name="notification_quick_add_note">Added from notification</string>
-    <!-- %1$s = formatted amount with unit, e.g. "500 ml" -->
+    <string name="notification_paused_confirmation">Reminders paused until tomorrow</string>
     <string name="notification_quick_add_feedback_title">Added %1$s</string>
     <!-- %1$s = formatted current intake, %2$s = formatted daily goal -->
     <string name="notification_quick_add_feedback_message">%1$s / %2$s</string>
