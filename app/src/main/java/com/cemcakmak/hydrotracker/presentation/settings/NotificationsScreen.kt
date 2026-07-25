@@ -24,6 +24,7 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import android.text.format.DateFormat
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.EnterExitState
@@ -47,6 +48,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -63,6 +65,7 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -113,7 +116,10 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.cemcakmak.hydrotracker.R
+import com.cemcakmak.hydrotracker.data.models.ActivityLevel
+import com.cemcakmak.hydrotracker.data.models.AgeGroup
 import com.cemcakmak.hydrotracker.data.models.DarkModePreference
+import com.cemcakmak.hydrotracker.data.models.Gender
 import com.cemcakmak.hydrotracker.data.models.ReminderStyle
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.UserProfile
@@ -201,7 +207,7 @@ fun NotificationsScreen(
     // Refresh permissions when returning from system settings
     DisposableEffect(Unit) {
         if (isPreview) return@DisposableEffect onDispose { }
-        val activity = context as? androidx.activity.ComponentActivity
+        val activity = context as? ComponentActivity
         val listener = object : Application.ActivityLifecycleCallbacks {
             override fun onActivityResumed(activity: Activity) {
                 if (activity == context) refreshTrigger++
@@ -223,6 +229,15 @@ fun NotificationsScreen(
             hasExactAlarmPermission = NotificationPermissionManager.hasExactAlarmPermission(context)
         }
         isRemindersEnabled = hasNotificationPermission && hasExactAlarmPermission && userProfile?.isOnboardingCompleted == true
+    }
+
+    var isSuspended by remember { mutableStateOf(false) }
+    var suspendRefreshTrigger by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(suspendRefreshTrigger) {
+        if (!isPreview) {
+            isSuspended = HydroNotificationScheduler.isCurrentlySuspended(context)
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -439,6 +454,17 @@ fun NotificationsScreen(
                     ScheduleSection(
                         intervalMinutes = userProfile.reminderInterval,
                         nextTime = nextTime,
+                        isSuspended = isSuspended,
+                        onToggleSuspended = {
+                            coroutineScope.launch {
+                                if (isSuspended) {
+                                    HydroNotificationScheduler.resumeReminders(context, userProfile)
+                                } else {
+                                    HydroNotificationScheduler.suspendRemindersUntilNextDay(context, userProfile)
+                                }
+                                suspendRefreshTrigger++
+                            }
+                        },
                         onConfigureClick = {
                             haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
                             onNavigateToReminderInterval()
@@ -969,6 +995,8 @@ private fun ActiveHoursSection(
 private fun ScheduleSection(
     intervalMinutes: Int,
     nextTime: String?,
+    isSuspended: Boolean,
+    onToggleSuspended: () -> Unit,
     onConfigureClick: () -> Unit
 ) {
     val haptics = LocalHapticFeedback.current
@@ -977,6 +1005,7 @@ private fun ScheduleSection(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         SettingsSectionHeader(stringResource(R.string.notif_schedule_header))
+
         Column {
             val totalSize = if (nextTime != null) 3 else 2
 
@@ -1080,6 +1109,30 @@ private fun ScheduleSection(
                     }
                 }
             }
+        }
+
+        Button(
+            onClick = {
+                haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
+                onToggleSuspended()
+            },
+            shapes = ButtonDefaults.shapes(),
+            colors = ButtonColors(
+                containerColor = if (isSuspended) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary,
+                contentColor = if (isSuspended) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onTertiary,
+                disabledContainerColor = ButtonDefaults.buttonColors().disabledContainerColor,
+                disabledContentColor = ButtonDefaults.buttonColors().disabledContentColor
+            ),
+            contentPadding = PaddingValues(20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = stringResource(
+                    if (isSuspended) R.string.notif_resume_reminders else R.string.notif_pause_reminders
+                ),
+                style = MaterialTheme.typography.titleMedium
+            )
         }
     }
 }
@@ -1265,9 +1318,9 @@ fun NotificationsScreenPreview() {
         mutableStateOf(
             UserProfile(
                 name = "Preview",
-                gender = com.cemcakmak.hydrotracker.data.models.Gender.MALE,
-                ageGroup = com.cemcakmak.hydrotracker.data.models.AgeGroup.ADULT_31_50,
-                activityLevel = com.cemcakmak.hydrotracker.data.models.ActivityLevel.MODERATE,
+                gender = Gender.MALE,
+                ageGroup = AgeGroup.ADULT_31_50,
+                activityLevel = ActivityLevel.MODERATE,
                 wakeUpTime = "07:00",
                 sleepTime = "23:00",
                 dailyWaterGoal = 2500.0,
@@ -1287,33 +1340,49 @@ fun NotificationsScreenPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "Schedule Section - Both States")
 @Composable
-fun WakeUpTimePickerPreview() {
+fun ScheduleSectionPreview() {
+    val previewProfile = remember {
+        UserProfile(
+            name = "Preview",
+            gender = Gender.MALE,
+            ageGroup = AgeGroup.ADULT_31_50,
+            activityLevel = ActivityLevel.MODERATE,
+            wakeUpTime = "07:00",
+            sleepTime = "23:00",
+            dailyWaterGoal = 2500.0,
+            reminderInterval = 60,
+            isOnboardingCompleted = true,
+            reminderStyle = ReminderStyle.GENTLE
+        )
+    }
+
+    var activeSuspended by remember { mutableStateOf(false) }
+    var suspendedSuspended by remember { mutableStateOf(true) }
+
     HydroTrackerTheme {
-        Surface(
-            color = MaterialTheme.colorScheme.surfaceContainerLow,
-            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-            modifier = Modifier.fillMaxSize()
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                BottomSheetDefaults.DragHandle()
-                val timeState = rememberTimePickerState(
-                    initialHour = 7,
-                    initialMinute = 0,
-                    is24Hour = true
-                )
-                TimePickerSheetContent(
-                    title = "Wake up time",
-                    timeState = timeState,
-                    onConfirm = {},
-                    onDismiss = {}
-                )
-            }
+            ScheduleSection(
+                intervalMinutes = previewProfile.reminderInterval,
+                nextTime = "08:00",
+                isSuspended = activeSuspended,
+                onToggleSuspended = { activeSuspended = !activeSuspended },
+                onConfigureClick = {}
+            )
+
+            ScheduleSection(
+                intervalMinutes = previewProfile.reminderInterval,
+                nextTime = null,
+                isSuspended = suspendedSuspended,
+                onToggleSuspended = { suspendedSuspended = !suspendedSuspended },
+                onConfigureClick = {}
+            )
         }
     }
 }

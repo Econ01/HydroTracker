@@ -74,7 +74,8 @@ class HydroNotificationService(private val context: Context) {
     fun showHydrationReminder(
         userProfile: UserProfile,
         waterProgress: WaterProgress,
-        quickAddPresets: List<ContainerPreset> = emptyList()
+        quickAddPresets: List<ContainerPreset> = emptyList(),
+        showPauseAction: Boolean = false
     ) {
         if (!NotificationPermissionManager.hasNotificationPermission(context)) {
             return
@@ -88,7 +89,7 @@ class HydroNotificationService(private val context: Context) {
             volumeUnit = userProfile.volumeUnit
         )
 
-        val notification = buildNotification(content, waterProgress, userProfile, quickAddPresets)
+        val notification = buildNotification(content, waterProgress, userProfile, quickAddPresets, showPauseAction)
 
         try {
             notificationManager.notify(NOTIFICATION_ID, notification)
@@ -103,7 +104,8 @@ class HydroNotificationService(private val context: Context) {
     fun showTestNotification(
         userProfile: UserProfile,
         waterProgress: WaterProgress,
-        quickAddPresets: List<ContainerPreset> = emptyList()
+        quickAddPresets: List<ContainerPreset> = emptyList(),
+        showPauseAction: Boolean = false
     ) {
         if (!NotificationPermissionManager.hasNotificationPermission(context)) {
             return
@@ -117,7 +119,7 @@ class HydroNotificationService(private val context: Context) {
             volumeUnit = userProfile.volumeUnit
         )
 
-        val notification = buildNotification(content, waterProgress, userProfile, quickAddPresets)
+        val notification = buildNotification(content, waterProgress, userProfile, quickAddPresets, showPauseAction)
 
         try {
             notificationManager.notify(NOTIFICATION_ID, notification)
@@ -182,7 +184,8 @@ class HydroNotificationService(private val context: Context) {
         content: NotificationContent,
         waterProgress: WaterProgress,
         userProfile: UserProfile,
-        quickAddPresets: List<ContainerPreset> = emptyList()
+        quickAddPresets: List<ContainerPreset> = emptyList(),
+        showPauseAction: Boolean = false
     ): android.app.Notification {
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -232,23 +235,19 @@ class HydroNotificationService(private val context: Context) {
             .setColorized(true)
             .setColor(progressColor)
 
-        quickAddPresets.take(2).forEachIndexed { index, preset ->
-            val actionLabel = context.getString(
-                R.string.notification_action_add,
-                VolumeUnitConverter.format(context, preset.volume, userProfile.volumeUnit)
-            )
-            val actionIntent = Intent(context, QuickAddWaterReceiver::class.java).apply {
-                action = QuickAddWaterReceiver.ACTION_QUICK_ADD_WATER
-                putExtra(QuickAddWaterReceiver.EXTRA_CONTAINER_VOLUME, preset.volume)
-                putExtra(QuickAddWaterReceiver.EXTRA_CONTAINER_NAME, preset.name)
+        // Add up to two actions. If the pause action is requested, it always occupies the second
+        // slot; the first slot is the primary quick-add preset when available.
+        if (quickAddPresets.isNotEmpty()) {
+            val primaryPreset = quickAddPresets[0]
+            addQuickAddAction(builder, userProfile, primaryPreset, 0)
+
+            if (showPauseAction) {
+                addPauseAction(builder)
+            } else if (quickAddPresets.size >= 2) {
+                addQuickAddAction(builder, userProfile, quickAddPresets[1], 1)
             }
-            val actionPendingIntent = PendingIntent.getBroadcast(
-                context,
-                index,
-                actionIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-            builder.addAction(0, actionLabel, actionPendingIntent)
+        } else if (showPauseAction) {
+            addPauseAction(builder)
         }
 
         return builder.build()
@@ -372,5 +371,48 @@ class HydroNotificationService(private val context: Context) {
      */
     fun cancelFunFactNotification() {
         notificationManager.cancel(FUN_FACT_NOTIFICATION_ID)
+    }
+
+    /**
+     * Add a quick-add action to the notification builder.
+     */
+    private fun addQuickAddAction(
+        builder: NotificationCompat.Builder,
+        userProfile: UserProfile,
+        preset: ContainerPreset,
+        requestCode: Int
+    ) {
+        val actionLabel = context.getString(
+            R.string.notification_action_add,
+            VolumeUnitConverter.format(context, preset.volume, userProfile.volumeUnit)
+        )
+        val actionIntent = Intent(context, QuickAddWaterReceiver::class.java).apply {
+            action = QuickAddWaterReceiver.ACTION_QUICK_ADD_WATER
+            putExtra(QuickAddWaterReceiver.EXTRA_CONTAINER_VOLUME, preset.volume)
+            putExtra(QuickAddWaterReceiver.EXTRA_CONTAINER_NAME, preset.name)
+        }
+        val actionPendingIntent = PendingIntent.getBroadcast(
+            context,
+            requestCode,
+            actionIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        builder.addAction(0, actionLabel, actionPendingIntent)
+    }
+
+    /**
+     * Add the manual "Pause for today" action to the notification builder.
+     */
+    private fun addPauseAction(builder: NotificationCompat.Builder) {
+        val actionIntent = Intent(context, PauseNotificationsReceiver::class.java).apply {
+            action = PauseNotificationsReceiver.ACTION_PAUSE_NOTIFICATIONS
+        }
+        val actionPendingIntent = PendingIntent.getBroadcast(
+            context,
+            2,
+            actionIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        builder.addAction(0, context.getString(R.string.notification_action_pause_today), actionPendingIntent)
     }
 }

@@ -22,6 +22,7 @@ import java.util.*
 import com.cemcakmak.hydrotracker.widgets.HydroWidgetUpdater
 import com.cemcakmak.hydrotracker.utils.UserDayCalculator
 import com.cemcakmak.hydrotracker.utils.ContainerIconMapper
+import com.cemcakmak.hydrotracker.notifications.HydroNotificationScheduler
 import android.content.Context
 import androidx.core.content.edit
 import androidx.health.connect.client.records.HydrationRecord
@@ -97,6 +98,9 @@ class WaterIntakeRepository(
         if (UserDayCalculator.hasNewUserDayStarted(lastCheckTime, dayEndTime, dayEndMode)) {
             // New user day has started, update widgets to reflect reset
             HydroWidgetUpdater.updateAll(context)
+
+            // Reset the per-day notification engagement state (ignored count and manual suspend).
+            HydroNotificationScheduler.resetNotificationEngagementState(context)
 
             // Store the new check time
             prefs.edit { putLong("last_day_check_time", currentTime) }

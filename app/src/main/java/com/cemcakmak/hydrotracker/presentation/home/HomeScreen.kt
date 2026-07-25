@@ -97,6 +97,7 @@ import com.cemcakmak.hydrotracker.presentation.common.EntryAnimationDefaults
 import com.cemcakmak.hydrotracker.presentation.common.shapes.PillShape
 import com.cemcakmak.hydrotracker.presentation.common.shapes.SquircleShape
 import com.cemcakmak.hydrotracker.presentation.common.timeBasedGreeting
+import com.cemcakmak.hydrotracker.ui.theme.extendedColorScheme
 import kotlinx.coroutines.delay
 import java.time.Instant
 import java.time.LocalTime
@@ -525,6 +526,11 @@ fun HomeScreen(
                             }
                         }
                     }
+                }
+
+                // Suspended reminder indicator
+                if (HydroNotificationScheduler.isCurrentlySuspended(context)) {
+                    SuspendedReminderIndicator(modifier = Modifier.padding(top = 8.dp))
                 }
             }
 
@@ -1301,6 +1307,46 @@ private class PreviewContainerPresetDao : ContainerPresetDao {
     override suspend fun getMaxDisplayOrder(): Int = defaultEntities.size
     override suspend fun updateDisplayOrder(id: Long, displayOrder: Int) {}
     override suspend fun reorderPresets(orderedIds: List<Long>) {}
+}
+
+@Composable
+private fun SuspendedReminderIndicator(
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = PillShape,
+        color = MaterialTheme.extendedColorScheme.warningContainer,
+        contentColor = MaterialTheme.extendedColorScheme.onWarningContainer
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.notifications_paused_filled),
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+            Text(
+                text = stringResource(R.string.home_reminders_paused_hint),
+                style = MaterialTheme.typography.labelLarge
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Suspended Reminder Indicator")
+@Composable
+private fun SuspendedReminderIndicatorPreview() {
+    HydroTrackerTheme {
+        Surface(
+            modifier = Modifier.padding(12.dp)
+        ) {
+            SuspendedReminderIndicator()
+        }
+    }
 }
 
 @Preview(showBackground = true, name = "Home Screen")

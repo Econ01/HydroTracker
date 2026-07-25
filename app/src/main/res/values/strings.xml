@@ -91,6 +91,7 @@
          Settings: Language & Translation
          ============================================================================ -->
     <string name="screen_language_title">Language &amp; Translation</string>
+    <string name="language_translation_disclaimer">Content is displayed only upon translation approval. Unapproved segments remain hidden.</string>
     <string name="language_contribute_title">Contribute</string>
     <string name="language_crowdin_title">Help translate HydroTracker</string>
     <string name="language_crowdin_description">Contribute on Crowdin</string>
@@ -376,6 +377,10 @@
     <string name="notif_configure_schedule_desc">Change reminder mode or set a custom interval</string>
     <string name="notif_reminder_interval">Reminder interval</string>
     <string name="notif_scheduled_for">Scheduled for</string>
+    <string name="notif_pause_reminders">Pause reminders for today</string>
+    <string name="notif_pause_reminders_desc">Stop hydration reminders until the next day</string>
+    <string name="notif_resume_reminders">Resume reminders</string>
+    <string name="notif_reminders_paused_desc">Hydration reminders are paused until tomorrow</string>
     <!-- Reminder cadence, e.g. "Every 60 minutes"; %1$d = minutes -->
     <plurals name="every_x_minutes">
         <item quantity="one">Every %1$d minute</item>
@@ -811,6 +816,7 @@
     <string name="home_label_entries">Entries</string>
     <string name="home_label_first_intake">First</string>
     <string name="home_label_latest_intake">Latest</string>
+    <string name="home_reminders_paused_hint">Reminders paused until tomorrow</string>
     <string name="home_section_recent_entries">Recent Entries</string>
 
     <!-- Dialogue titles -->
@@ -1001,9 +1007,11 @@
 
     <!-- %1$s = formatted amount with unit, e.g. "500 ml" -->
     <string name="notification_action_add">Add %1$s</string>
+    <string name="notification_action_pause_today">Pause for today</string>
     <string name="notification_quick_add_preset_name">Quick Add</string>
     <string name="notification_quick_add_note">Added from notification</string>
-    <!-- %1$s = formatted amount with unit, e.g. "500 ml" -->
+    <string name="notification_paused_confirmation">Reminders paused until tomorrow</string>
+
     <string name="notification_quick_add_feedback_title">Added %1$s</string>
     <!-- %1$s = formatted current intake, %2$s = formatted daily goal -->
     <string name="notification_quick_add_feedback_message">%1$s / %2$s</string>
