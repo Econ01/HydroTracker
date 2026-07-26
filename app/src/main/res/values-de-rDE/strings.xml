@@ -81,6 +81,7 @@
          Settings: Language & Translation
          ============================================================================ -->
     <string name="screen_language_title">Sprache &amp; Übersetzung</string>
+    <string name="language_translation_disclaimer">Inhalte werden erst nach Genehmigung der Übersetzung angezeigt. Ungenehmigte Segmente bleiben ausgeblendet.</string>
     <string name="language_contribute_title">Mitwirken</string>
     <string name="language_crowdin_title">Hilf mit, Hydration-Zähler zu übersetzen</string>
     <string name="language_crowdin_description">Auf Crowdin mitwirken</string>
@@ -110,100 +111,100 @@
     <string name="unit_gigalitre_short">Giga-Liter</string>
     <string name="unit_us_pint_short">Pint</string>
     <string name="unit_us_quart_short">Quart</string>
-    <string name="unit_us_gallon_short">gal</string>
-    <string name="unit_imperial_pint_short">pt</string>
-    <string name="unit_imperial_quart_short">qt</string>
-    <string name="unit_imperial_gallon_short">gal</string>
+    <string name="unit_us_gallon_short">Gal</string>
+    <string name="unit_imperial_pint_short">Pint</string>
+    <string name="unit_imperial_quart_short">Quarte</string>
+    <string name="unit_imperial_gallon_short">Gallone</string>
     <!-- ============================================================================
          Onboarding
          Per-step title + description (shown above each step), plus step controls.
          ============================================================================ -->
-    <string name="onboarding_welcome_title">Welcome to HydroTracker</string>
-    <string name="onboarding_welcome_description">We\'ll personalize the app for you.</string>
-    <string name="onboarding_gender_title">Tell us about yourself</string>
+    <string name="onboarding_welcome_title">Willkommen zu Hydration-Zähler</string>
+    <string name="onboarding_welcome_description">Wir werden die App für dich personalisieren.</string>
+    <string name="onboarding_gender_title">Erzähl uns über dich</string>
     <string name="onboarding_gender_description">Wähle die Option, die dich am besten beschreibt.</string>
-    <string name="onboarding_age_title">What\'s your age group?</string>
+    <string name="onboarding_age_title">Was ist deine Altersgruppe?</string>
     <string name="onboarding_age_description">Wähle deine Altersgruppe aus.</string>
     <string name="onboarding_activity_title">Wie aktiv bist du?</string>
-    <string name="onboarding_activity_description">Pick your general daily activity level.</string>
+    <string name="onboarding_activity_description">Wähle dein generelles tägliches Aktivitätslevel aus.</string>
     <string name="onboarding_schedule_title">Wann bist du wach?</string>
-    <string name="onboarding_schedule_description">Tell us your wake and sleep times.</string>
+    <string name="onboarding_schedule_description">Sag uns deine Aufwach und Schlafzeiten.</string>
     <string name="onboarding_profile_title">Vervollständige dein Profil</string>
-    <string name="onboarding_profile_description">Add your name and a profile photo to personalize your experience.</string>
-    <string name="onboarding_goal_title">Your personalized goal</string>
-    <string name="onboarding_goal_description">Review your calculated goal.</string>
+    <string name="onboarding_profile_description">Gib deinen Namen und ein Profilfoto hinzu, um deine App-Erfahrung zu personalisieren.</string>
+    <string name="onboarding_goal_title">Dein personalisiertes Ziel</string>
+    <string name="onboarding_goal_description">Prüfe dein berechnetes Ziel.</string>
     <string name="onboarding_complete_title">You\'re all set!</string>
     <string name="onboarding_complete_description">Tap the button to start hydrating!</string>
-    <string name="onboarding_finish">Finish</string>
+    <string name="onboarding_finish">Fertig</string>
     <!-- Welcome step -->
     <string name="onboarding_welcome_subtitle">Let\'s set up your personalized water intake goal based on your lifestyle and preferences.</string>
-    <string name="onboarding_feature_goals_title">Personalized Goals</string>
+    <string name="onboarding_feature_goals_title">Personalisierte Ziele</string>
     <string name="onboarding_feature_goals_desc">Based on scientific research and your profile</string>
     <string name="onboarding_feature_reminders_title">Intelligente Erinnerungen</string>
     <string name="onboarding_feature_reminders_desc">Gentle nudges during your active hours</string>
     <string name="onboarding_feature_progress_title">Progress Tracking</string>
     <string name="onboarding_feature_progress_desc">Detailed insights and history</string>
-    <string name="onboarding_get_started">Get Started</string>
+    <string name="onboarding_get_started">Fang an</string>
     <!-- Schedule step -->
     <string name="onboarding_wake_label">Aufwachzeit</string>
     <string name="onboarding_sleep_label">Schlafzeit</string>
     <string name="onboarding_wake_picker_title">Aufwachzeit</string>
-    <string name="onboarding_wake_picker_subtitle">Choose your wake-up time</string>
+    <string name="onboarding_wake_picker_subtitle">Wähle deine Aufwachzeit</string>
     <string name="onboarding_sleep_picker_title">Schlafzeit</string>
-    <string name="onboarding_sleep_picker_subtitle">Choose your sleep time</string>
-    <string name="time_picker_set">Set Time</string>
+    <string name="onboarding_sleep_picker_subtitle">Wähle deine Schlafzeit</string>
+    <string name="time_picker_set">Setze die Zeit</string>
     <!-- Awake duration, e.g. "Awake for 16h 0m"; %1$d = hours, %2$d = minutes -->
-    <string name="onboarding_awake_duration">Awake for %1$dh %2$dm</string>
+    <string name="onboarding_awake_duration">Wach für %1$dh %2$dm</string>
     <!-- Profile setup step -->
-    <string name="profile_add_photo">Add Photo</string>
-    <string name="profile_remove_photo">Remove Photo</string>
-    <string name="profile_name_prompt">What should we call you?</string>
+    <string name="profile_add_photo">Füge Foto hinzu</string>
+    <string name="profile_remove_photo">Entferne Foto</string>
+    <string name="profile_name_prompt">Wie sollen wir dich nennen?</string>
     <string name="profile_name_label">Dein Name</string>
-    <string name="profile_name_placeholder">Enter your name</string>
-    <string name="profile_name_required">Name is required to continue</string>
+    <string name="profile_name_placeholder">Gebe deinen Namen ein</string>
+    <string name="profile_name_required">Name ist notwendig um fortzuführen</string>
     <string name="profile_select_photo">Wähle Profilbild aus</string>
-    <string name="profile_choose_gallery">Choose from Gallery</string>
-    <string name="profile_choose_gallery_desc">Select an existing photo</string>
-    <string name="profile_take_photo">Take Photo</string>
-    <string name="profile_take_photo_desc">Use your camera to take a new photo</string>
+    <string name="profile_choose_gallery">Wähle aus Galerie</string>
+    <string name="profile_choose_gallery_desc">Wähle ein vorhandenes Foto aus</string>
+    <string name="profile_take_photo">Nehme ein Foto auf</string>
+    <string name="profile_take_photo_desc">Nutze deine Kamera, um ein neues Foto zu machen</string>
     <!-- Goal step -->
     <string name="goal_daily_water_goal">Tägliches Wasserziel</string>
     <string name="goal_reminder_interval">Reminder Interval</string>
-    <string name="goal_activity_level">Activity Level</string>
-    <string name="goal_personalized_title">How we personalized this</string>
+    <string name="goal_activity_level">Aktivitätslevel</string>
+    <string name="goal_personalized_title">Wie wir das personalisiert haben</string>
     <string name="goal_personalized_body">Your goal considers your profile and schedule. These factors influence total intake and notification cadence.</string>
     <!-- Profile recap chips; %1$s = a time like 07:00 -->
     <string name="goal_chip_wake">Wake: %1$s</string>
-    <string name="goal_chip_sleep">Sleep: %1$s</string>
+    <string name="goal_chip_sleep">Schlaf: %1$s</string>
     <!-- Reminder interval shown in the Goal step; pluralized on the minute count -->
     <plurals name="reminder_interval_minutes">
-        <item quantity="one">%1$d minute</item>
-        <item quantity="other">%1$d minutes</item>
+        <item quantity="one">%1$d Minute</item>
+        <item quantity="other">%1$d Minuten</item>
     </plurals>
     <!-- Complete step -->
-    <string name="complete_subtitle">Your personalized hydration plan is ready.</string>
-    <string name="complete_daily_goal">Your Daily Goal</string>
-    <string name="complete_start_button">Start hydrating</string>
+    <string name="complete_subtitle">Dein personalisierter Hydration Plan ist bereit.</string>
+    <string name="complete_daily_goal">Dein tägliches Ziel</string>
+    <string name="complete_start_button">Starte Hydration</string>
     <!-- Abbreviated reminder interval, e.g. "60 min"; %1$d = minutes -->
-    <string name="reminder_interval_min_short">%1$d min</string>
+    <string name="reminder_interval_min_short">%1$d Minute</string>
     <!-- ============================================================================
          Beverages &amp; containers — shared bottom sheets
          Add/edit custom beverages and container presets (presentation/common).
          ============================================================================ -->
     <!-- Shared -->
-    <string name="error_name_required">Name is required</string>
-    <string name="label_icon">Icon</string>
+    <string name="error_name_required">Name ist nötig</string>
+    <string name="label_icon">Symbol</string>
     <!-- Delete confirmation body; %1$s = the item name being deleted -->
-    <string name="delete_confirm_message">Are you sure you want to delete \"%1$s\"? This action cannot be undone.</string>
+    <string name="delete_confirm_message">Bist du dir sicher, dass du \"%1$s\" löschen willst? Diese Aktion kann nicht rückgängig gemacht werden.</string>
     <!-- Custom beverage sheet -->
-    <string name="beverage_add">Add Beverage</string>
-    <string name="beverage_edit_title">Edit Beverage</string>
-    <string name="beverage_delete_title">Delete Beverage?</string>
+    <string name="beverage_add">Getränk hinzufügen</string>
+    <string name="beverage_edit_title">Getränk bearbeiten</string>
+    <string name="beverage_delete_title">Getränk löschen?</string>
     <string name="beverage_show_in_quick_add">Show in Quick Add</string>
     <string name="beverage_hide_from_quick_add">Hide from Quick Add</string>
     <!-- Preset effectiveness line, e.g. "150% hydration effectiveness"; %1$d = percent -->
     <string name="beverage_hydration_effectiveness">%1$d%% hydration effectiveness</string>
-    <string name="beverage_name_label">Beverage Name</string>
+    <string name="beverage_name_label">Getränk Name</string>
     <string name="beverage_name_placeholder">e.g., Smoothie</string>
     <string name="beverage_effectiveness_label">Hydration effectiveness (%)</string>
     <string name="beverage_effectiveness_placeholder">e.g., 100</string>
@@ -211,28 +212,28 @@
     <string name="beverage_effectiveness_error">Enter a value between %1$d and %2$d</string>
     <string name="beverage_effectiveness_hint">100%% counts the full amount toward your goal</string>
     <!-- Container preset sheet -->
-    <string name="container_add_title">Add Container</string>
-    <string name="container_edit_title">Edit Container</string>
-    <string name="container_name_label">Container Name</string>
+    <string name="container_add_title">Gefäß hinzufügen</string>
+    <string name="container_edit_title">Gefäß bearbeiten</string>
+    <string name="container_name_label">Name des Gefäßes</string>
     <string name="container_name_placeholder">e.g., Coffee Mug</string>
-    <string name="container_volume_label">Volume (%1$s)</string>
+    <string name="container_volume_label">Volumen (%1$s)</string>
     <string name="container_volume_placeholder">e.g., 250</string>
     <!-- %1$s = minimum valid amount, %2$s = maximum valid amount (both with unit) -->
     <string name="container_volume_error">Enter a valid volume (%1$s–%2$s)</string>
     <string name="container_icon_picker_hint">Tap an icon below to override the automatic choice</string>
-    <string name="container_icon_preview_description">Selected container icon</string>
-    <string name="container_delete_title">Delete Container?</string>
+    <string name="container_icon_preview_description">Ausgewähltes Gefäß Symbol</string>
+    <string name="container_delete_title">Gefäß löschen?</string>
     <!-- ============================================================================
          Navigation &amp; top bars
          ============================================================================ -->
-    <string name="nav_home">Home</string>
+    <string name="nav_home">Start</string>
     <string name="nav_history">Verlauf</string>
-    <string name="nav_statistics">Statistics</string>
-    <string name="nav_profile">Profile</string>
+    <string name="nav_statistics">Statistik</string>
+    <string name="nav_profile">Profil</string>
     <string name="nav_settings">Einstellungen</string>
     <string name="nav_add_custom">Add Custom</string>
-    <string name="fab_menu_new_beverage">New Beverage</string>
-    <string name="fab_menu_new_container">New Container</string>
+    <string name="fab_menu_new_beverage">Neues Getränk</string>
+    <string name="fab_menu_new_container">Neues Gefäß</string>
     <string name="fab_menu_add_past_entry">Add Past Entry</string>
     <string name="fab_menu_toggle_menu">Toggle menu</string>
     <!-- ============================================================================
@@ -243,37 +244,37 @@
     <string name="screen_hydration_title">Hydration &amp; Health</string>
     <string name="screen_quickadd_title">Quick Add Customization</string>
     <string name="screen_notifications_title">Benachrichtigungen</string>
-    <string name="screen_support_title">Support Development</string>
+    <string name="screen_support_title">Entwicklung unterstützen</string>
     <string name="screen_about_title">Über</string>
     <string name="screen_developer_title">Entwicklereinstellungen</string>
     <string name="settings_about_update_available">Über - Aktualisierung verfügbar</string>
-    <string name="settings_appearance_desc">Theme, colours and AMOLED mode</string>
+    <string name="settings_appearance_desc">Design, Farben und AMOLED-Modus</string>
     <string name="settings_display_desc">Week start day and locale</string>
     <string name="settings_hydration_desc">Water goal calculation and Health Connect</string>
-    <string name="settings_quickadd_desc">Container presets and beverage types</string>
+    <string name="settings_quickadd_desc">Gefäß-Vorlagen und Getränkearten</string>
     <string name="settings_notifications_desc">Wasserzufuhr Erinnerungen und Berechtigungen</string>
     <string name="settings_support_desc">Spende und unterstütze die App</string>
-    <string name="settings_about_desc">Sources, privacy policy and license</string>
+    <string name="settings_about_desc">Quellen, Datenschutzerklärung und Lizenz</string>
     <string name="settings_developer_desc">Debug tools and testing</string>
     <string name="screen_data_management_title">Data Management</string>
     <string name="settings_data_management_desc">Export, import and delete your data</string>
     <!-- ============================================================================
          Settings — Appearance
          ============================================================================ -->
-    <string name="appearance_theme_header">Theme</string>
+    <string name="appearance_theme_header">Design</string>
     <string name="appearance_theme_system">System</string>
-    <string name="appearance_theme_light">Light</string>
-    <string name="appearance_theme_dark">Dark</string>
-    <string name="appearance_color_header">Color</string>
-    <string name="appearance_amoled_title">AMOLED Mode</string>
-    <string name="appearance_amoled_desc">True black backgrounds in dark mode</string>
+    <string name="appearance_theme_light">Hell</string>
+    <string name="appearance_theme_dark">Dunkel</string>
+    <string name="appearance_color_header">Farbe</string>
+    <string name="appearance_amoled_title">AMOLED-Schwarz</string>
+    <string name="appearance_amoled_desc">Tiefschwarzer Hintergrund im Dunkelmodus</string>
     <string name="appearance_amoled_borders_title">Surface Borders</string>
     <string name="appearance_amoled_borders_desc">Subtle borders around cards in AMOLED mode</string>
-    <string name="appearance_font_header">Font</string>
-    <string name="appearance_navbar_header">Navigation bar</string>
+    <string name="appearance_font_header">Schriftart</string>
+    <string name="appearance_navbar_header">Navigationsleiste</string>
     <string name="appearance_autohide_title">Auto-hide on scroll</string>
     <string name="appearance_autohide_desc">Hide the bar when scrolling down</string>
-    <string name="appearance_labels_title">Labels</string>
+    <string name="appearance_labels_title">Beschriftungen</string>
     <string name="appearance_home_header">Startbildschirm</string>
     <string name="appearance_feedback_header">Interaction &amp; Feedback</string>
     <string name="appearance_haptics_title">Haptic Feedback</string>
@@ -292,24 +293,24 @@
     <string name="appearance_widget_section_title">Widgets</string>
     <string name="appearance_widget_title">Widget Settings</string>
     <string name="appearance_widget_desc">Change appearance and behaviour</string>
-    <string name="widget_settings_colours_header">Colours</string>
+    <string name="widget_settings_colours_header">Farben</string>
     <string name="widget_settings_dynamic_title">Dynamic colours</string>
     <string name="widget_settings_dynamic_desc">Colours from your wallpaper</string>
     <string name="widget_settings_background_header">Hintergrund</string>
     <string name="widget_settings_transparent_title">Transparent background</string>
     <string name="widget_settings_transparent_desc">Make the background surface transparent</string>
-    <string name="widget_settings_pure_black_title">Pure black background</string>
+    <string name="widget_settings_pure_black_title">Rein schwarzer Hintergrund</string>
     <string name="widget_settings_pure_black_desc">Use a true black surface in dark mode</string>
-    <string name="widget_settings_pure_white_title">Pure white background</string>
+    <string name="widget_settings_pure_white_title">Rein weißen Hintergrund</string>
     <string name="widget_settings_pure_white_desc">Use a true white surface in light mode</string>
     <string name="widget_settings_quickadd_title">Quick actions</string>
     <string name="widget_settings_quickadd_desc">Choose the three quick-add buttons</string>
     <string name="screen_widget_quickadd_title">Widget quick actions</string>
-    <string name="widget_quickadd_auto">Auto</string>
-    <string name="widget_quickadd_beverage_header">Beverage</string>
+    <string name="widget_quickadd_auto">Automatisch</string>
+    <string name="widget_quickadd_beverage_header">Getränk</string>
     <string name="widget_quickadd_slot_section_title">Quick-add buttons</string>
-    <string name="widget_quickadd_container_sheet_title">Choose container</string>
-    <string name="widget_quickadd_beverage_sheet_title">Choose beverage</string>
+    <string name="widget_quickadd_container_sheet_title">Gefäß auswählen</string>
+    <string name="widget_quickadd_beverage_sheet_title">Getränk auswählen</string>
     <string name="widget_quickadd_reset_all">Reset all to automatic</string>
     <!-- ============================================================================
          Settings — Notifications
@@ -328,35 +329,39 @@
     <string name="notif_style_gentle_desc">Sanfte, motivierende Erinnerungen</string>
     <string name="notif_style_motivating_desc">Energetic, goal-focused reminders</string>
     <string name="notif_style_minimal_desc">Simple, unobtrusive reminders</string>
-    <string name="notif_permissions_header">Permissions</string>
+    <string name="notif_permissions_header">Berechtigungen</string>
     <string name="notif_permission_title">Notification permission</string>
     <string name="notif_permission_desc">Required to send hydration reminders</string>
     <string name="notif_exact_alarm_title">Exact alarm permission</string>
     <string name="notif_exact_alarm_desc">Required for precise reminder timing</string>
-    <string name="notif_reminder_style_header">Reminder style</string>
+    <string name="notif_reminder_style_header">Erinnerungsart</string>
     <!-- Short reminder-style labels shown on the toggle buttons -->
-    <string name="notif_style_gentle_short">Gentle</string>
-    <string name="notif_style_motivating_short">Energetic</string>
-    <string name="notif_style_minimal_short">Simple</string>
+    <string name="notif_style_gentle_short">Sanft</string>
+    <string name="notif_style_motivating_short">Intensiv</string>
+    <string name="notif_style_minimal_short">Simpel</string>
     <string name="notif_active_hours_header">Aktive Stunden</string>
     <string name="notif_wake_up">Aufwachen</string>
     <string name="notif_sleep">Schlaf</string>
     <string name="notif_wake_up_time">Aufwachzeit</string>
     <string name="notif_sleep_time">Schlafzeit</string>
-    <string name="notif_schedule_header">Schedule</string>
-    <string name="notif_configure_schedule">Configure schedule</string>
+    <string name="notif_schedule_header">Zeitplan</string>
+    <string name="notif_configure_schedule">Zeitplan einrichten</string>
     <string name="notif_configure_schedule_desc">Change reminder mode or set a custom interval</string>
     <string name="notif_reminder_interval">Reminder interval</string>
     <string name="notif_scheduled_for">Scheduled for</string>
+    <string name="notif_pause_reminders">Pause reminders for today</string>
+    <string name="notif_pause_reminders_desc">Stop hydration reminders until the next day</string>
+    <string name="notif_resume_reminders">Resume reminders</string>
+    <string name="notif_reminders_paused_desc">Hydration reminders are paused until tomorrow</string>
     <!-- Reminder cadence, e.g. "Every 60 minutes"; %1$d = minutes -->
     <plurals name="every_x_minutes">
-        <item quantity="one">Every %1$d minute</item>
-        <item quantity="other">Every %1$d minutes</item>
+        <item quantity="one">Jede %1$d Minute</item>
+        <item quantity="other">Jede %1$d Minuten</item>
     </plurals>
     <!-- ============================================================================
          Settings — Reminder Schedule
          ============================================================================ -->
-    <string name="screen_reminder_schedule_title">Reminder Schedule</string>
+    <string name="screen_reminder_schedule_title">Erinnerungszeitplan</string>
     <string name="reminder_mode_header">Mode</string>
     <string name="reminder_day_end_header">Day end</string>
     <string name="reminder_day_end_divider">Day End</string>
@@ -370,21 +375,21 @@
     <string name="interval_every_hour">Jede Stunde</string>
     <string name="interval_every_h_m">every %1$dh %2$dm</string>
     <plurals name="interval_every_minutes">
-        <item quantity="one">every %1$d minute</item>
-        <item quantity="other">every %1$d minutes</item>
+        <item quantity="one">Jede %1$d Minute</item>
+        <item quantity="other">Jede %1$d Minuten</item>
     </plurals>
     <plurals name="interval_every_hours">
-        <item quantity="one">every %1$d hour</item>
-        <item quantity="other">every %1$d hours</item>
+        <item quantity="one">Jede %1$d Stunde</item>
+        <item quantity="other">Jede %1$d Stunden</item>
     </plurals>
     <!-- Schedule preview sentences; auto: %1$s=goal, %2$d=glasses, %3$d=hours, %4$d=minutes -->
-    <string name="reminder_preview_auto">Based on your %1$s goal, you\'ll get about %2$d reminders (one per glass) spread across your %3$d active hours. Roughly every %4$d minutes.</string>
+    <string name="reminder_preview_auto">Basierend auf deinem %1$s-Ziel erhältst du etwa %2$d Erinnerungen (eine pro Glas) verteilt über deine %3$d aktiven Stunden. Ungefähr alle %4$d Minuten.</string>
     <!-- custom: %1$s=cadence phrase, %2$s=wake time, %3$s=sleep time -->
     <string name="reminder_preview_custom">You\'ll receive a reminder %1$s between %2$s and %3$s.</string>
     <!-- ============================================================================
          Settings — Quick Add customization
          ============================================================================ -->
-    <string name="quickadd_containers_header">Container presets</string>
+    <string name="quickadd_containers_header">Gefäß-Vorlagen</string>
     <string name="quickadd_containers_desc">Quick-select containers on the home screen. Tap to edit, drag to reorder.</string>
     <string name="quickadd_edit_containers">Edit container presets</string>
     <string name="quickadd_beverages_header">Beverage types</string>
@@ -424,10 +429,10 @@
     <string name="hc_data_title">Health Connect Data</string>
     <string name="hc_data_desc">View your synced intake history</string>
     <string name="hc_restore">Restore from Health Connect</string>
-    <string name="hc_restore_confirm">Restore</string>
+    <string name="hc_restore_confirm">Wiederherstellen</string>
     <string name="hc_grant_permissions">Grant Permissions</string>
     <string name="hc_restore_message">Import your past HydroTracker entries from Health Connect. Choose a time range:</string>
-    <string name="hc_restore_all">All history</string>
+    <string name="hc_restore_all">Gesamter Verlauf</string>
     <string name="hc_restore_90days">Letzte 90 Tage</string>
     <!-- %1$d = imported count, %2$d = skipped duplicates -->
     <string name="hc_restored_snackbar">Restored %1$d entries, skipped %2$d duplicates</string>
@@ -492,24 +497,24 @@
     <string name="reminder_interval_mode_automatic">Automatisch</string>
     <string name="reminder_interval_mode_custom">Custom</string>
     <!-- Dark mode preference -->
-    <string name="dark_mode_system">System Default</string>
-    <string name="dark_mode_light">Light Mode</string>
-    <string name="dark_mode_dark">Dark Mode</string>
+    <string name="dark_mode_system">Systemstandard</string>
+    <string name="dark_mode_light">Heller Modus</string>
+    <string name="dark_mode_dark">Dunkler Modus</string>
     <!-- Colour source -->
     <string name="color_source_hydro">HydroTracker Blue</string>
-    <string name="color_source_dynamic">Dynamic Colors</string>
+    <string name="color_source_dynamic">Dynamische Farben</string>
     <string name="color_source_dynamic_desc">Colors from your wallpaper</string>
     <!-- Week start day -->
-    <string name="weekday_sunday">Sunday</string>
-    <string name="weekday_monday">Monday</string>
-    <string name="weekday_tuesday">Tuesday</string>
-    <string name="weekday_wednesday">Wednesday</string>
-    <string name="weekday_thursday">Thursday</string>
-    <string name="weekday_friday">Friday</string>
-    <string name="weekday_saturday">Saturday</string>
+    <string name="weekday_sunday">Sonntag</string>
+    <string name="weekday_monday">Montag</string>
+    <string name="weekday_tuesday">Dienstag</string>
+    <string name="weekday_wednesday">Mittwoch</string>
+    <string name="weekday_thursday">Donnerstag</string>
+    <string name="weekday_friday">Freitag</string>
+    <string name="weekday_saturday">Samstag</string>
     <string name="week_start_system">System</string>
     <!-- App font (proper-noun font names are not translated) -->
-    <string name="font_system">System Default</string>
+    <string name="font_system">Systemstandard</string>
     <string name="font_xiaomi_warning">Font styling on HyperOS/MIUI (Xiaomi group devices) does not work as intended due to their custom text engine.</string>
     <!-- Navigation-bar label mode -->
     <string name="navbar_label_always">Always shown</string>
@@ -582,8 +587,8 @@
     <!-- ============================================================================
          Health Connect status & badges
          ============================================================================ -->
-    <string name="hc_status_error">Error: %1$s</string>
-    <string name="hc_badge_hidden">Hidden</string>
+    <string name="hc_status_error">Fehler: %1$s</string>
+    <string name="hc_badge_hidden">Versteckt</string>
     <!-- ============================================================================
          About
          ============================================================================ -->
@@ -595,7 +600,7 @@
     <string name="about_contributor_bio">Indie Android developer focused on clean, privacy-respecting apps.</string>
     <string name="cd_open_github_profile">Open GitHub profile</string>
     <string name="about_section_information">Information</string>
-    <string name="about_changelog">Changelog</string>
+    <string name="about_changelog">Änderungsprotokoll</string>
     <string name="about_changelog_desc">What\'s new in each version</string>
     <string name="about_sources">Sources &amp; Research</string>
     <string name="about_sources_desc">Scientific sources behind the app</string>
@@ -610,12 +615,12 @@
          Support Development
          ============================================================================ -->
     <string name="support_development_hero">HydroTracker is built and maintained by one person, with no ads and no tracking. If it has helped you drink more water, anything you chip in keeps it growing.</string>
-    <string name="support_section_support">Support development</string>
+    <string name="support_section_support">Entwicklung unterstützen</string>
     <string name="support_github_sponsors_blurb">Support ongoing development</string>
     <string name="support_paypal_blurb">Sende eine schnelle Spende</string>
     <string name="support_buymeacoffee_blurb">Treat me to a coffee</string>
     <string name="support_section_other_ways">Andere Wege zu helfen</string>
-    <string name="support_rate_play_store">Rate on Google Play</string>
+    <string name="support_rate_play_store">Bewerte im Play Store</string>
     <string name="support_rate_play_store_desc">Leave a rating on the Play Store</string>
     <string name="support_share_app">Teile die App</string>
     <string name="support_share_app_desc">Erzähl einem Freund über Hydration-Zähler</string>
@@ -651,11 +656,11 @@
     <string name="updates_button_download">Download update</string>
     <string name="label_version_simple">Version</string>
     <string name="label_build_simple">Build</string>
-    <string name="label_install_method">Install Method</string>
-    <string name="label_source">Source</string>
-    <string name="install_source_manual">Manual</string>
+    <string name="label_install_method">Installationsmethode</string>
+    <string name="label_source">Quelle</string>
+    <string name="install_source_manual">Anleitung</string>
     <string name="install_source_debug">Debug</string>
-    <string name="install_source_github">GitHub</string>
+    <string name="install_source_github">Github</string>
     <string name="toast_could_not_start_update">Couldn\'t start the update</string>
     <!-- ============================================================================
          Licenses
@@ -667,19 +672,19 @@
          ============================================================================ -->
     <string name="whats_new_title">What\'s New</string>
     <string name="whats_new_version">Version %1$s</string>
-    <string name="update_dialog_title">Update Available</string>
-    <string name="update_dialog_current_version">Current version</string>
-    <string name="update_dialog_new_version">New version</string>
+    <string name="update_dialog_title">Update verfügbar</string>
+    <string name="update_dialog_current_version">Aktuelle Version</string>
+    <string name="update_dialog_new_version">Neue Version</string>
     <string name="update_dialog_action_play">Open Google Play to update HydroTracker.</string>
     <string name="update_dialog_action_f_droid">Open the F-Droid app to update HydroTracker.</string>
     <string name="update_dialog_action_github">Download the latest APK from GitHub.</string>
-    <string name="update_button_later">Later</string>
-    <string name="update_button_update">Update</string>
+    <string name="update_button_later">Später</string>
+    <string name="update_button_update">Aktualisierung</string>
     <!-- ============================================================================
          Markdown components
          ============================================================================ -->
-    <string name="markdown_loading">Loading…</string>
-    <string name="markdown_error_loading">Error loading %1$s: %2$s</string>
+    <string name="markdown_loading">Ladet…</string>
+    <string name="markdown_error_loading">Fehler beim Laden %1$s: %2$s</string>
     <string name="markdown_version_prefix">Version %1$s</string>
     <string name="markdown_section_added">Hinzugefügt</string>
     <string name="markdown_section_changed">Geändert</string>
@@ -727,11 +732,12 @@
     <!-- Content descriptions -->
     <string name="cd_add_container">Add container</string>
     <!-- Stats labels -->
-    <string name="home_label_daily_progress">Daily Progress</string>
-    <string name="home_label_entries">Entries</string>
-    <string name="home_label_first_intake">First</string>
-    <string name="home_label_latest_intake">Latest</string>
-    <string name="home_section_recent_entries">Recent Entries</string>
+    <string name="home_label_daily_progress">Täglicher Fortschritt</string>
+    <string name="home_label_entries">Eingaben</string>
+    <string name="home_label_first_intake">Erstes</string>
+    <string name="home_label_latest_intake">Letztes</string>
+    <string name="home_reminders_paused_hint">Reminders paused until tomorrow</string>
+    <string name="home_section_recent_entries">Letzte Eingaben</string>
     <!-- Dialogue titles -->
     <string name="home_dialog_add_custom_amount">Add Custom Amount</string>
     <string name="home_dialog_edit_entry_title">Edit Water Entry</string>
@@ -748,10 +754,10 @@
     <string name="container_small_cup">Kleiner Becher</string>
     <string name="container_medium_glass">Medium Glass</string>
     <string name="container_large_glass">Großes Glas</string>
-    <string name="container_water_bottle">Water Bottle</string>
-    <string name="container_large_bottle">Large Bottle</string>
+    <string name="container_water_bottle">Wasserflasche</string>
+    <string name="container_large_bottle">Große Flasche</string>
     <!-- Hydration percentage label, e.g. "80% hydration" -->
-    <string name="home_label_hydration_percentage">%1$d%% hydration</string>
+    <string name="home_label_hydration_percentage">%1$d%% Hydration</string>
     <!-- Motivational messages -->
     <string name="home_motivation_goal_achieved">Amazing! You\'ve reached your daily goal!</string>
     <string name="home_motivation_almost_there">You\'re doing great! Almost there!</string>
@@ -762,74 +768,74 @@
          ============================================================================ -->
     <!-- Time-based greeting shown above the username; keep the trailing comma if the
          language separates greeting and name with a comma. -->
-    <string name="profile_greeting_morning">Good morning,</string>
-    <string name="profile_greeting_afternoon">Good afternoon,</string>
-    <string name="profile_greeting_evening">Good evening,</string>
-    <string name="profile_greeting_default">Hello,</string>
+    <string name="profile_greeting_morning">Guten Morgen,</string>
+    <string name="profile_greeting_afternoon">Guten Nachmittag,</string>
+    <string name="profile_greeting_evening">Guten Abend,</string>
+    <string name="profile_greeting_default">Hallo,</string>
     <!-- Quick stats under the profile header -->
-    <string name="profile_stat_today_entries">Today\'s Entries</string>
-    <string name="profile_stat_days_tracked">Days Tracked</string>
+    <string name="profile_stat_today_entries">Heutige Eingaben</string>
+    <string name="profile_stat_days_tracked">Gezählte Tage</string>
     <string name="profile_stat_today_goal">Heutiges Ziel</string>
     <!-- Section titles on the Profile screen -->
     <string name="profile_section_daily_goals">Tägliche Ziele</string>
-    <string name="profile_section_personal">Personal</string>
+    <string name="profile_section_personal">Persönlich</string>
     <!-- Info-row labels -->
     <string name="profile_label_gender">Geschlecht</string>
     <string name="profile_label_daily_goal">Tägliches Wasserziel</string>
-    <string name="profile_label_activity_level">Activity Level</string>
+    <string name="profile_label_activity_level">Aktivitätslevel</string>
     <!-- e.g. "07:00 - 23:00" -->
     <!-- Profile photo sheet -->
-    <string name="profile_photo_sheet_title">Update Profile Photo</string>
+    <string name="profile_photo_sheet_title">Profilbild aktualisieren</string>
     <!-- Name edit dialogue -->
-    <string name="profile_name_dialog_title">Edit Name</string>
+    <string name="profile_name_dialog_title">Namen bearbeiten</string>
     <string name="profile_name_error_empty">Name cannot be empty</string>
-    <string name="profile_name_error_too_long">Name is too long</string>
+    <string name="profile_name_error_too_long">Name ist zu lang</string>
     <!-- Daily goal bottom sheet -->
-    <string name="profile_goal_edit_title">Edit Daily Goal</string>
+    <string name="profile_goal_edit_title">Bearbeite tägliches Ziel</string>
     <string name="profile_goal_edit_description">Set your daily water intake goal. This will be used to track your progress and calculate reminders.</string>
     <!-- %1$s = formatted amount in the user's volume unit -->
     <!-- %1$s = minimum valid amount, %2$s = maximum valid amount (both with unit) -->
     <!-- %1$s = minimum recommended amount, %2$s = maximum recommended amount (both with unit) -->
     <!-- Activity level bottom sheet -->
-    <string name="profile_activity_title">Activity Level</string>
+    <string name="profile_activity_title">Aktivitätslevel</string>
     <!-- Schedule bottom sheet -->
     <!-- Gender bottom sheet -->
-    <string name="profile_gender_title">Select Gender</string>
+    <string name="profile_gender_title">Wähle Geschlecht aus</string>
     <!-- Age group bottom sheet -->
     <!-- Weight bottom sheet -->
     <!-- Generic OK button for time pickers and similar dialogues -->
     <!-- ============================================================================
          History &amp; Analytics
          ============================================================================ -->
-    <string name="history_period_weekly">Weekly</string>
-    <string name="history_period_monthly">Monthly</string>
-    <string name="history_period_yearly">Yearly</string>
+    <string name="history_period_weekly">Wöchentlich</string>
+    <string name="history_period_monthly">Monatlich</string>
+    <string name="history_period_yearly">Jährlich</string>
     <!-- %1$s = period name, e.g. "Weekly" -->
-    <string name="cd_previous_period">Previous %1$s</string>
-    <string name="cd_next_period">Next %1$s</string>
-    <string name="history_this_week">This Week</string>
-    <string name="history_last_week">Last Week</string>
-    <string name="history_this_month">This Month</string>
-    <string name="history_last_month">Last Month</string>
-    <string name="history_this_year">This Year</string>
-    <string name="history_last_year">Last Year</string>
-    <string name="history_stat_total">Total</string>
-    <string name="history_stat_average">Average</string>
-    <string name="history_stat_best_day">Best Day</string>
-    <string name="history_stat_days_tracked">Days Tracked</string>
-    <string name="history_stat_goals_met">Goals Met</string>
-    <string name="history_stat_success_rate">Success Rate</string>
-    <string name="history_stat_total_intake">Total Intake</string>
-    <string name="history_empty_week">No data available for this week</string>
-    <string name="history_empty_month">No data available for the last 30 days</string>
-    <string name="history_empty_year">No data available for this year</string>
-    <string name="history_empty_generic">No data available</string>
+    <string name="cd_previous_period">Vorherige %1$s</string>
+    <string name="cd_next_period">Nächstes %1$s</string>
+    <string name="history_this_week">Diese Woche</string>
+    <string name="history_last_week">Letzte Woche</string>
+    <string name="history_this_month">Diesen Monat</string>
+    <string name="history_last_month">Letzten Monat</string>
+    <string name="history_this_year">Dieses Jahr</string>
+    <string name="history_last_year">Letztes Jahr</string>
+    <string name="history_stat_total">Insgesamt</string>
+    <string name="history_stat_average">Durchschnittlich</string>
+    <string name="history_stat_best_day">Bester Tag</string>
+    <string name="history_stat_days_tracked">Gezählte Tage</string>
+    <string name="history_stat_goals_met">Erreichte Ziele</string>
+    <string name="history_stat_success_rate">Erfolgsrate</string>
+    <string name="history_stat_total_intake">Gesamte Einnahme</string>
+    <string name="history_empty_week">Für diese Woche sind keine Daten verfügbar</string>
+    <string name="history_empty_month">Für die letzten 30 Tage sind keine Daten verfügbar</string>
+    <string name="history_empty_year">Für dieses Jahr sind keine Daten verfügbar</string>
+    <string name="history_empty_generic">Keine Daten verfügbar</string>
     <string name="history_select_day_hint">Tap a day on the chart to see its entries</string>
     <!-- ============================================================================
          Statistics
          All-time insights shown on the dedicated Statistics tab.
          ============================================================================ -->
-    <string name="statistics_empty_title">No statistics yet</string>
+    <string name="statistics_empty_title">Keine Statistiken bisher</string>
     <string name="statistics_empty_description">Start logging your water intake to see personalised insights and trends.</string>
     <!-- Section titles -->
     <string name="statistics_section_overview">Überblick</string>
@@ -840,27 +846,27 @@
     <string name="statistics_hero_days_tracked">Days Tracked</string>
     <!-- Overview labels -->
     <string name="statistics_label_current_streak">Current Streak</string>
-    <string name="statistics_label_average_daily_intake">Daily Average</string>
+    <string name="statistics_label_average_daily_intake">Täglicher Durchschnitt</string>
     <string name="statistics_label_total_intake">Total Intake</string>
-    <string name="statistics_label_success_rate">Success Rate</string>
+    <string name="statistics_label_success_rate">Erfolgsrate</string>
     <string name="statistics_label_days_tracked">Days Tracked</string>
     <plurals name="statistics_streak_days">
-        <item quantity="one">%1$d day</item>
-        <item quantity="other">%1$d days</item>
+        <item quantity="one">%1$d Tag</item>
+        <item quantity="other">%1$d Tage</item>
     </plurals>
     <!-- Drinking pattern labels -->
-    <string name="statistics_label_first_drink">First Drink</string>
-    <string name="statistics_label_last_drink">Last Drink</string>
+    <string name="statistics_label_first_drink">Erstes Getränk</string>
+    <string name="statistics_label_last_drink">Letztes Getränk</string>
     <string name="statistics_label_average_interval">Average Interval</string>
     <string name="statistics_label_average_drink_size">Average Drink Size</string>
-    <string name="statistics_label_largest_drink">Largest Drink</string>
+    <string name="statistics_label_largest_drink">Größtes Getränk</string>
     <!-- Beverage breakdown -->
     <!-- %1$d = drink count, %2$s = effective volume with unit -->
     <!-- %1$s = effective volume with unit -->
-    <string name="statistics_beverage_effective_short">%1$s \neffective</string>
+    <string name="statistics_beverage_effective_short">%1$s \nEffektiv</string>
     <!-- Container Usage -->
-    <string name="statistics_container_header_container">Container</string>
-    <string name="statistics_container_header_volume">Volume</string>
+    <string name="statistics_container_header_container">Gefäß</string>
+    <string name="statistics_container_header_volume">Volumen</string>
     <string name="statistics_container_header_uses">Uses</string>
     <!-- Hydration multiplier -->
     <!-- %1$s = signed percentage, e.g. "+5%" -->
@@ -868,12 +874,12 @@
     <!-- %1$s = formatted goal amount -->
     <!-- %1$d = percentage -->
     <!-- Short weekday names for the monthly calendar header -->
-    <string name="weekday_short_sun">Sun</string>
-    <string name="weekday_short_mon">Mon</string>
-    <string name="weekday_short_tue">Tue</string>
-    <string name="weekday_short_wed">Wed</string>
-    <string name="weekday_short_thu">Thu</string>
-    <string name="weekday_short_fri">Fri</string>
+    <string name="weekday_short_sun">Sonntag</string>
+    <string name="weekday_short_mon">Montag</string>
+    <string name="weekday_short_tue">Dienstag</string>
+    <string name="weekday_short_wed">Mittwoch</string>
+    <string name="weekday_short_thu">Donnerstag</string>
+    <string name="weekday_short_fri">Freitag</string>
     <string name="weekday_short_sat">Sat</string>
     <!-- ============================================================================
          Notifications
@@ -884,9 +890,10 @@
     <string name="notification_minimal_remaining">%1$s remaining</string>
     <!-- %1$s = formatted amount with unit, e.g. "500 ml" -->
     <string name="notification_action_add">Add %1$s</string>
+    <string name="notification_action_pause_today">Pause for today</string>
     <string name="notification_quick_add_preset_name">Quick Add</string>
     <string name="notification_quick_add_note">Added from notification</string>
-    <!-- %1$s = formatted amount with unit, e.g. "500 ml" -->
+    <string name="notification_paused_confirmation">Reminders paused until tomorrow</string>
     <string name="notification_quick_add_feedback_title">Added %1$s</string>
     <!-- %1$s = formatted current intake, %2$s = formatted daily goal -->
     <string name="notification_quick_add_feedback_message">%1$s / %2$s</string>
@@ -894,10 +901,10 @@
     <string-array name="notification_gentle_titles">
         <item>Gentle Hydration Reminder</item>
         <item>Time for Some Water</item>
-        <item>Your Body is Calling</item>
+        <item>Dein Körper ruft</item>
         <item>Gentle Hydration Break</item>
         <item>Soft Reminder from HydroTracker</item>
-        <item>A Moment for Hydration</item>
+        <item>Ein Moment für Hydration</item>
         <item>Water Wellness Check</item>
     </string-array>
     <!-- Gentle reminder messages: low progress (&lt; 25%) -->

@@ -81,6 +81,7 @@
          Settings: Language & Translation
          ============================================================================ -->
     <string name="screen_language_title">Langue &amp; Traduction</string>
+    <string name="language_translation_disclaimer">Content is displayed only upon translation approval. Unapproved segments remain hidden.</string>
     <string name="language_contribute_title">Contribuer</string>
     <string name="language_crowdin_title">Aider à traduire HydroTracker</string>
     <string name="language_crowdin_description">Contribuer sur Crowdin</string>
@@ -348,6 +349,10 @@
     <string name="notif_configure_schedule_desc">Changer le mode de rappel ou définir un intervalle personnalisé</string>
     <string name="notif_reminder_interval">Intervalle de rappel</string>
     <string name="notif_scheduled_for">Planifié pour</string>
+    <string name="notif_pause_reminders">Pause reminders for today</string>
+    <string name="notif_pause_reminders_desc">Stop hydration reminders until the next day</string>
+    <string name="notif_resume_reminders">Resume reminders</string>
+    <string name="notif_reminders_paused_desc">Hydration reminders are paused until tomorrow</string>
     <!-- Reminder cadence, e.g. "Every 60 minutes"; %1$d = minutes -->
     <plurals name="every_x_minutes">
         <item quantity="one">Chaque %1$d minute</item>
@@ -731,6 +736,7 @@
     <string name="home_label_entries">Entrées</string>
     <string name="home_label_first_intake">Première</string>
     <string name="home_label_latest_intake">Dernière</string>
+    <string name="home_reminders_paused_hint">Reminders paused until tomorrow</string>
     <string name="home_section_recent_entries">Entrées récentes</string>
     <!-- Dialogue titles -->
     <string name="home_dialog_add_custom_amount">Ajouter une Quantité Personnalisée</string>
@@ -884,9 +890,10 @@
     <string name="notification_minimal_remaining">%1$s restant</string>
     <!-- %1$s = formatted amount with unit, e.g. "500 ml" -->
     <string name="notification_action_add">Ajouter %1$s</string>
+    <string name="notification_action_pause_today">Pause for today</string>
     <string name="notification_quick_add_preset_name">Ajout Rapide</string>
     <string name="notification_quick_add_note">Ajouté depuis une notification</string>
-    <!-- %1$s = formatted amount with unit, e.g. "500 ml" -->
+    <string name="notification_paused_confirmation">Reminders paused until tomorrow</string>
     <string name="notification_quick_add_feedback_title">Ajouté %1$s</string>
     <!-- %1$s = formatted current intake, %2$s = formatted daily goal -->
     <string name="notification_quick_add_feedback_message">%1$s / %2$s</string>
