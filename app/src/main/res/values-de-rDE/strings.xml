@@ -389,7 +389,7 @@
     <!-- ============================================================================
          Settings — Quick Add customization
          ============================================================================ -->
-    <string name="quickadd_containers_header">Container presets</string>
+    <string name="quickadd_containers_header">Gefäß-Vorlagen</string>
     <string name="quickadd_containers_desc">Quick-select containers on the home screen. Tap to edit, drag to reorder.</string>
     <string name="quickadd_edit_containers">Edit container presets</string>
     <string name="quickadd_beverages_header">Beverage types</string>
@@ -502,7 +502,7 @@
     <string name="dark_mode_dark">Dunkler Modus</string>
     <!-- Colour source -->
     <string name="color_source_hydro">HydroTracker Blue</string>
-    <string name="color_source_dynamic">Dynamic Colors</string>
+    <string name="color_source_dynamic">Dynamische Farben</string>
     <string name="color_source_dynamic_desc">Colors from your wallpaper</string>
     <!-- Week start day -->
     <string name="weekday_sunday">Sonntag</string>
@@ -587,7 +587,7 @@
     <!-- ============================================================================
          Health Connect status & badges
          ============================================================================ -->
-    <string name="hc_status_error">Error: %1$s</string>
+    <string name="hc_status_error">Fehler: %1$s</string>
     <string name="hc_badge_hidden">Versteckt</string>
     <!-- ============================================================================
          About
@@ -615,7 +615,7 @@
          Support Development
          ============================================================================ -->
     <string name="support_development_hero">HydroTracker is built and maintained by one person, with no ads and no tracking. If it has helped you drink more water, anything you chip in keeps it growing.</string>
-    <string name="support_section_support">Support development</string>
+    <string name="support_section_support">Entwicklung unterstützen</string>
     <string name="support_github_sponsors_blurb">Support ongoing development</string>
     <string name="support_paypal_blurb">Sende eine schnelle Spende</string>
     <string name="support_buymeacoffee_blurb">Treat me to a coffee</string>
@@ -732,12 +732,12 @@
     <!-- Content descriptions -->
     <string name="cd_add_container">Add container</string>
     <!-- Stats labels -->
-    <string name="home_label_daily_progress">Daily Progress</string>
-    <string name="home_label_entries">Entries</string>
-    <string name="home_label_first_intake">First</string>
-    <string name="home_label_latest_intake">Latest</string>
+    <string name="home_label_daily_progress">Täglicher Fortschritt</string>
+    <string name="home_label_entries">Eingaben</string>
+    <string name="home_label_first_intake">Erstes</string>
+    <string name="home_label_latest_intake">Letztes</string>
     <string name="home_reminders_paused_hint">Reminders paused until tomorrow</string>
-    <string name="home_section_recent_entries">Recent Entries</string>
+    <string name="home_section_recent_entries">Letzte Eingaben</string>
     <!-- Dialogue titles -->
     <string name="home_dialog_add_custom_amount">Add Custom Amount</string>
     <string name="home_dialog_edit_entry_title">Edit Water Entry</string>
@@ -846,27 +846,27 @@
     <string name="statistics_hero_days_tracked">Days Tracked</string>
     <!-- Overview labels -->
     <string name="statistics_label_current_streak">Current Streak</string>
-    <string name="statistics_label_average_daily_intake">Daily Average</string>
+    <string name="statistics_label_average_daily_intake">Täglicher Durchschnitt</string>
     <string name="statistics_label_total_intake">Total Intake</string>
-    <string name="statistics_label_success_rate">Success Rate</string>
+    <string name="statistics_label_success_rate">Erfolgsrate</string>
     <string name="statistics_label_days_tracked">Days Tracked</string>
     <plurals name="statistics_streak_days">
-        <item quantity="one">%1$d day</item>
-        <item quantity="other">%1$d days</item>
+        <item quantity="one">%1$d Tag</item>
+        <item quantity="other">%1$d Tage</item>
     </plurals>
     <!-- Drinking pattern labels -->
-    <string name="statistics_label_first_drink">First Drink</string>
-    <string name="statistics_label_last_drink">Last Drink</string>
+    <string name="statistics_label_first_drink">Erstes Getränk</string>
+    <string name="statistics_label_last_drink">Letztes Getränk</string>
     <string name="statistics_label_average_interval">Average Interval</string>
     <string name="statistics_label_average_drink_size">Average Drink Size</string>
-    <string name="statistics_label_largest_drink">Largest Drink</string>
+    <string name="statistics_label_largest_drink">Größtes Getränk</string>
     <!-- Beverage breakdown -->
     <!-- %1$d = drink count, %2$s = effective volume with unit -->
     <!-- %1$s = effective volume with unit -->
-    <string name="statistics_beverage_effective_short">%1$s \neffective</string>
+    <string name="statistics_beverage_effective_short">%1$s \nEffektiv</string>
     <!-- Container Usage -->
-    <string name="statistics_container_header_container">Container</string>
-    <string name="statistics_container_header_volume">Volume</string>
+    <string name="statistics_container_header_container">Gefäß</string>
+    <string name="statistics_container_header_volume">Volumen</string>
     <string name="statistics_container_header_uses">Uses</string>
     <!-- Hydration multiplier -->
     <!-- %1$s = signed percentage, e.g. "+5%" -->
@@ -874,12 +874,12 @@
     <!-- %1$s = formatted goal amount -->
     <!-- %1$d = percentage -->
     <!-- Short weekday names for the monthly calendar header -->
-    <string name="weekday_short_sun">Sun</string>
-    <string name="weekday_short_mon">Mon</string>
-    <string name="weekday_short_tue">Tue</string>
-    <string name="weekday_short_wed">Wed</string>
-    <string name="weekday_short_thu">Thu</string>
-    <string name="weekday_short_fri">Fri</string>
+    <string name="weekday_short_sun">Sonntag</string>
+    <string name="weekday_short_mon">Montag</string>
+    <string name="weekday_short_tue">Dienstag</string>
+    <string name="weekday_short_wed">Mittwoch</string>
+    <string name="weekday_short_thu">Donnerstag</string>
+    <string name="weekday_short_fri">Freitag</string>
     <string name="weekday_short_sat">Sat</string>
     <!-- ============================================================================
          Notifications
