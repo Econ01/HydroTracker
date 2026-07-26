@@ -85,6 +85,7 @@ import com.cemcakmak.hydrotracker.presentation.common.BeverageOption
 import com.cemcakmak.hydrotracker.presentation.common.toOption
 import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
+import com.cemcakmak.hydrotracker.utils.parseLocaleNumber
 import java.time.LocalTime
 import java.util.Calendar
 
@@ -152,7 +153,7 @@ fun EditWaterDialog(
     val isExternalEntry = entry.isExternalEntry()
 
     val handleSave = {
-        val amountInUserUnit = amountText.toDouble()
+        val amountInUserUnit = parseLocaleNumber(amountText) ?: 0.0
         val amountInMl = VolumeUnitConverter.toMillilitres(amountInUserUnit, volumeUnit)
 
         val newCalendar = Calendar.getInstance().apply {
@@ -600,7 +601,7 @@ private fun ActionButtons(
                 buttonGroupContent = {
                     Button(
                         onClick = {
-                            val amountInUserUnit = amountText.toDoubleOrNull()
+                            val amountInUserUnit = parseLocaleNumber(amountText)
                             if (amountInUserUnit != null && amountInUserUnit > 0) {
                                 val amountInMl = VolumeUnitConverter.toMillilitres(amountInUserUnit, volumeUnit)
                                 if (amountInMl in minAmountMl..maxAmountMl) {
