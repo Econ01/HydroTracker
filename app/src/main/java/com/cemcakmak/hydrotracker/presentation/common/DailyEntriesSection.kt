@@ -66,6 +66,7 @@ import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.presentation.common.dialogs.DailyEntryDeleteDialog
 import com.cemcakmak.hydrotracker.presentation.common.shapes.PillShape
 import com.cemcakmak.hydrotracker.presentation.common.shapes.SquircleShape
+import com.cemcakmak.hydrotracker.presentation.settings.amoledGroupBorder
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.ui.theme.rememberBeverageColorRoles
 import com.cemcakmak.hydrotracker.utils.ContainerIconMapper
@@ -249,10 +250,12 @@ internal fun DailyGroupCard(
     content: @Composable () -> Unit
 ) {
     val shape = getShapeForIndex(index, size)
+    val border = amoledGroupBorder()
 
     Surface(
         shape = shape,
         tonalElevation = tonalElevation,
+        border = border,
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 2.dp)

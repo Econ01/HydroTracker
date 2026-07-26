@@ -88,6 +88,16 @@
             android:exported="false" />
 
         <receiver
+            android:name=".notifications.PauseNotificationsReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
+        <receiver
+            android:name=".notifications.ResumeNotificationsReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
+        <receiver
             android:name=".notifications.FunFactReceiver"
             android:enabled="true"
             android:exported="false" />

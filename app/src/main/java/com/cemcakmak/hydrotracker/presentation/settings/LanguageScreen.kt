@@ -22,6 +22,7 @@ package com.cemcakmak.hydrotracker.presentation.settings
 
 import android.content.Intent
 import androidx.activity.compose.LocalActivity
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -56,8 +57,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cemcakmak.hydrotracker.R
@@ -67,6 +70,7 @@ import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.utils.AppLocale
 import org.json.JSONObject
 import androidx.core.net.toUri
+import com.cemcakmak.hydrotracker.ui.theme.extendedColorScheme
 
 /** Per-language translation and approval percentages. */
 private data class LanguageProgress(
@@ -131,9 +135,22 @@ private fun LanguageSection() {
     val haptics = LocalHapticFeedback.current
     val context = LocalContext.current
     var showLanguageSheet by remember { mutableStateOf(false) }
+    val isPreview = LocalInspectionMode.current
+    val progress = remember(context) { loadTranslationProgress(context) }
 
     // Cache the persisted tag so SharedPreferences is not read on every recomposition.
     val currentTag = remember(context) { AppLocale.currentTag(context) }
+    val effectiveTag = remember(currentTag) { resolveEffectiveTag(currentTag) }
+
+    val showDisclaimer = remember(isPreview, effectiveTag, progress) {
+        if (isPreview) return@remember true
+
+        val approved = effectiveTag?.let { progress?.languages?.get(it)?.approved }
+        effectiveTag != null &&
+                effectiveTag != "en" &&
+                approved != null &&
+                approved <= 70
+    }
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         SettingsSectionHeader(stringResource(R.string.display_language_header))
@@ -176,6 +193,16 @@ private fun LanguageSection() {
                 )
             }
         }
+
+        AnimatedVisibility(visible = showDisclaimer) {
+            Text(
+                text = stringResource(R.string.language_translation_disclaimer),
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.extendedColorScheme.warning
+            )
+        }
     }
 
     if (showLanguageSheet) {
@@ -183,6 +210,22 @@ private fun LanguageSection() {
             currentTag = currentTag,
             onDismiss = { showLanguageSheet = false }
         )
+    }
+}
+
+/**
+ * Returns the supported language tag that best matches the effective locale.
+ * For an explicit per-app selection this is just [currentTag]. For "System default"
+ * it is derived from [Locale.getDefault()].
+ */
+private fun resolveEffectiveTag(currentTag: String?): String? {
+    if (currentTag != null) return currentTag
+
+    val systemLocale = java.util.Locale.getDefault()
+    if (systemLocale.language == "en") return "en"
+
+    return AppLocale.SUPPORTED_TAGS.firstOrNull { tag ->
+        java.util.Locale.forLanguageTag(tag).language == systemLocale.language
     }
 }
 

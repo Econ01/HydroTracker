@@ -36,6 +36,10 @@ object HydroNotificationScheduler {
     private const val KEY_NEXT_REMINDER_TIME = "next_reminder_time"
     private const val KEY_LAST_SCHEDULED_TIME = "last_scheduled_time"
     private const val KEY_NEXT_FUN_FACT_TIME = "next_fun_fact_time"
+    private const val KEY_CONSECUTIVE_IGNORED_COUNT = "consecutive_ignored_count"
+    private const val KEY_SUSPEND_UNTIL_MILLIS = "suspend_until_millis"
+
+    private const val RESUME_NOTIFICATIONS_REQUEST_CODE = 2003
 
     private fun getPreferences(context: Context): SharedPreferences {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -60,6 +64,13 @@ object HydroNotificationScheduler {
 
         // Cancel any existing notifications first
         stopNotifications(context)
+
+        // If reminders are currently suspended, only schedule the resume alarm.
+        if (isCurrentlySuspended(context)) {
+            Log.d(TAG, "Reminders are suspended until ${Date(getSuspendUntilMillis(context) ?: 0L)}")
+            scheduleResumeAlarm(context)
+            return
+        }
 
         // Schedule the first notification
         scheduleNextReminder(context, userProfile)
@@ -292,6 +303,155 @@ object HydroNotificationScheduler {
     }
 
     /**
+     * Return true if hydration reminders are currently suspended until the next user day.
+     */
+    fun isCurrentlySuspended(context: Context): Boolean {
+        val suspendUntil = getSuspendUntilMillis(context) ?: return false
+        return System.currentTimeMillis() < suspendUntil
+    }
+
+    /**
+     * Return the stored suspend-until timestamp, or null if not set.
+     */
+    fun getSuspendUntilMillis(context: Context): Long? {
+        val value = getPreferences(context).getLong(KEY_SUSPEND_UNTIL_MILLIS, 0L)
+        return if (value > 0L) value else null
+    }
+
+    /**
+     * Return the number of consecutive hydration reminders shown without the user logging water.
+     */
+    fun getConsecutiveIgnoredCount(context: Context): Int {
+        return getPreferences(context).getInt(KEY_CONSECUTIVE_IGNORED_COUNT, 0)
+    }
+
+    /**
+     * Increment the count of consecutive ignored reminders.
+     */
+    fun incrementConsecutiveIgnoredCount(context: Context) {
+        val current = getConsecutiveIgnoredCount(context)
+        getPreferences(context).edit {
+            putInt(KEY_CONSECUTIVE_IGNORED_COUNT, current + 1)
+        }
+        Log.d(TAG, "Incremented consecutive ignored count to ${current + 1}")
+    }
+
+    /**
+     * Reset the ignored-reminder count and clear any active suspend state. Called whenever the user
+     * logs water or manually resumes reminders.
+     */
+    fun resetNotificationEngagementState(context: Context) {
+        getPreferences(context).edit {
+            remove(KEY_CONSECUTIVE_IGNORED_COUNT)
+            remove(KEY_SUSPEND_UNTIL_MILLIS)
+        }
+        cancelResumeAlarm(context)
+        Log.d(TAG, "Reset notification engagement state")
+    }
+
+    /**
+     * Suspend hydration reminders until the start of the next user day.
+     */
+    fun suspendRemindersUntilNextDay(
+        context: Context,
+        userProfile: UserProfile
+    ) {
+        val dayEndTime = userProfile.sleepTime
+        val dayEndMode = userProfile.dayEndMode
+        val resumeTime = com.cemcakmak.hydrotracker.utils.UserDayCalculator
+            .getNextUserDayStartMillis(dayEndTime, dayEndMode)
+
+        getPreferences(context).edit {
+            putLong(KEY_SUSPEND_UNTIL_MILLIS, resumeTime)
+            remove(KEY_CONSECUTIVE_IGNORED_COUNT)
+        }
+
+        // Cancel any currently visible reminder and the next scheduled alarm.
+        stopNotifications(context)
+
+        // Schedule a one-shot alarm to resume reminders at the next user-day boundary.
+        scheduleResumeAlarmAt(context, resumeTime)
+
+        Log.d(TAG, "Reminders suspended until ${Date(resumeTime)}")
+    }
+
+    /**
+     * Manually resume reminders before the suspend period ends.
+     */
+    fun resumeReminders(context: Context, userProfile: UserProfile) {
+        resetNotificationEngagementState(context)
+        startNotifications(context, userProfile)
+        Log.d(TAG, "Reminders manually resumed")
+    }
+
+    /**
+     * Schedule the resume alarm using the stored suspend-until timestamp.
+     */
+    private fun scheduleResumeAlarm(context: Context) {
+        val resumeTime = getSuspendUntilMillis(context) ?: return
+        scheduleResumeAlarmAt(context, resumeTime)
+    }
+
+    /**
+     * Schedule a one-shot alarm to resume reminders at [resumeTimeMillis].
+     */
+    private fun scheduleResumeAlarmAt(context: Context, resumeTimeMillis: Long) {
+        if (resumeTimeMillis <= System.currentTimeMillis()) {
+            Log.w(TAG, "Resume time is in the past, not scheduling resume alarm")
+            return
+        }
+
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, ResumeNotificationsReceiver::class.java).apply {
+            action = ResumeNotificationsReceiver.ACTION_RESUME_NOTIFICATIONS
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            RESUME_NOTIFICATIONS_REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (!alarmManager.canScheduleExactAlarms()) {
+                    Log.e(TAG, "Cannot schedule resume alarm: exact alarm permission not granted")
+                    return
+                }
+            }
+
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                resumeTimeMillis,
+                pendingIntent
+            )
+            Log.d(TAG, "Scheduled resume alarm for: ${Date(resumeTimeMillis)}")
+        } catch (e: SecurityException) {
+            Log.e(TAG, "Failed to schedule resume alarm due to security exception", e)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to schedule resume alarm", e)
+        }
+    }
+
+    /**
+     * Cancel the scheduled resume alarm.
+     */
+    private fun cancelResumeAlarm(context: Context) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, ResumeNotificationsReceiver::class.java).apply {
+            action = ResumeNotificationsReceiver.ACTION_RESUME_NOTIFICATIONS
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            RESUME_NOTIFICATIONS_REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        alarmManager.cancel(pendingIntent)
+        Log.d(TAG, "Cancelled resume alarm")
+    }
+
+    /**
      * Stop all scheduled notifications
      */
     fun stopNotifications(context: Context) {
@@ -359,6 +519,22 @@ object HydroNotificationScheduler {
         timeFormat: TimeFormat = TimeFormat.SYSTEM,
         dateFormat: DateFormatPattern = DateFormatPattern.SYSTEM
     ): String? {
+        val epochToFormatted: (Long) -> String = { epochMillis ->
+            val localDateTime = java.time.Instant.ofEpochMilli(epochMillis)
+                .atZone(java.time.ZoneId.systemDefault())
+                .toLocalDateTime()
+            DateTimeFormatters.formatDateTime(context, localDateTime, timeFormat, dateFormat)
+        }
+
+        // If reminders are suspended, predict the first reminder after the resume boundary.
+        if (isCurrentlySuspended(context)) {
+            val resumeTime = getSuspendUntilMillis(context) ?: return null
+            val resumeCalendar = Calendar.getInstance().apply { timeInMillis = resumeTime }
+            Log.d(TAG, "Calculating next reminder after suspension resumes at ${Date(resumeTime)}")
+            val nextTime = calculateNextReminderTime(userProfile, userProfile.reminderInterval, resumeCalendar)
+            return nextTime?.let { epochToFormatted(it.timeInMillis) }
+        }
+
         // First try to get the actual scheduled time with validation
         val prefs = getPreferences(context)
         val scheduledTime = prefs.getLong(KEY_NEXT_REMINDER_TIME, 0L)
@@ -367,13 +543,6 @@ object HydroNotificationScheduler {
         // Validate scheduled time
         val now = System.currentTimeMillis()
         val validationResult = validateScheduledTime(scheduledTime, lastScheduled, now)
-
-        val epochToFormatted: (Long) -> String = { epochMillis ->
-            val localDateTime = java.time.Instant.ofEpochMilli(epochMillis)
-                .atZone(java.time.ZoneId.systemDefault())
-                .toLocalDateTime()
-            DateTimeFormatters.formatDateTime(context, localDateTime, timeFormat, dateFormat)
-        }
 
         if (validationResult.isValid) {
             Log.d(TAG, "Using valid scheduled time: ${Date(scheduledTime)}")
@@ -560,6 +729,7 @@ object HydroNotificationScheduler {
         waterIntakeRepository: com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository? = null
     ) {
         Log.d(TAG, "Water entry added, bumping next reminder")
+        resetNotificationEngagementState(context)
         scheduleNextFromTriggered(context, userProfile, userRepository, waterIntakeRepository)
     }
 

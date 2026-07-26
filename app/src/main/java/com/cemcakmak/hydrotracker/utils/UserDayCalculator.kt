@@ -21,7 +21,7 @@ object UserDayCalculator {
      * @param dayEndTime The boundary time in HH:mm. For [DayEndMode.SLEEP_TIME] this should be the
      *                   user's sleep time; for [DayEndMode.MIDNIGHT] it is ignored.
      */
-    fun getCurrentUserDayString(dayEndTime: String, dayEndMode: DayEndMode = DayEndMode.SLEEP_TIME): String {
+    fun getCurrentUserDayString(dayEndTime: String, dayEndMode: DayEndMode = DayEndMode.MIDNIGHT): String {
         return getUserDayStringForTimestamp(System.currentTimeMillis(), dayEndTime, dayEndMode)
     }
 
@@ -31,7 +31,7 @@ object UserDayCalculator {
      * @param dayEndTime The boundary time in HH:mm. For [DayEndMode.SLEEP_TIME] this should be the
      *                   user's sleep time; for [DayEndMode.MIDNIGHT] it is ignored.
      */
-    fun getUserDayStringForTimestamp(timestamp: Long, dayEndTime: String, dayEndMode: DayEndMode = DayEndMode.SLEEP_TIME): String {
+    fun getUserDayStringForTimestamp(timestamp: Long, dayEndTime: String, dayEndMode: DayEndMode = DayEndMode.MIDNIGHT): String {
         val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
         val time = LocalTime.of(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE))
         val boundary = getDayBoundary(dayEndTime, dayEndMode)
@@ -48,15 +48,38 @@ object UserDayCalculator {
 
     /**
      * Check if a new user day has started since the last check.
-     * Used to trigger data reset or cleanup.
+     * Used to trigger data reset or clean-up.
      *
      * @param dayEndTime The boundary time in HH:mm. For [DayEndMode.SLEEP_TIME] this should be the
      *                   user's sleep time; for [DayEndMode.MIDNIGHT] it is ignored.
      */
-    fun hasNewUserDayStarted(lastCheckTime: Long, dayEndTime: String, dayEndMode: DayEndMode = DayEndMode.SLEEP_TIME): Boolean {
+    fun hasNewUserDayStarted(lastCheckTime: Long, dayEndTime: String, dayEndMode: DayEndMode = DayEndMode.MIDNIGHT): Boolean {
         val lastUserDay = getUserDayStringForTimestamp(lastCheckTime, dayEndTime, dayEndMode)
         val currentUserDay = getCurrentUserDayString(dayEndTime, dayEndMode)
         return lastUserDay != currentUserDay
+    }
+
+    /**
+     * Return the epoch millis of the start of the next user day.
+     *
+     * For [DayEndMode.MIDNIGHT] this is the next calendar midnight. For
+     * [DayEndMode.SLEEP_TIME] it is the next occurrence of the user's sleep time.
+     *
+     * @param dayEndTime The boundary time in HH:mm. For [DayEndMode.SLEEP_TIME] this should be the
+     *                   user's sleep time; for [DayEndMode.MIDNIGHT] it is ignored.
+     */
+    fun getNextUserDayStartMillis(dayEndTime: String, dayEndMode: DayEndMode = DayEndMode.MIDNIGHT): Long {
+        val now = Calendar.getInstance()
+        val boundary = getDayBoundary(dayEndTime, dayEndMode)
+        val nextBoundary = now.clone() as Calendar
+        nextBoundary.set(Calendar.HOUR_OF_DAY, boundary.hour)
+        nextBoundary.set(Calendar.MINUTE, boundary.minute)
+        nextBoundary.set(Calendar.SECOND, 0)
+        nextBoundary.set(Calendar.MILLISECOND, 0)
+        if (nextBoundary.timeInMillis <= now.timeInMillis) {
+            nextBoundary.add(Calendar.DAY_OF_YEAR, 1)
+        }
+        return nextBoundary.timeInMillis
     }
 
     /**

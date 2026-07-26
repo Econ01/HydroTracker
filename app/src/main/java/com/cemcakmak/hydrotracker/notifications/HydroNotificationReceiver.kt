@@ -48,6 +48,12 @@ class HydroNotificationReceiver : BroadcastReceiver() {
                 return
             }
 
+            // If reminders are suspended, do not show anything. The resume alarm is already set.
+            if (HydroNotificationScheduler.isCurrentlySuspended(context)) {
+                Log.d(TAG, "Reminders are suspended, skipping notification display")
+                return
+            }
+
             val waterIntakeRepository = DatabaseInitializer.getWaterIntakeRepository(
                 context = context,
                 userRepository = userRepository
@@ -72,7 +78,10 @@ class HydroNotificationReceiver : BroadcastReceiver() {
             }
 
             Log.d(TAG, "Showing hydration reminder notification")
-            // Show the notification with the user's primary and secondary quick-add actions
+            // Show the notification with the user's primary and secondary quick-add actions.
+            // If the user has ignored two consecutive reminders, offer a manual pause action.
+            val ignoredCount = HydroNotificationScheduler.getConsecutiveIgnoredCount(context)
+            val showPauseAction = ignoredCount >= 2
             val quickAddPresets = waterIntakeRepository.getQuickAddPresets()
             val presetsForNotification = listOfNotNull(
                 quickAddPresets.primary,
@@ -81,11 +90,20 @@ class HydroNotificationReceiver : BroadcastReceiver() {
             Log.d(
                 TAG,
                 "Quick-add presets: primary=${quickAddPresets.primary?.let { "${it.name}/${it.volume}" } ?: "none"}, " +
-                    "secondary=${quickAddPresets.secondary?.let { "${it.name}/${it.volume}" } ?: "none"}"
+                    "secondary=${quickAddPresets.secondary?.let { "${it.name}/${it.volume}" } ?: "none"}, " +
+                    "ignoredCount=$ignoredCount, showPauseAction=$showPauseAction"
             )
 
             val notificationService = HydroNotificationService(context)
-            notificationService.showHydrationReminder(userProfile, currentProgress, presetsForNotification)
+            notificationService.showHydrationReminder(
+                userProfile,
+                currentProgress,
+                presetsForNotification,
+                showPauseAction
+            )
+
+            // Count this reminder as ignored until the user logs water.
+            HydroNotificationScheduler.incrementConsecutiveIgnoredCount(context)
 
             // Schedule the next reminder using the new method that ensures continuous operation
             Log.d(TAG, "Scheduling next reminder from triggered time")

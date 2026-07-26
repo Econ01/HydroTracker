@@ -1,3 +1,14 @@
+[1.4]
+Added
+- Option to pause hydration reminders until the next day after two ignored reminders in a row
+- Manual pause and resume control for reminders in Notifications ▸ Schedule
+- Home-screen indicator showing when reminders are paused until the next day
+- Translation disclaimer in language settings
+
+Changed
+- Switched the default day-end time mode from **Sleep time** to **Midnight**
+- Subtle AMOLED borders now also appear around daily entry cards
+
 [1.3]
 Added
 - 6 new font options added:
