@@ -56,7 +56,7 @@
          ============================================================================ -->
     <string name="widget_large_label">Grand traqueur d\'hydratation</string>
     <string name="widget_large_description">Suivre l\'hydratation et ajouter de l\'eau en un clic</string>
-    <string name="widget_of_goal_format">%1$s de %2$s</string>
+    <string name="widget_of_goal_format">%1$s sur %2$s</string>
     <string name="widget_goal_reached">Objectif atteint !</string>
     <string name="widget_quick_add_cd">Ajouter %1$s</string>
     <string name="widget_daily_hydration">Hydratation quotidienne</string>
@@ -81,7 +81,7 @@
          Settings: Language & Translation
          ============================================================================ -->
     <string name="screen_language_title">Langue &amp; Traduction</string>
-    <string name="language_translation_disclaimer">Content is displayed only upon translation approval. Unapproved segments remain hidden.</string>
+    <string name="language_translation_disclaimer">Contenu affiché seulement quand la traduction est approuvée. Les sections non approuvées restent cachées.</string>
     <string name="language_contribute_title">Contribuer</string>
     <string name="language_crowdin_title">Aider à traduire HydroTracker</string>
     <string name="language_crowdin_description">Contribuer sur Crowdin</string>
@@ -349,9 +349,9 @@
     <string name="notif_configure_schedule_desc">Changer le mode de rappel ou définir un intervalle personnalisé</string>
     <string name="notif_reminder_interval">Intervalle de rappel</string>
     <string name="notif_scheduled_for">Planifié pour</string>
-    <string name="notif_pause_reminders">Pause reminders for today</string>
-    <string name="notif_pause_reminders_desc">Stop hydration reminders until the next day</string>
-    <string name="notif_resume_reminders">Resume reminders</string>
+    <string name="notif_pause_reminders">Notifications de rappel en pause pour aujourd\'hui</string>
+    <string name="notif_pause_reminders_desc">Arrêter les rappels d\'hydratation jusqu\'au jour suivant</string>
+    <string name="notif_resume_reminders">Reprendre les rappels</string>
     <string name="notif_reminders_paused_desc">Les rappels d\'hydratation sont en pause jusqu\'à demain</string>
     <!-- Reminder cadence, e.g. "Every 60 minutes"; %1$d = minutes -->
     <plurals name="every_x_minutes">
@@ -736,7 +736,7 @@
     <string name="home_label_entries">Entrées</string>
     <string name="home_label_first_intake">Première</string>
     <string name="home_label_latest_intake">Dernière</string>
-    <string name="home_reminders_paused_hint">Reminders paused until tomorrow</string>
+    <string name="home_reminders_paused_hint">Pause des rappels jusqu\'à demain</string>
     <string name="home_section_recent_entries">Entrées récentes</string>
     <!-- Dialogue titles -->
     <string name="home_dialog_add_custom_amount">Ajouter une Quantité Personnalisée</string>
