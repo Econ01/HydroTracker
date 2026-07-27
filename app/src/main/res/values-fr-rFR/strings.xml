@@ -48,13 +48,13 @@
     <string name="notification_channel_name">Rappels d\'hydratation</string>
     <string name="notification_channel_description">Notifications pour te rappeler de rester hydraté</string>
     <string name="notification_channel_fun_facts_name">Faits Quotidiens d\'Hydratation</string>
-    <string name="notification_channel_fun_facts_description">Un conseil ou funfact quotidien d\'hydratation</string>
+    <string name="notification_channel_fun_facts_description">Une astuce ou une anecdote quotidienne d\'hydratation</string>
     <!-- ============================================================================
          Widgets
          android:label value shown in the home-screen widget picker, plus the text
          rendered inside the Glance widget.
          ============================================================================ -->
-    <string name="widget_large_label">Grand HydroTracker</string>
+    <string name="widget_large_label">Grand traqueur d\'hydratation</string>
     <string name="widget_large_description">Suivre l\'hydratation et ajouter de l\'eau en un clic</string>
     <string name="widget_of_goal_format">%1$s de %2$s</string>
     <string name="widget_goal_reached">Objectif atteint !</string>
@@ -352,7 +352,7 @@
     <string name="notif_pause_reminders">Pause reminders for today</string>
     <string name="notif_pause_reminders_desc">Stop hydration reminders until the next day</string>
     <string name="notif_resume_reminders">Resume reminders</string>
-    <string name="notif_reminders_paused_desc">Hydration reminders are paused until tomorrow</string>
+    <string name="notif_reminders_paused_desc">Les rappels d\'hydratation sont en pause jusqu\'à demain</string>
     <!-- Reminder cadence, e.g. "Every 60 minutes"; %1$d = minutes -->
     <plurals name="every_x_minutes">
         <item quantity="one">Chaque %1$d minute</item>
@@ -890,10 +890,10 @@
     <string name="notification_minimal_remaining">%1$s restant</string>
     <!-- %1$s = formatted amount with unit, e.g. "500 ml" -->
     <string name="notification_action_add">Ajouter %1$s</string>
-    <string name="notification_action_pause_today">Pause for today</string>
+    <string name="notification_action_pause_today">Mettre en pause pour aujourd\'hui</string>
     <string name="notification_quick_add_preset_name">Ajout Rapide</string>
     <string name="notification_quick_add_note">Ajouté depuis une notification</string>
-    <string name="notification_paused_confirmation">Reminders paused until tomorrow</string>
+    <string name="notification_paused_confirmation">Pause des rappels jusqu\'à demain</string>
     <string name="notification_quick_add_feedback_title">Ajouté %1$s</string>
     <!-- %1$s = formatted current intake, %2$s = formatted daily goal -->
     <string name="notification_quick_add_feedback_message">%1$s / %2$s</string>
