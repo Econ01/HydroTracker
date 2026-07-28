@@ -7,8 +7,8 @@
     <text x="612" y="65" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">0%</text>
     <text x="20" y="105" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">French</text>
     <rect x="220" y="91" width="380" height="18" rx="4" fill="#e0e0e0"/>
-    <rect x="220" y="91" width="372" height="18" rx="4" fill="#008080"/>
-    <text x="612" y="105" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">98%</text>
+    <rect x="220" y="91" width="380" height="18" rx="4" fill="#008080"/>
+    <text x="612" y="105" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">100%</text>
     <text x="20" y="145" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">German</text>
     <rect x="220" y="131" width="380" height="18" rx="4" fill="#e0e0e0"/>
     <rect x="220" y="131" width="110" height="18" rx="4" fill="#008080"/>
