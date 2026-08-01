@@ -231,7 +231,7 @@
     <string name="nav_statistics">Statistik</string>
     <string name="nav_profile">Profil</string>
     <string name="nav_settings">Einstellungen</string>
-    <string name="nav_add_custom">Add Custom</string>
+    <string name="nav_add_custom">Füge benutzerdefiniert hinzu</string>
     <string name="fab_menu_new_beverage">Neues Getränk</string>
     <string name="fab_menu_new_container">Neues Gefäß</string>
     <string name="fab_menu_add_past_entry">Add Past Entry</string>
@@ -241,7 +241,7 @@
          Screen titles are reused as both the hub row title and the screen's app-bar title.
          ============================================================================ -->
     <string name="screen_appearance_title">Aussehen</string>
-    <string name="screen_hydration_title">Hydration &amp; Health</string>
+    <string name="screen_hydration_title">Hydration &amp; Gesundheit</string>
     <string name="screen_quickadd_title">Quick Add Customization</string>
     <string name="screen_notifications_title">Benachrichtigungen</string>
     <string name="screen_support_title">Entwicklung unterstützen</string>
