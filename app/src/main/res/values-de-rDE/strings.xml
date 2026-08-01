@@ -256,8 +256,8 @@
     <string name="settings_support_desc">Spende und unterstütze die App</string>
     <string name="settings_about_desc">Quellen, Datenschutzerklärung und Lizenz</string>
     <string name="settings_developer_desc">Debug tools and testing</string>
-    <string name="screen_data_management_title">Data Management</string>
-    <string name="settings_data_management_desc">Export, import and delete your data</string>
+    <string name="screen_data_management_title">Datenverwaltung</string>
+    <string name="settings_data_management_desc">Exportiere, importiere und lösche deine Daten</string>
     <!-- ============================================================================
          Settings — Appearance
          ============================================================================ -->
@@ -276,25 +276,25 @@
     <string name="appearance_autohide_desc">Hide the bar when scrolling down</string>
     <string name="appearance_labels_title">Beschriftungen</string>
     <string name="appearance_home_header">Startbildschirm</string>
-    <string name="appearance_feedback_header">Interaction &amp; Feedback</string>
-    <string name="appearance_haptics_title">Haptic Feedback</string>
-    <string name="appearance_haptics_desc">Vibrate on button taps and actions</string>
+    <string name="appearance_feedback_header">Interaktion &amp; Rückmeldung</string>
+    <string name="appearance_haptics_title">Vibrierende Rückmeldung</string>
+    <string name="appearance_haptics_desc">Vibriere beim Tasten drücken und Aktionen</string>
     <string name="appearance_edge_effect_title">Edge Effect</string>
     <string name="appearance_beverage_colors_title">Beverage Colours</string>
     <string name="appearance_beverage_colors_desc">Tint home-screen cards and entries with each beverage’s colour</string>
     <!-- Sample data shown in the theme preview card -->
-    <string name="appearance_preview_amount">1,250 / 2,500 ml</string>
-    <string name="appearance_preview_entries">Entries</string>
-    <string name="appearance_preview_first">First</string>
-    <string name="appearance_preview_latest">Latest</string>
+    <string name="appearance_preview_amount">1.250 / 2.500 Milliliter</string>
+    <string name="appearance_preview_entries">Einträge</string>
+    <string name="appearance_preview_first">Erstes</string>
+    <string name="appearance_preview_latest">Letztes</string>
     <!-- ============================================================================
          Settings — Widget (Appearance ▸ Widget)
          ============================================================================ -->
     <string name="appearance_widget_section_title">Widgets</string>
-    <string name="appearance_widget_title">Widget Settings</string>
-    <string name="appearance_widget_desc">Change appearance and behaviour</string>
+    <string name="appearance_widget_title">Widgets Einstellungen</string>
+    <string name="appearance_widget_desc">Ändere Darstellung und Verhalten</string>
     <string name="widget_settings_colours_header">Farben</string>
-    <string name="widget_settings_dynamic_title">Dynamic colours</string>
+    <string name="widget_settings_dynamic_title">Dynamische Farben</string>
     <string name="widget_settings_dynamic_desc">Colours from your wallpaper</string>
     <string name="widget_settings_background_header">Hintergrund</string>
     <string name="widget_settings_transparent_title">Transparent background</string>
@@ -330,9 +330,9 @@
     <string name="notif_style_motivating_desc">Energetic, goal-focused reminders</string>
     <string name="notif_style_minimal_desc">Simple, unobtrusive reminders</string>
     <string name="notif_permissions_header">Berechtigungen</string>
-    <string name="notif_permission_title">Notification permission</string>
-    <string name="notif_permission_desc">Required to send hydration reminders</string>
-    <string name="notif_exact_alarm_title">Exact alarm permission</string>
+    <string name="notif_permission_title">Berechtigung für Benachrichtigung</string>
+    <string name="notif_permission_desc">Benötigt, um Hydration Erinnerungen zu senden</string>
+    <string name="notif_exact_alarm_title">Exakte Alarm Berechtigung</string>
     <string name="notif_exact_alarm_desc">Required for precise reminder timing</string>
     <string name="notif_reminder_style_header">Erinnerungsart</string>
     <!-- Short reminder-style labels shown on the toggle buttons -->
@@ -348,11 +348,11 @@
     <string name="notif_configure_schedule">Zeitplan einrichten</string>
     <string name="notif_configure_schedule_desc">Change reminder mode or set a custom interval</string>
     <string name="notif_reminder_interval">Reminder interval</string>
-    <string name="notif_scheduled_for">Scheduled for</string>
-    <string name="notif_pause_reminders">Pause reminders for today</string>
-    <string name="notif_pause_reminders_desc">Stop hydration reminders until the next day</string>
-    <string name="notif_resume_reminders">Resume reminders</string>
-    <string name="notif_reminders_paused_desc">Hydration reminders are paused until tomorrow</string>
+    <string name="notif_scheduled_for">Geplant für</string>
+    <string name="notif_pause_reminders">Pausiere Erinnerungen für heute</string>
+    <string name="notif_pause_reminders_desc">Stoppe Hydration-Erinnerungen bis zum nächsten Tag</string>
+    <string name="notif_resume_reminders">Erinnerungen fortführen</string>
+    <string name="notif_reminders_paused_desc">Hydration Erinnerungen sind bis morgen pausiert</string>
     <!-- Reminder cadence, e.g. "Every 60 minutes"; %1$d = minutes -->
     <plurals name="every_x_minutes">
         <item quantity="one">Jede %1$d Minute</item>
@@ -362,9 +362,9 @@
          Settings — Reminder Schedule
          ============================================================================ -->
     <string name="screen_reminder_schedule_title">Erinnerungszeitplan</string>
-    <string name="reminder_mode_header">Mode</string>
-    <string name="reminder_day_end_header">Day end</string>
-    <string name="reminder_day_end_divider">Day End</string>
+    <string name="reminder_mode_header">Modus</string>
+    <string name="reminder_day_end_header">Tagesende</string>
+    <string name="reminder_day_end_divider">Tagesende</string>
     <string name="reminder_mode_auto_explain">Reminders are spaced automatically based on your daily goal and active hours.</string>
     <string name="reminder_mode_custom_explain">Reminders are sent at your chosen fixed interval between wake-up and sleep.</string>
     <string name="reminder_dayend_sleep_explain">Your day ends at sleep time. Daily progress resets then.</string>
@@ -397,7 +397,7 @@
     <string name="quickadd_edit_beverages">Edit beverage presets</string>
     <!-- Container presets list/editor -->
     <string name="container_presets_screen_title">Container Presets</string>
-    <string name="container_reset_defaults_button">Reset Defaults</string>
+    <string name="container_reset_defaults_button">Zum Standard zurücksetzen</string>
     <string name="container_reset_title">Reset Container Presets?</string>
     <string name="container_reset_message">This will remove all custom containers and restore the default presets. This action cannot be undone.</string>
     <!-- Snackbars; %1$s = container name -->
@@ -410,27 +410,27 @@
     <string name="screen_beverage_types_title">Beverage Types</string>
     <string name="beverage_types_helper">Beverages offered in quick add. Tap to edit, drag to reorder.</string>
     <!-- e.g. "150% hydration"; %1$d = per cent -->
-    <string name="beverage_hydration_short">%1$d%% hydration</string>
+    <string name="beverage_hydration_short">%1$d%% Hydration</string>
     <string name="beverage_reset_title">Reset Beverages?</string>
     <string name="beverage_reset_message">This restores the default beverage order, unhides all presets, and removes all custom beverages. This action cannot be undone.</string>
     <!-- ============================================================================
          Settings — Hydration &amp; Health
          ============================================================================ -->
     <string name="hydration_baseline_intake">Daily baseline intake</string>
-    <string name="hydration_calc_standard_header">Calculation standard</string>
+    <string name="hydration_calc_standard_header">Kalkulationsstandard</string>
     <string name="hydration_region_european">(Europäisch)</string>
     <string name="hydration_region_us">(US)</string>
-    <string name="hydration_efsa_tag">Conservative</string>
+    <string name="hydration_efsa_tag">Konservativ</string>
     <string name="hydration_iom_tag">Higher intake</string>
     <!-- Health Connect -->
-    <string name="hc_section_header">Health Connect</string>
-    <string name="hc_sync_title">Sync with Health Connect</string>
-    <string name="hc_sync_desc">Share hydration data with other health apps</string>
-    <string name="hc_data_title">Health Connect Data</string>
+    <string name="hc_section_header">Gesundheitsverbindung Anwendung</string>
+    <string name="hc_sync_title">Synchronisiere mit Gesundheitsverbindungs-Anwendung</string>
+    <string name="hc_sync_desc">Teile Hydration-Daten mit anderen Gesundheitsanwendungen</string>
+    <string name="hc_data_title">Gesundheitsverbindungs-Anwendungsdaten</string>
     <string name="hc_data_desc">View your synced intake history</string>
-    <string name="hc_restore">Restore from Health Connect</string>
+    <string name="hc_restore">Wiederherstellen von der Gesundheitsverbindungs-Anwendung</string>
     <string name="hc_restore_confirm">Wiederherstellen</string>
-    <string name="hc_grant_permissions">Grant Permissions</string>
+    <string name="hc_grant_permissions">Erteile Berechtigung</string>
     <string name="hc_restore_message">Import your past HydroTracker entries from Health Connect. Choose a time range:</string>
     <string name="hc_restore_all">Gesamter Verlauf</string>
     <string name="hc_restore_90days">Letzte 90 Tage</string>
@@ -495,15 +495,15 @@
     <string name="day_end_midnight">Mitternacht</string>
     <!-- Reminder interval mode -->
     <string name="reminder_interval_mode_automatic">Automatisch</string>
-    <string name="reminder_interval_mode_custom">Custom</string>
+    <string name="reminder_interval_mode_custom">Benutzerdefiniert</string>
     <!-- Dark mode preference -->
     <string name="dark_mode_system">Systemstandard</string>
     <string name="dark_mode_light">Heller Modus</string>
     <string name="dark_mode_dark">Dunkler Modus</string>
     <!-- Colour source -->
-    <string name="color_source_hydro">HydroTracker Blue</string>
+    <string name="color_source_hydro">Hydration-Zähler Blau</string>
     <string name="color_source_dynamic">Dynamische Farben</string>
-    <string name="color_source_dynamic_desc">Colors from your wallpaper</string>
+    <string name="color_source_dynamic_desc">Farben von deinem Hintergrund</string>
     <!-- Week start day -->
     <string name="weekday_sunday">Sonntag</string>
     <string name="weekday_monday">Montag</string>
@@ -517,23 +517,23 @@
     <string name="font_system">Systemstandard</string>
     <string name="font_xiaomi_warning">Font styling on HyperOS/MIUI (Xiaomi group devices) does not work as intended due to their custom text engine.</string>
     <!-- Navigation-bar label mode -->
-    <string name="navbar_label_always">Always shown</string>
-    <string name="navbar_label_selected">Selected only</string>
-    <string name="navbar_label_none">Off</string>
+    <string name="navbar_label_always">Immer angezeigt</string>
+    <string name="navbar_label_selected">Nur ausgewählte</string>
+    <string name="navbar_label_none">Aus</string>
     <!-- Home screen edge effect -->
     <string name="edge_effect_transparent">Transparent</string>
-    <string name="edge_effect_blurred">Blurred</string>
+    <string name="edge_effect_blurred">Verwischt</string>
     <string name="edge_effect_scrim">Scrim</string>
     <!-- Beverage types -->
     <string name="beverage_water">Wasser</string>
     <string name="beverage_coffee">Kaffee</string>
     <string name="beverage_tea">Tee</string>
     <string name="beverage_soft_drink">Soft Drink</string>
-    <string name="beverage_energy_drink">Energy Drink</string>
+    <string name="beverage_energy_drink">Energie Getränk</string>
     <string name="beverage_sports_drink">Sport Getränk</string>
     <string name="beverage_ors">ORS</string>
     <string name="beverage_milk">Milch</string>
-    <string name="beverage_fruit_juice">Fruit Juice</string>
+    <string name="beverage_fruit_juice">Fruchtsaft</string>
     <string name="beverage_desc_water">Pure water - baseline hydration</string>
     <string name="beverage_desc_coffee">Coffee - equivalent to water</string>
     <string name="beverage_desc_tea">Tea - equivalent to water</string>
@@ -546,17 +546,17 @@
     <!-- ============================================================================
          Data Management
          ============================================================================ -->
-    <string name="data_management_backup_header">Import &amp; Export</string>
-    <string name="data_management_delete_header">Delete Data</string>
-    <string name="data_export_csv_title">Export as CSV</string>
-    <string name="data_export_json_title">Export as JSON</string>
+    <string name="data_management_backup_header">Importieren &amp; Exportieren</string>
+    <string name="data_management_delete_header">Lösche Daten</string>
+    <string name="data_export_csv_title">Exportiere als CSV</string>
+    <string name="data_export_json_title">Exportiere als JSON</string>
     <string name="data_import_title">Importiere Sicherung</string>
     <string name="data_import_desc">Restore entries from a CSV or JSON file</string>
     <string name="data_export_scope_desc">Exports only HydroTracker entries. Entries imported from other health apps are excluded.</string>
-    <string name="data_delete_before_date_title">Delete entries before date</string>
+    <string name="data_delete_before_date_title">Lösche Einträge vor dem Datum</string>
     <string name="data_delete_before_date_desc">Remove intake entries on or before a chosen date</string>
     <!-- %1$s = formatted cutoff date -->
-    <string name="data_delete_before_date_model_title">Delete entries</string>
+    <string name="data_delete_before_date_model_title">Lösche Einträge</string>
     <string name="data_delete_health_connect_include">Include Health Connect</string>
     <string name="data_delete_no_entries_affected">No entries on or before this date</string>
     <!-- Number of entries that will be deleted for the selected cutoff date -->
@@ -564,11 +564,11 @@
         <item quantity="one">%1$d entry recorded on or before %2$s will be permanently deleted.</item>
         <item quantity="other">%1$d entries recorded on or before %2$s will be permanently deleted.</item>
     </plurals>
-    <string name="data_delete_local_title">Delete local data only</string>
-    <string name="data_delete_local_desc">Remove all app data stored on this device</string>
+    <string name="data_delete_local_title">Lösche nur lokale Daten</string>
+    <string name="data_delete_local_desc">Lösche alle App Daten, die auf diesem Gerät gespeichert sind</string>
     <string name="data_delete_local_message">This will delete all water intake entries, daily summaries, container presets, custom beverages, and your profile. This action cannot be undone.</string>
-    <string name="data_delete_health_connect_title">Delete Health Connect data only</string>
-    <string name="data_delete_health_connect_desc">Remove HydroTracker records from Health Connect</string>
+    <string name="data_delete_health_connect_title">Lösche nur Gesundheitsverbindungs-Anwendungsdaten</string>
+    <string name="data_delete_health_connect_desc">Lösche Hydration-Zähler Rekorde von der Gesundheitsverbindungs-Anwendung</string>
     <string name="data_delete_health_connect_message">This will delete HydroTracker records from Health Connect. Entries from other apps will not be affected. This action cannot be undone.</string>
     <string name="data_delete_everything_title">Lösche alles</string>
     <string name="data_delete_everything_desc">Remove all local and Health Connect data</string>
@@ -608,27 +608,27 @@
     <string name="about_privacy_policy_desc">How your data is handled</string>
     <string name="about_license">Lizenz</string>
     <string name="about_license_desc">HydroTracker\'s open-source license</string>
-    <string name="about_third_party_licenses">Third-party licenses</string>
+    <string name="about_third_party_licenses">Drittanbieter Lizenzen</string>
     <string name="about_third_party_licenses_desc">Open-source libraries we depend on</string>
-    <string name="toast_no_app_to_open_link">No app found to open this link</string>
+    <string name="toast_no_app_to_open_link">Keine App gefunden, um diesen Link zu öffnen</string>
     <!-- ============================================================================
          Support Development
          ============================================================================ -->
     <string name="support_development_hero">HydroTracker is built and maintained by one person, with no ads and no tracking. If it has helped you drink more water, anything you chip in keeps it growing.</string>
     <string name="support_section_support">Entwicklung unterstützen</string>
-    <string name="support_github_sponsors_blurb">Support ongoing development</string>
+    <string name="support_github_sponsors_blurb">Unterstütze fortlaufende Entwicklung</string>
     <string name="support_paypal_blurb">Sende eine schnelle Spende</string>
     <string name="support_buymeacoffee_blurb">Treat me to a coffee</string>
     <string name="support_section_other_ways">Andere Wege zu helfen</string>
     <string name="support_rate_play_store">Bewerte im Play Store</string>
-    <string name="support_rate_play_store_desc">Leave a rating on the Play Store</string>
+    <string name="support_rate_play_store_desc">Lasse eine Bewertung im Play Store</string>
     <string name="support_share_app">Teile die App</string>
     <string name="support_share_app_desc">Erzähl einem Freund über Hydration-Zähler</string>
     <string name="support_star_github">Stern auf Github</string>
     <string name="support_star_github_desc">Star the project on GitHub</string>
     <string name="share_chooser_title">Teile Hydration-Zähler</string>
-    <string name="toast_review_successful">Review is successful</string>
-    <string name="toast_review_failed">Review failed</string>
+    <string name="toast_review_successful">Prüfung ist erfolgreich</string>
+    <string name="toast_review_failed">Prüfung ist fehlgeschlagen</string>
     <string name="toast_no_app_to_share">No app found to share</string>
     <!-- ============================================================================
          Updates
@@ -640,8 +640,8 @@
     <string name="updates_section_status">Status</string>
     <string name="updates_status_checking">Nach Updates prüfen…</string>
     <string name="updates_status_failed">Konnte nicht nach Aktualisierungen prüfen</string>
-    <string name="updates_status_f_droid">Updates are handled by F-Droid</string>
-    <string name="updates_status_f_droid_desc">Open the F-Droid app to update HydroTracker.</string>
+    <string name="updates_status_f_droid">Aktualisierungen werden von F/Droid verwaltet</string>
+    <string name="updates_status_f_droid_desc">Öffne die F/Droid Anwendung, um Hydration-Zähler zu aktualisieren.</string>
     <string name="updates_status_up_to_date">Du bist auf der aktuellen Version</string>
     <string name="updates_status_check_now">Nach Aktualisierung prüfen</string>
     <string name="updates_last_checked_never">Noch nicht geprüft</string>
@@ -652,8 +652,8 @@
     <string name="updates_available_title">Aktualisierung verfügbar</string>
     <string name="updates_available_play_desc">Eine neue Version ist im Play Store verfügbar</string>
     <string name="updates_available_version">Version %1$s</string>
-    <string name="updates_button_update">Update</string>
-    <string name="updates_button_download">Download update</string>
+    <string name="updates_button_update">Aktualisierung</string>
+    <string name="updates_button_download">Lade die Aktualisierung herunter</string>
     <string name="label_version_simple">Version</string>
     <string name="label_build_simple">Build</string>
     <string name="label_install_method">Installationsmethode</string>
@@ -661,23 +661,23 @@
     <string name="install_source_manual">Anleitung</string>
     <string name="install_source_debug">Debug</string>
     <string name="install_source_github">Github</string>
-    <string name="toast_could_not_start_update">Couldn\'t start the update</string>
+    <string name="toast_could_not_start_update">Aktualisierung konnte nicht gestartet werden</string>
     <!-- ============================================================================
          Licenses
          ============================================================================ -->
-    <string name="screen_licenses_title">Third-party licenses</string>
-    <string name="licenses_empty">No licence information available.</string>
+    <string name="screen_licenses_title">Drittanbieter Lizenzen</string>
+    <string name="licenses_empty">Keine Lizenzinformationen verfügbar.</string>
     <!-- ============================================================================
          What\'s New / Update Dialog
          ============================================================================ -->
-    <string name="whats_new_title">What\'s New</string>
+    <string name="whats_new_title">Was neu ist</string>
     <string name="whats_new_version">Version %1$s</string>
     <string name="update_dialog_title">Update verfügbar</string>
     <string name="update_dialog_current_version">Aktuelle Version</string>
     <string name="update_dialog_new_version">Neue Version</string>
-    <string name="update_dialog_action_play">Open Google Play to update HydroTracker.</string>
-    <string name="update_dialog_action_f_droid">Open the F-Droid app to update HydroTracker.</string>
-    <string name="update_dialog_action_github">Download the latest APK from GitHub.</string>
+    <string name="update_dialog_action_play">Öffne den Play Store, um Hydration-Zähler zu aktualisieren.</string>
+    <string name="update_dialog_action_f_droid">Öffne die F/Droid Anwendung, um Hydration-Zähler zu aktualisieren.</string>
+    <string name="update_dialog_action_github">Lade die letzte APK aus GitHub herunter.</string>
     <string name="update_button_later">Später</string>
     <string name="update_button_update">Aktualisierung</string>
     <!-- ============================================================================
@@ -688,7 +688,7 @@
     <string name="markdown_version_prefix">Version %1$s</string>
     <string name="markdown_section_added">Hinzugefügt</string>
     <string name="markdown_section_changed">Geändert</string>
-    <string name="markdown_section_fixed">Fixed</string>
+    <string name="markdown_section_fixed">Behoben</string>
     <!-- ============================================================================
          Placeholder
          ============================================================================ -->
@@ -701,18 +701,18 @@
     <string name="health_connect_status_update_required">Health Connect app needs to be updated</string>
     <string name="health_connect_status_no_permissions">Permissions not granted for Health Connect</string>
     <string name="health_connect_status_ready">Health Connect is ready</string>
-    <string name="health_connect_imported_from">Imported from %1$s</string>
+    <string name="health_connect_imported_from">Importiert von %1$s</string>
     <!-- ============================================================================
          Home
          ============================================================================ -->
     <!-- Snackbars -->
-    <string name="home_snackbar_add_failed">Failed to add water: %1$s</string>
-    <string name="home_snackbar_delete_failed">Failed to delete entry: %1$s</string>
-    <string name="home_snackbar_update_failed">Failed to update entry: %1$s</string>
+    <string name="home_snackbar_add_failed">Wasser hinzufügen ist fehlgeschlagen: %1$s</string>
+    <string name="home_snackbar_delete_failed">Eintrag löschen ist fehlgeschlagen: %1$s</string>
+    <string name="home_snackbar_update_failed">Eintrag Aktualisierung ist fehlgeschlagen: %1$s</string>
     <string name="home_snackbar_synced">Synced %1$d entries from Health Connect</string>
     <string name="home_snackbar_sync_errors">Sync completed with %1$d errors</string>
-    <string name="home_snackbar_up_to_date">Data is up to date</string>
-    <string name="home_snackbar_sync_failed">Sync failed: %1$s</string>
+    <string name="home_snackbar_up_to_date">Daten sind auf aktuellem Stand</string>
+    <string name="home_snackbar_sync_failed">Synchronisation ist fehlgeschlagen: %1$s</string>
     <string name="home_snackbar_sync_disabled">Health Connect sync is disabled</string>
     <string name="home_snackbar_container_added">Added \"%1$s\" container</string>
     <string name="home_snackbar_container_updated">Updated \"%1$s\" container</string>
@@ -739,7 +739,7 @@
     <string name="home_reminders_paused_hint">Reminders paused until tomorrow</string>
     <string name="home_section_recent_entries">Letzte Eingaben</string>
     <!-- Dialogue titles -->
-    <string name="home_dialog_add_custom_amount">Add Custom Amount</string>
+    <string name="home_dialog_add_custom_amount">Füge benutzerdefinierte Menge hinzu</string>
     <string name="home_dialog_edit_entry_title">Edit Water Entry</string>
     <string name="home_dialog_external_entry_title">External Water Entry</string>
     <string name="home_dialog_select_time">Wähle Zeit</string>
@@ -887,12 +887,12 @@
     <!-- %1$s = the random water fact -->
     <string name="notification_fun_fact_title">Did you know?</string>
     <!-- %1$d = remaining milliliters -->
-    <string name="notification_minimal_remaining">%1$s remaining</string>
+    <string name="notification_minimal_remaining">%1$s Verbleibend</string>
     <!-- %1$s = formatted amount with unit, e.g. "500 ml" -->
-    <string name="notification_action_add">Add %1$s</string>
-    <string name="notification_action_pause_today">Pause for today</string>
+    <string name="notification_action_add">Füge hinzu %1$s</string>
+    <string name="notification_action_pause_today">Für heute pausieren</string>
     <string name="notification_quick_add_preset_name">Quick Add</string>
-    <string name="notification_quick_add_note">Added from notification</string>
+    <string name="notification_quick_add_note">Aus Benachrichtigungen hinzugefügt</string>
     <string name="notification_paused_confirmation">Reminders paused until tomorrow</string>
     <string name="notification_quick_add_feedback_title">Added %1$s</string>
     <!-- %1$s = formatted current intake, %2$s = formatted daily goal -->
