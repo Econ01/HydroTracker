@@ -23,13 +23,13 @@
          Spoken by TalkBack / screen readers. Keep concise.
          ============================================================================ -->
     <string name="cd_back">Geri</string>
-    <string name="cd_delete_entry">Delete entry</string>
-    <string name="cd_edit_entry">Edit entry</string>
+    <string name="cd_delete_entry">Girişi sil</string>
+    <string name="cd_edit_entry">Girişi düzenle</string>
     <string name="cd_reorder">Reorder</string>
-    <string name="cd_profile_photo">Profile photo</string>
-    <string name="cd_water_drop">Water drop</string>
-    <string name="cd_pinned">Pinned</string>
-    <string name="cd_hidden">Hidden</string>
+    <string name="cd_profile_photo">Profil fotoğrafı</string>
+    <string name="cd_water_drop">Su damlası</string>
+    <string name="cd_pinned">Sabitlenmiş</string>
+    <string name="cd_hidden">Gizlenmiş</string>
     <!-- ============================================================================
          Units & number formatting
          Unit suffixes are kept separate from numbers so the value can be formatted
@@ -37,7 +37,7 @@
          ============================================================================ -->
     <string name="unit_milliliters_format">%1$s ml</string>
     <!-- current / goal, e.g. "1.2 L / 2.7 L" -->
-    <string name="percent_format">%1$d%%</string>
+    <string name="percent_format">%1$d %%</string>
     <!-- Character counter, e.g. "12/15 characters"; %1$d = current length, %2$d = max -->
     <string name="character_count">%1$d /%2$d karakter</string>
     <!-- ============================================================================
@@ -57,52 +57,52 @@
     <string name="widget_large_label">HydroTracker Large</string>
     <string name="widget_large_description">Track hydration and add water with one tap</string>
     <string name="widget_of_goal_format">%1$s of %2$s</string>
-    <string name="widget_goal_reached">Goal reached!</string>
-    <string name="widget_quick_add_cd">Add %1$s</string>
+    <string name="widget_goal_reached">Hedefe ulaşıldı</string>
+    <string name="widget_quick_add_cd">%1$s Ekle</string>
     <string name="widget_daily_hydration">Daily Hydration</string>
-    <string name="widget_card_glass">Glass</string>
-    <string name="widget_card_bottle">Bottle</string>
-    <string name="widget_card_large_bottle">Large Bottle</string>
+    <string name="widget_card_glass">Cam</string>
+    <string name="widget_card_bottle">Şişe</string>
+    <string name="widget_card_large_bottle">Büyük Şişe</string>
     <!-- ============================================================================
          Settings: About
          ============================================================================ -->
-    <string name="updates_bug_report">Updates &amp; Bug Report</string>
+    <string name="updates_bug_report">Güncellemeler &amp; Hata raporla</string>
     <!-- ============================================================================
          Settings: Display &amp; Locale
          ============================================================================ -->
     <string name="screen_display_locale_title">Display &amp; Locale</string>
-    <string name="display_language_header">Language</string>
-    <string name="display_date_and_time_format_header">Date &amp; Time</string>
-    <string name="display_time_format_header">Time Format</string>
-    <string name="display_volume_unit_header">Volume unit</string>
+    <string name="display_language_header">Dil</string>
+    <string name="display_date_and_time_format_header">Tarih&amp; Saat</string>
+    <string name="display_time_format_header">Saat formatı</string>
+    <string name="display_volume_unit_header">Hacim birimi</string>
     <!-- Language option that follows the device language instead of a fixed one -->
-    <string name="language_system_default">System default</string>
+    <string name="language_system_default">Sistem varsayılanı</string>
     <!-- ============================================================================
          Settings: Language & Translation
          ============================================================================ -->
-    <string name="screen_language_title">Language &amp; Translation</string>
+    <string name="screen_language_title">Dil &amp; Çeviri</string>
     <string name="language_translation_disclaimer">Content is displayed only upon translation approval. Unapproved segments remain hidden.</string>
     <string name="language_contribute_title">Contribute</string>
-    <string name="language_crowdin_title">Help translate HydroTracker</string>
+    <string name="language_crowdin_title">HydroTracker\'i çevirimine destek olun</string>
     <string name="language_crowdin_description">Contribute on Crowdin</string>
-    <string name="language_progress_header">Translation progress</string>
-    <string name="language_progress_translated">Translated</string>
-    <string name="language_progress_approved">Approved</string>
+    <string name="language_progress_header">Çeviri seviyesi</string>
+    <string name="language_progress_translated">Çevirildi</string>
+    <string name="language_progress_approved">Onaylandı</string>
     <!-- Time format options -->
-    <string name="time_format_system">System</string>
-    <string name="time_format_12_hour">12-hour</string>
-    <string name="time_format_24_hour">24-hour</string>
+    <string name="time_format_system">Sistem</string>
+    <string name="time_format_12_hour">12-saat</string>
+    <string name="time_format_24_hour">24-saat</string>
     <!-- Date format options -->
-    <string name="date_format_system">System</string>
-    <string name="date_format_day_month_year">16 Jun 2026</string>
-    <string name="date_format_month_day_year">Jun 16, 2026</string>
+    <string name="date_format_system">Sistem</string>
+    <string name="date_format_day_month_year">16 Temmuz 2026</string>
+    <string name="date_format_month_day_year">Temmuz 16, 2926</string>
     <string name="date_format_year_month_day">2026–06–16</string>
     <!-- Volume unit options -->
-    <string name="unit_millilitres">Metric</string>
+    <string name="unit_millilitres">Metrik</string>
     <string name="unit_ml_short">ml</string>
-    <string name="unit_us_fl_oz">US fluid ounces</string>
+    <string name="unit_us_fl_oz">Amerikan sıvı birimleri</string>
     <string name="unit_us_fl_oz_short">fl oz</string>
-    <string name="unit_imperial_fl_oz">Imperial fluid ounces</string>
+    <string name="unit_imperial_fl_oz">Emperyal sıvı birimleri</string>
     <string name="unit_imperial_fl_oz_short">fl oz (UK)</string>
     <!-- Display-only volume units (auto-scaling and call-site overrides) -->
     <string name="unit_litre_short">L</string>
