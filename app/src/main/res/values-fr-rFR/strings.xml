@@ -598,6 +598,7 @@
     <string name="about_section_contributors">Contributeurs</string>
     <string name="about_contributor_role">Créateur &amp; mainteneur</string>
     <string name="about_contributor_bio">Le développeur Indépendant Android s\'est concentré sur des applications propres, respectueuses de la vie privée.</string>
+    <string name="about_contributor_role_contributor">Contributor</string>
     <string name="cd_open_github_profile">Ouvrir le profil GitHub</string>
     <string name="about_section_information">Informations</string>
     <string name="about_changelog">Journal de modifications</string>
