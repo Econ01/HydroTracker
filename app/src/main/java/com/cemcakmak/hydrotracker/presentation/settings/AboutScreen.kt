@@ -40,8 +40,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -51,6 +49,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -82,14 +81,18 @@ import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.models.DarkModePreference
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
-
-private const val URL_GITHUB_PROFILE = "https://github.com/Econ01"
+import com.cemcakmak.hydrotracker.utils.ContributorDisplay
+import com.cemcakmak.hydrotracker.utils.ContributorType
+import com.cemcakmak.hydrotracker.utils.ContributorsLoader
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun AboutScreen(
     themePreferences: ThemePreferences = ThemePreferences(),
     wasPop: Boolean = false,
     updateStatus: UpdateStatus = UpdateStatus.Idle,
+    contributors: List<ContributorDisplay> = emptyList(),
     onNavigateToUpdates: () -> Unit = {},
     onNavigateBack: () -> Unit = {},
     onNavigateToLicenses: () -> Unit = {}
@@ -99,6 +102,21 @@ fun AboutScreen(
 
     val isPreview = LocalInspectionMode.current
     val shouldApplyDepth = !isPreview && wasPop
+
+    val loadedContributors by produceState(
+        initialValue = contributors,
+        key1 = isPreview
+    ) {
+        if (!isPreview && contributors.isEmpty()) {
+            value = withContext(Dispatchers.IO) {
+                try {
+                    ContributorsLoader.load(context)
+                } catch (_: Exception) {
+                    emptyList()
+                }
+            }
+        }
+    }
 
     val blur by if (shouldApplyDepth) {
         val animatedContentScope = LocalNavAnimatedContentScope.current
@@ -142,17 +160,25 @@ fun AboutScreen(
                 // Contributors
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     SettingsSectionHeader(stringResource(R.string.about_section_contributors))
-                    SettingsGroupCard(index = 0, size = 1) {
-                        ContributorRow(
-                            avatar = R.drawable.econ01,
-                            name = stringResource(R.string.about_contributor_name),
-                            role = stringResource(R.string.about_contributor_role),
-                            bio = stringResource(R.string.about_contributor_bio),
-                            onOpenGitHub = {
-                                haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                openUrl(context, URL_GITHUB_PROFILE)
+                    Column {
+                        loadedContributors.forEachIndexed { index, contributor ->
+                            SettingsGroupCard(
+                                index = index,
+                                size = loadedContributors.size
+                            ) {
+                                ContributorRow(
+                                    avatar = contributor.avatarResId,
+                                    name = contributor.name,
+                                    role = contributor.role,
+                                    bio = contributor.bio,
+                                    type = contributor.type,
+                                    onOpenGitHub = {
+                                        haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                        openUrl(context, contributor.githubUrl)
+                                    }
+                                )
                             }
-                        )
+                        }
                     }
                 }
 
@@ -327,8 +353,21 @@ private fun ContributorRow(
     name: String,
     role: String,
     bio: String,
+    type: ContributorType,
     onOpenGitHub: () -> Unit
 ) {
+    val avatarSize = when (type) {
+        ContributorType.MAINTAINER -> 56.dp
+        ContributorType.CONTRIBUTOR,
+        ContributorType.TRANSLATOR -> 56.dp
+    }
+
+    val roleColor = when (type) {
+        ContributorType.MAINTAINER -> MaterialTheme.colorScheme.primary
+        ContributorType.CONTRIBUTOR,
+        ContributorType.TRANSLATOR -> MaterialTheme.colorScheme.tertiary
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -341,7 +380,7 @@ private fun ContributorRow(
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .size(56.dp)
+                .size(avatarSize)
                 .clip(CircleShape)
         )
         Column(modifier = Modifier.weight(1f)) {
@@ -349,12 +388,14 @@ private fun ContributorRow(
             Text(
                 text = role,
                 style = MaterialTheme.typography.bodyMediumEmphasized,
-                color = MaterialTheme.colorScheme.tertiary
+                color = roleColor
             )
-            Text(
-                text = bio,
-                style = MaterialTheme.typography.bodySmall
-            )
+            if (type == ContributorType.MAINTAINER) {
+                Text(
+                    text = bio,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
         IconButton(
             modifier = Modifier.size(34.dp),
@@ -363,7 +404,7 @@ private fun ContributorRow(
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.github),
                 contentDescription = stringResource(R.string.cd_open_github_profile),
-                tint = MaterialTheme.colorScheme.primary
+                tint = roleColor
             )
         }
     }
@@ -408,7 +449,13 @@ private fun AboutRow(
             }
             if (showChevron) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    imageVector = ImageVector.vectorResource(R.drawable.keyboard_arrow_right_filled),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } else {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.keyboard_arrow_up_filled),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -432,6 +479,25 @@ private fun openUrl(context: Context, url: String) {
 @Composable
 fun AboutScreenPreview() {
     HydroTrackerTheme {
-        AboutScreen()
+        AboutScreen(
+            contributors = listOf(
+                ContributorDisplay(
+                    name = "Ali Cem Çakmak",
+                    role = "Creator & maintainer",
+                    bio = "Indie Android developer focused on clean, privacy-respecting apps.",
+                    avatarResId = R.drawable.econ01,
+                    githubUrl = "https://github.com/Econ01",
+                    type = ContributorType.MAINTAINER
+                ),
+                ContributorDisplay(
+                    name = "Aditya",
+                    role = "Contributor",
+                    bio = "",
+                    avatarResId = R.drawable.lemmesleep247,
+                    githubUrl = "https://github.com/lemmesleep247",
+                    type = ContributorType.CONTRIBUTOR
+                )
+            )
+        )
     }
 }

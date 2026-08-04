@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Ali Cem Çakmak",
+    "roleKey": "about_contributor_role",
+    "bioKey": "about_contributor_bio",
+    "avatar": "econ01",
+    "github": "Econ01",
+    "type": "maintainer"
+  },
+  {
+    "name": "Aditya",
+    "roleKey": "about_contributor_role_contributor",
+    "avatar": "lemmesleep247",
+    "github": "lemmesleep247",
+    "type": "contributor"
+  }
+]

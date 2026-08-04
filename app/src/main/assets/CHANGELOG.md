@@ -1,3 +1,10 @@
+[1.4.1]
+Added
+- Expanded the contributors list in Settings
+
+Fixed
+- Number input in custom water and container dialogues now matches your device's locale (for example, 1,5 versus 1.5)
+
 [1.4]
 Added
 - Option to pause hydration reminders until the next day after two ignored reminders in a row
