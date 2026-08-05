@@ -593,6 +593,7 @@
     <string name="about_section_contributors">Contributors</string>
     <string name="about_contributor_role">Creator &amp; maintainer</string>
     <string name="about_contributor_bio">Indie Android developer focused on clean, privacy-respecting apps.</string>
+    <string name="about_contributor_role_contributor">Contributor</string>
     <string name="cd_open_github_profile">Open GitHub profile</string>
     <string name="about_section_information">Information</string>
     <string name="about_changelog">Changelog</string>
