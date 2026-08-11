@@ -57,7 +57,7 @@
     <string name="widget_large_label">HydroTracker Large</string>
     <string name="widget_large_description">Track hydration and add water with one tap</string>
     <string name="widget_of_goal_format">%1$s of %2$s</string>
-    <string name="widget_goal_reached">Hedefe ulaşıldı</string>
+    <string name="widget_goal_reached">Hedefe ulaşıldı!</string>
     <string name="widget_quick_add_cd">%1$s Ekle</string>
     <string name="widget_daily_hydration">Daily Hydration</string>
     <string name="widget_card_glass">Cam</string>
@@ -83,7 +83,7 @@
     <string name="screen_language_title">Dil &amp; Çeviri</string>
     <string name="language_translation_disclaimer">Content is displayed only upon translation approval. Unapproved segments remain hidden.</string>
     <string name="language_contribute_title">Contribute</string>
-    <string name="language_crowdin_title">HydroTracker\'i çevirimine destek olun</string>
+    <string name="language_crowdin_title">HydroTracker\'ın çevrilmesine yardımcı olun</string>
     <string name="language_crowdin_description">Contribute on Crowdin</string>
     <string name="language_progress_header">Çeviri seviyesi</string>
     <string name="language_progress_translated">Çevirildi</string>
@@ -102,7 +102,7 @@
     <string name="unit_ml_short">ml</string>
     <string name="unit_us_fl_oz">Amerikan sıvı birimleri</string>
     <string name="unit_us_fl_oz_short">fl oz</string>
-    <string name="unit_imperial_fl_oz">Emperyal sıvı birimleri</string>
+    <string name="unit_imperial_fl_oz">Imperial sıvı ons</string>
     <string name="unit_imperial_fl_oz_short">fl oz (UK)</string>
     <!-- Display-only volume units (auto-scaling and call-site overrides) -->
     <string name="unit_litre_short">L</string>
