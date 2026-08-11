@@ -108,17 +108,21 @@ class WaterIntakeRepository(
     }
 
     /**
-     * One-time repair for the SLEEP_TIME boundary fix.
+     * One-time repair for the SLEEP_TIME boundary fixes.
      *
-     * Old entries were dated using wake-up time as the boundary, while the UI claimed the boundary
-     * was sleep time. This routine rewrites every stored [WaterIntakeEntry.date] using the current
-     * day-end settings, rebuilds all daily summaries, and records the migration so it never runs
-     * again.
+     * Version 1 (shipped in v1.3) rewrote entry dates using sleep time as the boundary but kept
+     * the morning-boundary comparison, so entries logged during the waking day were stamped with
+     * the previous calendar date. Version 2 recomputes every stored [WaterIntakeEntry.date] from
+     * the entry's intact [WaterIntakeEntry.timestamp] using the corrected, regime-aware mapping,
+     * rebuilds all daily summaries, and records the migration so it never runs again.
+     *
+     * Only users whose stored day-end mode is [DayEndMode.SLEEP_TIME] are affected; MIDNIGHT
+     * users are simply marked as migrated because their dates were never misassigned.
      */
     suspend fun repairUserDayBoundariesIfNeeded() = withContext(Dispatchers.IO) {
         try {
             val appPreferences = userRepository.appPreferences.first()
-            if (appPreferences.dateBoundaryMigratedVersion >= 1) {
+            if (appPreferences.dateBoundaryMigratedVersion >= 2) {
                 Log.d(TAG, "User-day boundary migration already completed")
                 return@withContext
             }
@@ -129,7 +133,15 @@ class WaterIntakeRepository(
                 return@withContext
             }
 
-            Log.i(TAG, "🛠️ Starting user-day boundary migration...")
+            // MIDNIGHT mode was never affected by the flipped mapping, so there is nothing to
+            // repair — just record completion and move on.
+            if (userProfile.dayEndMode != DayEndMode.SLEEP_TIME) {
+                userRepository.updateDateBoundaryMigratedVersion(2)
+                Log.d(TAG, "Boundary migration not required for ${userProfile.dayEndMode} mode")
+                return@withContext
+            }
+
+            Log.i(TAG, "🛠️ Starting user-day boundary migration v2...")
             val dayEndTime = getDayEndTime(userProfile)
             val dayEndMode = userProfile.dayEndMode
 
@@ -166,8 +178,8 @@ class WaterIntakeRepository(
 
             // Refresh widgets and record completion.
             HydroWidgetUpdater.updateAll(context)
-            userRepository.updateDateBoundaryMigratedVersion(1)
-            Log.i(TAG, "🎉 User-day boundary migration complete")
+            userRepository.updateDateBoundaryMigratedVersion(2)
+            Log.i(TAG, "🎉 User-day boundary migration v2 complete")
         } catch (e: Exception) {
             Log.e(TAG, "❌ User-day boundary migration failed", e)
             // Do not mark as completed so the next launch retries.
