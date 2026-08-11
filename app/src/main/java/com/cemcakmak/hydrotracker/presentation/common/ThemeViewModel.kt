@@ -15,6 +15,7 @@ import com.cemcakmak.hydrotracker.data.models.WeekStartDay
 import com.cemcakmak.hydrotracker.data.models.AppFont
 import com.cemcakmak.hydrotracker.data.models.NavBarLabelMode
 import com.cemcakmak.hydrotracker.data.models.EdgeEffect
+import com.cemcakmak.hydrotracker.data.models.NumberAnimationStyle
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
 
 class ThemeViewModel(private val userRepository: UserRepository) : ViewModel() {
@@ -135,6 +136,16 @@ class ThemeViewModel(private val userRepository: UserRepository) : ViewModel() {
         viewModelScope.launch {
             val newPreferences = _themePreferences.value.copy(
                 edgeEffect = style
+            )
+            _themePreferences.value = newPreferences
+            userRepository.updateThemePreferences(newPreferences)
+        }
+    }
+
+    fun setNumberAnimationStyle(style: NumberAnimationStyle) {
+        viewModelScope.launch {
+            val newPreferences = _themePreferences.value.copy(
+                numberAnimationStyle = style
             )
             _themePreferences.value = newPreferences
             userRepository.updateThemePreferences(newPreferences)

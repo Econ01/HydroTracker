@@ -27,6 +27,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -104,6 +106,7 @@ import com.cemcakmak.hydrotracker.data.models.ActivityLevel
 import com.cemcakmak.hydrotracker.data.models.AgeGroup
 import com.cemcakmak.hydrotracker.data.models.DarkModePreference
 import com.cemcakmak.hydrotracker.data.models.Gender
+import com.cemcakmak.hydrotracker.data.models.NumberAnimationStyle
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.UserProfile
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
@@ -112,7 +115,6 @@ import com.cemcakmak.hydrotracker.presentation.common.LocalNavAnimatedVisibility
 import com.cemcakmak.hydrotracker.presentation.common.LocalSharedTransitionScope
 import com.cemcakmak.hydrotracker.presentation.common.AnimatedNumber
 import com.cemcakmak.hydrotracker.presentation.common.EntryAnimationDefaults
-import com.cemcakmak.hydrotracker.presentation.common.RollingNumberConfig
 import com.cemcakmak.hydrotracker.presentation.settings.SelectableOptionCard
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.utils.ImageUtils
@@ -546,14 +548,15 @@ internal fun DailyGoalBottomSheetContent(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        // Rolling number headline
+        // Animated value headline; the lightweight classic tween tracks slider drags smoothly
         AnimatedNumber(
             targetValue = sliderPosition.toDouble(),
             formatValue = { v -> stringResource(R.string.unit_milliliters_format, v.toInt().toString()) },
             style = MaterialTheme.typography.headlineSmallEmphasized,
             hapticsEnabled = false,
-            animationConfig = RollingNumberConfig(rapidChangeThresholdMs = 150),
             animateEntry = false,
+            animationStyle = NumberAnimationStyle.CLASSIC,
+            classicAnimationSpec = tween(durationMillis = 150, easing = EaseInOut),
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 

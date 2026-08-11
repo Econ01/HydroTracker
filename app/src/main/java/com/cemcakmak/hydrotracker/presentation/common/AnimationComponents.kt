@@ -5,6 +5,9 @@ import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDp
@@ -37,6 +40,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
@@ -47,13 +51,18 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.cemcakmak.hydrotracker.data.models.NumberAnimationStyle
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
+import com.cemcakmak.hydrotracker.ui.theme.LocalThemePreferences
 import com.cemcakmak.hydrotracker.utils.parseLocaleNumber
 import kotlinx.coroutines.delay
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -132,30 +141,42 @@ private fun padNumericDecimalPlaces(text: String, decimalPlaces: Int, locale: Lo
 }
 
 /**
- * Displays a numeric value with a rolling-digit entry animation followed by rolling-digit updates.
+ * Displays a numeric value with an animated transition between values.
  *
- * On first composition the value starts at zero and rolls to [targetValue]. Subsequent changes to
- * [targetValue] are rendered with [RollingNumberText] so only the digits that change roll.
+ * The animation style is selected by [animationStyle], which defaults to the ambient
+ * [LocalThemePreferences] number-animation preference:
+ * - [NumberAnimationStyle.ROLLING] — on first composition the value starts at zero and rolls to
+ * [targetValue]; subsequent changes are rendered with [RollingNumberText] so only the digits that
+ * change roll.
+ * - [NumberAnimationStyle.CLASSIC] — the whole value animates smoothly between targets with a
+ * single [Animatable] and a plain [Text], a lightweight alternative for low-end devices. The
+ * rolling-only parameters ([direction], [effects], [animationConfig], [entryStepCount] and
+ * [entryStepSpacingMillis]) are ignored in this mode; the transition feel is controlled by
+ * [classicAnimationSpec] instead.
  *
  * @param targetValue the value to display.
  * @param formatValue formats [targetValue] into the string to display.
  * @param modifier applied to the text container.
  * @param style text style applied to the number.
  * @param color text colour; [Color.Unspecified] follows the ambient content colour.
- * @param suffix optional static text appended after the number (e.g. a unit label). When supplied,
- * it is rendered in its own character slots so the whole block shares a single baseline.
+ * @param suffix optional static text appended after the number (e.g. a unit label). In rolling
+ * mode it is rendered in its own character slots so the whole block shares a single baseline.
  * @param suffixStyle text style applied to [suffix]; defaults to [style].
  * @param hapticsEnabled when true, haptic feedback fires on value changes after entry.
- * @param direction roll direction for [RollingNumberText].
- * @param effects effect recipe for [RollingNumberText].
- * @param animationConfig spring and timing parameters for [RollingNumberText].
- * @param animateEntry when false, the entry roll is skipped and the value is shown directly with
- * rolling updates only on subsequent changes.
- * @param entryDelayMillis delay before the entry roll starts, in milliseconds.
- * @param entryStepCount number of linear near-target steps used for the entry roll. The default
- * of 3 gives a fast start and a slow landing.
- * @param entryStepSpacingMillis base spacing between entry steps. The actual interval is scaled
- * by [FastOutLinearInEasing] so the animation starts quickly and decelerates toward the target.
+ * @param direction roll direction for [RollingNumberText] (rolling mode only).
+ * @param effects effect recipe for [RollingNumberText] (rolling mode only).
+ * @param animationConfig spring and timing parameters for [RollingNumberText] (rolling mode only).
+ * @param animateEntry when false, the entry animation is skipped and the value is shown directly,
+ * animating only on subsequent changes.
+ * @param entryDelayMillis delay before the entry animation starts, in milliseconds.
+ * @param entryStepCount number of linear near-target steps used for the entry roll (rolling mode
+ * only). The default of 10 gives a fast start and a slow landing.
+ * @param entryStepSpacingMillis base spacing between entry steps (rolling mode only). The actual
+ * interval is scaled by [FastOutLinearInEasing] so the animation starts quickly and decelerates
+ * toward the target.
+ * @param animationStyle rolling digits or classic count-up; defaults to the user's
+ * [LocalThemePreferences] number-animation preference.
+ * @param classicAnimationSpec tween used for every value transition in classic mode.
  */
 @Composable
 fun AnimatedNumber(
@@ -173,8 +194,30 @@ fun AnimatedNumber(
     animateEntry: Boolean = true,
     entryDelayMillis: Int = 0,
     entryStepCount: Int = 10,
-    entryStepSpacingMillis: Int = DEFAULT_ENTRY_STEP_SPACING_MS
+    entryStepSpacingMillis: Int = DEFAULT_ENTRY_STEP_SPACING_MS,
+    animationStyle: NumberAnimationStyle = LocalThemePreferences.current.numberAnimationStyle,
+    classicAnimationSpec: AnimationSpec<Float> = tween(
+        durationMillis = DEFAULT_CLASSIC_DURATION_MS,
+        easing = EaseInOut
+    )
 ) {
+    if (animationStyle == NumberAnimationStyle.CLASSIC) {
+        ClassicNumberText(
+            targetValue = targetValue,
+            formatValue = formatValue,
+            modifier = modifier,
+            style = style,
+            color = color,
+            suffix = suffix,
+            suffixStyle = suffixStyle,
+            hapticsEnabled = hapticsEnabled,
+            animateEntry = animateEntry,
+            entryDelayMillis = entryDelayMillis,
+            animationSpec = classicAnimationSpec
+        )
+        return
+    }
+
     data class DisplayState(val value: Double, val isEntryStart: Boolean)
 
     var state by remember {
@@ -262,6 +305,138 @@ fun AnimatedNumber(
         animationConfig = animationConfig,
         skipEntryAnimation = true
     )
+}
+
+private const val DEFAULT_CLASSIC_DURATION_MS = 1000
+
+/** Divisor for the fallback haptic step (`|target| / 8`), used when the display step cannot be
+ *  derived from the formatted text. */
+private const val CLASSIC_HAPTIC_FALLBACK_TICKS = 8
+
+/** Lower bound for the classic haptic tick step so near-zero targets cannot divide by zero. */
+private const val CLASSIC_HAPTIC_MIN_STEP = 1e-3f
+
+/**
+ * Lightweight numeric text used for [NumberAnimationStyle.CLASSIC]: the whole value animates
+ * smoothly between targets with a single [Animatable] and a plain [Text], so a frame costs one
+ * recomposition instead of per-character transitions.
+ *
+ * When [animateEntry] is true the value counts up from zero (after [entryDelayMillis]).
+ * Otherwise, the value is shown directly: if it was still loading at first composition (an
+ * initial [targetValue] of zero), the first change is revealed instantly via
+ * [Animatable.snapTo] instead of counting up, and only later changes animate.
+ *
+ * While an animation is running, a haptic tick fires each time the value crosses one whole display
+ * unit of the formatted text (every 1 L for "2.5 L", every 1 ml for "2500 ml"), so ticks always
+ * line up with the unit digit on screen. If the display unit cannot be derived from the
+ * formatted text, a fallback step of `|target| / [CLASSIC_HAPTIC_FALLBACK_TICKS]` is used.
+ * Ticks only fire while an animation is running, so instant reveals and statically composed
+ * values stay silent.
+ */
+@Composable
+private fun ClassicNumberText(
+    targetValue: Double,
+    formatValue: @Composable (Float) -> String,
+    modifier: Modifier = Modifier,
+    style: TextStyle = LocalTextStyle.current,
+    color: Color = Color.Unspecified,
+    suffix: String? = null,
+    suffixStyle: TextStyle? = null,
+    hapticsEnabled: Boolean = true,
+    animateEntry: Boolean = true,
+    entryDelayMillis: Int = 0,
+    animationSpec: AnimationSpec<Float> = tween(
+        durationMillis = DEFAULT_CLASSIC_DURATION_MS,
+        easing = EaseInOut
+    )
+) {
+    val haptics = LocalHapticFeedback.current
+    val animatable = remember { Animatable(if (animateEntry) 0f else targetValue.toFloat()) }
+    val isFirstRun = remember { booleanArrayOf(true) }
+
+    // A zero placeholder at first composition (with the entry animation disabled) means the
+    // real value is still loading; reveal it instantly rather than counting up.
+    val startedFromEmpty = remember { booleanArrayOf(!animateEntry && targetValue == 0.0) }
+
+    LaunchedEffect(targetValue) {
+        if (isFirstRun[0]) {
+            isFirstRun[0] = false
+            if (animateEntry) {
+                if (entryDelayMillis > 0) {
+                    delay(entryDelayMillis.milliseconds)
+                }
+                animatable.animateTo(targetValue.toFloat(), animationSpec)
+            }
+        } else if (startedFromEmpty[0]) {
+            startedFromEmpty[0] = false
+            animatable.snapTo(targetValue.toFloat())
+        } else {
+            animatable.animateTo(targetValue.toFloat(), animationSpec)
+        }
+    }
+
+    // Haptic step expressed in target-space units per whole display unit, derived from the
+    // formatted target text so ticks follow the unit digit on screen rather than the raw value.
+    val locale = LocalConfiguration.current.locales[0]
+    val finalText = formatValue(targetValue.toFloat())
+    val hapticStep = remember(finalText, targetValue, locale) {
+        val numericPortion = extractNumericPortion(finalText)
+        val displayValue = numericPortion?.let { parseLocaleNumber(it, locale) }
+        val derived = if (displayValue != null && displayValue != 0.0 && targetValue != 0.0) {
+            abs(targetValue / displayValue).toFloat()
+        } else {
+            0f
+        }
+        if (derived > 0f) {
+            derived
+        } else {
+            (abs(targetValue) / CLASSIC_HAPTIC_FALLBACK_TICKS).toFloat()
+        }.coerceAtLeast(CLASSIC_HAPTIC_MIN_STEP)
+    }
+
+    if (hapticsEnabled) {
+        LaunchedEffect(hapticStep) {
+            var lastTick: Int? = null
+            snapshotFlow { animatable.value to animatable.isRunning }.collect { (value, running) ->
+                val currentTick = (value / hapticStep).toInt()
+                val previousTick = lastTick
+                lastTick = currentTick
+                if (running && previousTick != null && currentTick != previousTick) {
+                    haptics.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
+                }
+            }
+        }
+    }
+
+    val numberText = formatValue(animatable.value)
+    val displayedSuffix = suffix?.let { " ${it.trimStart()}" } ?: ""
+
+    if (suffixStyle != null && displayedSuffix.isNotEmpty()) {
+        val suffixSpan = remember(suffixStyle) { suffixStyle.toSpanStyle() }
+        val annotated = remember(numberText, displayedSuffix, suffixSpan) {
+            buildAnnotatedString {
+                append(numberText)
+                withStyle(suffixSpan) { append(displayedSuffix) }
+            }
+        }
+        Text(
+            text = annotated,
+            modifier = modifier,
+            style = style,
+            color = color,
+            maxLines = 1,
+            softWrap = false
+        )
+    } else {
+        Text(
+            text = numberText + displayedSuffix,
+            modifier = modifier,
+            style = style,
+            color = color,
+            maxLines = 1,
+            softWrap = false
+        )
+    }
 }
 
 /**

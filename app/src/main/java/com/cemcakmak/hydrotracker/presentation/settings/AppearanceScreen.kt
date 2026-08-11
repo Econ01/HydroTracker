@@ -86,6 +86,7 @@ import com.cemcakmak.hydrotracker.data.models.ColorSource
 import com.cemcakmak.hydrotracker.data.models.DarkModePreference
 import com.cemcakmak.hydrotracker.data.models.NavBarLabelMode
 import com.cemcakmak.hydrotracker.data.models.EdgeEffect
+import com.cemcakmak.hydrotracker.data.models.NumberAnimationStyle
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
 import com.cemcakmak.hydrotracker.ui.theme.extendedColorScheme
@@ -110,6 +111,7 @@ fun AppearanceScreen(
     isBlurSupported: Boolean = true,
     onEdgeEffectChange: (EdgeEffect) -> Unit = {},
     onUseBeverageColorsChange: (Boolean) -> Unit = {},
+    onNumberAnimationStyleChange: (NumberAnimationStyle) -> Unit = {},
     onNavigateToWidget: () -> Unit = {},
     onNavigateBack: () -> Unit = {}
 ) {
@@ -197,7 +199,9 @@ fun AppearanceScreen(
 
                 FeedbackSection(
                     isHapticsEnabled = isHapticsEnabled,
-                    onHapticsEnabledChange = onHapticsEnabledChange
+                    onHapticsEnabledChange = onHapticsEnabledChange,
+                    numberAnimationStyle = themePreferences.numberAnimationStyle,
+                    onNumberAnimationStyleChange = onNumberAnimationStyleChange
                 )
             }
 
@@ -942,66 +946,131 @@ private fun EdgeEffectBottomSheet(
 @Composable
 private fun FeedbackSection(
     isHapticsEnabled: Boolean,
-    onHapticsEnabledChange: (Boolean) -> Unit
+    onHapticsEnabledChange: (Boolean) -> Unit,
+    numberAnimationStyle: NumberAnimationStyle,
+    onNumberAnimationStyleChange: (NumberAnimationStyle) -> Unit
 ) {
     val haptics = LocalHapticFeedback.current
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         SettingsSectionHeader(stringResource(R.string.appearance_feedback_header))
-        SettingsGroupCard(index = 0, size = 1) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Crossfade(
-                    targetState = isHapticsEnabled,
-                    animationSpec = tween(400),
-                    label = "hapticsIcon"
-                ) { on ->
-                    Icon(
-                        imageVector = if (on) ImageVector.vectorResource(R.drawable.mobile_vibrate_filled) else ImageVector.vectorResource(R.drawable.mobile_vibrate),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.appearance_haptics_title),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = stringResource(R.string.appearance_haptics_desc),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                Switch(
-                    checked = isHapticsEnabled,
-                    onCheckedChange = { enabled ->
-                        onHapticsEnabledChange(enabled)
 
-                        val hapticType = if (enabled) {
-                            HapticFeedbackType.ToggleOn
-                        } else {
-                            HapticFeedbackType.ToggleOff
-                        }
-                        haptics.performHapticFeedback(hapticType)
-                    },
-                    thumbContent = if (isHapticsEnabled) {
-                        {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(R.drawable.check_filled),
-                                contentDescription = null,
-                                modifier = Modifier.size(SwitchDefaults.IconSize),
-                            )
-                        }
-                    } else {
-                        null
+        Column {
+            SettingsGroupCard(index = 0, size = 2) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Crossfade(
+                        targetState = isHapticsEnabled,
+                        animationSpec = tween(400),
+                        label = "hapticsIcon"
+                    ) { on ->
+                        Icon(
+                            imageVector = if (on) ImageVector.vectorResource(R.drawable.mobile_vibrate_filled) else ImageVector.vectorResource(R.drawable.mobile_vibrate),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
                     }
-                )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.appearance_haptics_title),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Text(
+                            text = stringResource(R.string.appearance_haptics_desc),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = isHapticsEnabled,
+                        onCheckedChange = { enabled ->
+                            onHapticsEnabledChange(enabled)
+
+                            val hapticType = if (enabled) {
+                                HapticFeedbackType.ToggleOn
+                            } else {
+                                HapticFeedbackType.ToggleOff
+                            }
+                            haptics.performHapticFeedback(hapticType)
+                        },
+                        thumbContent = if (isHapticsEnabled) {
+                            {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(R.drawable.check_filled),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize),
+                                )
+                            }
+                        } else {
+                            null
+                        }
+                    )
+                }
+            }
+            SettingsGroupCard(index = 1, size = 2) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val isRolling = numberAnimationStyle == NumberAnimationStyle.ROLLING
+                    Crossfade(
+                        targetState = isRolling,
+                        animationSpec = tween(400),
+                        label = "numberAnimationIcon"
+                    ) { rolling ->
+                        Icon(
+                            imageVector = if (rolling) ImageVector.vectorResource(R.drawable.animation_filled) else ImageVector.vectorResource(R.drawable.animation),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.appearance_number_animation_title),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Text(
+                            text = stringResource(R.string.appearance_number_animation_desc),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = isRolling,
+                        onCheckedChange = { rolling ->
+                            onNumberAnimationStyleChange(
+                                if (rolling) NumberAnimationStyle.ROLLING else NumberAnimationStyle.CLASSIC
+                            )
+
+                            val hapticType = if (rolling) {
+                                HapticFeedbackType.ToggleOn
+                            } else {
+                                HapticFeedbackType.ToggleOff
+                            }
+                            haptics.performHapticFeedback(hapticType)
+                        },
+                        thumbContent = if (isRolling) {
+                            {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(R.drawable.check_filled),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize),
+                                )
+                            }
+                        } else {
+                            null
+                        }
+                    )
+                }
             }
         }
     }
