@@ -67,7 +67,7 @@ class FunFactReceiver : BroadcastReceiver() {
                 }
 
                 HydroNotificationService(context).showFunFact()
-                HydroNotificationScheduler.scheduleFunFact(context, userProfile)
+                HydroNotificationScheduler.scheduleFunFact(context, userProfile, forNextDay = true)
             } catch (e: Exception) {
                 Log.e(TAG, "Error handling fun-fact alarm", e)
             }

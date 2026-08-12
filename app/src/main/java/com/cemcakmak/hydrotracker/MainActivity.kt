@@ -656,6 +656,7 @@ fun HydroTrackerApp(
                                 isBlurSupported = themeViewModel.isBlurSupported(),
                                 onEdgeEffectChange = themeViewModel::setEdgeEffect,
                                 onUseBeverageColorsChange = themeViewModel::setUseBeverageColors,
+                                onNumberAnimationStyleChange = themeViewModel::setNumberAnimationStyle,
                                 onNavigateToWidget = {
                                     appearanceWasPop = true
                                     backStack.add(NavigationRoutes.SettingsWidget)

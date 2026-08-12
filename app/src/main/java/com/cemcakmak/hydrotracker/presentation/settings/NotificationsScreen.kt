@@ -193,12 +193,8 @@ fun NotificationsScreen(
 
     val allPermissionsGranted = hasNotificationPermission && hasExactAlarmPermission
 
-    // Reminders enabled state (runtime toggle, not persisted)
-    var isRemindersEnabled by remember {
-        mutableStateOf(
-            allPermissionsGranted && userProfile?.isOnboardingCompleted == true
-        )
-    }
+    // Reminders enabled state (persisted on the user profile)
+    val isRemindersEnabled = userProfile?.notificationsEnabled == true
 
     // Time picker sheet state
     var showWakeUpPicker by remember { mutableStateOf(false) }
@@ -228,7 +224,6 @@ fun NotificationsScreen(
             hasNotificationPermission = NotificationPermissionManager.hasNotificationPermission(context)
             hasExactAlarmPermission = NotificationPermissionManager.hasExactAlarmPermission(context)
         }
-        isRemindersEnabled = hasNotificationPermission && hasExactAlarmPermission && userProfile?.isOnboardingCompleted == true
     }
 
     var isSuspended by remember { mutableStateOf(false) }
@@ -312,18 +307,30 @@ fun NotificationsScreen(
                                     }
                                     Switch(
                                         checked = isRemindersEnabled,
-                                        onCheckedChange = { enabled ->
+                                        onCheckedChange = label@{ enabled ->
                                             val hapticType = if (enabled) {
                                                 HapticFeedbackType.ToggleOn
                                             } else {
                                                 HapticFeedbackType.ToggleOff
                                             }
                                             haptics.performHapticFeedback(hapticType)
-                                            isRemindersEnabled = enabled
+                                            if (enabled && !isPreview && !allPermissionsGranted) {
+                                                // Request the missing permissions first; the toggle
+                                                // stays off until they have been granted
+                                                if (!hasNotificationPermission) {
+                                                    onRequestNotificationPermission()
+                                                }
+                                                if (!hasExactAlarmPermission) {
+                                                    NotificationPermissionManager.requestExactAlarmPermission(context)
+                                                }
+                                                return@label
+                                            }
+                                            val updated = userProfile.copy(notificationsEnabled = enabled)
+                                            onUserProfileUpdate(updated)
                                             if (!isPreview) {
                                                 coroutineScope.launch {
                                                     if (enabled) {
-                                                        HydroNotificationScheduler.startNotifications(context, userProfile)
+                                                        HydroNotificationScheduler.startNotifications(context, updated)
                                                     } else {
                                                         HydroNotificationScheduler.stopNotifications(context)
                                                     }
@@ -382,13 +389,19 @@ fun NotificationsScreen(
                                     }
                                     Switch(
                                         checked = isEnabled,
-                                        onCheckedChange = { enabled ->
+                                        onCheckedChange = label@{ enabled ->
                                             val hapticType = if (enabled) {
                                                 HapticFeedbackType.ToggleOn
                                             } else {
                                                 HapticFeedbackType.ToggleOff
                                             }
                                             haptics.performHapticFeedback(hapticType)
+                                            if (enabled && !isPreview && !hasNotificationPermission) {
+                                                // Request the permission first; the toggle stays
+                                                // off until it has been granted
+                                                onRequestNotificationPermission()
+                                                return@label
+                                            }
                                             val updated = userProfile.copy(funFactsEnabled = enabled)
                                             onUserProfileUpdate(updated)
                                             if (!isPreview) {

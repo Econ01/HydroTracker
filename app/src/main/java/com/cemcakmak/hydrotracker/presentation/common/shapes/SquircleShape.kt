@@ -82,6 +82,15 @@ data class SquircleShape(
         layoutDirection: LayoutDirection,
         density: Density
     ): Outline {
+        // Consumers with animated or masked bounds (e.g. carousel maskClip) can momentarily
+        // report a degenerate size; emit an empty outline instead of crashing on negative
+        // corner-radius ranges or NaN path maths.
+        if (size.width <= 0f || size.height <= 0f ||
+            !size.width.isFinite() || !size.height.isFinite()
+        ) {
+            return Outline.Generic(AndroidPath().asComposePath())
+        }
+
         val maxRadius = min(size.width, size.height) / 2f
         val isLtr = layoutDirection == LayoutDirection.Ltr
 

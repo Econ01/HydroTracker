@@ -1,3 +1,15 @@
+[1.5]
+Added
+- New animation option under Appearance ▸ Interaction & Feedback — you can now switch off the rolling number animation for a simpler one that runs more smoothly on older or slower devices
+
+Fixed
+- Fixed a crash when scrolling the container carousel all the way to the end
+- Fixed drinks logged before bedtime being counted towards the previous day when using Sleep time mode; any entries affected in the past are corrected automatically
+- Fixed the reminders switch turning itself back on after being turned off
+- Turning on reminders or fun fact notifications now asks for the needed permissions instead of doing nothing
+- Fixed fun fact notifications sometimes arriving twice on the same day
+- The number in the daily goal editor now follows the slider smoothly as you drag it
+
 [1.4.1]
 Added
 - Expanded the contributors list in Settings

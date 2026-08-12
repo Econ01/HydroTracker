@@ -62,6 +62,11 @@ object HydroNotificationScheduler {
             return
         }
 
+        if (!userProfile.notificationsEnabled) {
+            Log.d(TAG, "Notifications disabled by user, not starting")
+            return
+        }
+
         // Cancel any existing notifications first
         stopNotifications(context)
 
@@ -504,7 +509,8 @@ object HydroNotificationScheduler {
      * Check if notifications should be enabled for this user
      */
     fun shouldEnableNotifications(context: Context, userProfile: UserProfile): Boolean {
-        return NotificationPermissionManager.hasNotificationPermission(context) &&
+        return userProfile.notificationsEnabled &&
+                NotificationPermissionManager.hasNotificationPermission(context) &&
                 userProfile.isOnboardingCompleted
     }
 
@@ -678,6 +684,11 @@ object HydroNotificationScheduler {
     ) {
         Log.d(TAG, "Scheduling next reminder from triggered time")
 
+        if (!userProfile.notificationsEnabled) {
+            Log.d(TAG, "Notifications disabled by user, not scheduling")
+            return
+        }
+
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val userRepo = userRepository ?: UserRepository(context)
@@ -729,6 +740,10 @@ object HydroNotificationScheduler {
         waterIntakeRepository: com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository? = null
     ) {
         Log.d(TAG, "Water entry added, bumping next reminder")
+        if (!userProfile.notificationsEnabled) {
+            Log.d(TAG, "Notifications disabled by user, not rescheduling")
+            return
+        }
         resetNotificationEngagementState(context)
         scheduleNextFromTriggered(context, userProfile, userRepository, waterIntakeRepository)
     }
@@ -782,8 +797,10 @@ object HydroNotificationScheduler {
     /**
      * Schedule the daily fun-fact notification at a random time within the user's waking hours.
      * If the chosen time has already passed today, it is scheduled for tomorrow.
+     * When [forNextDay] is true the random time is picked within tomorrow's waking hours, so a
+     * fun fact that has already fired today cannot re-fire a second time the same day.
      */
-    fun scheduleFunFact(context: Context, userProfile: UserProfile) {
+    fun scheduleFunFact(context: Context, userProfile: UserProfile, forNextDay: Boolean = false) {
         if (!userProfile.funFactsEnabled) {
             Log.d(TAG, "Fun facts disabled, not scheduling")
             return
@@ -802,7 +819,11 @@ object HydroNotificationScheduler {
             return
         }
 
-        val triggerTime = calculateRandomFunFactTime(Calendar.getInstance(), wakeUpTime, sleepTime)
+        val baseDay = Calendar.getInstance()
+        if (forNextDay) {
+            baseDay.add(Calendar.DAY_OF_YEAR, 1)
+        }
+        val triggerTime = calculateRandomFunFactTime(baseDay, wakeUpTime, sleepTime)
         if (triggerTime == null) {
             Log.w(TAG, "Could not calculate fun-fact time")
             return

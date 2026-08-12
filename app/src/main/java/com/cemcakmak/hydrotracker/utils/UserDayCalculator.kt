@@ -16,7 +16,8 @@ object UserDayCalculator {
 
     /**
      * Get the current user day date string based on day-end mode.
-     * If current time is before the day boundary, it's still the previous calendar day's "user day".
+     * The mapping between the current time and the user day label follows the same
+     * regime-aware rules as [getUserDayStringForTimestamp].
      *
      * @param dayEndTime The boundary time in HH:mm. For [DayEndMode.SLEEP_TIME] this should be the
      *                   user's sleep time; for [DayEndMode.MIDNIGHT] it is ignored.
@@ -28,6 +29,14 @@ object UserDayCalculator {
     /**
      * Get the user day string for a specific timestamp based on day-end mode.
      *
+     * [DayEndMode.MIDNIGHT] always yields the plain calendar date. For [DayEndMode.SLEEP_TIME]
+     * two regimes are supported:
+     *  - Evening boundary (sleep time at/after noon): the user day *ends* at the boundary, so
+     *    timestamps before the boundary keep the current calendar date and timestamps at/after
+     *    it belong to the next calendar date.
+     *  - Morning boundary (sleep time before noon, e.g. 01:00): timestamps before the boundary
+     *    belong to the previous calendar date, timestamps at/after it keep the current date.
+     *
      * @param dayEndTime The boundary time in HH:mm. For [DayEndMode.SLEEP_TIME] this should be the
      *                   user's sleep time; for [DayEndMode.MIDNIGHT] it is ignored.
      */
@@ -36,12 +45,19 @@ object UserDayCalculator {
         val time = LocalTime.of(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE))
         val boundary = getDayBoundary(dayEndTime, dayEndMode)
 
-        return if (time.isBefore(boundary)) {
-            // Before day boundary, so this entry belongs to the previous day's "user day"
+        return if (dayEndMode == DayEndMode.SLEEP_TIME && !boundary.isBefore(LocalTime.NOON)) {
+            // Evening boundary: the day ends at sleep time, so entries at/after the boundary
+            // already count towards the next calendar date
+            if (!time.isBefore(boundary)) {
+                calendar.add(Calendar.DAY_OF_YEAR, 1)
+            }
+            dateFormat.format(calendar.time)
+        } else if (time.isBefore(boundary)) {
+            // Morning boundary: before the boundary the entry still belongs to the previous
+            // calendar date (midnight mode can never enter this branch)
             calendar.add(Calendar.DAY_OF_YEAR, -1)
             dateFormat.format(calendar.time)
         } else {
-            // After day boundary, so this entry belongs to today's "user day"
             dateFormat.format(calendar.time)
         }
     }
