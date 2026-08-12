@@ -278,6 +278,8 @@
     <string name="appearance_feedback_header">Interaction &amp; Feedback</string>
     <string name="appearance_haptics_title">Haptic Feedback</string>
     <string name="appearance_haptics_desc">Vibrate on button taps and actions</string>
+    <string name="appearance_number_animation_title">Rolling Number Animation</string>
+    <string name="appearance_number_animation_desc">Switch off for a lighter count-up animation</string>
     <string name="appearance_edge_effect_title">Edge Effect</string>
     <string name="appearance_beverage_colors_title">Beverage Colours</string>
     <string name="appearance_beverage_colors_desc">Tint home-screen cards and entries with each beverage’s colour</string>
