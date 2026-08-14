@@ -227,7 +227,7 @@ private fun StatisticsContent(
                         bottomEnd = CornerSize(10.dp)
                     ),
                     hapticsEnabled = false,
-                    tooltipText = stringResource(R.string.percent_format, uiState.goalSuccessRate.toInt()),
+                    tooltipText = stringResource(R.string.percent_format, "${uiState.goalSuccessRate.toInt()}%"),
                     formatValue = { it.toInt().toString() },
                     suffix = "%",
                     entryDelayMillis = EntryAnimationDefaults.DELAY_MS

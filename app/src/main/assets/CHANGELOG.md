@@ -1,3 +1,9 @@
+[1.5.1]
+Fixed
+- Fixed the app crashing when picking a beverage other than water in some languages
+- Fixed the app crashing when opening the Statistics tab in some languages
+- Fixed a hint in the custom beverage editor showing "100%%" instead of "100%"
+
 [1.5]
 Added
 - New animation option under Appearance ▸ Interaction & Feedback — you can now switch off the rolling number animation for a simpler one that runs more smoothly on older or slower devices

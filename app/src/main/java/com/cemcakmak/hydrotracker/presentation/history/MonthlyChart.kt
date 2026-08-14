@@ -141,7 +141,7 @@ internal fun MonthlyChartSection(
                 AnimatedStatItem(
                     label = stringResource(R.string.history_stat_success_rate),
                     targetValue = stats.successRate,
-                    formatValue = { stringResource(R.string.percent_format, it.toInt()) },
+                    formatValue = { stringResource(R.string.percent_format, "${it.toInt()}%") },
                     entryDelayMillis = EntryAnimationDefaults.DELAY_MS
                 )
             }

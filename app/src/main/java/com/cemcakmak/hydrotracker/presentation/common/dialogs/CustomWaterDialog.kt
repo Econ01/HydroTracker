@@ -159,7 +159,7 @@ fun CustomWaterDialog(
                                     Text(
                                         stringResource(
                                             R.string.home_label_hydration_percentage,
-                                            (beverage.hydrationMultiplier * 100).toInt()
+                                            "${(beverage.hydrationMultiplier * 100).toInt()}%"
                                         )
                                     )
                                 },
@@ -210,7 +210,7 @@ fun CustomWaterDialog(
                             Text(
                                 text = stringResource(
                                     R.string.home_label_hydration_effectiveness,
-                                    (selectedBeverage.hydrationMultiplier * 100).toInt()
+                                    "${(selectedBeverage.hydrationMultiplier * 100).toInt()}%"
                                 ),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = beverageColors.color

@@ -90,7 +90,7 @@ fun OverviewCard(
             OverviewCategory(
                 iconRes = R.drawable.check_filled,
                 label = stringResource(R.string.statistics_label_success_rate),
-                value = stringResource(R.string.percent_format, successRate.toInt())
+                value = stringResource(R.string.percent_format, "${successRate.toInt()}%")
             )
         )
         add(

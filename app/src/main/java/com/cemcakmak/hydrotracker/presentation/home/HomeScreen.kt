@@ -1120,7 +1120,7 @@ private fun EffectiveHydrationCardContent(
                 AnimatedNumber(
                     targetValue = (safeSelected.hydrationMultiplier * 100),
                     formatValue = { value ->
-                        stringResource(R.string.home_label_effective_hydration, value.toInt())
+                        stringResource(R.string.home_label_effective_hydration, "${value.toInt()}%")
                     },
                     style = MaterialTheme.typography.titleSmall,
                     animateEntry = false,

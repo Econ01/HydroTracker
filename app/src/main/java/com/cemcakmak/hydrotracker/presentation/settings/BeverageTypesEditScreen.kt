@@ -197,7 +197,7 @@ fun BeverageTypesEditScreen(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = stringResource(R.string.beverage_hydration_short, (multiplier * 100).toInt()),
+                    text = stringResource(R.string.beverage_hydration_short, "${(multiplier * 100).toInt()}%"),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
