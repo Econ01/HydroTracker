@@ -36,7 +36,7 @@
          locale-aware (NumberFormat) and the unit swapped independently.
          ============================================================================ -->
     <string name="unit_milliliters_format">%1$s ml</string>
-    <!-- current / goal, e.g. "1.2 L / 2.7 L" -->
+    <!-- Percentage with sign appended in code; %1$s = value including the % sign, e.g. "85%" -->
     <string name="percent_format">%1$s</string>
     <!-- Character counter, e.g. "12/15 characters"; %1$d = current length, %2$d = max -->
     <string name="character_count">%1$d/%2$d caractères</string>
@@ -202,15 +202,15 @@
     <string name="beverage_delete_title">Supprimer la boisson ?</string>
     <string name="beverage_show_in_quick_add">Afficher dans l\'ajout rapide</string>
     <string name="beverage_hide_from_quick_add">Cacher de l\'ajout rapide</string>
-    <!-- Preset effectiveness line, e.g. "150% hydration effectiveness"; %1$d = percent -->
-    <string name="beverage_hydration_effectiveness">%1$s d\'efficacité d\'hydratation</string>
+    <!-- Preset effectiveness line, e.g. "150% hydration effectiveness"; %1$s = per cent value including the % sign -->
+    <string name="beverage_hydration_effectiveness">%1$s hydration effectiveness</string>
     <string name="beverage_name_label">Nom de la boisson</string>
     <string name="beverage_name_placeholder">ex., Smoothie</string>
     <string name="beverage_effectiveness_label" formatted="false">Efficacité de l\'hydratation (%)</string>
     <string name="beverage_effectiveness_placeholder">ex., 100</string>
     <!-- Validation; %1$d = min, %2$d = max -->
     <string name="beverage_effectiveness_error">Entre une valeur entre %1$d et %2$d</string>
-    <string name="beverage_effectiveness_hint" formatted="false">100% compte le montant total pour atteindre ton objectif</string>
+    <string name="beverage_effectiveness_hint" formatted="false">100% counts the full amount toward your goal</string>
     <!-- Container preset sheet -->
     <string name="container_add_title">Ajouter un contenant</string>
     <string name="container_edit_title">Modifier le contenant</string>
@@ -411,8 +411,8 @@
     <!-- Beverage types list/editor -->
     <string name="screen_beverage_types_title">Types de Boisson</string>
     <string name="beverage_types_helper">Boissons disponibles en ajout rapide. Appuie pour modifier, glisse vers pour réordonner.</string>
-    <!-- e.g. "150% hydration"; %1$d = per cent -->
-    <string name="beverage_hydration_short">%1$s d\'hydratation</string>
+    <!-- e.g. "150% hydration"; %1$s = per cent value including the % sign -->
+    <string name="beverage_hydration_short">%1$s hydration</string>
     <string name="beverage_reset_title">Réinitialiser les Boissons ?</string>
     <string name="beverage_reset_message">Ceci restaure l\'ordre par défaut des boissons, démasque tous les préréglages et supprime toutes les boissons personnalisées. Cette action est irréversible.</string>
     <!-- ============================================================================
@@ -727,8 +727,8 @@
     <string name="home_label_time">Heure</string>
     <!-- %1$s = minimum valid amount, %2$s = maximum valid amount (both with unit) -->
     <string name="home_error_amount_invalid">Merci de saisir une quantité valide (%1$s-%2$s)</string>
-    <string name="home_label_hydration_effectiveness">Efficacité de l\'hydratation : %1$s</string>
-    <string name="home_label_effective_hydration">Hydratation Efficace : %1$s</string>
+    <string name="home_label_hydration_effectiveness">Hydration effectiveness: %1$s</string>
+    <string name="home_label_effective_hydration">Effective Hydration: %1$s</string>
     <string name="home_option_custom">Personnalisé</string>
     <string name="home_beverage_effective_name">%1$s</string>
     <string name="home_beverage_effective_amount">%1$s</string>
@@ -759,8 +759,8 @@
     <string name="container_large_glass">Grand verre</string>
     <string name="container_water_bottle">Bouteille d\'eau</string>
     <string name="container_large_bottle">Grande bouteille</string>
-    <!-- Hydration percentage label, e.g. "80% hydration" -->
-    <string name="home_label_hydration_percentage">%1$s d\'hydratation</string>
+    <!-- Hydration percentage label, e.g. "80% hydration"; %1$s = per cent value including the % sign -->
+    <string name="home_label_hydration_percentage">%1$s hydration</string>
     <!-- Motivational messages -->
     <string name="home_motivation_goal_achieved">Incroyable ! Tu as atteint ton objectif quotidien !</string>
     <string name="home_motivation_almost_there">Tu t\'en sors bien ! Tu y es presque !</string>
