@@ -36,7 +36,7 @@
          locale-aware (NumberFormat) and the unit swapped independently.
          ============================================================================ -->
     <string name="unit_milliliters_format">%1$s ml</string>
-    <!-- current / goal, e.g. "1.2 L / 2.7 L" -->
+    <!-- Percentage with sign appended in code; %1$s = value including the % sign, e.g. "85%" -->
     <string name="percent_format">%1$s</string>
     <!-- Character counter, e.g. "12/15 characters"; %1$d = current length, %2$d = max -->
     <string name="character_count">%1$d/%2$d characters</string>
@@ -202,7 +202,7 @@
     <string name="beverage_delete_title">Delete Beverage?</string>
     <string name="beverage_show_in_quick_add">Show in Quick Add</string>
     <string name="beverage_hide_from_quick_add">Hide from Quick Add</string>
-    <!-- Preset effectiveness line, e.g. "150% hydration effectiveness"; %1$d = percent -->
+    <!-- Preset effectiveness line, e.g. "150% hydration effectiveness"; %1$s = per cent value including the % sign -->
     <string name="beverage_hydration_effectiveness">%1$s hydration effectiveness</string>
     <string name="beverage_name_label">Beverage Name</string>
     <string name="beverage_name_placeholder">e.g., Smoothie</string>
@@ -411,7 +411,7 @@
     <!-- Beverage types list/editor -->
     <string name="screen_beverage_types_title">Beverage Types</string>
     <string name="beverage_types_helper">Beverages offered in quick add. Tap to edit, drag to reorder.</string>
-    <!-- e.g. "150% hydration"; %1$d = per cent -->
+    <!-- e.g. "150% hydration"; %1$s = per cent value including the % sign -->
     <string name="beverage_hydration_short">%1$s hydration</string>
     <string name="beverage_reset_title">Reset Beverages?</string>
     <string name="beverage_reset_message">This restores the default beverage order, unhides all presets, and removes all custom beverages. This action cannot be undone.</string>
@@ -759,7 +759,7 @@
     <string name="container_large_glass">Large Glass</string>
     <string name="container_water_bottle">Water Bottle</string>
     <string name="container_large_bottle">Large Bottle</string>
-    <!-- Hydration percentage label, e.g. "80% hydration" -->
+    <!-- Hydration percentage label, e.g. "80% hydration"; %1$s = per cent value including the % sign -->
     <string name="home_label_hydration_percentage">%1$s hydration</string>
     <!-- Motivational messages -->
     <string name="home_motivation_goal_achieved">Amazing! You\'ve reached your daily goal!</string>
