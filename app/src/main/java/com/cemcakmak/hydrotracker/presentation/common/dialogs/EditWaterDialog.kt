@@ -382,7 +382,7 @@ fun EditWaterDialog(
                                         Text(
                                             stringResource(
                                                 R.string.home_label_hydration_percentage,
-                                                (beverage.hydrationMultiplier * 100).toInt()
+                                                "${(beverage.hydrationMultiplier * 100).toInt()}%"
                                             )
                                         )
                                     },

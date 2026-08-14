@@ -367,7 +367,7 @@ private fun PresetBeverageSheetContent(
                 Text(
                     text = stringResource(
                         R.string.beverage_hydration_effectiveness,
-                        (type.hydrationMultiplier * 100).toInt()
+                        "${(type.hydrationMultiplier * 100).toInt()}%"
                     ),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant

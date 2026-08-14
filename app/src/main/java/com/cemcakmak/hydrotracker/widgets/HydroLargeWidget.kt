@@ -318,7 +318,7 @@ private fun LargeContent(state: HydroWidgetState) {
                         )
                     } else {
                         Text(
-                            text = context.getString(R.string.percent_format, percent),
+                            text = context.getString(R.string.percent_format, "$percent%"),
                             style = TextStyle(
                                 color = GlanceTheme.colors.onSurface,
                                 fontSize = (ringSize.value * 0.17f).sp,

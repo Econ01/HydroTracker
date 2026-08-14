@@ -23,8 +23,8 @@ android {
         applicationId = "com.cemcakmak.hydrotracker"
         minSdk = 26
         targetSdk = 37
-        versionCode = 34
-        versionName = "1.5"
+        versionCode = 35
+        versionName = "1.5.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -72,6 +72,11 @@ android {
         unitTests {
             isIncludeAndroidResources = true
         }
+    }
+    lint {
+        // Baseline records pre-existing issues; any NEW lint error (e.g. a malformed
+        // translated format string via StringFormatInvalid/StringFormatMatches) fails the build.
+        baseline = file("lint-baseline.xml")
     }
     sourceSets {
         // Robolectric reads the debug variant's merged assets, so expose the exported Room schemas

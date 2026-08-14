@@ -38,3 +38,15 @@ jobs:
         with:
           name: unit-test-report
           path: app/build/reports/tests/testDebugUnitTest/
+
+      # Lint validates translated format strings (StringFormatInvalid/StringFormatMatches),
+      # so a malformed community translation fails CI instead of crashing the app.
+      - name: Run Android lint
+        run: ./gradlew lintDebug --stacktrace
+
+      - name: Upload lint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report
+          path: app/build/reports/lint-results-debug.html
