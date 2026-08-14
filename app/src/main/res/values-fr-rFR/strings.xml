@@ -279,6 +279,8 @@
     <string name="appearance_feedback_header">Interaction &amp; Feedback</string>
     <string name="appearance_haptics_title">Retour Haptique</string>
     <string name="appearance_haptics_desc">Vibre en appuyant sur les boutons et lors des actions</string>
+    <string name="appearance_number_animation_title">Animation Chiffres Défilants</string>
+    <string name="appearance_number_animation_desc">Désactiver pour une animation de compteur plus légère</string>
     <string name="appearance_edge_effect_title">Effet de Bordure</string>
     <string name="appearance_beverage_colors_title">Couleurs de Boisson</string>
     <string name="appearance_beverage_colors_desc">Colore les cartes et les entrées de l\'écran d\'accueil avec la couleur de chaque boisson</string>
@@ -598,7 +600,7 @@
     <string name="about_section_contributors">Contributeurs</string>
     <string name="about_contributor_role">Créateur &amp; mainteneur</string>
     <string name="about_contributor_bio">Le développeur Indépendant Android s\'est concentré sur des applications propres, respectueuses de la vie privée.</string>
-    <string name="about_contributor_role_contributor">Contributor</string>
+    <string name="about_contributor_role_contributor">Contributeur</string>
     <string name="cd_open_github_profile">Ouvrir le profil GitHub</string>
     <string name="about_section_information">Informations</string>
     <string name="about_changelog">Journal de modifications</string>
@@ -758,7 +760,7 @@
     <string name="container_water_bottle">Bouteille d\'eau</string>
     <string name="container_large_bottle">Grande bouteille</string>
     <!-- Hydration percentage label, e.g. "80% hydration" -->
-    <string name="home_label_hydration_percentage">%1$d% % d\'hydratation</string>
+    <string name="home_label_hydration_percentage">%1$d %% d\'hydratation</string>
     <!-- Motivational messages -->
     <string name="home_motivation_goal_achieved">Incroyable ! Tu as atteint ton objectif quotidien !</string>
     <string name="home_motivation_almost_there">Tu t\'en sors bien ! Tu y es presque !</string>
