@@ -383,42 +383,42 @@
     <!-- Schedule preview sentences; auto: %1$s=goal, %2$d=glasses, %3$d=hours, %4$d=minutes -->
     <string name="reminder_preview_auto">基于 %1$s 这个目标，你将在你 %3$d 小时的活跃期间内收到约 %2$d 次提醒（每次一杯）。间隔大约为每 %4$d 分钟。</string>
     <!-- custom: %1$s=cadence phrase, %2$s=wake time, %3$s=sleep time -->
-    <string name="reminder_preview_custom">You\'ll receive a reminder %1$s between %2$s and %3$s.</string>
+    <string name="reminder_preview_custom">你将在 %2$s 至 %3$s 期间，%1$s 收到提醒。</string>
     <!-- ============================================================================
          Settings — Quick Add customization
          ============================================================================ -->
-    <string name="quickadd_containers_header">Container presets</string>
-    <string name="quickadd_containers_desc">Quick-select containers on the home screen. Tap to edit, drag to reorder.</string>
-    <string name="quickadd_edit_containers">Edit container presets</string>
-    <string name="quickadd_beverages_header">Beverage types</string>
-    <string name="quickadd_beverages_desc">Beverages offered in quick add. Drag to reorder, drag into Hidden to hide.</string>
-    <string name="quickadd_edit_beverages">Edit beverage presets</string>
+    <string name="quickadd_containers_header">容器预设</string>
+    <string name="quickadd_containers_desc">在主屏上快速选择容器。点击以编辑，拖动即可重新排序。</string>
+    <string name="quickadd_edit_containers">编辑容器预设</string>
+    <string name="quickadd_beverages_header">饮品类型</string>
+    <string name="quickadd_beverages_desc">快速添加中提供的饮品选项。拖动以重新排序，拖动至已隐藏区域来隐藏。</string>
+    <string name="quickadd_edit_beverages">编辑饮品预设</string>
     <!-- Container presets list/editor -->
-    <string name="container_presets_screen_title">Container Presets</string>
-    <string name="container_reset_defaults_button">Reset Defaults</string>
-    <string name="container_reset_title">Reset Container Presets?</string>
-    <string name="container_reset_message">This will remove all custom containers and restore the default presets. This action cannot be undone.</string>
+    <string name="container_presets_screen_title">容器预设</string>
+    <string name="container_reset_defaults_button">重置默认</string>
+    <string name="container_reset_title">重置容器预设？</string>
+    <string name="container_reset_message">这将移除所有自定义容器并恢复默认预设。该操作无法撤销。</string>
     <!-- Snackbars; %1$s = container name -->
-    <string name="container_added">Added \"%1$s\" container</string>
-    <string name="container_updated">Updated \"%1$s\" container</string>
-    <string name="container_deleted">Deleted \"%1$s\" container</string>
-    <string name="container_reset_done">Container presets reset to defaults</string>
+    <string name="container_added">已添加名为「%1$s」的容器</string>
+    <string name="container_updated">已更新「%1$s」容器</string>
+    <string name="container_deleted">已删除「%1$s」容器</string>
+    <string name="container_reset_done">容器预设重置为默认</string>
     <!-- Snackbars; %1$s = beverage name -->
     <!-- Beverage types list/editor -->
-    <string name="screen_beverage_types_title">Beverage Types</string>
-    <string name="beverage_types_helper">Beverages offered in quick add. Tap to edit, drag to reorder.</string>
+    <string name="screen_beverage_types_title">饮品类别</string>
+    <string name="beverage_types_helper">快速添加中提供的饮品选项。点击以编辑，拖动以重新排序。</string>
     <!-- e.g. "150% hydration"; %1$s = per cent value including the % sign -->
-    <string name="beverage_hydration_short">%1$s hydration</string>
-    <string name="beverage_reset_title">Reset Beverages?</string>
-    <string name="beverage_reset_message">This restores the default beverage order, unhides all presets, and removes all custom beverages. This action cannot be undone.</string>
+    <string name="beverage_hydration_short">含水率 %1$s</string>
+    <string name="beverage_reset_title">重置饮品？</string>
+    <string name="beverage_reset_message">这将恢复默认的饮品类型排序、取消隐藏所有预设，并移除所有自定义饮品。该操作无法撤销。</string>
     <!-- ============================================================================
          Settings — Hydration &amp; Health
          ============================================================================ -->
-    <string name="hydration_baseline_intake">Daily baseline intake</string>
-    <string name="hydration_calc_standard_header">Calculation standard</string>
-    <string name="hydration_region_european">(European)</string>
-    <string name="hydration_region_us">(US)</string>
-    <string name="hydration_efsa_tag">Conservative</string>
+    <string name="hydration_baseline_intake">每日摄入基准</string>
+    <string name="hydration_calc_standard_header">计算标准</string>
+    <string name="hydration_region_european">（欧洲）</string>
+    <string name="hydration_region_us">（美国）</string>
+    <string name="hydration_efsa_tag">保守</string>
     <string name="hydration_iom_tag">更高摄入</string>
     <!-- Health Connect -->
     <string name="hc_section_header">Health Connect</string>
@@ -545,74 +545,74 @@
          Data Management
          ============================================================================ -->
     <string name="data_management_backup_header">导入 &amp; 导出</string>
-    <string name="data_management_delete_header">Delete Data</string>
-    <string name="data_export_csv_title">Export as CSV</string>
-    <string name="data_export_json_title">Export as JSON</string>
-    <string name="data_import_title">Import backup</string>
-    <string name="data_import_desc">Restore entries from a CSV or JSON file</string>
-    <string name="data_export_scope_desc">Exports only HydroTracker entries. Entries imported from other health apps are excluded.</string>
-    <string name="data_delete_before_date_title">Delete entries before date</string>
-    <string name="data_delete_before_date_desc">Remove intake entries on or before a chosen date</string>
+    <string name="data_management_delete_header">删除数据</string>
+    <string name="data_export_csv_title">导出为 CSV</string>
+    <string name="data_export_json_title">导出为 JSON</string>
+    <string name="data_import_title">导入备份</string>
+    <string name="data_import_desc">从 CSV 或 JSON 文件恢复条目</string>
+    <string name="data_export_scope_desc">仅导出 HydroTracker 条目。其他健康应用中导入的条目将被排除。</string>
+    <string name="data_delete_before_date_title">删除该日期以前的条目</string>
+    <string name="data_delete_before_date_desc">移除选定日期及以前的摄入条目</string>
     <!-- %1$s = formatted cutoff date -->
-    <string name="data_delete_before_date_model_title">Delete entries</string>
-    <string name="data_delete_health_connect_include">Include Health Connect</string>
-    <string name="data_delete_no_entries_affected">No entries on or before this date</string>
+    <string name="data_delete_before_date_model_title">删除条目</string>
+    <string name="data_delete_health_connect_include">包含 Health Connect</string>
+    <string name="data_delete_no_entries_affected">该日期及以前没有条目</string>
     <!-- Number of entries that will be deleted for the selected cutoff date -->
     <plurals name="data_delete_entries_affected">
-        <item quantity="other">%1$d entries recorded on or before %2$s will be permanently deleted.</item>
+        <item quantity="other">%2$s 及以前记录的 %1$d 则条目将被永久删除。</item>
     </plurals>
-    <string name="data_delete_local_title">Delete local data only</string>
-    <string name="data_delete_local_desc">Remove all app data stored on this device</string>
-    <string name="data_delete_local_message">This will delete all water intake entries, daily summaries, container presets, custom beverages, and your profile. This action cannot be undone.</string>
-    <string name="data_delete_health_connect_title">Delete Health Connect data only</string>
-    <string name="data_delete_health_connect_desc">Remove HydroTracker records from Health Connect</string>
-    <string name="data_delete_health_connect_message">This will delete HydroTracker records from Health Connect. Entries from other apps will not be affected. This action cannot be undone.</string>
-    <string name="data_delete_everything_title">Delete everything</string>
-    <string name="data_delete_everything_desc">Remove all local and Health Connect data</string>
-    <string name="data_delete_everything_message">This will delete all local data and all HydroTracker records from Health Connect, then reset your profile. This action cannot be undone.</string>
+    <string name="data_delete_local_title">仅删除本地日期</string>
+    <string name="data_delete_local_desc">从该设备上移除所有应用数据</string>
+    <string name="data_delete_local_message">这将删除所有输入水的条目、每日摘要、容器预设、自定义饮料和您的个人资料。此操作不能撤消。</string>
+    <string name="data_delete_health_connect_title">仅删除 Health Connect 数据</string>
+    <string name="data_delete_health_connect_desc">移除 HydroTracker 中来自 Health Connect 的记录</string>
+    <string name="data_delete_health_connect_message">这将从 HydroTracker 中删除来自 Health Connect 的记录。来自其他应用的条目将不会受到影响。此操作无法撤消。</string>
+    <string name="data_delete_everything_title">删除所有内容</string>
+    <string name="data_delete_everything_desc">移除所有本地和 Health Connect 数据</string>
+    <string name="data_delete_everything_message">这将移除所有本地数据和 HydroTracker 中来自 Health Connect 中的记录，然后重置你的个人资料。此操作无法撤销。</string>
     <!-- %1$d = number of entries exported -->
-    <string name="data_export_success">Exported %1$d entries</string>
+    <string name="data_export_success">已导出 %1$d 则条目</string>
     <!-- %1$s = error message -->
-    <string name="data_export_failed">Export failed: %1$s</string>
+    <string name="data_export_failed">导出失败：%1$s</string>
     <!-- %1$d = imported count, %2$d = skipped count -->
-    <string name="data_import_success">Imported %1$d entries, skipped %2$d duplicates</string>
+    <string name="data_import_success">已导入 %1$d 则条目，跳过了 %2$d 则重复记录</string>
     <!-- %1$s = error message -->
-    <string name="data_import_failed">Import failed: %1$s</string>
-    <string name="data_delete_success">Data deleted successfully</string>
+    <string name="data_import_failed">导入失败：%1$s</string>
+    <string name="data_delete_success">成功删除数据</string>
     <!-- %1$s = error message -->
-    <string name="data_delete_failed">Delete failed: %1$s</string>
+    <string name="data_delete_failed">删除失败：%1$s</string>
     <!-- ============================================================================
          Health Connect status & badges
          ============================================================================ -->
-    <string name="hc_status_error">Error: %1$s</string>
-    <string name="hc_badge_hidden">Hidden</string>
+    <string name="hc_status_error">错误：%1$s</string>
+    <string name="hc_badge_hidden">已隐藏</string>
     <!-- ============================================================================
          About
          ============================================================================ -->
-    <string name="app_tagline">Open source water intake tracker.</string>
-    <string name="label_version">Version: %1$s</string>
-    <string name="label_build_number">Build Number: %1$d</string>
-    <string name="about_section_contributors">Contributors</string>
-    <string name="about_contributor_role">Creator &amp; maintainer</string>
-    <string name="about_contributor_bio">Indie Android developer focused on clean, privacy-respecting apps.</string>
-    <string name="about_contributor_role_contributor">Contributor</string>
-    <string name="cd_open_github_profile">Open GitHub profile</string>
-    <string name="about_section_information">Information</string>
-    <string name="about_changelog">Changelog</string>
-    <string name="about_changelog_desc">What\'s new in each version</string>
-    <string name="about_sources">Sources &amp; Research</string>
-    <string name="about_sources_desc">Scientific sources behind the app</string>
-    <string name="about_privacy_policy">Privacy Policy</string>
-    <string name="about_privacy_policy_desc">How your data is handled</string>
-    <string name="about_license">License</string>
-    <string name="about_license_desc">HydroTracker\'s open-source license</string>
-    <string name="about_third_party_licenses">Third-party licenses</string>
-    <string name="about_third_party_licenses_desc">Open-source libraries we depend on</string>
-    <string name="toast_no_app_to_open_link">No app found to open this link</string>
+    <string name="app_tagline">开源饮水记录追踪器。</string>
+    <string name="label_version">版本：%1$s</string>
+    <string name="label_build_number">构建号：%1$d</string>
+    <string name="about_section_contributors">贡献者</string>
+    <string name="about_contributor_role">创作者 &amp; 维护者</string>
+    <string name="about_contributor_bio">专注简洁、尊重隐私的独立 Android 开发者。</string>
+    <string name="about_contributor_role_contributor">贡献者</string>
+    <string name="cd_open_github_profile">打开 GitHub 账户页面</string>
+    <string name="about_section_information">信息</string>
+    <string name="about_changelog">更新日志</string>
+    <string name="about_changelog_desc">每个版本中的新变化</string>
+    <string name="about_sources">来源 &amp; 研究</string>
+    <string name="about_sources_desc">应用背后的科学来源</string>
+    <string name="about_privacy_policy">隐私策略</string>
+    <string name="about_privacy_policy_desc">你的数据将如何处理</string>
+    <string name="about_license">许可证</string>
+    <string name="about_license_desc">HydroTracker 的开源许可证</string>
+    <string name="about_third_party_licenses">第三方许可证</string>
+    <string name="about_third_party_licenses_desc">我们依赖的开放源代码库</string>
+    <string name="toast_no_app_to_open_link">未找到可打开链接的应用</string>
     <!-- ============================================================================
          Support Development
          ============================================================================ -->
-    <string name="support_development_hero">HydroTracker is built and maintained by one person, with no ads and no tracking. If it has helped you drink more water, anything you chip in keeps it growing.</string>
+    <string name="support_development_hero">HydroTracker 由一人开发和维护，它没有广告、也不会跟踪你的数据。 如果它帮助你喝了更多的水，任何一点支持都能帮助它不断成长。</string>
     <string name="support_section_support">支持开发</string>
     <string name="support_github_sponsors_blurb">支持当前的开发工作</string>
     <string name="support_paypal_blurb">发起快速捐赠</string>
@@ -672,21 +672,21 @@
     <string name="whats_new_version">版本 %1$s</string>
     <string name="update_dialog_title">更新可用</string>
     <string name="update_dialog_current_version">当前版本</string>
-    <string name="update_dialog_new_version">New version</string>
-    <string name="update_dialog_action_play">Open Google Play to update HydroTracker.</string>
-    <string name="update_dialog_action_f_droid">Open the F-Droid app to update HydroTracker.</string>
-    <string name="update_dialog_action_github">Download the latest APK from GitHub.</string>
-    <string name="update_button_later">Later</string>
-    <string name="update_button_update">Update</string>
+    <string name="update_dialog_new_version">新版本</string>
+    <string name="update_dialog_action_play">打开 Google Play 以更新 HydroTracker。</string>
+    <string name="update_dialog_action_f_droid">打开 F-Droid 应用以更新 HydroTracker。</string>
+    <string name="update_dialog_action_github">从 GitHub 下载最新的 APK。</string>
+    <string name="update_button_later">稍后</string>
+    <string name="update_button_update">更新</string>
     <!-- ============================================================================
          Markdown components
          ============================================================================ -->
-    <string name="markdown_loading">Loading…</string>
-    <string name="markdown_error_loading">Error loading %1$s: %2$s</string>
-    <string name="markdown_version_prefix">Version %1$s</string>
-    <string name="markdown_section_added">Added</string>
-    <string name="markdown_section_changed">Changed</string>
-    <string name="markdown_section_fixed">Fixed</string>
+    <string name="markdown_loading">加载中……</string>
+    <string name="markdown_error_loading">加载 %1$s 时出错：%2$s</string>
+    <string name="markdown_version_prefix">版本 %1$s</string>
+    <string name="markdown_section_added">已添加</string>
+    <string name="markdown_section_changed">已更改</string>
+    <string name="markdown_section_fixed">已修复</string>
     <!-- ============================================================================
          Placeholder
          ============================================================================ -->
@@ -695,356 +695,356 @@
          ============================================================================ -->
     <!-- %1$s = beverage name, %2$s = effective amount with unit -->
     <!-- %1$s = beverage name, %2$s = raw amount with unit, %3$s = effective amount with unit -->
-    <string name="health_connect_status_unavailable">Health Connect is not available on this device</string>
-    <string name="health_connect_status_update_required">Health Connect app needs to be updated</string>
-    <string name="health_connect_status_no_permissions">Permissions not granted for Health Connect</string>
-    <string name="health_connect_status_ready">Health Connect is ready</string>
-    <string name="health_connect_imported_from">Imported from %1$s</string>
+    <string name="health_connect_status_unavailable">Health Connect 在该设备上不可用</string>
+    <string name="health_connect_status_update_required">Health Connect 应用需要更新</string>
+    <string name="health_connect_status_no_permissions">Health Connect 需要授权</string>
+    <string name="health_connect_status_ready">Health Connect 已就绪</string>
+    <string name="health_connect_imported_from">导入自 %1$s</string>
     <!-- ============================================================================
          Home
          ============================================================================ -->
     <!-- Snackbars -->
-    <string name="home_snackbar_add_failed">Failed to add water: %1$s</string>
-    <string name="home_snackbar_delete_failed">Failed to delete entry: %1$s</string>
-    <string name="home_snackbar_update_failed">Failed to update entry: %1$s</string>
-    <string name="home_snackbar_synced">Synced %1$d entries from Health Connect</string>
-    <string name="home_snackbar_sync_errors">Sync completed with %1$d errors</string>
-    <string name="home_snackbar_up_to_date">Data is up to date</string>
-    <string name="home_snackbar_sync_failed">Sync failed: %1$s</string>
-    <string name="home_snackbar_sync_disabled">Health Connect sync is disabled</string>
-    <string name="home_snackbar_container_added">Added \"%1$s\" container</string>
-    <string name="home_snackbar_container_updated">Updated \"%1$s\" container</string>
-    <string name="home_snackbar_container_deleted">Deleted \"%1$s\" container</string>
+    <string name="home_snackbar_add_failed">添加饮水失败：%1$s</string>
+    <string name="home_snackbar_delete_failed">删除条目失败：%1$s</string>
+    <string name="home_snackbar_update_failed">更新条目失败：%1$s</string>
+    <string name="home_snackbar_synced">已从 Health Connect 同步 %1$d 则条目</string>
+    <string name="home_snackbar_sync_errors">已完成同步，有 %1$d 处错误</string>
+    <string name="home_snackbar_up_to_date">日期已更新</string>
+    <string name="home_snackbar_sync_failed">同步失败：%1$s</string>
+    <string name="home_snackbar_sync_disabled">Health Connect 同步已禁用</string>
+    <string name="home_snackbar_container_added">已添加名为「%1$s」的容器</string>
+    <string name="home_snackbar_container_updated">已更新容器「%1$s」</string>
+    <string name="home_snackbar_container_deleted">已删除容器「%1$s」</string>
     <!-- Dialogue labels -->
-    <string name="home_label_beverage_type">Beverage Type</string>
-    <string name="home_label_amount_ml">Amount (%1$s)</string>
-    <string name="home_label_container_type">Container Type</string>
-    <string name="home_label_time">Time</string>
+    <string name="home_label_beverage_type">饮品类型</string>
+    <string name="home_label_amount_ml">容量（%1$s）</string>
+    <string name="home_label_container_type">容器类型</string>
+    <string name="home_label_time">时间</string>
     <!-- %1$s = minimum valid amount, %2$s = maximum valid amount (both with unit) -->
-    <string name="home_error_amount_invalid">Please enter a valid amount (%1$s–%2$s)</string>
-    <string name="home_label_hydration_effectiveness">Hydration effectiveness: %1$s</string>
-    <string name="home_label_effective_hydration">Effective Hydration: %1$s</string>
-    <string name="home_option_custom">Custom</string>
+    <string name="home_error_amount_invalid">请输入一个有效的容量（%1$s - %2$s）</string>
+    <string name="home_label_hydration_effectiveness">含水率：%1$s</string>
+    <string name="home_label_effective_hydration">含水率：%1$s</string>
+    <string name="home_option_custom">自定义</string>
     <string name="home_beverage_effective_name">%1$s</string>
     <string name="home_beverage_effective_amount">%1$s</string>
     <!-- Content descriptions -->
-    <string name="cd_add_container">Add container</string>
+    <string name="cd_add_container">添加容器</string>
     <!-- Stats labels -->
-    <string name="home_label_daily_progress">Daily Progress</string>
-    <string name="home_label_entries">Entries</string>
-    <string name="home_label_first_intake">First</string>
-    <string name="home_label_latest_intake">Latest</string>
-    <string name="home_reminders_paused_hint">Reminders paused until tomorrow</string>
-    <string name="home_section_recent_entries">Recent Entries</string>
+    <string name="home_label_daily_progress">每日进度</string>
+    <string name="home_label_entries">条目</string>
+    <string name="home_label_first_intake">最早</string>
+    <string name="home_label_latest_intake">最新</string>
+    <string name="home_reminders_paused_hint">提醒已暂停至明天</string>
+    <string name="home_section_recent_entries">近期条目</string>
     <!-- Dialogue titles -->
-    <string name="home_dialog_add_custom_amount">Add Custom Amount</string>
-    <string name="home_dialog_edit_entry_title">Edit Water Entry</string>
-    <string name="home_dialog_external_entry_title">External Water Entry</string>
-    <string name="home_dialog_select_time">Select Time</string>
-    <string name="home_dialog_delete_message">Are you sure you want to delete this %1$s %2$s entry?</string>
-    <string name="home_external_entry_title">Entry from another app</string>
-    <string name="home_external_entry_message">This entry was imported from another health app and cannot be edited. You can only view its details.</string>
+    <string name="home_dialog_add_custom_amount">添加自定义容量</string>
+    <string name="home_dialog_edit_entry_title">编辑饮水条目</string>
+    <string name="home_dialog_external_entry_title">外部饮水条目</string>
+    <string name="home_dialog_select_time">选择时间</string>
+    <string name="home_dialog_delete_message">你确定要删除该 %1$s %2$s 条目吗？</string>
+    <string name="home_external_entry_title">来自另一个应用的条目</string>
+    <string name="home_external_entry_message">无法编辑从另一个健康应用导入的条目。你只能查看其详细信息。</string>
     <!-- Add Container Card -->
-    <string name="home_add_container_label">Add</string>
+    <string name="home_add_container_label">添加</string>
     <!-- Container preset names (stable English key kept for storage; these are display strings) -->
-    <string name="container_coffee_cup">Coffee Cup</string>
-    <string name="container_tea_cup">Tea Cup</string>
-    <string name="container_small_cup">Small Cup</string>
-    <string name="container_medium_glass">Medium Glass</string>
-    <string name="container_large_glass">Large Glass</string>
-    <string name="container_water_bottle">Water Bottle</string>
-    <string name="container_large_bottle">Large Bottle</string>
+    <string name="container_coffee_cup">咖啡杯</string>
+    <string name="container_tea_cup">茶杯</string>
+    <string name="container_small_cup">小杯子</string>
+    <string name="container_medium_glass">中号玻璃杯</string>
+    <string name="container_large_glass">大玻璃杯</string>
+    <string name="container_water_bottle">水瓶</string>
+    <string name="container_large_bottle">大号水瓶</string>
     <!-- Hydration percentage label, e.g. "80% hydration"; %1$s = per cent value including the % sign -->
-    <string name="home_label_hydration_percentage">%1$s hydration</string>
+    <string name="home_label_hydration_percentage">含水率 %1$s</string>
     <!-- Motivational messages -->
-    <string name="home_motivation_goal_achieved">Amazing! You\'ve reached your daily goal!</string>
-    <string name="home_motivation_almost_there">You\'re doing great! Almost there!</string>
-    <string name="home_motivation_halfway">Halfway there! Keep up the good work!</string>
-    <string name="home_motivation_good_start">Good start! Stay consistent!</string>
+    <string name="home_motivation_goal_achieved">震惊！你已达成每日目标！</string>
+    <string name="home_motivation_almost_there">干得不错！就快达标了！</string>
+    <string name="home_motivation_halfway">成功了一半！继续加油！</string>
+    <string name="home_motivation_good_start">渐入佳境！保持下去！</string>
     <!-- ============================================================================
          Profile
          ============================================================================ -->
     <!-- Time-based greeting shown above the username; keep the trailing comma if the
          language separates greeting and name with a comma. -->
-    <string name="profile_greeting_morning">Good morning,</string>
-    <string name="profile_greeting_afternoon">Good afternoon,</string>
-    <string name="profile_greeting_evening">Good evening,</string>
-    <string name="profile_greeting_default">Hello,</string>
+    <string name="profile_greeting_morning">早上好，</string>
+    <string name="profile_greeting_afternoon">下午好，</string>
+    <string name="profile_greeting_evening">晚上好，</string>
+    <string name="profile_greeting_default">你好，</string>
     <!-- Quick stats under the profile header -->
-    <string name="profile_stat_today_entries">Today\'s Entries</string>
-    <string name="profile_stat_days_tracked">Days Tracked</string>
-    <string name="profile_stat_today_goal">Today\'s Goal</string>
+    <string name="profile_stat_today_entries">今天的条目</string>
+    <string name="profile_stat_days_tracked">已追踪天数</string>
+    <string name="profile_stat_today_goal">今天的目标</string>
     <!-- Section titles on the Profile screen -->
-    <string name="profile_section_daily_goals">Daily Goals</string>
-    <string name="profile_section_personal">Personal</string>
+    <string name="profile_section_daily_goals">每日目标</string>
+    <string name="profile_section_personal">个人</string>
     <!-- Info-row labels -->
-    <string name="profile_label_gender">Gender</string>
-    <string name="profile_label_daily_goal">Daily Water Goal</string>
-    <string name="profile_label_activity_level">Activity Level</string>
+    <string name="profile_label_gender">性别</string>
+    <string name="profile_label_daily_goal">每日饮水目标</string>
+    <string name="profile_label_activity_level">活动等级</string>
     <!-- e.g. "07:00 - 23:00" -->
     <!-- Profile photo sheet -->
-    <string name="profile_photo_sheet_title">Update Profile Photo</string>
+    <string name="profile_photo_sheet_title">更新个人图像</string>
     <!-- Name edit dialogue -->
-    <string name="profile_name_dialog_title">Edit Name</string>
-    <string name="profile_name_error_empty">Name cannot be empty</string>
-    <string name="profile_name_error_too_long">Name is too long</string>
+    <string name="profile_name_dialog_title">编辑姓名</string>
+    <string name="profile_name_error_empty">姓名不能为空</string>
+    <string name="profile_name_error_too_long">名字太长了</string>
     <!-- Daily goal bottom sheet -->
-    <string name="profile_goal_edit_title">Edit Daily Goal</string>
-    <string name="profile_goal_edit_description">Set your daily water intake goal. This will be used to track your progress and calculate reminders.</string>
+    <string name="profile_goal_edit_title">编辑每日目标</string>
+    <string name="profile_goal_edit_description">设置你的每日饮水摄入目标。这将用于追踪你的进度并计算提醒间隔。</string>
     <!-- %1$s = formatted amount in the user's volume unit -->
     <!-- %1$s = minimum valid amount, %2$s = maximum valid amount (both with unit) -->
     <!-- %1$s = minimum recommended amount, %2$s = maximum recommended amount (both with unit) -->
     <!-- Activity level bottom sheet -->
-    <string name="profile_activity_title">Activity Level</string>
+    <string name="profile_activity_title">活动等级</string>
     <!-- Schedule bottom sheet -->
     <!-- Gender bottom sheet -->
-    <string name="profile_gender_title">Select Gender</string>
+    <string name="profile_gender_title">选择性别</string>
     <!-- Age group bottom sheet -->
     <!-- Weight bottom sheet -->
     <!-- Generic OK button for time pickers and similar dialogues -->
     <!-- ============================================================================
          History &amp; Analytics
          ============================================================================ -->
-    <string name="history_period_weekly">Weekly</string>
-    <string name="history_period_monthly">Monthly</string>
-    <string name="history_period_yearly">Yearly</string>
+    <string name="history_period_weekly">每周</string>
+    <string name="history_period_monthly">每月</string>
+    <string name="history_period_yearly">每天</string>
     <!-- %1$s = period name, e.g. "Weekly" -->
-    <string name="cd_previous_period">Previous %1$s</string>
-    <string name="cd_next_period">Next %1$s</string>
-    <string name="history_this_week">This Week</string>
-    <string name="history_last_week">Last Week</string>
-    <string name="history_this_month">This Month</string>
-    <string name="history_last_month">Last Month</string>
-    <string name="history_this_year">This Year</string>
-    <string name="history_last_year">Last Year</string>
-    <string name="history_stat_total">Total</string>
-    <string name="history_stat_average">Average</string>
-    <string name="history_stat_best_day">Best Day</string>
-    <string name="history_stat_days_tracked">Days Tracked</string>
-    <string name="history_stat_goals_met">Goals Met</string>
-    <string name="history_stat_success_rate">Success Rate</string>
-    <string name="history_stat_total_intake">Total Intake</string>
-    <string name="history_empty_week">No data available for this week</string>
-    <string name="history_empty_month">No data available for the last 30 days</string>
-    <string name="history_empty_year">No data available for this year</string>
-    <string name="history_empty_generic">No data available</string>
-    <string name="history_select_day_hint">Tap a day on the chart to see its entries</string>
+    <string name="cd_previous_period">上一 %1$s</string>
+    <string name="cd_next_period">下一 %1$s</string>
+    <string name="history_this_week">本周</string>
+    <string name="history_last_week">上周</string>
+    <string name="history_this_month">本月</string>
+    <string name="history_last_month">上月</string>
+    <string name="history_this_year">本年</string>
+    <string name="history_last_year">去年</string>
+    <string name="history_stat_total">总计</string>
+    <string name="history_stat_average">平均</string>
+    <string name="history_stat_best_day">最好的一天</string>
+    <string name="history_stat_days_tracked">已追踪天数</string>
+    <string name="history_stat_goals_met">目标达成</string>
+    <string name="history_stat_success_rate">成功率</string>
+    <string name="history_stat_total_intake">总摄入</string>
+    <string name="history_empty_week">本周没有可用数据</string>
+    <string name="history_empty_month">最近 30 天没有可用数据</string>
+    <string name="history_empty_year">最近一年没有可用数据</string>
+    <string name="history_empty_generic">没有可用数据</string>
+    <string name="history_select_day_hint">点击表格上的特定日期来查看条目</string>
     <!-- ============================================================================
          Statistics
          All-time insights shown on the dedicated Statistics tab.
          ============================================================================ -->
-    <string name="statistics_empty_title">No statistics yet</string>
-    <string name="statistics_empty_description">Start logging your water intake to see personalised insights and trends.</string>
+    <string name="statistics_empty_title">还没有数据</string>
+    <string name="statistics_empty_description">记录你的饮水摄入，即可查看个性化见解和趋势。</string>
     <!-- Section titles -->
-    <string name="statistics_section_overview">Overview</string>
-    <string name="statistics_section_beverages">Beverage Breakdown</string>
-    <string name="statistics_section_containers">Container Usage</string>
+    <string name="statistics_section_overview">概览</string>
+    <string name="statistics_section_beverages">饮品构成</string>
+    <string name="statistics_section_containers">容器使用</string>
     <!-- Hero stats -->
-    <string name="statistics_hero_success_rate">Success Rate</string>
-    <string name="statistics_hero_days_tracked">Days Tracked</string>
+    <string name="statistics_hero_success_rate">成功率</string>
+    <string name="statistics_hero_days_tracked">追踪天数</string>
     <!-- Overview labels -->
-    <string name="statistics_label_current_streak">Current Streak</string>
-    <string name="statistics_label_average_daily_intake">Daily Average</string>
-    <string name="statistics_label_total_intake">Total Intake</string>
-    <string name="statistics_label_success_rate">Success Rate</string>
-    <string name="statistics_label_days_tracked">Days Tracked</string>
+    <string name="statistics_label_current_streak">已坚持天数</string>
+    <string name="statistics_label_average_daily_intake">每日平均</string>
+    <string name="statistics_label_total_intake">总摄入</string>
+    <string name="statistics_label_success_rate">成功率</string>
+    <string name="statistics_label_days_tracked">追踪天数</string>
     <plurals name="statistics_streak_days">
-        <item quantity="other">%1$d days</item>
+        <item quantity="other">%1$d 天</item>
     </plurals>
     <!-- Drinking pattern labels -->
-    <string name="statistics_label_first_drink">First Drink</string>
-    <string name="statistics_label_last_drink">Last Drink</string>
-    <string name="statistics_label_average_interval">Average Interval</string>
-    <string name="statistics_label_average_drink_size">Average Drink Size</string>
-    <string name="statistics_label_largest_drink">Largest Drink</string>
+    <string name="statistics_label_first_drink">首次饮用</string>
+    <string name="statistics_label_last_drink">最近饮用</string>
+    <string name="statistics_label_average_interval">平均间隔</string>
+    <string name="statistics_label_average_drink_size">平均饮用量</string>
+    <string name="statistics_label_largest_drink">最大饮用量</string>
     <!-- Beverage breakdown -->
     <!-- %1$d = drink count, %2$s = effective volume with unit -->
     <!-- %1$s = effective volume with unit -->
-    <string name="statistics_beverage_effective_short">%1$s \neffective</string>
+    <string name="statistics_beverage_effective_short">%1$s \n 含水率</string>
     <!-- Container Usage -->
-    <string name="statistics_container_header_container">Container</string>
-    <string name="statistics_container_header_volume">Volume</string>
-    <string name="statistics_container_header_uses">Uses</string>
+    <string name="statistics_container_header_container">容器</string>
+    <string name="statistics_container_header_volume">容量</string>
+    <string name="statistics_container_header_uses">使用次数</string>
     <!-- Hydration multiplier -->
     <!-- %1$s = signed percentage, e.g. "+5%" -->
     <!-- Health Connect imports -->
     <!-- %1$s = formatted goal amount -->
     <!-- %1$d = percentage -->
     <!-- Short weekday names for the monthly calendar header -->
-    <string name="weekday_short_sun">Sun</string>
-    <string name="weekday_short_mon">Mon</string>
-    <string name="weekday_short_tue">Tue</string>
-    <string name="weekday_short_wed">Wed</string>
-    <string name="weekday_short_thu">Thu</string>
-    <string name="weekday_short_fri">Fri</string>
-    <string name="weekday_short_sat">Sat</string>
+    <string name="weekday_short_sun">周日</string>
+    <string name="weekday_short_mon">周一</string>
+    <string name="weekday_short_tue">周二</string>
+    <string name="weekday_short_wed">周三</string>
+    <string name="weekday_short_thu">周四</string>
+    <string name="weekday_short_fri">周五</string>
+    <string name="weekday_short_sat">周六</string>
     <!-- ============================================================================
          Notifications
          ============================================================================ -->
     <!-- %1$s = the random water fact -->
-    <string name="notification_fun_fact_title">Did you know?</string>
+    <string name="notification_fun_fact_title">你知道吗？</string>
     <!-- %1$d = remaining milliliters -->
-    <string name="notification_minimal_remaining">%1$s remaining</string>
+    <string name="notification_minimal_remaining">剩余 %1$s</string>
     <!-- %1$s = formatted amount with unit, e.g. "500 ml" -->
-    <string name="notification_action_add">Add %1$s</string>
-    <string name="notification_action_pause_today">Pause for today</string>
-    <string name="notification_quick_add_preset_name">Quick Add</string>
-    <string name="notification_quick_add_note">Added from notification</string>
-    <string name="notification_paused_confirmation">Reminders paused until tomorrow</string>
-    <string name="notification_quick_add_feedback_title">Added %1$s</string>
+    <string name="notification_action_add">添加 %1$s</string>
+    <string name="notification_action_pause_today">今天不再提醒</string>
+    <string name="notification_quick_add_preset_name">快速添加</string>
+    <string name="notification_quick_add_note">添加自通知</string>
+    <string name="notification_paused_confirmation">提醒已暂停至明天</string>
+    <string name="notification_quick_add_feedback_title">已添加 %1$s</string>
     <!-- %1$s = formatted current intake, %2$s = formatted daily goal -->
     <string name="notification_quick_add_feedback_message">%1$s / %2$s</string>
     <!-- Gentle reminder titles -->
     <string-array name="notification_gentle_titles">
-        <item>Gentle Hydration Reminder</item>
-        <item>Time for Some Water</item>
-        <item>Your Body is Calling</item>
-        <item>Gentle Hydration Break</item>
-        <item>Soft Reminder from HydroTracker</item>
-        <item>A Moment for Hydration</item>
-        <item>Water Wellness Check</item>
+        <item>温和的喝水提醒</item>
+        <item>是时候喝点水了</item>
+        <item>你的身体在呼唤</item>
+        <item>温和的喝水休息</item>
+        <item>来自 HydroTracker 的温和提醒</item>
+        <item>喝水时间</item>
+        <item>饮水健康检查</item>
     </string-array>
     <!-- Gentle reminder messages: low progress (&lt; 25%) -->
     <string-array name="notification_gentle_messages_low">
-        <item>Your body would love some refreshing water right now.</item>
-        <item>How about a sip of something refreshing?</item>
-        <item>A gentle reminder to nurture yourself with water.</item>
-        <item>Time to give your body the hydration it deserves.</item>
-        <item>Let\'s start building that healthy hydration habit.</item>
-        <item>Starting your day with water sets a healthy tone.</item>
-        <item>A small glass now can make a big difference later.</item>
-        <item>Your cells are asking for a little attention.</item>
+        <item>来一杯水，唤醒身心。</item>
+        <item>喝点清爽的东西怎么样？</item>
+        <item>温馨提醒：记得喝水滋养身心。</item>
+        <item>是时候给你的身体补点水了。</item>
+        <item>让我们一起打造健康的喝水习惯。</item>
+        <item>用一杯水开启健康的一天。</item>
+        <item>一小杯水也能带来巨大的改变。</item>
+        <item>你的细胞需要你的关注。</item>
     </string-array>
     <!-- Gentle reminder messages: mid-progress (25–50%) -->
     <string-array name="notification_gentle_messages_mid">
-        <item>You\'re making great progress! Keep it flowing.</item>
-        <item>Halfway there! Your body appreciates every drop.</item>
-        <item>Looking good! Time for another refreshing moment.</item>
-        <item>Your hydration journey is flowing beautifully.</item>
-        <item>Keep up the wonderful work! Another sip awaits.</item>
-        <item>You\'re building a great rhythm today.</item>
-        <item>Steady progress is the best kind of progress.</item>
-        <item>Every sip is a step toward your goal.</item>
+        <item>你取得了巨大的进步！继续保持。</item>
+        <item>成功了一半！你的身体会感恩每一滴水的。</item>
+        <item>看起来不错！是时候喝点水了。</item>
+        <item>你的喝水旅程一帆风顺。</item>
+        <item>干得漂亮！再来一杯水吧。</item>
+        <item>你今天的节奏真不错。</item>
+        <item>稳步前进本身就是最好的进步。</item>
+        <item>每一杯都让你离目标更近一步。</item>
     </string-array>
     <!-- Gentle reminder messages: high progress (50–75%) -->
     <string-array name="notification_gentle_messages_high">
-        <item>Almost there! You\'re doing wonderfully.</item>
-        <item>Your dedication to hydration is inspiring.</item>
-        <item>So close to your goal! Keep flowing forward.</item>
-        <item>Your body is thanking you for this care.</item>
-        <item>Beautiful progress! Just a bit more to go.</item>
-        <item>Your consistency is paying off.</item>
-        <item>You have come so far — don\'t stop now.</item>
-        <item>The finish line is closer than you think.</item>
+        <item>就快成功了！你做得真不错。</item>
+        <item>你在喝水这件事上的坚持让人侧目。</item>
+        <item>离目标很近了！继续前进。</item>
+        <item>你的身体会感谢你的呵护。</item>
+        <item>干得漂亮。还有一点点。</item>
+        <item>你的坚持有了回报。</item>
+        <item>你已经这么努力了——别放弃。</item>
+        <item>胜利近在咫尺。</item>
     </string-array>
     <!-- Gentle reminder messages: final progress (&gt; 75%) -->
     <string-array name="notification_gentle_messages_final">
-        <item>You\'re so close to achieving your daily goal!</item>
-        <item>Final stretch! Your consistency is amazing.</item>
-        <item>Almost at the finish line! You\'ve got this.</item>
-        <item>Your dedication today has been incredible.</item>
-        <item>One more push to complete your hydration victory.</item>
-        <item>Just a little more to reach your goal.</item>
-        <item>You should be proud of today\'s effort.</item>
-        <item>Victory is just a few sips away.</item>
+        <item>距离你的每日目标只有一步之遥！</item>
+        <item>最后一步！你的坚持真不容易。</item>
+        <item>就快成功了！你可以的。</item>
+        <item>你今天的努力让人难以置信。</item>
+        <item>再努力一把即可达成喝水胜利。</item>
+        <item>再来一点就能完成目标。</item>
+        <item>你应该为今天的努力感到骄傲。</item>
+        <item>胜利也就几杯水之遥。</item>
     </string-array>
     <!-- Motivating reminder titles -->
     <string-array name="notification_motivating_titles">
-        <item>Hydration Champion!</item>
-        <item>Water Warrior Alert!</item>
-        <item>Power Up with H2O!</item>
-        <item>Hydration Hero Time!</item>
-        <item>Fuel Your Success!</item>
-        <item>Time to Level Up!</item>
-        <item>Champion Mode: Activated</item>
+        <item>掌管喝水的王！</item>
+        <item>喝水战士来袭！</item>
+        <item>用 H2O 加加「油」！</item>
+        <item>喝水的就是英雄！</item>
+        <item>助力你的成功！</item>
+        <item>是时候加快节奏了！</item>
+        <item>喝水模式：已启动</item>
     </string-array>
     <!-- Motivating reminder messages: low progress -->
     <string-array name="notification_motivating_messages_low">
-        <item>Time to CRUSH your hydration goals! Let\'s GO!</item>
-        <item>Your SUCCESS starts with the next sip!</item>
-        <item>Champions hydrate! Are you ready to DOMINATE?</item>
-        <item>FUEL your potential with premium H2O!</item>
-        <item>Winners stay hydrated! Time to LEVEL UP!</item>
-        <item>First step to victory — grab some water!</item>
-        <item>Every champion starts with the basics. Hydrate!</item>
-        <item>Your competition is hydrating. Are you?</item>
+        <item>是时候向你的喝水目标发起冲刺了！冲呀！</item>
+        <item>你的成功始于下一杯水！</item>
+        <item>成功的人都爱喝水！你要成为下一位吗？</item>
+        <item>给你的身体来点 H2O 作燃料！</item>
+        <item>成功离不开喝水。是时候来点了！</item>
+        <item>迈向成功的第一步——喝点水！</item>
+        <item>千里之行始于足下。喝水！</item>
+        <item>你在跟喝水较劲吗？</item>
     </string-array>
     <!-- Motivating reminder messages: mid progress -->
     <string-array name="notification_motivating_messages_mid">
-        <item>UNSTOPPABLE! You\'re building momentum!</item>
-        <item>CRUSHING IT! Halfway to hydration victory!</item>
-        <item>POWERFUL progress! Keep that energy flowing!</item>
-        <item>AMAZING work! You\'re on fire today!</item>
-        <item>CHAMPION mindset! Push forward!</item>
-        <item>Momentum is building, keep it going!</item>
-        <item>You are stronger than your excuses. Drink up!</item>
-        <item>No limits, no excuses. Just hydration.</item>
+        <item>干得好！你简直势不可挡！</item>
+        <item>一鼓作气！饮水目标成功了一半！</item>
+        <item>强而有力！再接再厉！</item>
+        <item>干得漂亮！你今天状态很好！</item>
+        <item>保持心态！努力前进！</item>
+        <item>小有成就，继续保持！</item>
+        <item>少点借口，多喝点水！</item>
+        <item>不设限、不退缩。该喝水了。</item>
     </string-array>
     <!-- Motivating reminder messages: high progress -->
     <string-array name="notification_motivating_messages_high">
-        <item>INCREDIBLE dedication! Victory is within reach!</item>
-        <item>OUTSTANDING! You\'re in the winner\'s zone!</item>
-        <item>PHENOMENAL! Final quarter — you\'ve got this!</item>
-        <item>EXCELLENCE in action! Keep dominating!</item>
-        <item>LEGENDARY persistence! Almost at the summit!</item>
-        <item>The finish line is in sight!</item>
-        <item>Leave it all on the field. Hydrate!</item>
-        <item>Greatness is earned one sip at a time.</item>
+        <item>无与伦比！胜利已在咫尺！</item>
+        <item>太棒了！你超越了自我！</item>
+        <item>厉害了！最后一点——你没问题的！</item>
+        <item>优雅！继续保持！</item>
+        <item>你简直是传奇！就要创造新纪录了！</item>
+        <item>终点就在眼前！</item>
+        <item>挥洒汗水，多多补水！</item>
+        <item>每一条口都将成就伟大。</item>
     </string-array>
     <!-- Motivating reminder messages: final progress -->
     <string-array name="notification_motivating_messages_final">
-        <item>FINAL PUSH! Greatness awaits!</item>
-        <item>SO CLOSE to TOTAL VICTORY!</item>
-        <item>MAXIMUM effort for MAXIMUM results!</item>
-        <item>ULTIMATE hydration hero! Finish strong!</item>
-        <item>LEGENDARY status incoming! Complete the mission!</item>
-        <item>Close it out strong, champion!</item>
-        <item>This is what separates good from great. Finish!</item>
-        <item>One last push. You were born for this.</item>
+        <item>最后一点！成功就在眼前！</item>
+        <item>就 要 胜 利 了！</item>
+        <item>全力以赴，更上一层！</item>
+        <item>喝水的神！干得漂亮！</item>
+        <item>渐入佳境！向任务目标进发！</item>
+        <item>干得不错！</item>
+        <item>精益求精。已达标！</item>
+        <item>最后一点，你可以的。</item>
     </string-array>
     <!-- Minimal reminder titles -->
     <string-array name="notification_minimal_titles">
-        <item>Water reminder</item>
+        <item>喝水提醒</item>
     </string-array>
     <!-- Minimal reminder messages -->
-    <string name="notification_minimal_message_low">Time to hydrate</string>
-    <string name="notification_minimal_message_mid">Continue hydrating</string>
-    <string name="date_format_title">Date Format</string>
-    <string name="week_start_format_title">Week Start</string>
-    <string name="profile_photo_sheet_gallery_title">Choose from Gallery</string>
-    <string name="profile_photo_sheet_camera_title">Take a photo</string>
-    <string name="profile_photo_sheet_delete">Remove profile photo</string>
+    <string name="notification_minimal_message_low">喝水时间</string>
+    <string name="notification_minimal_message_mid">继续喝水</string>
+    <string name="date_format_title">日期格式</string>
+    <string name="week_start_format_title">每周起始日</string>
+    <string name="profile_photo_sheet_gallery_title">从图库选择</string>
+    <string name="profile_photo_sheet_camera_title">拍照</string>
+    <string name="profile_photo_sheet_delete">移除个人头像</string>
     <!-- Profile photo cropper -->
-    <string name="profile_crop_title">Crop Profile Photo</string>
-    <string name="crop_save">Save</string>
-    <string name="crop_cancel">Cancel</string>
-    <string name="crop_rotate_left">Rotate left 90 degrees</string>
-    <string name="crop_rotate_right">Rotate right 90 degrees</string>
-    <string name="crop_reset">Reset</string>
-    <string name="cd_crop_image">Photo to crop</string>
-    <string name="error_saving_image">Could not save cropped image</string>
+    <string name="profile_crop_title">裁剪个人图像</string>
+    <string name="crop_save">保存</string>
+    <string name="crop_cancel">取消</string>
+    <string name="crop_rotate_left">向左旋转 90 度</string>
+    <string name="crop_rotate_right">向右旋转 90 度</string>
+    <string name="crop_reset">重置</string>
+    <string name="cd_crop_image">要裁剪的照片</string>
+    <string name="error_saving_image">无法保存裁剪后的照片</string>
     <!-- Water facts shown with gentle reminders -->
     <string-array name="notification_facts">
-        <item>Your brain is 75% water — feed it well!</item>
-        <item>Water helps regulate your body temperature.</item>
-        <item>Proper hydration can improve your mood and concentration.</item>
-        <item>Your muscles are 75% water.</item>
-        <item>Water helps transport nutrients throughout your body.</item>
-        <item>Staying hydrated can boost your energy levels.</item>
-        <item>Water helps your kidneys filter waste efficiently.</item>
-        <item>Proper hydration supports healthy skin.</item>
-        <item>Your blood is 90% water.</item>
-        <item>Water helps lubricate your joints.</item>
-        <item>Hydration can improve your physical performance.</item>
-        <item>Water aids in digestion and nutrient absorption.</item>
-        <item>Staying hydrated helps maintain healthy blood pressure.</item>
-        <item>Water helps prevent kidney stones.</item>
-        <item>Your heart works more efficiently when you\'re hydrated.</item>
-        <item>Dehydration can cause headaches and fatigue.</item>
-        <item>Drinking water before meals can help with portion control.</item>
-        <item>Water is essential for maintaining body temperature during exercise.</item>
-        <item>Even mild dehydration can impair cognitive function.</item>
-        <item>Water makes up about 60% of your total body weight.</item>
+        <item>你的大脑由 75% 的水组成——好好滋养它！</item>
+        <item>水有助于你调节体温。</item>
+        <item>适当饮水能改善你的情绪和专注力。</item>
+        <item>你的肌肉里有 75% 的水分。</item>
+        <item>水有助于营养物质在你的体内传递。</item>
+        <item>保持水分能让你精力充沛。</item>
+        <item>水能有效帮助你的肾脏过滤垃圾。</item>
+        <item>适当饮水有利皮肤。</item>
+        <item>你的血液里有 90% 的水。</item>
+        <item>谁能帮助你润滑关节。</item>
+        <item>水能改善你的运动表现。</item>
+        <item>水有助于消化和营养吸收。</item>
+        <item>多喝水能帮助保持健康的血压。</item>
+        <item>喝水能避免肾结石。</item>
+        <item>喝够水，你的心脏才能更有效率地工作。</item>
+        <item>脱水会导致头痛和疲乏。</item>
+        <item>饭前喝水有助于控制进餐量。</item>
+        <item>水是运动过程中维持体温的关键。</item>
+        <item>轻微的脱水就能损害认知表现。</item>
+        <item>水占据了你体重中约 60% 的重量。</item>
     </string-array>
     <!-- Water puns shown with motivating reminders. These are language-dependent word
          play, so they are not translated; each locale should provide its own if desired. -->
