@@ -345,43 +345,43 @@
     <string name="notif_sleep">就寝</string>
     <string name="notif_wake_up_time">起床时间</string>
     <string name="notif_sleep_time">就寝时间</string>
-    <string name="notif_schedule_header">Schedule</string>
-    <string name="notif_configure_schedule">Configure schedule</string>
-    <string name="notif_configure_schedule_desc">Change reminder mode or set a custom interval</string>
-    <string name="notif_reminder_interval">Reminder interval</string>
-    <string name="notif_scheduled_for">Scheduled for</string>
-    <string name="notif_pause_reminders">Pause reminders for today</string>
-    <string name="notif_pause_reminders_desc">Stop hydration reminders until the next day</string>
-    <string name="notif_resume_reminders">Resume reminders</string>
-    <string name="notif_reminders_paused_desc">Hydration reminders are paused until tomorrow</string>
+    <string name="notif_schedule_header">时间表</string>
+    <string name="notif_configure_schedule">配置时间表</string>
+    <string name="notif_configure_schedule_desc">更改提醒模式或设置自定义间隔</string>
+    <string name="notif_reminder_interval">提醒间隔</string>
+    <string name="notif_scheduled_for">排期定于</string>
+    <string name="notif_pause_reminders">暂停今日提醒</string>
+    <string name="notif_pause_reminders_desc">明天前不再发送喝水提醒</string>
+    <string name="notif_resume_reminders">恢复提醒</string>
+    <string name="notif_reminders_paused_desc">暂停喝水提醒至明天</string>
     <!-- Reminder cadence, e.g. "Every 60 minutes"; %1$d = minutes -->
     <plurals name="every_x_minutes">
-        <item quantity="other">Every %1$d minutes</item>
+        <item quantity="other">每 %1$d 分钟</item>
     </plurals>
     <!-- ============================================================================
          Settings — Reminder Schedule
          ============================================================================ -->
-    <string name="screen_reminder_schedule_title">Reminder Schedule</string>
-    <string name="reminder_mode_header">Mode</string>
-    <string name="reminder_day_end_header">Day end</string>
-    <string name="reminder_day_end_divider">Day End</string>
-    <string name="reminder_mode_auto_explain">Reminders are spaced automatically based on your daily goal and active hours.</string>
-    <string name="reminder_mode_custom_explain">Reminders are sent at your chosen fixed interval between wake-up and sleep.</string>
-    <string name="reminder_dayend_sleep_explain">Your day ends at sleep time. Daily progress resets then.</string>
-    <string name="reminder_dayend_midnight_explain">Your day ends at midnight, matching the calendar day.</string>
-    <string name="reminder_slider_min">1 min</string>
-    <string name="reminder_slider_max">8 hours</string>
+    <string name="screen_reminder_schedule_title">提醒排期</string>
+    <string name="reminder_mode_header">模式</string>
+    <string name="reminder_day_end_header">每日结算</string>
+    <string name="reminder_day_end_divider">每日结算</string>
+    <string name="reminder_mode_auto_explain">将根据你的每日目标和活跃时段自动安排提醒间隔。</string>
+    <string name="reminder_mode_custom_explain">将在你起床后和就寝前按所选固定间隔发送提醒。</string>
+    <string name="reminder_dayend_sleep_explain">你的一天在就寝时结束。每日进度届时也将重置。</string>
+    <string name="reminder_dayend_midnight_explain">你的一天在午夜结束，与日历上的日夜周期同步。</string>
+    <string name="reminder_slider_min">1 分钟</string>
+    <string name="reminder_slider_max">8 小时</string>
     <!-- Cadence phrases used mid-sentence and standalone -->
-    <string name="interval_every_hour">every hour</string>
-    <string name="interval_every_h_m">every %1$dh %2$dm</string>
+    <string name="interval_every_hour">每小时</string>
+    <string name="interval_every_h_m">每 %1$d 小时 %2$d 分钟</string>
     <plurals name="interval_every_minutes">
-        <item quantity="other">every %1$d minutes</item>
+        <item quantity="other">每 %1$d 分钟</item>
     </plurals>
     <plurals name="interval_every_hours">
-        <item quantity="other">every %1$d hours</item>
+        <item quantity="other">每 %1$d 小时</item>
     </plurals>
     <!-- Schedule preview sentences; auto: %1$s=goal, %2$d=glasses, %3$d=hours, %4$d=minutes -->
-    <string name="reminder_preview_auto">Based on your %1$s goal, you\'ll get about %2$d reminders (one per glass) spread across your %3$d active hours. Roughly every %4$d minutes.</string>
+    <string name="reminder_preview_auto">基于 %1$s 这个目标，你将在你 %3$d 小时的活跃期间内收到约 %2$d 次提醒（每次一杯）。间隔大约为每 %4$d 分钟。</string>
     <!-- custom: %1$s=cadence phrase, %2$s=wake time, %3$s=sleep time -->
     <string name="reminder_preview_custom">You\'ll receive a reminder %1$s between %2$s and %3$s.</string>
     <!-- ============================================================================
