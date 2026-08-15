@@ -10,23 +10,23 @@
          (e.g. home_cancel, dialogue_cancel) — reuse these everywhere.
          ============================================================================ -->
     <string name="action_cancel">取消</string>
-    <string name="action_save">Save</string>
-    <string name="action_delete">Delete</string>
-    <string name="action_add">Add</string>
-    <string name="action_close">Close</string>
-    <string name="action_confirm">Confirm</string>
-    <string name="action_reset">Reset</string>
-    <string name="action_next">Next</string>
-    <string name="action_continue">Continue</string>
+    <string name="action_save">保存</string>
+    <string name="action_delete">删除</string>
+    <string name="action_add">添加</string>
+    <string name="action_close">关闭</string>
+    <string name="action_confirm">确认</string>
+    <string name="action_reset">重置</string>
+    <string name="action_next">下一步</string>
+    <string name="action_continue">继续</string>
     <!-- ============================================================================
          Accessibility content descriptions
          Spoken by TalkBack / screen readers. Keep concise.
          ============================================================================ -->
-    <string name="cd_back">Back</string>
-    <string name="cd_delete_entry">Delete entry</string>
-    <string name="cd_edit_entry">Edit entry</string>
-    <string name="cd_reorder">Reorder</string>
-    <string name="cd_profile_photo">Profile photo</string>
+    <string name="cd_back">返回</string>
+    <string name="cd_delete_entry">删除条目</string>
+    <string name="cd_edit_entry">编辑条目</string>
+    <string name="cd_reorder">重新排序</string>
+    <string name="cd_profile_photo">个人头像</string>
     <string name="cd_water_drop">Water drop</string>
     <string name="cd_pinned">Pinned</string>
     <string name="cd_hidden">Hidden</string>
