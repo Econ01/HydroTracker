@@ -27,324 +27,324 @@
     <string name="cd_edit_entry">编辑条目</string>
     <string name="cd_reorder">重新排序</string>
     <string name="cd_profile_photo">个人头像</string>
-    <string name="cd_water_drop">Water drop</string>
-    <string name="cd_pinned">Pinned</string>
-    <string name="cd_hidden">Hidden</string>
+    <string name="cd_water_drop">水滴</string>
+    <string name="cd_pinned">已置顶</string>
+    <string name="cd_hidden">已隐藏</string>
     <!-- ============================================================================
          Units & number formatting
          Unit suffixes are kept separate from numbers so the value can be formatted
          locale-aware (NumberFormat) and the unit swapped independently.
          ============================================================================ -->
-    <string name="unit_milliliters_format">%1$s ml</string>
+    <string name="unit_milliliters_format">%1$s 毫升</string>
     <!-- Percentage with sign appended in code; %1$s = value including the % sign, e.g. "85%" -->
     <string name="percent_format">%1$s</string>
     <!-- Character counter, e.g. "12/15 characters"; %1$d = current length, %2$d = max -->
-    <string name="character_count">%1$d/%2$d characters</string>
+    <string name="character_count">%1$d/%2$d 个字符</string>
     <!-- ============================================================================
          Notification channel (Android 8+)
          Channel name/description refresh on each createNotificationChannel() call, so
          translating these values is enough — no channel-id bump required.
          ============================================================================ -->
-    <string name="notification_channel_name">Hydration Reminders</string>
-    <string name="notification_channel_description">Notifications to remind you to stay hydrated</string>
-    <string name="notification_channel_fun_facts_name">Daily Hydration Facts</string>
-    <string name="notification_channel_fun_facts_description">A daily hydration tip or fun fact</string>
+    <string name="notification_channel_name">饮水提醒</string>
+    <string name="notification_channel_description">通过通知提醒你定期喝水</string>
+    <string name="notification_channel_fun_facts_name">每日饮水报告</string>
+    <string name="notification_channel_fun_facts_description">一则每日饮水提示或趣味小知识</string>
     <!-- ============================================================================
          Widgets
          android:label value shown in the home-screen widget picker, plus the text
          rendered inside the Glance widget.
          ============================================================================ -->
-    <string name="widget_large_label">HydroTracker Large</string>
-    <string name="widget_large_description">Track hydration and add water with one tap</string>
-    <string name="widget_of_goal_format">%1$s of %2$s</string>
-    <string name="widget_goal_reached">Goal reached!</string>
-    <string name="widget_quick_add_cd">Add %1$s</string>
-    <string name="widget_daily_hydration">Daily Hydration</string>
-    <string name="widget_card_glass">Glass</string>
-    <string name="widget_card_bottle">Bottle</string>
-    <string name="widget_card_large_bottle">Large Bottle</string>
+    <string name="widget_large_label">大尺寸 HydroTracker</string>
+    <string name="widget_large_description">跟踪饮水习惯，一键添加饮水记录</string>
+    <string name="widget_of_goal_format">%2$s 中的 %1$s</string>
+    <string name="widget_goal_reached">达成目标！</string>
+    <string name="widget_quick_add_cd">添加 %1$s</string>
+    <string name="widget_daily_hydration">每日饮水</string>
+    <string name="widget_card_glass">玻璃杯</string>
+    <string name="widget_card_bottle">水瓶</string>
+    <string name="widget_card_large_bottle">大瓶</string>
     <!-- ============================================================================
          Settings: About
          ============================================================================ -->
-    <string name="updates_bug_report">Updates &amp; Bug Report</string>
+    <string name="updates_bug_report">更新 &amp; 问题报告</string>
     <!-- ============================================================================
          Settings: Display &amp; Locale
          ============================================================================ -->
-    <string name="screen_display_locale_title">Display &amp; Locale</string>
-    <string name="display_language_header">Language</string>
-    <string name="display_date_and_time_format_header">Date &amp; Time</string>
-    <string name="display_time_format_header">Time Format</string>
-    <string name="display_volume_unit_header">Volume unit</string>
+    <string name="screen_display_locale_title">显示 &amp; 语言</string>
+    <string name="display_language_header">语言</string>
+    <string name="display_date_and_time_format_header">日期 &amp; 时间</string>
+    <string name="display_time_format_header">时间格式</string>
+    <string name="display_volume_unit_header">容积单位</string>
     <!-- Language option that follows the device language instead of a fixed one -->
-    <string name="language_system_default">System default</string>
+    <string name="language_system_default">系统默认</string>
     <!-- ============================================================================
          Settings: Language & Translation
          ============================================================================ -->
-    <string name="screen_language_title">Language &amp; Translation</string>
-    <string name="language_translation_disclaimer">Content is displayed only upon translation approval. Unapproved segments remain hidden.</string>
-    <string name="language_contribute_title">Contribute</string>
-    <string name="language_crowdin_title">Help translate HydroTracker</string>
-    <string name="language_crowdin_description">Contribute on Crowdin</string>
-    <string name="language_progress_header">Translation progress</string>
-    <string name="language_progress_translated">Translated</string>
-    <string name="language_progress_approved">Approved</string>
+    <string name="screen_language_title">语言 &amp; 翻译</string>
+    <string name="language_translation_disclaimer">内容仅在翻译获批后显示。未批准部分将保持隐藏。</string>
+    <string name="language_contribute_title">贡献</string>
+    <string name="language_crowdin_title">帮助翻译 HydroTracker</string>
+    <string name="language_crowdin_description">在 Crowdin 上贡献翻译</string>
+    <string name="language_progress_header">翻译进度</string>
+    <string name="language_progress_translated">已翻译</string>
+    <string name="language_progress_approved">已批准</string>
     <!-- Time format options -->
-    <string name="time_format_system">System</string>
-    <string name="time_format_12_hour">12-hour</string>
-    <string name="time_format_24_hour">24-hour</string>
+    <string name="time_format_system">系统</string>
+    <string name="time_format_12_hour">12 小时制</string>
+    <string name="time_format_24_hour">24 小时制</string>
     <!-- Date format options -->
-    <string name="date_format_system">System</string>
+    <string name="date_format_system">系统</string>
     <string name="date_format_day_month_year">16 Jun 2026</string>
     <string name="date_format_month_day_year">Jun 16, 2026</string>
     <string name="date_format_year_month_day">2026–06–16</string>
     <!-- Volume unit options -->
-    <string name="unit_millilitres">Metric</string>
-    <string name="unit_ml_short">ml</string>
-    <string name="unit_us_fl_oz">US fluid ounces</string>
-    <string name="unit_us_fl_oz_short">fl oz</string>
-    <string name="unit_imperial_fl_oz">Imperial fluid ounces</string>
-    <string name="unit_imperial_fl_oz_short">fl oz (UK)</string>
+    <string name="unit_millilitres">公制</string>
+    <string name="unit_ml_short">毫升</string>
+    <string name="unit_us_fl_oz">美式盎司</string>
+    <string name="unit_us_fl_oz_short">液量盎司</string>
+    <string name="unit_imperial_fl_oz">英制</string>
+    <string name="unit_imperial_fl_oz_short">液量盎司（英制）</string>
     <!-- Display-only volume units (auto-scaling and call-site overrides) -->
-    <string name="unit_litre_short">L</string>
-    <string name="unit_kilolitre_short">kL</string>
-    <string name="unit_megalitre_short">ML</string>
-    <string name="unit_gigalitre_short">GL</string>
-    <string name="unit_us_pint_short">pt</string>
-    <string name="unit_us_quart_short">qt</string>
-    <string name="unit_us_gallon_short">gal</string>
-    <string name="unit_imperial_pint_short">pt</string>
-    <string name="unit_imperial_quart_short">qt</string>
-    <string name="unit_imperial_gallon_short">gal</string>
+    <string name="unit_litre_short">升</string>
+    <string name="unit_kilolitre_short">千升</string>
+    <string name="unit_megalitre_short">毫升</string>
+    <string name="unit_gigalitre_short">公升</string>
+    <string name="unit_us_pint_short">品脱</string>
+    <string name="unit_us_quart_short">夸脱</string>
+    <string name="unit_us_gallon_short">加仑</string>
+    <string name="unit_imperial_pint_short">品脱</string>
+    <string name="unit_imperial_quart_short">夸脱</string>
+    <string name="unit_imperial_gallon_short">加仑</string>
     <!-- ============================================================================
          Onboarding
          Per-step title + description (shown above each step), plus step controls.
          ============================================================================ -->
-    <string name="onboarding_welcome_title">Welcome to HydroTracker</string>
-    <string name="onboarding_welcome_description">We\'ll personalize the app for you.</string>
-    <string name="onboarding_gender_title">Tell us about yourself</string>
-    <string name="onboarding_gender_description">Choose the option that best describes you.</string>
-    <string name="onboarding_age_title">What\'s your age group?</string>
-    <string name="onboarding_age_description">Select your age range.</string>
-    <string name="onboarding_activity_title">How active are you?</string>
-    <string name="onboarding_activity_description">Pick your general daily activity level.</string>
-    <string name="onboarding_schedule_title">When are you awake?</string>
-    <string name="onboarding_schedule_description">Tell us your wake and sleep times.</string>
-    <string name="onboarding_profile_title">Complete Your Profile</string>
-    <string name="onboarding_profile_description">Add your name and a profile photo to personalize your experience.</string>
-    <string name="onboarding_goal_title">Your personalized goal</string>
-    <string name="onboarding_goal_description">Review your calculated goal.</string>
-    <string name="onboarding_complete_title">You\'re all set!</string>
-    <string name="onboarding_complete_description">Tap the button to start hydrating!</string>
-    <string name="onboarding_finish">Finish</string>
+    <string name="onboarding_welcome_title">欢迎使用 HydroTracker</string>
+    <string name="onboarding_welcome_description">让我们来为你定制应用使用体验。</string>
+    <string name="onboarding_gender_title">介绍一下自己</string>
+    <string name="onboarding_gender_description">选择最符合你实际情况的选项。</string>
+    <string name="onboarding_age_title">你属于哪个年龄分组？</string>
+    <string name="onboarding_age_description">选择你的年龄范围。</string>
+    <string name="onboarding_activity_title">你的活动状态是？</string>
+    <string name="onboarding_activity_description">选择你的一般日常活动等级。</string>
+    <string name="onboarding_schedule_title">你什么时候起床？</string>
+    <string name="onboarding_schedule_description">告诉我们你的起床和就寝时间。</string>
+    <string name="onboarding_profile_title">完成个人设置</string>
+    <string name="onboarding_profile_description">添加你的名字和个人资料图像，个性化你的使用体验。</string>
+    <string name="onboarding_goal_title">你的个性化目标</string>
+    <string name="onboarding_goal_description">查看你的目标计算结果。</string>
+    <string name="onboarding_complete_title">一切就绪！</string>
+    <string name="onboarding_complete_description">点击图标来记录饮水！</string>
+    <string name="onboarding_finish">完成</string>
     <!-- Welcome step -->
-    <string name="onboarding_welcome_subtitle">Let\'s set up your personalized water intake goal based on your lifestyle and preferences.</string>
-    <string name="onboarding_feature_goals_title">Personalized Goals</string>
-    <string name="onboarding_feature_goals_desc">Based on scientific research and your profile</string>
-    <string name="onboarding_feature_reminders_title">Smart Reminders</string>
-    <string name="onboarding_feature_reminders_desc">Gentle nudges during your active hours</string>
-    <string name="onboarding_feature_progress_title">Progress Tracking</string>
-    <string name="onboarding_feature_progress_desc">Detailed insights and history</string>
-    <string name="onboarding_get_started">Get Started</string>
+    <string name="onboarding_welcome_subtitle">让我们根据你的生活方式和偏好来配置个性化饮水目标。</string>
+    <string name="onboarding_feature_goals_title">个性化目标</string>
+    <string name="onboarding_feature_goals_desc">基于科学研究和你的个人资料</string>
+    <string name="onboarding_feature_reminders_title">智能提醒</string>
+    <string name="onboarding_feature_reminders_desc">在你的活跃时段温和提醒</string>
+    <string name="onboarding_feature_progress_title">进度追踪</string>
+    <string name="onboarding_feature_progress_desc">详细见解和历史记录</string>
+    <string name="onboarding_get_started">开始体验</string>
     <!-- Schedule step -->
-    <string name="onboarding_wake_label">Wake-Up Time</string>
-    <string name="onboarding_sleep_label">Sleep Time</string>
-    <string name="onboarding_wake_picker_title">Wake Up Time</string>
-    <string name="onboarding_wake_picker_subtitle">Choose your wake-up time</string>
-    <string name="onboarding_sleep_picker_title">Sleep Time</string>
-    <string name="onboarding_sleep_picker_subtitle">Choose your sleep time</string>
-    <string name="time_picker_set">Set Time</string>
+    <string name="onboarding_wake_label">起床时间</string>
+    <string name="onboarding_sleep_label">就寝时间</string>
+    <string name="onboarding_wake_picker_title">起床时间</string>
+    <string name="onboarding_wake_picker_subtitle">选择你的起床时间</string>
+    <string name="onboarding_sleep_picker_title">就寝时间</string>
+    <string name="onboarding_sleep_picker_subtitle">选择你的就寝时间</string>
+    <string name="time_picker_set">设置时间</string>
     <!-- Awake duration, e.g. "Awake for 16h 0m"; %1$d = hours, %2$d = minutes -->
-    <string name="onboarding_awake_duration">Awake for %1$dh %2$dm</string>
+    <string name="onboarding_awake_duration">清醒时间为 %1$d 小时 %2$d 分钟</string>
     <!-- Profile setup step -->
-    <string name="profile_add_photo">Add Photo</string>
-    <string name="profile_remove_photo">Remove Photo</string>
-    <string name="profile_name_prompt">What should we call you?</string>
-    <string name="profile_name_label">Your name</string>
-    <string name="profile_name_placeholder">Enter your name</string>
-    <string name="profile_name_required">Name is required to continue</string>
-    <string name="profile_select_photo">Select Profile Photo</string>
-    <string name="profile_choose_gallery">Choose from Gallery</string>
-    <string name="profile_choose_gallery_desc">Select an existing photo</string>
-    <string name="profile_take_photo">Take Photo</string>
-    <string name="profile_take_photo_desc">Use your camera to take a new photo</string>
+    <string name="profile_add_photo">添加照片</string>
+    <string name="profile_remove_photo">移除照片</string>
+    <string name="profile_name_prompt">我们应该怎么称呼你？</string>
+    <string name="profile_name_label">你的名字</string>
+    <string name="profile_name_placeholder">输入你的名字</string>
+    <string name="profile_name_required">需要名字以继续</string>
+    <string name="profile_select_photo">选择个人图像</string>
+    <string name="profile_choose_gallery">从图库选择</string>
+    <string name="profile_choose_gallery_desc">从已有照片选择</string>
+    <string name="profile_take_photo">拍照</string>
+    <string name="profile_take_photo_desc">使用你的相机拍摄新图像</string>
     <!-- Goal step -->
-    <string name="goal_daily_water_goal">Daily Water Goal</string>
-    <string name="goal_reminder_interval">Reminder Interval</string>
-    <string name="goal_activity_level">Activity Level</string>
-    <string name="goal_personalized_title">How we personalized this</string>
-    <string name="goal_personalized_body">Your goal considers your profile and schedule. These factors influence total intake and notification cadence.</string>
+    <string name="goal_daily_water_goal">每日饮水目标</string>
+    <string name="goal_reminder_interval">提醒间隔</string>
+    <string name="goal_activity_level">活动等级</string>
+    <string name="goal_personalized_title">我们的个性化方案</string>
+    <string name="goal_personalized_body">你的目标基于你的个人信息和习惯。这些因素会影响总饮水需求和通知节奏。</string>
     <!-- Profile recap chips; %1$s = a time like 07:00 -->
-    <string name="goal_chip_wake">Wake: %1$s</string>
-    <string name="goal_chip_sleep">Sleep: %1$s</string>
+    <string name="goal_chip_wake">清醒时间：%1$s</string>
+    <string name="goal_chip_sleep">就寝时间：%1$s</string>
     <!-- Reminder interval shown in the Goal step; pluralized on the minute count -->
     <plurals name="reminder_interval_minutes">
-        <item quantity="other">%1$d minutes</item>
+        <item quantity="other">%1$d 分钟</item>
     </plurals>
     <!-- Complete step -->
-    <string name="complete_subtitle">Your personalized hydration plan is ready.</string>
-    <string name="complete_daily_goal">Your Daily Goal</string>
-    <string name="complete_start_button">Start hydrating</string>
+    <string name="complete_subtitle">你的个性化饮水方案已就绪。</string>
+    <string name="complete_daily_goal">你的每日目标</string>
+    <string name="complete_start_button">开始饮水</string>
     <!-- Abbreviated reminder interval, e.g. "60 min"; %1$d = minutes -->
-    <string name="reminder_interval_min_short">%1$d min</string>
+    <string name="reminder_interval_min_short">%1$d 分钟</string>
     <!-- ============================================================================
          Beverages &amp; containers — shared bottom sheets
          Add/edit custom beverages and container presets (presentation/common).
          ============================================================================ -->
     <!-- Shared -->
-    <string name="error_name_required">Name is required</string>
-    <string name="label_icon">Icon</string>
+    <string name="error_name_required">需要名称</string>
+    <string name="label_icon">图标</string>
     <!-- Delete confirmation body; %1$s = the item name being deleted -->
-    <string name="delete_confirm_message">Are you sure you want to delete \"%1$s\"? This action cannot be undone.</string>
+    <string name="delete_confirm_message">你确定要删除「%1$s」吗？该操作无法撤销。</string>
     <!-- Custom beverage sheet -->
-    <string name="beverage_add">Add Beverage</string>
-    <string name="beverage_edit_title">Edit Beverage</string>
-    <string name="beverage_delete_title">Delete Beverage?</string>
-    <string name="beverage_show_in_quick_add">Show in Quick Add</string>
-    <string name="beverage_hide_from_quick_add">Hide from Quick Add</string>
+    <string name="beverage_add">添加饮品</string>
+    <string name="beverage_edit_title">编辑饮品</string>
+    <string name="beverage_delete_title">删除饮品？</string>
+    <string name="beverage_show_in_quick_add">在快速添加中显示</string>
+    <string name="beverage_hide_from_quick_add">从快速添加中隐藏</string>
     <!-- Preset effectiveness line, e.g. "150% hydration effectiveness"; %1$s = per cent value including the % sign -->
-    <string name="beverage_hydration_effectiveness">%1$s hydration effectiveness</string>
-    <string name="beverage_name_label">Beverage Name</string>
-    <string name="beverage_name_placeholder">e.g., Smoothie</string>
-    <string name="beverage_effectiveness_label" formatted="false">Hydration effectiveness (%)</string>
-    <string name="beverage_effectiveness_placeholder">e.g., 100</string>
+    <string name="beverage_hydration_effectiveness">%1$s 含水率</string>
+    <string name="beverage_name_label">饮品名称</string>
+    <string name="beverage_name_placeholder">比如：冰沙</string>
+    <string name="beverage_effectiveness_label" formatted="false">含水率（%）</string>
+    <string name="beverage_effectiveness_placeholder">比如：100</string>
     <!-- Validation; %1$d = min, %2$d = max -->
-    <string name="beverage_effectiveness_error">Enter a value between %1$d and %2$d</string>
-    <string name="beverage_effectiveness_hint" formatted="false">100% counts the full amount toward your goal</string>
+    <string name="beverage_effectiveness_error">输入一个 %1$d 到 %2$d 间的数值</string>
+    <string name="beverage_effectiveness_hint" formatted="false">将按 100% 全部记入你的目标</string>
     <!-- Container preset sheet -->
-    <string name="container_add_title">Add Container</string>
-    <string name="container_edit_title">Edit Container</string>
-    <string name="container_name_label">Container Name</string>
-    <string name="container_name_placeholder">e.g., Coffee Mug</string>
-    <string name="container_volume_label">Volume (%1$s)</string>
-    <string name="container_volume_placeholder">e.g., 250</string>
+    <string name="container_add_title">添加容器</string>
+    <string name="container_edit_title">编辑容器</string>
+    <string name="container_name_label">容器名称</string>
+    <string name="container_name_placeholder">比如：咖啡杯</string>
+    <string name="container_volume_label">容量（%1$s）</string>
+    <string name="container_volume_placeholder">比如：250</string>
     <!-- %1$s = minimum valid amount, %2$s = maximum valid amount (both with unit) -->
-    <string name="container_volume_error">Enter a valid volume (%1$s–%2$s)</string>
-    <string name="container_icon_picker_hint">Tap an icon below to override the automatic choice</string>
-    <string name="container_icon_preview_description">Selected container icon</string>
-    <string name="container_delete_title">Delete Container?</string>
+    <string name="container_volume_error">输入一个有效容量（%1$s - %2$s）</string>
+    <string name="container_icon_picker_hint">点击下方的图标来覆盖自动选择</string>
+    <string name="container_icon_preview_description">已选择的容器图标</string>
+    <string name="container_delete_title">删除容器？</string>
     <!-- ============================================================================
          Navigation &amp; top bars
          ============================================================================ -->
-    <string name="nav_home">Home</string>
-    <string name="nav_history">History</string>
-    <string name="nav_statistics">Statistics</string>
-    <string name="nav_profile">Profile</string>
-    <string name="nav_settings">Settings</string>
-    <string name="nav_add_custom">Add Custom</string>
-    <string name="fab_menu_new_beverage">New Beverage</string>
-    <string name="fab_menu_new_container">New Container</string>
-    <string name="fab_menu_add_past_entry">Add Past Entry</string>
-    <string name="fab_menu_toggle_menu">Toggle menu</string>
+    <string name="nav_home">主屏</string>
+    <string name="nav_history">历史</string>
+    <string name="nav_statistics">数据</string>
+    <string name="nav_profile">个人资料</string>
+    <string name="nav_settings">设置</string>
+    <string name="nav_add_custom">添加自定义</string>
+    <string name="fab_menu_new_beverage">新饮品</string>
+    <string name="fab_menu_new_container">新容器</string>
+    <string name="fab_menu_add_past_entry">添加历史条目</string>
+    <string name="fab_menu_toggle_menu">切换菜单</string>
     <!-- ============================================================================
          Settings — hub
          Screen titles are reused as both the hub row title and the screen's app-bar title.
          ============================================================================ -->
-    <string name="screen_appearance_title">Appearance</string>
-    <string name="screen_hydration_title">Hydration &amp; Health</string>
-    <string name="screen_quickadd_title">Quick Add Customization</string>
-    <string name="screen_notifications_title">Notifications</string>
-    <string name="screen_support_title">Support Development</string>
-    <string name="screen_about_title">About</string>
-    <string name="screen_developer_title">Developer Options</string>
-    <string name="settings_about_update_available">About - Update Available</string>
-    <string name="settings_appearance_desc">Theme, colours and AMOLED mode</string>
-    <string name="settings_display_desc">Week start day and locale</string>
-    <string name="settings_hydration_desc">Water goal calculation and Health Connect</string>
-    <string name="settings_quickadd_desc">Container presets and beverage types</string>
-    <string name="settings_notifications_desc">Hydration reminders and permissions</string>
-    <string name="settings_support_desc">Donate and support the app</string>
-    <string name="settings_about_desc">Sources, privacy policy and license</string>
-    <string name="settings_developer_desc">Debug tools and testing</string>
-    <string name="screen_data_management_title">Data Management</string>
-    <string name="settings_data_management_desc">Export, import and delete your data</string>
+    <string name="screen_appearance_title">外观</string>
+    <string name="screen_hydration_title">饮水 &amp; 健康</string>
+    <string name="screen_quickadd_title">自定义快速添加</string>
+    <string name="screen_notifications_title">通知</string>
+    <string name="screen_support_title">支持开发</string>
+    <string name="screen_about_title">关于</string>
+    <string name="screen_developer_title">开发者选项</string>
+    <string name="settings_about_update_available">关于 - 有可用更新</string>
+    <string name="settings_appearance_desc">主题、色彩与 AMOLED 模式</string>
+    <string name="settings_display_desc">每周起始日与本地化</string>
+    <string name="settings_hydration_desc">饮水目标计算与 Health Connect</string>
+    <string name="settings_quickadd_desc">容器预设与饮品类型</string>
+    <string name="settings_notifications_desc">饮水提醒与权限</string>
+    <string name="settings_support_desc">捐赠与支持应用开发</string>
+    <string name="settings_about_desc">来源、隐私策略与许可证</string>
+    <string name="settings_developer_desc">开发工具与测试</string>
+    <string name="screen_data_management_title">数据管理</string>
+    <string name="settings_data_management_desc">导出、导入与个人数据删除</string>
     <!-- ============================================================================
          Settings — Appearance
          ============================================================================ -->
-    <string name="appearance_theme_header">Theme</string>
-    <string name="appearance_theme_system">System</string>
-    <string name="appearance_theme_light">Light</string>
-    <string name="appearance_theme_dark">Dark</string>
-    <string name="appearance_color_header">Color</string>
-    <string name="appearance_amoled_title">AMOLED Mode</string>
-    <string name="appearance_amoled_desc">True black backgrounds in dark mode</string>
-    <string name="appearance_amoled_borders_title">Surface Borders</string>
-    <string name="appearance_amoled_borders_desc">Subtle borders around cards in AMOLED mode</string>
-    <string name="appearance_font_header">Font</string>
-    <string name="appearance_navbar_header">Navigation bar</string>
-    <string name="appearance_autohide_title">Auto-hide on scroll</string>
-    <string name="appearance_autohide_desc">Hide the bar when scrolling down</string>
-    <string name="appearance_labels_title">Labels</string>
-    <string name="appearance_home_header">Home screen</string>
-    <string name="appearance_feedback_header">Interaction &amp; Feedback</string>
-    <string name="appearance_haptics_title">Haptic Feedback</string>
-    <string name="appearance_haptics_desc">Vibrate on button taps and actions</string>
-    <string name="appearance_number_animation_title">Rolling Number Animation</string>
-    <string name="appearance_number_animation_desc">Switch off for a lighter count-up animation</string>
-    <string name="appearance_edge_effect_title">Edge Effect</string>
-    <string name="appearance_beverage_colors_title">Beverage Colours</string>
-    <string name="appearance_beverage_colors_desc">Tint home-screen cards and entries with each beverage’s colour</string>
+    <string name="appearance_theme_header">主题</string>
+    <string name="appearance_theme_system">系统</string>
+    <string name="appearance_theme_light">浅色</string>
+    <string name="appearance_theme_dark">深色</string>
+    <string name="appearance_color_header">色彩</string>
+    <string name="appearance_amoled_title">AMOLED 模式</string>
+    <string name="appearance_amoled_desc">在深色模式下使用纯黑背景</string>
+    <string name="appearance_amoled_borders_title">界面边角</string>
+    <string name="appearance_amoled_borders_desc">在 AMOLED 模式下为卡片使用柔和边角</string>
+    <string name="appearance_font_header">字体</string>
+    <string name="appearance_navbar_header">导航栏</string>
+    <string name="appearance_autohide_title">滚动时隐藏</string>
+    <string name="appearance_autohide_desc">滚动页面时自动隐藏</string>
+    <string name="appearance_labels_title">标签</string>
+    <string name="appearance_home_header">主屏</string>
+    <string name="appearance_feedback_header">交互 &amp; 反馈</string>
+    <string name="appearance_haptics_title">振动反馈</string>
+    <string name="appearance_haptics_desc">点击按钮和操作时提供振动反馈</string>
+    <string name="appearance_number_animation_title">数字滚动动画</string>
+    <string name="appearance_number_animation_desc">关闭以使用更清凉的计数动画</string>
+    <string name="appearance_edge_effect_title">边缘效果</string>
+    <string name="appearance_beverage_colors_title">饮品颜色</string>
+    <string name="appearance_beverage_colors_desc">用每种饮品的颜色来为主屏卡片和条目上色</string>
     <!-- Sample data shown in the theme preview card -->
-    <string name="appearance_preview_amount">1,250 / 2,500 ml</string>
-    <string name="appearance_preview_entries">Entries</string>
-    <string name="appearance_preview_first">First</string>
-    <string name="appearance_preview_latest">Latest</string>
+    <string name="appearance_preview_amount">1250 / 2500 毫升</string>
+    <string name="appearance_preview_entries">条目</string>
+    <string name="appearance_preview_first">最前</string>
+    <string name="appearance_preview_latest">最近</string>
     <!-- ============================================================================
          Settings — Widget (Appearance ▸ Widget)
          ============================================================================ -->
-    <string name="appearance_widget_section_title">Widgets</string>
-    <string name="appearance_widget_title">Widget Settings</string>
-    <string name="appearance_widget_desc">Change appearance and behaviour</string>
-    <string name="widget_settings_colours_header">Colours</string>
-    <string name="widget_settings_dynamic_title">Dynamic colours</string>
-    <string name="widget_settings_dynamic_desc">Colours from your wallpaper</string>
-    <string name="widget_settings_background_header">Background</string>
-    <string name="widget_settings_transparent_title">Transparent background</string>
-    <string name="widget_settings_transparent_desc">Make the background surface transparent</string>
-    <string name="widget_settings_pure_black_title">Pure black background</string>
-    <string name="widget_settings_pure_black_desc">Use a true black surface in dark mode</string>
-    <string name="widget_settings_pure_white_title">Pure white background</string>
-    <string name="widget_settings_pure_white_desc">Use a true white surface in light mode</string>
-    <string name="widget_settings_quickadd_title">Quick actions</string>
-    <string name="widget_settings_quickadd_desc">Choose the three quick-add buttons</string>
-    <string name="screen_widget_quickadd_title">Widget quick actions</string>
-    <string name="widget_quickadd_auto">Auto</string>
-    <string name="widget_quickadd_beverage_header">Beverage</string>
-    <string name="widget_quickadd_slot_section_title">Quick-add buttons</string>
-    <string name="widget_quickadd_container_sheet_title">Choose container</string>
-    <string name="widget_quickadd_beverage_sheet_title">Choose beverage</string>
-    <string name="widget_quickadd_reset_all">Reset all to automatic</string>
+    <string name="appearance_widget_section_title">小组件</string>
+    <string name="appearance_widget_title">小组件设置</string>
+    <string name="appearance_widget_desc">更改外观和行为</string>
+    <string name="widget_settings_colours_header">颜色</string>
+    <string name="widget_settings_dynamic_title">动态颜色</string>
+    <string name="widget_settings_dynamic_desc">来自你壁纸的颜色</string>
+    <string name="widget_settings_background_header">背景</string>
+    <string name="widget_settings_transparent_title">透明背景</string>
+    <string name="widget_settings_transparent_desc">让背景图像透明</string>
+    <string name="widget_settings_pure_black_title">纯黑背景</string>
+    <string name="widget_settings_pure_black_desc">在深色模式下使用纯黑背景</string>
+    <string name="widget_settings_pure_white_title">纯白背景</string>
+    <string name="widget_settings_pure_white_desc">在浅色模式下使用纯白背景</string>
+    <string name="widget_settings_quickadd_title">快速操作</string>
+    <string name="widget_settings_quickadd_desc">选择三个快速添加按钮</string>
+    <string name="screen_widget_quickadd_title">小组件快速操作</string>
+    <string name="widget_quickadd_auto">自动</string>
+    <string name="widget_quickadd_beverage_header">饮品</string>
+    <string name="widget_quickadd_slot_section_title">快速添加按钮</string>
+    <string name="widget_quickadd_container_sheet_title">选择容器</string>
+    <string name="widget_quickadd_beverage_sheet_title">选择饮品</string>
+    <string name="widget_quickadd_reset_all">全部重置为自动</string>
     <!-- ============================================================================
          Settings — Notifications
          ============================================================================ -->
-    <string name="action_allow">Allow</string>
-    <string name="notif_reminders_header">Reminders</string>
-    <string name="notif_hydration_reminders">Hydration reminders</string>
-    <string name="notif_reminders_active">Reminders are active</string>
-    <string name="notif_reminders_paused">Reminders are paused</string>
-    <string name="notif_fun_facts">Daily hydration facts</string>
-    <string name="notif_fun_facts_active">A fun fact will be sent each day</string>
-    <string name="notif_fun_facts_paused">Daily facts are paused</string>
-    <string name="notif_sample_notification">Sample notification</string>
-    <string name="notif_fun_fact">Fun Fact</string>
+    <string name="action_allow">允许</string>
+    <string name="notif_reminders_header">提醒</string>
+    <string name="notif_hydration_reminders">饮水提醒</string>
+    <string name="notif_reminders_active">已激活提醒</string>
+    <string name="notif_reminders_paused">已暂停提醒</string>
+    <string name="notif_fun_facts">每日饮水报告</string>
+    <string name="notif_fun_facts_active">每天将发送一条趣味饮水小知识</string>
+    <string name="notif_fun_facts_paused">已暂停每日报告</string>
+    <string name="notif_sample_notification">示例通知</string>
+    <string name="notif_fun_fact">趣味知识</string>
     <!-- Reminder-style descriptions shown in the preview card -->
-    <string name="notif_style_gentle_desc">Soft, encouraging reminders</string>
-    <string name="notif_style_motivating_desc">Energetic, goal-focused reminders</string>
-    <string name="notif_style_minimal_desc">Simple, unobtrusive reminders</string>
-    <string name="notif_permissions_header">Permissions</string>
-    <string name="notif_permission_title">Notification permission</string>
-    <string name="notif_permission_desc">Required to send hydration reminders</string>
-    <string name="notif_exact_alarm_title">Exact alarm permission</string>
-    <string name="notif_exact_alarm_desc">Required for precise reminder timing</string>
-    <string name="notif_reminder_style_header">Reminder style</string>
+    <string name="notif_style_gentle_desc">温和激励式提醒</string>
+    <string name="notif_style_motivating_desc">活力十足、目标导向式提醒</string>
+    <string name="notif_style_minimal_desc">简单不突兀的提醒</string>
+    <string name="notif_permissions_header">权限</string>
+    <string name="notif_permission_title">通知权限</string>
+    <string name="notif_permission_desc">用以发送饮水提醒</string>
+    <string name="notif_exact_alarm_title">精确闹钟权限</string>
+    <string name="notif_exact_alarm_desc">保证提醒时间精确</string>
+    <string name="notif_reminder_style_header">提醒风格</string>
     <!-- Short reminder-style labels shown on the toggle buttons -->
-    <string name="notif_style_gentle_short">Gentle</string>
-    <string name="notif_style_motivating_short">Energetic</string>
-    <string name="notif_style_minimal_short">Simple</string>
-    <string name="notif_active_hours_header">Active hours</string>
-    <string name="notif_wake_up">Wake up</string>
-    <string name="notif_sleep">Sleep</string>
-    <string name="notif_wake_up_time">Wake up time</string>
-    <string name="notif_sleep_time">Sleep time</string>
+    <string name="notif_style_gentle_short">温和</string>
+    <string name="notif_style_motivating_short">活力</string>
+    <string name="notif_style_minimal_short">简洁</string>
+    <string name="notif_active_hours_header">活跃时段</string>
+    <string name="notif_wake_up">起床</string>
+    <string name="notif_sleep">就寝</string>
+    <string name="notif_wake_up_time">起床时间</string>
+    <string name="notif_sleep_time">就寝时间</string>
     <string name="notif_schedule_header">Schedule</string>
     <string name="notif_configure_schedule">Configure schedule</string>
     <string name="notif_configure_schedule_desc">Change reminder mode or set a custom interval</string>
@@ -419,132 +419,132 @@
     <string name="hydration_region_european">(European)</string>
     <string name="hydration_region_us">(US)</string>
     <string name="hydration_efsa_tag">Conservative</string>
-    <string name="hydration_iom_tag">Higher intake</string>
+    <string name="hydration_iom_tag">更高摄入</string>
     <!-- Health Connect -->
     <string name="hc_section_header">Health Connect</string>
-    <string name="hc_sync_title">Sync with Health Connect</string>
-    <string name="hc_sync_desc">Share hydration data with other health apps</string>
-    <string name="hc_data_title">Health Connect Data</string>
-    <string name="hc_data_desc">View your synced intake history</string>
-    <string name="hc_restore">Restore from Health Connect</string>
-    <string name="hc_restore_confirm">Restore</string>
-    <string name="hc_grant_permissions">Grant Permissions</string>
-    <string name="hc_restore_message">Import your past HydroTracker entries from Health Connect. Choose a time range:</string>
-    <string name="hc_restore_all">All history</string>
-    <string name="hc_restore_90days">Last 90 days</string>
+    <string name="hc_sync_title">与 Health Connect 同步</string>
+    <string name="hc_sync_desc">与其他健康应用分享你的饮水数据</string>
+    <string name="hc_data_title">Health Connect 数据</string>
+    <string name="hc_data_desc">查看已同步的摄入历史</string>
+    <string name="hc_restore">从 Health Connect 恢复</string>
+    <string name="hc_restore_confirm">恢复</string>
+    <string name="hc_grant_permissions">授予权限</string>
+    <string name="hc_restore_message">从 Health Connect 导入你的 HydroTracker 历史条目。选择时间范围：</string>
+    <string name="hc_restore_all">全部历史</string>
+    <string name="hc_restore_90days">过去 90 天</string>
     <!-- %1$d = imported count, %2$d = skipped duplicates -->
-    <string name="hc_restored_snackbar">Restored %1$d entries, skipped %2$d duplicates</string>
-    <string name="hc_no_data_title">No Water Intake Data</string>
-    <string name="hc_no_data_desc">No water intake entries found in the database.</string>
+    <string name="hc_restored_snackbar">已恢复 %1$d 个条目，已跳过 %2$d 重复条目</string>
+    <string name="hc_no_data_title">没有饮水摄入数据</string>
+    <string name="hc_no_data_desc">在该数据库中找不到饮水摄入条目。</string>
     <!-- %1$s = volume, %2$s = container label -->
-    <string name="hc_amount_line">Amount: %1$s (%2$s)</string>
+    <string name="hc_amount_line">容量：%1$s（%2$s）</string>
     <!-- %1$s = beverage name, %2$s = effective amount with unit -->
-    <string name="hc_beverage_eff">Beverage: %1$s (%2$s eff.)</string>
-    <string name="hc_beverage">Beverage: %1$s</string>
-    <string name="hc_badge_external">External</string>
-    <string name="hc_record_id">Health Connect ID: %1$s</string>
-    <string name="hc_unhide_entry">Unhide Entry</string>
+    <string name="hc_beverage_eff">饮品：%1$s（有效容量 %2$s）</string>
+    <string name="hc_beverage">饮品：%1$s</string>
+    <string name="hc_badge_external">外部</string>
+    <string name="hc_record_id">Health Connect ID：%1$s</string>
+    <string name="hc_unhide_entry">取消隐藏条目</string>
     <!-- ============================================================================
          Data-model enum labels
          Resolved in the UI via stringResource(enum.labelResId). Grouped by enum.
          ============================================================================ -->
     <!-- Gender -->
-    <string name="gender_male">Male</string>
-    <string name="gender_female">Female</string>
-    <string name="gender_other">Prefer not to say</string>
+    <string name="gender_male">男性</string>
+    <string name="gender_female">女性</string>
+    <string name="gender_other">不便透露</string>
     <!-- Inclusive, encouraging greeting shown per gender -->
-    <string name="gender_greeting_male">Stay hydrated, champion!</string>
-    <string name="gender_greeting_female">Keep glowing with hydration!</string>
-    <string name="gender_greeting_other">You\'ve got this!</string>
+    <string name="gender_greeting_male">记得喝水，保持状态！</string>
+    <string name="gender_greeting_female">记得补水，保持元气！</string>
+    <string name="gender_greeting_other">喝点水，你可以的！</string>
     <!-- Age group -->
-    <string name="age_group_young_adult">18–30 years</string>
-    <string name="age_group_adult">31–50 years</string>
-    <string name="age_group_middle_aged">51–60 years</string>
-    <string name="age_group_senior">60+ years</string>
-    <string name="age_motivation_young_adult">Your body is building its foundation - keep it hydrated!</string>
-    <string name="age_motivation_adult">Hydration is your energy source - fuel your busy life!</string>
-    <string name="age_motivation_middle_aged">Stay refreshed and vibrant with proper hydration!</string>
-    <string name="age_motivation_senior">Hydration supports your wellness journey every day!</string>
+    <string name="age_group_young_adult">18–30 岁</string>
+    <string name="age_group_adult">31–50 岁</string>
+    <string name="age_group_middle_aged">51–60 岁</string>
+    <string name="age_group_senior">60+ 岁</string>
+    <string name="age_motivation_young_adult">给身体打好基础——别忘了喝水！</string>
+    <string name="age_motivation_adult">水分跟得上，活力才跟得上！</string>
+    <string name="age_motivation_middle_aged">及时补水，身体清爽有活力！</string>
+    <string name="age_motivation_senior">坚持补水，为健康助力！</string>
     <!-- Activity level -->
-    <string name="activity_sedentary">Sedentary</string>
-    <string name="activity_light">Light Activity</string>
-    <string name="activity_moderate">Moderate Activity</string>
-    <string name="activity_active">Active</string>
-    <string name="activity_very_active">Very Active</string>
-    <string name="activity_desc_sedentary">Little to no exercise</string>
-    <string name="activity_desc_light">Light exercise 1–3 days/week</string>
-    <string name="activity_desc_moderate" tools:ignore="TypographyDashes">Moderate exercise 3–5 days/week</string>
-    <string name="activity_desc_active">Heavy exercise 6–7 days/week</string>
-    <string name="activity_desc_very_active">Very heavy exercise or physical job</string>
-    <string name="activity_tip_sedentary">Even at rest, your body needs consistent hydration!</string>
-    <string name="activity_tip_light">Light activity still means you need extra hydration support!</string>
-    <string name="activity_tip_moderate">Regular exercise requires regular hydration - you\'re doing great!</string>
-    <string name="activity_tip_active">Your active lifestyle deserves premium hydration care!</string>
-    <string name="activity_tip_very_active">High performance demands high hydration - you\'re a champion!</string>
+    <string name="activity_sedentary">久坐</string>
+    <string name="activity_light">轻度活动</string>
+    <string name="activity_moderate">中等活动</string>
+    <string name="activity_active">活跃</string>
+    <string name="activity_very_active">非常活跃</string>
+    <string name="activity_desc_sedentary">几乎不运动</string>
+    <string name="activity_desc_light">每周运动 1-3 天</string>
+    <string name="activity_desc_moderate" tools:ignore="TypographyDashes">每周运动 3-5 天</string>
+    <string name="activity_desc_active">每周运动 6-7 天</string>
+    <string name="activity_desc_very_active">重度运动或体力工作</string>
+    <string name="activity_tip_sedentary">即便是静止状态，你的身体也需要持续补水！</string>
+    <string name="activity_tip_light">轻度活动也需要额外的补水作为支撑！</string>
+    <string name="activity_tip_moderate">常规的运动习惯依赖规律的饮水支持——干得不错！</string>
+    <string name="activity_tip_active">活跃的生活方式需要更精细的水分呵护！</string>
+    <string name="activity_tip_very_active">状态拉满，补水也要跟上！</string>
     <!-- Reminder style -->
-    <string name="reminder_style_gentle">Gentle &amp; Caring</string>
-    <string name="reminder_style_motivating">Motivating &amp; Energetic</string>
-    <string name="reminder_style_minimal">Simple &amp; Clean</string>
+    <string name="reminder_style_gentle">温和 &amp; 贴心</string>
+    <string name="reminder_style_motivating">激励 &amp; 活力</string>
+    <string name="reminder_style_minimal">简单 &amp; 整洁</string>
     <!-- Hydration standard (acronyms are not translated) -->
-    <string name="hydration_standard_efsa_desc">European Food Safety Authority standards</string>
-    <string name="hydration_standard_iom_desc">Institute of Medicine standards</string>
+    <string name="hydration_standard_efsa_desc">欧洲食品安全局标准</string>
+    <string name="hydration_standard_iom_desc">医学研究所标准</string>
     <!-- Day-end mode -->
-    <string name="day_end_sleep_time">Sleep time</string>
-    <string name="day_end_midnight">Midnight</string>
+    <string name="day_end_sleep_time">就寝时间</string>
+    <string name="day_end_midnight">午夜</string>
     <!-- Reminder interval mode -->
-    <string name="reminder_interval_mode_automatic">Automatic</string>
-    <string name="reminder_interval_mode_custom">Custom</string>
+    <string name="reminder_interval_mode_automatic">自动</string>
+    <string name="reminder_interval_mode_custom">自定义</string>
     <!-- Dark mode preference -->
-    <string name="dark_mode_system">System Default</string>
-    <string name="dark_mode_light">Light Mode</string>
-    <string name="dark_mode_dark">Dark Mode</string>
+    <string name="dark_mode_system">系统默认</string>
+    <string name="dark_mode_light">浅色模式</string>
+    <string name="dark_mode_dark">深色模式</string>
     <!-- Colour source -->
-    <string name="color_source_hydro">HydroTracker Blue</string>
-    <string name="color_source_dynamic">Dynamic Colors</string>
-    <string name="color_source_dynamic_desc">Colors from your wallpaper</string>
+    <string name="color_source_hydro">HydroTracker 主题蓝</string>
+    <string name="color_source_dynamic">动态颜色</string>
+    <string name="color_source_dynamic_desc">来自你壁纸的颜色</string>
     <!-- Week start day -->
-    <string name="weekday_sunday">Sunday</string>
-    <string name="weekday_monday">Monday</string>
-    <string name="weekday_tuesday">Tuesday</string>
-    <string name="weekday_wednesday">Wednesday</string>
-    <string name="weekday_thursday">Thursday</string>
-    <string name="weekday_friday">Friday</string>
-    <string name="weekday_saturday">Saturday</string>
-    <string name="week_start_system">System</string>
+    <string name="weekday_sunday">星期日</string>
+    <string name="weekday_monday">星期一</string>
+    <string name="weekday_tuesday">星期二</string>
+    <string name="weekday_wednesday">星期三</string>
+    <string name="weekday_thursday">星期四</string>
+    <string name="weekday_friday">星期五</string>
+    <string name="weekday_saturday">星期六</string>
+    <string name="week_start_system">系统</string>
     <!-- App font (proper-noun font names are not translated) -->
-    <string name="font_system">System Default</string>
-    <string name="font_xiaomi_warning">Font styling on HyperOS/MIUI (Xiaomi group devices) does not work as intended due to their custom text engine.</string>
+    <string name="font_system">系统默认</string>
+    <string name="font_xiaomi_warning">因为 HyperOS/MIUI（小米系设备）使用了自定义文本引擎，字体样式功能在这些设备上无法按照预期工作。</string>
     <!-- Navigation-bar label mode -->
-    <string name="navbar_label_always">Always shown</string>
-    <string name="navbar_label_selected">Selected only</string>
-    <string name="navbar_label_none">Off</string>
+    <string name="navbar_label_always">总是显示</string>
+    <string name="navbar_label_selected">仅选中的</string>
+    <string name="navbar_label_none">关闭</string>
     <!-- Home screen edge effect -->
-    <string name="edge_effect_transparent">Transparent</string>
-    <string name="edge_effect_blurred">Blurred</string>
-    <string name="edge_effect_scrim">Scrim</string>
+    <string name="edge_effect_transparent">透明</string>
+    <string name="edge_effect_blurred">模糊</string>
+    <string name="edge_effect_scrim">宽松</string>
     <!-- Beverage types -->
-    <string name="beverage_water">Water</string>
-    <string name="beverage_coffee">Coffee</string>
-    <string name="beverage_tea">Tea</string>
-    <string name="beverage_soft_drink">Soft Drink</string>
-    <string name="beverage_energy_drink">Energy Drink</string>
-    <string name="beverage_sports_drink">Sports Drink</string>
-    <string name="beverage_ors">ORS</string>
-    <string name="beverage_milk">Milk</string>
-    <string name="beverage_fruit_juice">Fruit Juice</string>
-    <string name="beverage_desc_water">Pure water - baseline hydration</string>
-    <string name="beverage_desc_coffee">Coffee - equivalent to water</string>
-    <string name="beverage_desc_tea">Tea - equivalent to water</string>
-    <string name="beverage_desc_soft_drink">Soft drink - equivalent to water</string>
-    <string name="beverage_desc_energy_drink">Energy drink - equivalent to water</string>
-    <string name="beverage_desc_sports_drink">Sports drink - slightly enhanced hydration</string>
-    <string name="beverage_desc_ors">Oral rehydration solution - superior hydration</string>
-    <string name="beverage_desc_milk">Milk - superior hydration</string>
-    <string name="beverage_desc_fruit_juice">Fruit juice - enhanced hydration</string>
+    <string name="beverage_water">饮用水</string>
+    <string name="beverage_coffee">咖啡</string>
+    <string name="beverage_tea">茶</string>
+    <string name="beverage_soft_drink">软饮</string>
+    <string name="beverage_energy_drink">能量饮料</string>
+    <string name="beverage_sports_drink">运动饮料</string>
+    <string name="beverage_ors">口服补液盐</string>
+    <string name="beverage_milk">牛奶</string>
+    <string name="beverage_fruit_juice">果汁</string>
+    <string name="beverage_desc_water">纯水——含水量基准</string>
+    <string name="beverage_desc_coffee">咖啡——等效于纯水</string>
+    <string name="beverage_desc_tea">茶——等效于纯水</string>
+    <string name="beverage_desc_soft_drink">软饮——等效于纯水</string>
+    <string name="beverage_desc_energy_drink">能量饮料——等效于纯水</string>
+    <string name="beverage_desc_sports_drink">运动饮料——含水量略有提升</string>
+    <string name="beverage_desc_ors">口服补液盐——优质补水方案</string>
+    <string name="beverage_desc_milk">牛奶——优质补水方案</string>
+    <string name="beverage_desc_fruit_juice">果汁——含水量提升</string>
     <!-- ============================================================================
          Data Management
          ============================================================================ -->
-    <string name="data_management_backup_header">Import &amp; Export</string>
+    <string name="data_management_backup_header">导入 &amp; 导出</string>
     <string name="data_management_delete_header">Delete Data</string>
     <string name="data_export_csv_title">Export as CSV</string>
     <string name="data_export_json_title">Export as JSON</string>
@@ -613,65 +613,65 @@
          Support Development
          ============================================================================ -->
     <string name="support_development_hero">HydroTracker is built and maintained by one person, with no ads and no tracking. If it has helped you drink more water, anything you chip in keeps it growing.</string>
-    <string name="support_section_support">Support development</string>
-    <string name="support_github_sponsors_blurb">Support ongoing development</string>
-    <string name="support_paypal_blurb">Send a quick donation</string>
-    <string name="support_buymeacoffee_blurb">Treat me to a coffee</string>
-    <string name="support_section_other_ways">Other ways to help</string>
-    <string name="support_rate_play_store">Rate on Google Play</string>
-    <string name="support_rate_play_store_desc">Leave a rating on the Play Store</string>
-    <string name="support_share_app">Share the app</string>
-    <string name="support_share_app_desc">Tell a friend about HydroTracker</string>
-    <string name="support_star_github">Star on GitHub</string>
-    <string name="support_star_github_desc">Star the project on GitHub</string>
-    <string name="share_chooser_title">Share HydroTracker</string>
-    <string name="toast_review_successful">Review is successful</string>
-    <string name="toast_review_failed">Review failed</string>
-    <string name="toast_no_app_to_share">No app found to share</string>
+    <string name="support_section_support">支持开发</string>
+    <string name="support_github_sponsors_blurb">支持当前的开发工作</string>
+    <string name="support_paypal_blurb">发起快速捐赠</string>
+    <string name="support_buymeacoffee_blurb">请我喝杯咖啡</string>
+    <string name="support_section_other_ways">其他支持方案</string>
+    <string name="support_rate_play_store">在 Google Play 上评分</string>
+    <string name="support_rate_play_store_desc">在 Play 商店中留下评分</string>
+    <string name="support_share_app">分享此应用</string>
+    <string name="support_share_app_desc">与朋友分享 HydroTracker</string>
+    <string name="support_star_github">在 GitHub 上星标</string>
+    <string name="support_star_github_desc">在 GitHub 上星标该项目</string>
+    <string name="share_chooser_title">分享 HydroTracker</string>
+    <string name="toast_review_successful">评分成功</string>
+    <string name="toast_review_failed">评分失败</string>
+    <string name="toast_no_app_to_share">没有可分享的应用</string>
     <!-- ============================================================================
          Updates
          ============================================================================ -->
-    <string name="screen_updates_title">Updates</string>
-    <string name="updates_section_auto_update">Auto Update</string>
-    <string name="updates_toggle_auto_check">Check automatically</string>
-    <string name="updates_toggle_auto_check_desc">Look for updates about once a day</string>
-    <string name="updates_section_status">Status</string>
-    <string name="updates_status_checking">Checking for updates…</string>
-    <string name="updates_status_failed">Couldn\'t check for updates</string>
-    <string name="updates_status_f_droid">Updates are handled by F-Droid</string>
-    <string name="updates_status_f_droid_desc">Open the F-Droid app to update HydroTracker.</string>
-    <string name="updates_status_up_to_date">You\'re on the latest version</string>
-    <string name="updates_status_check_now">Check for updates</string>
-    <string name="updates_last_checked_never">Not checked yet</string>
-    <string name="updates_last_checked">Last checked %1$s</string>
-    <string name="updates_button_check_now">Check now</string>
-    <string name="updates_button_checking">Checking…</string>
-    <string name="updates_button_restart_install">Restart to install</string>
-    <string name="updates_available_title">Update available</string>
-    <string name="updates_available_play_desc">A new version is available on Google Play</string>
-    <string name="updates_available_version">Version %1$s</string>
-    <string name="updates_button_update">Update</string>
-    <string name="updates_button_download">Download update</string>
-    <string name="label_version_simple">Version</string>
-    <string name="label_build_simple">Build</string>
-    <string name="label_install_method">Install Method</string>
-    <string name="label_source">Source</string>
-    <string name="install_source_manual">Manual</string>
-    <string name="install_source_debug">Debug</string>
+    <string name="screen_updates_title">更新</string>
+    <string name="updates_section_auto_update">自动更新</string>
+    <string name="updates_toggle_auto_check">自动检查更新</string>
+    <string name="updates_toggle_auto_check_desc">每天自动查询一次更新</string>
+    <string name="updates_section_status">状态</string>
+    <string name="updates_status_checking">正在检查更新……</string>
+    <string name="updates_status_failed">无法检查更新</string>
+    <string name="updates_status_f_droid">更新由 F-Droid 管理</string>
+    <string name="updates_status_f_droid_desc">打开 F-Droid 应用来更新 HydroTracker。</string>
+    <string name="updates_status_up_to_date">你正在使用最新版</string>
+    <string name="updates_status_check_now">检查更新</string>
+    <string name="updates_last_checked_never">未检查过</string>
+    <string name="updates_last_checked">上次检查于 %1$s</string>
+    <string name="updates_button_check_now">现在检查</string>
+    <string name="updates_button_checking">正在检查……</string>
+    <string name="updates_button_restart_install">重启以安装</string>
+    <string name="updates_available_title">更新可用</string>
+    <string name="updates_available_play_desc">新版本在 Google Play 上可用</string>
+    <string name="updates_available_version">版本 %1$s</string>
+    <string name="updates_button_update">更新</string>
+    <string name="updates_button_download">下载更新</string>
+    <string name="label_version_simple">版本</string>
+    <string name="label_build_simple">构建</string>
+    <string name="label_install_method">安装方式</string>
+    <string name="label_source">来源</string>
+    <string name="install_source_manual">手动</string>
+    <string name="install_source_debug">调试</string>
     <string name="install_source_github">GitHub</string>
-    <string name="toast_could_not_start_update">Couldn\'t start the update</string>
+    <string name="toast_could_not_start_update">无法启动更新</string>
     <!-- ============================================================================
          Licenses
          ============================================================================ -->
-    <string name="screen_licenses_title">Third-party licenses</string>
-    <string name="licenses_empty">No licence information available.</string>
+    <string name="screen_licenses_title">第三方许可</string>
+    <string name="licenses_empty">没有可用的许可证信息。</string>
     <!-- ============================================================================
          What\'s New / Update Dialog
          ============================================================================ -->
-    <string name="whats_new_title">What\'s New</string>
-    <string name="whats_new_version">Version %1$s</string>
-    <string name="update_dialog_title">Update Available</string>
-    <string name="update_dialog_current_version">Current version</string>
+    <string name="whats_new_title">更新内容</string>
+    <string name="whats_new_version">版本 %1$s</string>
+    <string name="update_dialog_title">更新可用</string>
+    <string name="update_dialog_current_version">当前版本</string>
     <string name="update_dialog_new_version">New version</string>
     <string name="update_dialog_action_play">Open Google Play to update HydroTracker.</string>
     <string name="update_dialog_action_f_droid">Open the F-Droid app to update HydroTracker.</string>
