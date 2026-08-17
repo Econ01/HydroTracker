@@ -5,7 +5,7 @@ HydroTracker is translated by volunteers through [Crowdin](https://crowdin.com/p
 ## Translation Progress
 
 <!-- TRANSLATION_PROGRESS_START -->
-*Last updated: 2026-08-16 00:34 UTC*
+*Last updated: 2026-08-17 00:33 UTC*
 
 <img src="docs/translation-progress.svg" alt="Translation progress" width="720">
 <!-- TRANSLATION_PROGRESS_END -->
