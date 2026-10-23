@@ -42,8 +42,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenu
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -52,6 +51,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SelectableDropdownMenuItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -102,7 +102,6 @@ import java.util.Calendar
  * @param onConfirm Called with the updated entry when the user saves.
  * @param beverages The list of beverage options available for selection.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditWaterDialog(
     entry: WaterIntakeEntry,
@@ -292,7 +291,7 @@ fun EditWaterDialog(
                                     containerType == preset.name
                                 }
 
-                                DropdownMenuItem(
+                                SelectableDropdownMenuItem(
                                     selected = isSelected,
                                     onClick = {
                                         if (isCustomItem) {
@@ -370,7 +369,7 @@ fun EditWaterDialog(
                                     beverage.displayName
                                 }
 
-                                DropdownMenuItem(
+                                SelectableDropdownMenuItem(
                                     selected = selectedBeverage.displayName == beverage.displayName,
                                     onClick = {
                                         selectedBeverage = beverage
@@ -527,7 +526,6 @@ fun EditWaterDialog(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ActionButtons(
     onDismiss: () -> Unit,

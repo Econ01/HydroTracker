@@ -36,8 +36,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -46,9 +44,9 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
+import androidx.compose.material3.rememberSliderState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -88,7 +86,6 @@ import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 import com.cemcakmak.hydrotracker.utils.WaterCalculator
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ReminderIntervalScreen(
     userProfile: UserProfile? = null,
@@ -330,7 +327,6 @@ private fun ReminderSchedulePreviewCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun DayEndSection(
     currentMode: DayEndMode,
@@ -396,20 +392,23 @@ private fun DayEndSection(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CustomIntervalPicker(
     currentInterval: Int,
     onIntervalChange: (Int) -> Unit
 ) {
     val haptics = LocalHapticFeedback.current
-    var sliderPosition by remember { mutableIntStateOf(currentInterval) }
+    val sliderState = rememberSliderState(
+        value = currentInterval.toFloat(),
+        steps = 0,
+        trackRange = 1f..480f
+    )
 
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         AnimatedNumber(
-            targetValue = sliderPosition.toDouble(),
+            targetValue = sliderState.value.toDouble(),
             formatValue = { value -> formatInterval(value.toInt()) },
             style = MaterialTheme.typography.headlineSmallEmphasized,
             hapticsEnabled = false,
@@ -420,23 +419,21 @@ private fun CustomIntervalPicker(
         val startIcon = rememberVectorPainter(ImageVector.vectorResource(R.drawable.sunny_filled))
         val endIcon = rememberVectorPainter(ImageVector.vectorResource(R.drawable.bedtime_filled))
         Slider(
-            value = sliderPosition.toFloat(),
+            state = sliderState,
             onValueChange = {
                 val stepSize = 10f
                 val rawValue = it.coerceIn(1f, 480f)
                 val snappedValue = kotlin.math.round(rawValue / stepSize) * stepSize
                 val newValue = snappedValue.toInt().coerceIn(1, 480)
-                if (newValue != sliderPosition) {
+                if (newValue.toFloat() != sliderState.value) {
                     haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)
-                    sliderPosition = newValue
+                    sliderState.value = newValue.toFloat()
                 }
             },
             onValueChangeFinished = {
-                onIntervalChange(sliderPosition)
+                onIntervalChange(sliderState.value.toInt())
             },
-            valueRange = 1f..480f,
-            steps = 0,
-            track = { sliderState ->
+            track = { state ->
                 val iconSize = DpSize(25.dp, 25.dp)
                 val iconPadding = 10.dp
                 val thumbTrackGapSize = 6.dp
@@ -457,13 +454,13 @@ private fun CustomIntervalPicker(
                     }
                 }
                 SliderDefaults.Track(
-                    sliderState = sliderState,
+                    sliderState = state,
                     modifier = Modifier.height(36.dp).drawWithContent {
                         drawContent()
 
                         val yOffset = size.height / 2 - iconSize.toSize().height / 2
                         val activeTrackStart = 0f
-                        val activeTrackEnd = size.width * sliderState.coercedValueAsFraction - thumbTrackGapSize.toPx()
+                        val activeTrackEnd = size.width * state.coercedValueAsFraction - thumbTrackGapSize.toPx()
                         val inactiveTrackStart = activeTrackEnd + thumbTrackGapSize.toPx() * 2
                         val inactiveTrackEnd = size.width
 

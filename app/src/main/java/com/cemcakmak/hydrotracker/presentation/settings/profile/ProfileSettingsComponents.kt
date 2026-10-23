@@ -55,7 +55,6 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -68,10 +67,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.rememberBottomSheetState
+import androidx.compose.material3.rememberSliderState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -516,7 +515,6 @@ internal fun ActivityLevelBottomSheet(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun DailyGoalBottomSheetContent(
     currentGoalMl: Double,
@@ -526,7 +524,11 @@ internal fun DailyGoalBottomSheetContent(
     val context = LocalContext.current
     val haptics = LocalHapticFeedback.current
 
-    var sliderPosition by remember { mutableFloatStateOf(currentGoalMl.toFloat()) }
+    val sliderState = rememberSliderState(
+        value = currentGoalMl.toFloat(),
+        steps = 0,
+        trackRange = GOAL_MIN_ML..GOAL_MAX_ML
+    )
 
     Column(
         modifier = Modifier
@@ -550,7 +552,7 @@ internal fun DailyGoalBottomSheetContent(
 
         // Animated value headline; the lightweight classic tween tracks slider drags smoothly
         AnimatedNumber(
-            targetValue = sliderPosition.toDouble(),
+            targetValue = sliderState.value.toDouble(),
             formatValue = { v -> stringResource(R.string.unit_milliliters_format, v.toInt().toString()) },
             style = MaterialTheme.typography.headlineSmallEmphasized,
             hapticsEnabled = false,
@@ -565,21 +567,19 @@ internal fun DailyGoalBottomSheetContent(
         val endIcon = rememberVectorPainter(ImageVector.vectorResource(R.drawable.water_bottle_large_filled))
 
         Slider(
-            value = sliderPosition,
+            state = sliderState,
             onValueChange = { rawValue ->
                 val snappedMl = round(rawValue / GOAL_STEP_ML) * GOAL_STEP_ML
                 val newValue = snappedMl.coerceIn(GOAL_MIN_ML, GOAL_MAX_ML)
-                if (newValue != sliderPosition) {
+                if (newValue != sliderState.value) {
                     haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)
-                    sliderPosition = newValue
+                    sliderState.value = newValue
                 }
             },
             onValueChangeFinished = {
-                onGoalChange(sliderPosition.toDouble())
+                onGoalChange(sliderState.value.toDouble())
             },
-            valueRange = GOAL_MIN_ML..GOAL_MAX_ML,
-            steps = 0,
-            track = { sliderState ->
+            track = { state ->
                 val iconSize = DpSize(25.dp, 25.dp)
                 val iconPadding = 10.dp
                 val thumbTrackGapSize = 6.dp
@@ -602,14 +602,14 @@ internal fun DailyGoalBottomSheetContent(
                 }
 
                 SliderDefaults.Track(
-                    sliderState = sliderState,
+                    sliderState = state,
                     modifier = Modifier
                         .height(36.dp)
                         .drawWithContent {
                             drawContent()
 
                             val yOffset = size.height / 2 - iconSize.toSize().height / 2
-                            val activeTrackEnd = size.width * sliderState.coercedValueAsFraction - thumbTrackGapSize.toPx()
+                            val activeTrackEnd = size.width * state.coercedValueAsFraction - thumbTrackGapSize.toPx()
                             val inactiveTrackStart = activeTrackEnd + thumbTrackGapSize.toPx() * 2
                             val inactiveTrackWidth = size.width - inactiveTrackStart
 
@@ -876,7 +876,6 @@ internal fun UpdateProfilePictureBottomSheet(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun UsernameEditDialog(
     currentName: String,
@@ -1110,7 +1109,7 @@ fun ActivityLevelBottomSheetPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, name = "Daily Goal Bottom Sheet", heightDp = 700)
 @Composable
 fun DailyGoalBottomSheetPreview() {

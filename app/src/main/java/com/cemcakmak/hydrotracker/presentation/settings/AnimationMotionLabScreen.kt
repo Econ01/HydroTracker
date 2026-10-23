@@ -26,8 +26,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +34,9 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.ToggleButton
+import androidx.compose.material3.rememberSliderState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -63,7 +63,6 @@ import java.util.Locale
 /**
  * Developer screen for testing custom motion components in isolation.
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AnimationMotionLabScreen(
     themePreferences: ThemePreferences = ThemePreferences(),
@@ -594,6 +593,9 @@ private fun TuningSlider(
     steps: Int = 0,
     onReset: (() -> Unit)? = null
 ) {
+    val sliderState = rememberSliderState(value = value, steps = steps, trackRange = valueRange)
+    // Keep the thumb in sync when the value changes externally (e.g. Reset)
+    LaunchedEffect(value) { sliderState.value = value }
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -627,10 +629,11 @@ private fun TuningSlider(
             }
         }
         Slider(
-            value = value,
-            valueRange = valueRange,
-            steps = steps,
-            onValueChange = onValueChange
+            state = sliderState,
+            onValueChange = {
+                sliderState.value = it
+                onValueChange(it)
+            }
         )
     }
 }
@@ -647,6 +650,13 @@ private fun SpringSlider(
     onStiffnessChange: (Float) -> Unit,
     onReset: (() -> Unit)? = null
 ) {
+    val dampingSliderState =
+        rememberSliderState(value = dampingRatio, steps = dampingSteps, trackRange = 0.1f..1.5f)
+    val stiffnessSliderState =
+        rememberSliderState(value = stiffness, steps = stiffnessSteps, trackRange = stiffnessRange)
+    // Keep the thumbs in sync when values change externally (e.g. Reset)
+    LaunchedEffect(dampingRatio) { dampingSliderState.value = dampingRatio }
+    LaunchedEffect(stiffness) { stiffnessSliderState.value = stiffness }
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -693,10 +703,11 @@ private fun SpringSlider(
             )
         }
         Slider(
-            value = dampingRatio,
-            valueRange = 0.1f..1.5f,
-            steps = dampingSteps,
-            onValueChange = onDampingChange
+            state = dampingSliderState,
+            onValueChange = {
+                dampingSliderState.value = it
+                onDampingChange(it)
+            }
         )
 
         Row(
@@ -719,10 +730,11 @@ private fun SpringSlider(
             )
         }
         Slider(
-            value = stiffness,
-            valueRange = stiffnessRange,
-            steps = stiffnessSteps,
-            onValueChange = onStiffnessChange
+            state = stiffnessSliderState,
+            onValueChange = {
+                stiffnessSliderState.value = it
+                onStiffnessChange(it)
+            }
         )
     }
 }
@@ -744,7 +756,6 @@ private fun dampingFlag(value: Float): String? = when {
     else -> null
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview(showBackground = true, name = "Animation Motion Lab")
 @Composable
 private fun AnimationMotionLabScreenPreview() {
