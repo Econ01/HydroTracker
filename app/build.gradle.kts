@@ -46,6 +46,9 @@ android {
 
     buildTypes {
         debug {
+            // Install debug builds beside the release app (package gets a ".debug" suffix)
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
             signingConfig = signingConfigs.findByName("release")
                 ?: signingConfigs.getByName("debug")
             // Pseudolocale for text-expansion testing: add "English (XA)" in system languages.
