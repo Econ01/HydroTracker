@@ -13,6 +13,7 @@ import androidx.health.connect.client.records.metadata.Device
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.health.connect.client.units.Volume
+import com.cemcakmak.hydrotracker.BuildConfig
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
 import java.time.Instant
@@ -357,7 +358,7 @@ object HealthConnectManager {
                 val isFromHydroTrackerById = recordId.startsWith("hydrotracker_")
 
                 // Check if this is from HydroTracker by package name
-                val isFromHydroTrackerByPackage = packageName == "com.cemcakmak.hydrotracker"
+                val isFromHydroTrackerByPackage = packageName == BuildConfig.APPLICATION_ID
 
                 val isFromHydroTracker = isFromHydroTrackerByClientId || isFromHydroTrackerById || isFromHydroTrackerByPackage
 
@@ -439,7 +440,7 @@ object HealthConnectManager {
         val packageName = dataOrigin.trim().trim('"', '\'').trimEnd(')')
 
         val cleanName = when {
-            packageName.equals("com.cemcakmak.hydrotracker", ignoreCase = true) -> "HydroTracker"
+            packageName.equals(BuildConfig.APPLICATION_ID, ignoreCase = true) -> "HydroTracker"
             else -> {
                 val appLabel = runCatching {
                     context.packageManager.getApplicationLabel(
@@ -479,7 +480,7 @@ object HealthConnectManager {
 
                 val isFromHydroTrackerByClientId = clientRecordId?.startsWith("hydrotracker_") == true
                 val isFromHydroTrackerById = recordId.startsWith("hydrotracker_")
-                val isFromHydroTrackerByPackage = packageName == "com.cemcakmak.hydrotracker"
+                val isFromHydroTrackerByPackage = packageName == BuildConfig.APPLICATION_ID
 
                 val isFromHydroTracker = isFromHydroTrackerByClientId || isFromHydroTrackerById || isFromHydroTrackerByPackage
 

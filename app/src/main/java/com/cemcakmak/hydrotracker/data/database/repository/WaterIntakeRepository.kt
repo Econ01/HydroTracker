@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.cemcakmak.hydrotracker.BuildConfig
 import com.cemcakmak.hydrotracker.data.database.dao.WaterIntakeDao
 import com.cemcakmak.hydrotracker.data.database.dao.DailySummaryDao
 import com.cemcakmak.hydrotracker.data.database.dao.MostUsedQuickAddCombo
@@ -636,7 +637,7 @@ class WaterIntakeRepository(
             }
 
             val hydroTrackerRecords = result.getOrNull()?.filter { record ->
-                record.metadata.dataOrigin.packageName == "com.cemcakmak.hydrotracker" ||
+                record.metadata.dataOrigin.packageName == BuildConfig.APPLICATION_ID ||
                     record.metadata.clientRecordId?.startsWith("hydrotracker_") == true
             } ?: emptyList()
 
@@ -679,7 +680,7 @@ class WaterIntakeRepository(
             }
 
             val hydroTrackerRecords = result.getOrNull()?.filter { record ->
-                (record.metadata.dataOrigin.packageName == "com.cemcakmak.hydrotracker" ||
+                (record.metadata.dataOrigin.packageName == BuildConfig.APPLICATION_ID ||
                     record.metadata.clientRecordId?.startsWith("hydrotracker_") == true) &&
                     predicate(record)
             } ?: emptyList()

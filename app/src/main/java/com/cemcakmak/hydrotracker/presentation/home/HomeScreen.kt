@@ -71,7 +71,6 @@ import com.cemcakmak.hydrotracker.presentation.common.toOption
 import com.cemcakmak.hydrotracker.presentation.common.DailyEntriesSection
 import com.cemcakmak.hydrotracker.presentation.common.dialogs.CustomWaterDialog
 import com.cemcakmak.hydrotracker.presentation.common.dialogs.EditWaterDialog
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.pullToRefresh
@@ -105,7 +104,7 @@ import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun HomeScreen(
     userProfile: UserProfile,
@@ -807,7 +806,6 @@ private fun TopEdgeEffect(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CarouselWaterCard(
     modifier: Modifier = Modifier,
@@ -948,7 +946,6 @@ fun AddContainerCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun BeverageSelectionSection(
     modifier: Modifier = Modifier,
@@ -1003,7 +1000,7 @@ private fun BeverageSelectionSection(
                     haptics.performHapticFeedback(HapticFeedbackType.ToggleOn)
                     onBeverageChange(beverage)
                 },
-                colors = ToggleButtonDefaults.toggleButtonColors(
+                colors = ToggleButtonDefaults.colors(
                     checkedContainerColor = checkedContainerColor,
                     checkedContentColor = checkedContentColor,
                     contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1046,7 +1043,6 @@ private fun BeverageSelectionSection(
  * Displays the effective hydration percentage for the selected non-water beverage.
  * Intended to appear below the preset carousel.
  */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun EffectiveHydrationInfoCard(
     modifier: Modifier = Modifier,
@@ -1080,7 +1076,6 @@ private fun EffectiveHydrationInfoCard(
 /**
  * The actual content of the effective-hydration info card.
  */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun EffectiveHydrationCardContent(
     modifier: Modifier = Modifier,

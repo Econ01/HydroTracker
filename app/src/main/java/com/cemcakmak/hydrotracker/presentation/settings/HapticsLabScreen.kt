@@ -48,7 +48,9 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberSliderState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -392,26 +394,34 @@ private fun StepCardContent(
             text = "Intensity: ${"%.2f".format(step.scale)}",
             style = MaterialTheme.typography.bodySmall
         )
+        val scaleSliderState = rememberSliderState(value = step.scale, trackRange = 0f..1f)
+        LaunchedEffect(step.scale) { scaleSliderState.value = step.scale }
         Slider(
-            value = step.scale,
+            state = scaleSliderState,
             onValueChange = { raw ->
                 val snapped = ((raw * 20f).roundToInt() / 20f).coerceIn(0f, 1f)
-                if (snapped != step.scale) onScaleChange(snapped)
-            },
-            valueRange = 0f..1f
+                if (snapped != scaleSliderState.value) {
+                    scaleSliderState.value = snapped
+                    onScaleChange(snapped)
+                }
+            }
         )
 
         Text(
             text = "Delay before: ${step.delayMs} ms",
             style = MaterialTheme.typography.bodySmall
         )
+        val delaySliderState = rememberSliderState(value = step.delayMs.toFloat(), trackRange = 0f..200f)
+        LaunchedEffect(step.delayMs) { delaySliderState.value = step.delayMs.toFloat() }
         Slider(
-            value = step.delayMs.toFloat(),
+            state = delaySliderState,
             onValueChange = { raw ->
                 val snapped = ((raw / 5f).roundToInt() * 5).coerceIn(0, 200)
-                if (snapped != step.delayMs) onDelayChange(snapped)
-            },
-            valueRange = 0f..200f
+                if (snapped.toFloat() != delaySliderState.value) {
+                    delaySliderState.value = snapped.toFloat()
+                    onDelayChange(snapped)
+                }
+            }
         )
 
         Row(

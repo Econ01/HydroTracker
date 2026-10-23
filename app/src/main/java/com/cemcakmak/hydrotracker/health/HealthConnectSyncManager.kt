@@ -2,6 +2,7 @@ package com.cemcakmak.hydrotracker.health
 
 import android.content.Context
 import android.util.Log
+import com.cemcakmak.hydrotracker.BuildConfig
 import com.cemcakmak.hydrotracker.data.database.entities.WaterIntakeEntry
 import com.cemcakmak.hydrotracker.data.repository.UserRepository
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
@@ -621,7 +622,7 @@ object HealthConnectSyncManager {
             // Only consider HydroTracker's own records. Searching external records could delete
             // another app's hydration data by accident.
             val matchingRecord = records.find { record ->
-                val isFromHydroTracker = record.metadata.dataOrigin.packageName == "com.cemcakmak.hydrotracker" ||
+                val isFromHydroTracker = record.metadata.dataOrigin.packageName == BuildConfig.APPLICATION_ID ||
                     record.metadata.clientRecordId?.startsWith("hydrotracker_") == true
                 if (!isFromHydroTracker) return@find false
 

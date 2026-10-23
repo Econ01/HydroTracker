@@ -32,8 +32,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonGroup
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenu
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -42,6 +41,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SelectableDropdownMenuItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -68,7 +68,6 @@ import com.cemcakmak.hydrotracker.ui.theme.rememberBeverageColorRoles
 import com.cemcakmak.hydrotracker.utils.VolumeUnitConverter
 import com.cemcakmak.hydrotracker.utils.parseLocaleNumber
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomWaterDialog(
     onDismiss: () -> Unit,
@@ -147,7 +146,7 @@ fun CustomWaterDialog(
                                 beverage.displayName
                             }
 
-                            DropdownMenuItem(
+                            SelectableDropdownMenuItem(
                                 selected = selectedBeverage.displayName == beverage.displayName,
                                 onClick = {
                                     onBeverageChange(beverage)
@@ -249,7 +248,6 @@ fun CustomWaterDialog(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ActionButtons(
     onDismiss: () -> Unit,
