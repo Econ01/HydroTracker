@@ -9,27 +9,27 @@
          Reused across the whole app. Do NOT create screen-specific duplicates
          (e.g. home_cancel, dialogue_cancel) — reuse these everywhere.
          ============================================================================ -->
-    <string name="action_cancel">Cancel</string>
-    <string name="action_save">Save</string>
-    <string name="action_delete">Delete</string>
-    <string name="action_add">Add</string>
-    <string name="action_close">Close</string>
-    <string name="action_confirm">Confirm</string>
-    <string name="action_reset">Reset</string>
-    <string name="action_next">Next</string>
-    <string name="action_continue">Continue</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_save">Guardar</string>
+    <string name="action_delete">Borrar</string>
+    <string name="action_add">Añadir</string>
+    <string name="action_close">Cerrar</string>
+    <string name="action_confirm">Confirmar</string>
+    <string name="action_reset">Reiniciar</string>
+    <string name="action_next">Siguiente</string>
+    <string name="action_continue">Continuar</string>
     <!-- ============================================================================
          Accessibility content descriptions
          Spoken by TalkBack / screen readers. Keep concise.
          ============================================================================ -->
-    <string name="cd_back">Back</string>
-    <string name="cd_delete_entry">Delete entry</string>
-    <string name="cd_edit_entry">Edit entry</string>
-    <string name="cd_reorder">Reorder</string>
-    <string name="cd_profile_photo">Profile photo</string>
+    <string name="cd_back">Volver</string>
+    <string name="cd_delete_entry">Borrar entrada</string>
+    <string name="cd_edit_entry">Editar entrada</string>
+    <string name="cd_reorder">Reordenar</string>
+    <string name="cd_profile_photo">Foto de perfil</string>
     <string name="cd_water_drop">Water drop</string>
-    <string name="cd_pinned">Pinned</string>
-    <string name="cd_hidden">Hidden</string>
+    <string name="cd_pinned">Fijado</string>
+    <string name="cd_hidden">Oculto</string>
     <!-- ============================================================================
          Units & number formatting
          Unit suffixes are kept separate from numbers so the value can be formatted
@@ -45,20 +45,20 @@
          Channel name/description refresh on each createNotificationChannel() call, so
          translating these values is enough — no channel-id bump required.
          ============================================================================ -->
-    <string name="notification_channel_name">Hydration Reminders</string>
-    <string name="notification_channel_description">Notifications to remind you to stay hydrated</string>
-    <string name="notification_channel_fun_facts_name">Daily Hydration Facts</string>
-    <string name="notification_channel_fun_facts_description">A daily hydration tip or fun fact</string>
+    <string name="notification_channel_name">Recordatorios de hidratación</string>
+    <string name="notification_channel_description">Notificaciones para recordarte estar hidratado</string>
+    <string name="notification_channel_fun_facts_name">Hechos diarios sobre hidratación</string>
+    <string name="notification_channel_fun_facts_description">Un truco o hecho divertido sobre hidratación</string>
     <!-- ============================================================================
          Widgets
          android:label value shown in the home-screen widget picker, plus the text
          rendered inside the Glance widget.
          ============================================================================ -->
-    <string name="widget_large_label">HydroTracker Large</string>
+    <string name="widget_large_label">HydroTracker Grande</string>
     <string name="widget_large_description">Track hydration and add water with one tap</string>
     <string name="widget_of_goal_format">%1$s of %2$s</string>
-    <string name="widget_goal_reached">Goal reached!</string>
-    <string name="widget_quick_add_cd">Add %1$s</string>
+    <string name="widget_goal_reached">¡Objetivo alcanzado!</string>
+    <string name="widget_quick_add_cd">Añadir %1$s</string>
     <string name="widget_daily_hydration">Daily Hydration</string>
     <string name="widget_card_glass">Glass</string>
     <string name="widget_card_bottle">Bottle</string>
