@@ -1,0 +1,1069 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- ============================================================================
+         Branding & non-translatable values
+         App / brand names, acronyms and platform names must NOT be translated.
+         ============================================================================ -->
+    <!-- ============================================================================
+         Common actions
+         Reused across the whole app. Do NOT create screen-specific duplicates
+         (e.g. home_cancel, dialogue_cancel) — reuse these everywhere.
+         ============================================================================ -->
+    <string name="action_cancel">Отмена</string>
+    <string name="action_save">Сохранить</string>
+    <string name="action_delete">Удалить</string>
+    <string name="action_add">Добавить</string>
+    <string name="action_close">Закрыть</string>
+    <string name="action_confirm">Подтвердить</string>
+    <string name="action_reset">Сбросить</string>
+    <string name="action_next">Далее</string>
+    <string name="action_continue">Продолжить</string>
+    <!-- ============================================================================
+         Accessibility content descriptions
+         Spoken by TalkBack / screen readers. Keep concise.
+         ============================================================================ -->
+    <string name="cd_back">Назад</string>
+    <string name="cd_delete_entry">Удалить запись</string>
+    <string name="cd_edit_entry">Изменить запись</string>
+    <string name="cd_reorder">Изменить порядок</string>
+    <string name="cd_profile_photo">Фото профиля</string>
+    <string name="cd_water_drop">Капля воды</string>
+    <string name="cd_pinned">Закреплено</string>
+    <string name="cd_hidden">Скрыто</string>
+    <!-- ============================================================================
+         Units & number formatting
+         Unit suffixes are kept separate from numbers so the value can be formatted
+         locale-aware (NumberFormat) and the unit swapped independently.
+         ============================================================================ -->
+    <string name="unit_milliliters_format">%1$s мл</string>
+    <!-- Percentage with sign appended in code; %1$s = value including the % sign, e.g. "85%" -->
+    <string name="percent_format">%1$s</string>
+    <!-- Character counter, e.g. "12/15 characters"; %1$d = current length, %2$d = max -->
+    <string name="character_count">%1$d/%2$d символов</string>
+    <!-- ============================================================================
+         Notification channel (Android 8+)
+         Channel name/description refresh on each createNotificationChannel() call, so
+         translating these values is enough — no channel-id bump required.
+         ============================================================================ -->
+    <string name="notification_channel_name">Напоминания о воде</string>
+    <string name="notification_channel_description">Уведомления, напоминающие пить воду</string>
+    <string name="notification_channel_fun_facts_name">Ежедневные факты о воде</string>
+    <string name="notification_channel_fun_facts_description">Ежедневный совет или интересный факт о воде</string>
+    <!-- ============================================================================
+         Widgets
+         android:label value shown in the home-screen widget picker, plus the text
+         rendered inside the Glance widget.
+         ============================================================================ -->
+    <string name="widget_large_label">HydroTracker — большой виджет</string>
+    <string name="widget_large_description">Следите за потреблением воды и добавляйте её одним нажатием</string>
+    <string name="widget_of_goal_format">%1$s из %2$s</string>
+    <string name="widget_goal_reached">Цель достигнута!</string>
+    <string name="widget_quick_add_cd">Добавить %1$s</string>
+    <string name="widget_daily_hydration">Вода за день</string>
+    <string name="widget_card_glass">Стакан</string>
+    <string name="widget_card_bottle">Бутылка</string>
+    <string name="widget_card_large_bottle">Большая бутылка</string>
+    <!-- ============================================================================
+         Settings: About
+         ============================================================================ -->
+    <string name="updates_bug_report">Обновления и сообщения об ошибках</string>
+    <!-- ============================================================================
+         Settings: Display &amp; Locale
+         ============================================================================ -->
+    <string name="screen_display_locale_title">Отображение и регион</string>
+    <string name="display_language_header">Язык</string>
+    <string name="display_date_and_time_format_header">Дата и время</string>
+    <string name="display_time_format_header">Формат времени</string>
+    <string name="display_volume_unit_header">Единица объёма</string>
+    <!-- Language option that follows the device language instead of a fixed one -->
+    <string name="language_system_default">Как в системе</string>
+    <!-- ============================================================================
+         Settings: Language & Translation
+         ============================================================================ -->
+    <string name="screen_language_title">Язык и перевод</string>
+    <string name="language_translation_disclaimer">Текст отображается только после утверждения перевода. Неутверждённые строки остаются скрытыми.</string>
+    <string name="language_contribute_title">Помочь проекту</string>
+    <string name="language_crowdin_title">Помогите перевести HydroTracker</string>
+    <string name="language_crowdin_description">Участвовать в переводе на Crowdin</string>
+    <string name="language_progress_header">Ход перевода</string>
+    <string name="language_progress_translated">Переведено</string>
+    <string name="language_progress_approved">Утверждено</string>
+    <!-- Time format options -->
+    <string name="time_format_system">Как в системе</string>
+    <string name="time_format_12_hour">12-часовой</string>
+    <string name="time_format_24_hour">24-часовой</string>
+    <!-- Date format options -->
+    <string name="date_format_system">Как в системе</string>
+    <string name="date_format_day_month_year">16 июн. 2026</string>
+    <string name="date_format_month_day_year">Июн. 16, 2026</string>
+    <string name="date_format_year_month_day">2026–06–16</string>
+    <!-- Volume unit options -->
+    <string name="unit_millilitres">Метрическая система</string>
+    <string name="unit_ml_short">мл</string>
+    <string name="unit_us_fl_oz">Жидкие унции США</string>
+    <string name="unit_us_fl_oz_short">жидк. унц. (США)</string>
+    <string name="unit_imperial_fl_oz">Британские жидкие унции</string>
+    <string name="unit_imperial_fl_oz_short">жидк. унц. (Великобритания)</string>
+    <!-- Display-only volume units (auto-scaling and call-site overrides) -->
+    <string name="unit_litre_short">л</string>
+    <string name="unit_kilolitre_short">кл</string>
+    <string name="unit_megalitre_short">Мл</string>
+    <string name="unit_gigalitre_short">Гл</string>
+    <string name="unit_us_pint_short">пт</string>
+    <string name="unit_us_quart_short">кв</string>
+    <string name="unit_us_gallon_short">гал</string>
+    <string name="unit_imperial_pint_short">пт</string>
+    <string name="unit_imperial_quart_short">кв</string>
+    <string name="unit_imperial_gallon_short">гал</string>
+    <!-- ============================================================================
+         Onboarding
+         Per-step title + description (shown above each step), plus step controls.
+         ============================================================================ -->
+    <string name="onboarding_welcome_title">Добро пожаловать в HydroTracker</string>
+    <string name="onboarding_welcome_description">Настроим приложение под вас.</string>
+    <string name="onboarding_gender_title">Расскажите о себе</string>
+    <string name="onboarding_gender_description">Выберите подходящий вариант.</string>
+    <string name="onboarding_age_title">Сколько вам лет?</string>
+    <string name="onboarding_age_description">Выберите возрастную группу.</string>
+    <string name="onboarding_activity_title">Насколько вы активны?</string>
+    <string name="onboarding_activity_description">Укажите свой обычный уровень дневной активности.</string>
+    <string name="onboarding_schedule_title">Какой у вас режим дня?</string>
+    <string name="onboarding_schedule_description">Укажите время подъёма и отхода ко сну.</string>
+    <string name="onboarding_profile_title">Заполните профиль</string>
+    <string name="onboarding_profile_description">Добавьте имя и фото профиля, чтобы настроить приложение под себя.</string>
+    <string name="onboarding_goal_title">Ваша персональная цель</string>
+    <string name="onboarding_goal_description">Проверьте рассчитанную для вас цель.</string>
+    <string name="onboarding_complete_title">Всё готово!</string>
+    <string name="onboarding_complete_description">Нажмите кнопку и начните следить за потреблением воды!</string>
+    <string name="onboarding_finish">Завершить</string>
+    <!-- Welcome step -->
+    <string name="onboarding_welcome_subtitle">Настроим вашу персональную цель по потреблению воды с учётом образа жизни и предпочтений.</string>
+    <string name="onboarding_feature_goals_title">Персональные цели</string>
+    <string name="onboarding_feature_goals_desc">На основе научных исследований и вашего профиля</string>
+    <string name="onboarding_feature_reminders_title">Умные напоминания</string>
+    <string name="onboarding_feature_reminders_desc">Ненавязчивые напоминания в часы бодрствования</string>
+    <string name="onboarding_feature_progress_title">Отслеживание прогресса</string>
+    <string name="onboarding_feature_progress_desc">Подробная статистика и история</string>
+    <string name="onboarding_get_started">Начать</string>
+    <!-- Schedule step -->
+    <string name="onboarding_wake_label">Время подъёма</string>
+    <string name="onboarding_sleep_label">Время сна</string>
+    <string name="onboarding_wake_picker_title">Время подъёма</string>
+    <string name="onboarding_wake_picker_subtitle">Выберите время подъёма</string>
+    <string name="onboarding_sleep_picker_title">Время сна</string>
+    <string name="onboarding_sleep_picker_subtitle">Выберите время отхода ко сну</string>
+    <string name="time_picker_set">Установить время</string>
+    <!-- Awake duration, e.g. "Awake for 16h 0m"; %1$d = hours, %2$d = minutes -->
+    <string name="onboarding_awake_duration">Время бодрствования: %1$d ч %2$d мин</string>
+    <!-- Profile setup step -->
+    <string name="profile_add_photo">Добавить фото</string>
+    <string name="profile_remove_photo">Удалить фото</string>
+    <string name="profile_name_prompt">Как к вам обращаться?</string>
+    <string name="profile_name_label">Ваше имя</string>
+    <string name="profile_name_placeholder">Введите имя</string>
+    <string name="profile_name_required">Чтобы продолжить, укажите имя</string>
+    <string name="profile_select_photo">Выбрать фото профиля</string>
+    <string name="profile_choose_gallery">Выбрать из галереи</string>
+    <string name="profile_choose_gallery_desc">Выберите существующее фото</string>
+    <string name="profile_take_photo">Сделать фото</string>
+    <string name="profile_take_photo_desc">Сделайте новое фото с помощью камеры</string>
+    <!-- Goal step -->
+    <string name="goal_daily_water_goal">Дневная цель по воде</string>
+    <string name="goal_reminder_interval">Интервал напоминаний</string>
+    <string name="goal_activity_level">Уровень активности</string>
+    <string name="goal_personalized_title">Как мы подобрали ваш план</string>
+    <string name="goal_personalized_body">При расчёте цели учитываются ваш профиль и распорядок дня. Они определяют общий объём воды и частоту уведомлений.</string>
+    <!-- Profile recap chips; %1$s = a time like 07:00 -->
+    <string name="goal_chip_wake">Подъём: %1$s</string>
+    <string name="goal_chip_sleep">Сон: %1$s</string>
+    <!-- Reminder interval shown in the Goal step; pluralized on the minute count -->
+    <plurals name="reminder_interval_minutes">
+        <item quantity="one">%1$d минута</item>
+        <item quantity="few">%1$d минуты</item>
+        <item quantity="many">%1$d минут</item>
+        <item quantity="other">%1$d минуты</item>
+    </plurals>
+    <!-- Complete step -->
+    <string name="complete_subtitle">Ваш персональный план потребления воды готов.</string>
+    <string name="complete_daily_goal">Ваша дневная цель</string>
+    <string name="complete_start_button">Начать пить воду</string>
+    <!-- Abbreviated reminder interval, e.g. "60 min"; %1$d = minutes -->
+    <string name="reminder_interval_min_short">%1$d мин</string>
+    <!-- ============================================================================
+         Beverages &amp; containers — shared bottom sheets
+         Add/edit custom beverages and container presets (presentation/common).
+         ============================================================================ -->
+    <!-- Shared -->
+    <string name="error_name_required">Укажите имя</string>
+    <string name="label_icon">Значок</string>
+    <!-- Delete confirmation body; %1$s = the item name being deleted -->
+    <string name="delete_confirm_message">Удалить «%1$s»? Это действие нельзя отменить.</string>
+    <!-- Custom beverage sheet -->
+    <string name="beverage_add">Добавить напиток</string>
+    <string name="beverage_edit_title">Изменить напиток</string>
+    <string name="beverage_delete_title">Удалить напиток?</string>
+    <string name="beverage_show_in_quick_add">Показывать в быстром добавлении</string>
+    <string name="beverage_hide_from_quick_add">Скрыть из быстрого добавления</string>
+    <!-- Preset effectiveness line, e.g. "150% hydration effectiveness"; %1$s = per cent value including the % sign -->
+    <string name="beverage_hydration_effectiveness">Эффективность восполнения жидкости: %1$s</string>
+    <string name="beverage_name_label">Название напитка</string>
+    <string name="beverage_name_placeholder">Например, смузи</string>
+    <string name="beverage_effectiveness_label" formatted="false">Эффективность восполнения жидкости (%)</string>
+    <string name="beverage_effectiveness_placeholder">Например, 100</string>
+    <!-- Validation; %1$d = min, %2$d = max -->
+    <string name="beverage_effectiveness_error">Введите значение от %1$d до %2$d</string>
+    <string name="beverage_effectiveness_hint" formatted="false">При 100% весь объём учитывается в дневной цели</string>
+    <!-- Container preset sheet -->
+    <string name="container_add_title">Добавить ёмкость</string>
+    <string name="container_edit_title">Изменить ёмкость</string>
+    <string name="container_name_label">Название ёмкости</string>
+    <string name="container_name_placeholder">Например, кружка для кофе</string>
+    <string name="container_volume_label">Объём (%1$s)</string>
+    <string name="container_volume_placeholder">Например, 250</string>
+    <!-- %1$s = minimum valid amount, %2$s = maximum valid amount (both with unit) -->
+    <string name="container_volume_error">Введите допустимый объём (%1$s–%2$s)</string>
+    <string name="container_icon_picker_hint">Нажмите значок ниже, чтобы заменить автоматически выбранный</string>
+    <string name="container_icon_preview_description">Выбранный значок ёмкости</string>
+    <string name="container_delete_title">Удалить ёмкость?</string>
+    <!-- ============================================================================
+         Navigation &amp; top bars
+         ============================================================================ -->
+    <string name="nav_home">Главная</string>
+    <string name="nav_history">История</string>
+    <string name="nav_statistics">Статистика</string>
+    <string name="nav_profile">Профиль</string>
+    <string name="nav_settings">Настройки</string>
+    <string name="nav_add_custom">Добавить своё</string>
+    <string name="fab_menu_new_beverage">Новый напиток</string>
+    <string name="fab_menu_new_container">Новая ёмкость</string>
+    <string name="fab_menu_add_past_entry">Добавить запись за прошлую дату</string>
+    <string name="fab_menu_toggle_menu">Открыть или закрыть меню</string>
+    <!-- ============================================================================
+         Settings — hub
+         Screen titles are reused as both the hub row title and the screen's app-bar title.
+         ============================================================================ -->
+    <string name="screen_appearance_title">Оформление</string>
+    <string name="screen_hydration_title">Вода и здоровье</string>
+    <string name="screen_quickadd_title">Настройка быстрого добавления</string>
+    <string name="screen_notifications_title">Уведомления</string>
+    <string name="screen_support_title">Поддержать разработку</string>
+    <string name="screen_about_title">О приложении</string>
+    <string name="screen_developer_title">Для разработчиков</string>
+    <string name="settings_about_update_available">О приложении — доступно обновление</string>
+    <string name="settings_appearance_desc">Тема, цвета и режим AMOLED</string>
+    <string name="settings_display_desc">Первый день недели и регион</string>
+    <string name="settings_hydration_desc">Расчёт дневной цели и Health Connect</string>
+    <string name="settings_quickadd_desc">Шаблоны ёмкостей и виды напитков</string>
+    <string name="settings_notifications_desc">Напоминания о воде и разрешения</string>
+    <string name="settings_support_desc">Пожертвования на развитие приложения</string>
+    <string name="settings_about_desc">Исходный код, политика конфиденциальности и лицензия</string>
+    <string name="settings_developer_desc">Инструменты отладки и тестирования</string>
+    <string name="screen_data_management_title">Управление данными</string>
+    <string name="settings_data_management_desc">Экспорт, импорт и удаление данных</string>
+    <!-- ============================================================================
+         Settings — Appearance
+         ============================================================================ -->
+    <string name="appearance_theme_header">Тема</string>
+    <string name="appearance_theme_system">Как в системе</string>
+    <string name="appearance_theme_light">Светлая</string>
+    <string name="appearance_theme_dark">Тёмная</string>
+    <string name="appearance_color_header">Цвет</string>
+    <string name="appearance_amoled_title">Режим AMOLED</string>
+    <string name="appearance_amoled_desc">Полностью чёрный фон в тёмной теме</string>
+    <string name="appearance_amoled_borders_title">Границы карточек</string>
+    <string name="appearance_amoled_borders_desc">Тонкие границы карточек в режиме AMOLED</string>
+    <string name="appearance_font_header">Шрифт</string>
+    <string name="appearance_navbar_header">Панель навигации</string>
+    <string name="appearance_autohide_title">Скрывать при прокрутке</string>
+    <string name="appearance_autohide_desc">Скрывать панель при прокрутке вниз</string>
+    <string name="appearance_labels_title">Подписи</string>
+    <string name="appearance_home_header">Главный экран</string>
+    <string name="appearance_feedback_header">Взаимодействие и отклик</string>
+    <string name="appearance_haptics_title">Тактильный отклик</string>
+    <string name="appearance_haptics_desc">Вибрация при нажатии кнопок и выполнении действий</string>
+    <string name="appearance_number_animation_title">Анимация прокрутки цифр</string>
+    <string name="appearance_number_animation_desc">Отключите для более простой анимации счётчика</string>
+    <string name="appearance_edge_effect_title">Эффект по краям</string>
+    <string name="appearance_beverage_colors_title">Цвета напитков</string>
+    <string name="appearance_beverage_colors_desc">Окрашивать карточки и записи на главном экране в цвет напитка</string>
+    <!-- Sample data shown in the theme preview card -->
+    <string name="appearance_preview_amount">1 250 / 2 500 мл</string>
+    <string name="appearance_preview_entries">Записи</string>
+    <string name="appearance_preview_first">Первая</string>
+    <string name="appearance_preview_latest">Последняя</string>
+    <!-- ============================================================================
+         Settings — Widget (Appearance ▸ Widget)
+         ============================================================================ -->
+    <string name="appearance_widget_section_title">Виджеты</string>
+    <string name="appearance_widget_title">Настройки виджета</string>
+    <string name="appearance_widget_desc">Изменить внешний вид и поведение</string>
+    <string name="widget_settings_colours_header">Цвета</string>
+    <string name="widget_settings_dynamic_title">Динамические цвета</string>
+    <string name="widget_settings_dynamic_desc">Цвета из обоев</string>
+    <string name="widget_settings_background_header">Фон</string>
+    <string name="widget_settings_transparent_title">Прозрачный фон</string>
+    <string name="widget_settings_transparent_desc">Сделать фон прозрачным</string>
+    <string name="widget_settings_pure_black_title">Полностью чёрный фон</string>
+    <string name="widget_settings_pure_black_desc">Использовать полностью чёрный фон в тёмной теме</string>
+    <string name="widget_settings_pure_white_title">Полностью белый фон</string>
+    <string name="widget_settings_pure_white_desc">Использовать полностью белый фон в светлой теме</string>
+    <string name="widget_settings_quickadd_title">Быстрые действия</string>
+    <string name="widget_settings_quickadd_desc">Настроить три кнопки быстрого добавления</string>
+    <string name="screen_widget_quickadd_title">Быстрые действия виджета</string>
+    <string name="widget_quickadd_auto">Авто</string>
+    <string name="widget_quickadd_beverage_header">Напиток</string>
+    <string name="widget_quickadd_slot_section_title">Кнопки быстрого добавления</string>
+    <string name="widget_quickadd_container_sheet_title">Выберите ёмкость</string>
+    <string name="widget_quickadd_beverage_sheet_title">Выберите напиток</string>
+    <string name="widget_quickadd_reset_all">Сбросить всё на автоматический выбор</string>
+    <!-- ============================================================================
+         Settings — Notifications
+         ============================================================================ -->
+    <string name="action_allow">Разрешить</string>
+    <string name="notif_reminders_header">Напоминания</string>
+    <string name="notif_hydration_reminders">Напоминания о воде</string>
+    <string name="notif_reminders_active">Напоминания включены</string>
+    <string name="notif_reminders_paused">Напоминания приостановлены</string>
+    <string name="notif_fun_facts">Ежедневные факты о воде</string>
+    <string name="notif_fun_facts_active">Каждый день будет приходить интересный факт</string>
+    <string name="notif_fun_facts_paused">Ежедневные факты приостановлены</string>
+    <string name="notif_sample_notification">Пример уведомления</string>
+    <string name="notif_fun_fact">Интересный факт</string>
+    <!-- Reminder-style descriptions shown in the preview card -->
+    <string name="notif_style_gentle_desc">Мягкие, ободряющие напоминания</string>
+    <string name="notif_style_motivating_desc">Энергичные напоминания о достижении цели</string>
+    <string name="notif_style_minimal_desc">Простые, ненавязчивые напоминания</string>
+    <string name="notif_permissions_header">Разрешения</string>
+    <string name="notif_permission_title">Разрешение на уведомления</string>
+    <string name="notif_permission_desc">Необходимо для отправки напоминаний о воде</string>
+    <string name="notif_exact_alarm_title">Разрешение на точные сигналы</string>
+    <string name="notif_exact_alarm_desc">Необходимо для отправки напоминаний точно по расписанию</string>
+    <string name="notif_reminder_style_header">Стиль напоминаний</string>
+    <!-- Short reminder-style labels shown on the toggle buttons -->
+    <string name="notif_style_gentle_short">Мягкий</string>
+    <string name="notif_style_motivating_short">Энергичный</string>
+    <string name="notif_style_minimal_short">Простой</string>
+    <string name="notif_active_hours_header">Часы бодрствования</string>
+    <string name="notif_wake_up">Подъём</string>
+    <string name="notif_sleep">Сон</string>
+    <string name="notif_wake_up_time">Время подъёма</string>
+    <string name="notif_sleep_time">Время сна</string>
+    <string name="notif_schedule_header">Расписание</string>
+    <string name="notif_configure_schedule">Настроить расписание</string>
+    <string name="notif_configure_schedule_desc">Изменить режим напоминаний или задать свой интервал</string>
+    <string name="notif_reminder_interval">Интервал напоминаний</string>
+    <string name="notif_scheduled_for">Запланировано на</string>
+    <string name="notif_pause_reminders">Приостановить напоминания на сегодня</string>
+    <string name="notif_pause_reminders_desc">Остановить напоминания о воде до следующего дня</string>
+    <string name="notif_resume_reminders">Возобновить напоминания</string>
+    <string name="notif_reminders_paused_desc">Напоминания о воде приостановлены до завтра</string>
+    <!-- Reminder cadence, e.g. "Every 60 minutes"; %1$d = minutes -->
+    <plurals name="every_x_minutes">
+        <item quantity="one">Каждую %1$d минуту</item>
+        <item quantity="few">Каждые %1$d минуты</item>
+        <item quantity="many">Каждые %1$d минут</item>
+        <item quantity="other">Каждые %1$d минуты</item>
+    </plurals>
+    <!-- ============================================================================
+         Settings — Reminder Schedule
+         ============================================================================ -->
+    <string name="screen_reminder_schedule_title">Расписание напоминаний</string>
+    <string name="reminder_mode_header">Режим</string>
+    <string name="reminder_day_end_header">Конец дня</string>
+    <string name="reminder_day_end_divider">Конец дня</string>
+    <string name="reminder_mode_auto_explain">Интервалы между напоминаниями рассчитываются автоматически с учётом дневной цели и часов бодрствования.</string>
+    <string name="reminder_mode_custom_explain">Напоминания приходят с заданным интервалом между подъёмом и отходом ко сну.</string>
+    <string name="reminder_dayend_sleep_explain">День заканчивается в момент отхода ко сну. Тогда же сбрасывается дневной прогресс.</string>
+    <string name="reminder_dayend_midnight_explain">День заканчивается в полночь, как и календарный день.</string>
+    <string name="reminder_slider_min">1 мин</string>
+    <string name="reminder_slider_max">8 часов</string>
+    <!-- Cadence phrases used mid-sentence and standalone -->
+    <string name="interval_every_hour">каждый час</string>
+    <string name="interval_every_h_m">каждые %1$d ч %2$d мин</string>
+    <plurals name="interval_every_minutes">
+        <item quantity="one">каждую %1$d минуту</item>
+        <item quantity="few">каждые %1$d минуты</item>
+        <item quantity="many">каждые %1$d минут</item>
+        <item quantity="other">каждые %1$d минуты</item>
+    </plurals>
+    <plurals name="interval_every_hours">
+        <item quantity="one">каждый %1$d час</item>
+        <item quantity="few">каждые %1$d часа</item>
+        <item quantity="many">каждые %1$d часов</item>
+        <item quantity="other">каждые %1$d часа</item>
+    </plurals>
+    <!-- Schedule preview sentences; auto: %1$s=goal, %2$d=glasses, %3$d=hours, %4$d=minutes -->
+    <string name="reminder_preview_auto">При цели %1$s вы получите примерно %2$d напоминаний (по одному на стакан) за %3$d ч бодрствования. Примерный интервал: %4$d мин.</string>
+    <!-- custom: %1$s=cadence phrase, %2$s=wake time, %3$s=sleep time -->
+    <string name="reminder_preview_custom">Напоминания будут приходить %1$s с %2$s до %3$s.</string>
+    <!-- ============================================================================
+         Settings — Quick Add customization
+         ============================================================================ -->
+    <string name="quickadd_containers_header">Шаблоны ёмкостей</string>
+    <string name="quickadd_containers_desc">Ёмкости для быстрого выбора на главном экране. Нажмите, чтобы изменить, или перетащите, чтобы поменять порядок.</string>
+    <string name="quickadd_edit_containers">Изменить шаблоны ёмкостей</string>
+    <string name="quickadd_beverages_header">Виды напитков</string>
+    <string name="quickadd_beverages_desc">Напитки для быстрого добавления. Перетаскивайте для изменения порядка или в раздел «Скрытые», чтобы скрыть.</string>
+    <string name="quickadd_edit_beverages">Изменить шаблоны напитков</string>
+    <!-- Container presets list/editor -->
+    <string name="container_presets_screen_title">Шаблоны ёмкостей</string>
+    <string name="container_reset_defaults_button">Восстановить исходные</string>
+    <string name="container_reset_title">Сбросить шаблоны ёмкостей?</string>
+    <string name="container_reset_message">Все пользовательские ёмкости будут удалены, а исходные шаблоны — восстановлены. Это действие нельзя отменить.</string>
+    <!-- Snackbars; %1$s = container name -->
+    <string name="container_added">Добавлена ёмкость «%1$s»</string>
+    <string name="container_updated">Ёмкость «%1$s» обновлена</string>
+    <string name="container_deleted">Ёмкость «%1$s» удалена</string>
+    <string name="container_reset_done">Восстановлены исходные шаблоны ёмкостей</string>
+    <!-- Snackbars; %1$s = beverage name -->
+    <!-- Beverage types list/editor -->
+    <string name="screen_beverage_types_title">Виды напитков</string>
+    <string name="beverage_types_helper">Напитки для быстрого добавления. Нажмите, чтобы изменить, или перетащите, чтобы поменять порядок.</string>
+    <!-- e.g. "150% hydration"; %1$s = per cent value including the % sign -->
+    <string name="beverage_hydration_short">Восполнение жидкости: %1$s</string>
+    <string name="beverage_reset_title">Сбросить напитки?</string>
+    <string name="beverage_reset_message">Будет восстановлен исходный порядок напитков, показаны все стандартные напитки и удалены пользовательские. Это действие нельзя отменить.</string>
+    <!-- ============================================================================
+         Settings — Hydration &amp; Health
+         ============================================================================ -->
+    <string name="hydration_baseline_intake">Базовое дневное потребление</string>
+    <string name="hydration_calc_standard_header">Стандарт расчёта</string>
+    <string name="hydration_region_european">(Европа)</string>
+    <string name="hydration_region_us">(США)</string>
+    <string name="hydration_efsa_tag">Умеренная норма</string>
+    <string name="hydration_iom_tag">Повышенная норма</string>
+    <!-- Health Connect -->
+    <string name="hc_section_header">Health Connect</string>
+    <string name="hc_sync_title">Синхронизация с Health Connect</string>
+    <string name="hc_sync_desc">Обменивайтесь данными о потреблении воды с другими приложениями для здоровья</string>
+    <string name="hc_data_title">Данные Health Connect</string>
+    <string name="hc_data_desc">История синхронизированных записей</string>
+    <string name="hc_restore">Восстановить из Health Connect</string>
+    <string name="hc_restore_confirm">Восстановить</string>
+    <string name="hc_grant_permissions">Предоставить разрешения</string>
+    <string name="hc_restore_message">Импорт прошлых записей HydroTracker из Health Connect. Выберите период:</string>
+    <string name="hc_restore_all">Вся история</string>
+    <string name="hc_restore_90days">Последние 90 дней</string>
+    <!-- %1$d = imported count, %2$d = skipped duplicates -->
+    <string name="hc_restored_snackbar">Восстановлено записей: %1$d; пропущено дубликатов: %2$d</string>
+    <string name="hc_no_data_title">Нет данных о потреблении воды</string>
+    <string name="hc_no_data_desc">В базе данных не найдено записей о потреблении воды.</string>
+    <!-- %1$s = volume, %2$s = container label -->
+    <string name="hc_amount_line">Объём: %1$s (%2$s)</string>
+    <!-- %1$s = beverage name, %2$s = effective amount with unit -->
+    <string name="hc_beverage_eff">Напиток: %1$s (эфф. %2$s)</string>
+    <string name="hc_beverage">Напиток: %1$s</string>
+    <string name="hc_badge_external">Из другого приложения</string>
+    <string name="hc_record_id">ID в Health Connect: %1$s</string>
+    <string name="hc_unhide_entry">Показать запись</string>
+    <!-- ============================================================================
+         Data-model enum labels
+         Resolved in the UI via stringResource(enum.labelResId). Grouped by enum.
+         ============================================================================ -->
+    <!-- Gender -->
+    <string name="gender_male">Мужской</string>
+    <string name="gender_female">Женский</string>
+    <string name="gender_other">Предпочитаю не указывать</string>
+    <!-- Inclusive, encouraging greeting shown per gender -->
+    <string name="gender_greeting_male">Пейте воду, чемпион!</string>
+    <string name="gender_greeting_female">Пейте воду и сияйте!</string>
+    <string name="gender_greeting_other">У вас всё получится!</string>
+    <!-- Age group -->
+    <string name="age_group_young_adult">18–30 лет</string>
+    <string name="age_group_adult">31–50 лет</string>
+    <string name="age_group_middle_aged">51–60 лет</string>
+    <string name="age_group_senior">60+ лет</string>
+    <string name="age_motivation_young_adult">Ваш организм закладывает основу на будущее — не забывайте пить воду!</string>
+    <string name="age_motivation_adult">Вода — источник энергии для вашей насыщенной жизни!</string>
+    <string name="age_motivation_middle_aged">Пейте достаточно воды, чтобы сохранять свежесть и бодрость!</string>
+    <string name="age_motivation_senior">Достаточное потребление воды помогает заботиться о самочувствии каждый день!</string>
+    <!-- Activity level -->
+    <string name="activity_sedentary">Сидячий образ жизни</string>
+    <string name="activity_light">Низкая активность</string>
+    <string name="activity_moderate">Умеренная активность</string>
+    <string name="activity_active">Высокая активность</string>
+    <string name="activity_very_active">Очень высокая активность</string>
+    <string name="activity_desc_sedentary">Почти нет физических нагрузок</string>
+    <string name="activity_desc_light">Лёгкие нагрузки 1–3 дня в неделю</string>
+    <string name="activity_desc_moderate" tools:ignore="TypographyDashes">Умеренные нагрузки 3–5 дней в неделю</string>
+    <string name="activity_desc_active">Интенсивные нагрузки 6–7 дней в неделю</string>
+    <string name="activity_desc_very_active">Очень интенсивные нагрузки или физическая работа</string>
+    <string name="activity_tip_sedentary">Даже в покое организму нужно регулярно получать воду!</string>
+    <string name="activity_tip_light">Даже лёгкие нагрузки требуют дополнительного восполнения жидкости!</string>
+    <string name="activity_tip_moderate">Регулярные тренировки требуют регулярного питья — так держать!</string>
+    <string name="activity_tip_active">При активном образе жизни особенно важно следить за потреблением воды!</string>
+    <string name="activity_tip_very_active">Высокие нагрузки требуют больше воды — вы чемпион!</string>
+    <!-- Reminder style -->
+    <string name="reminder_style_gentle">Мягкий и заботливый</string>
+    <string name="reminder_style_motivating">Мотивирующий и энергичный</string>
+    <string name="reminder_style_minimal">Простой и лаконичный</string>
+    <!-- Hydration standard (acronyms are not translated) -->
+    <string name="hydration_standard_efsa_desc">Нормы Европейского агентства по безопасности пищевых продуктов</string>
+    <string name="hydration_standard_iom_desc">Нормы Института медицины США</string>
+    <!-- Day-end mode -->
+    <string name="day_end_sleep_time">Время сна</string>
+    <string name="day_end_midnight">Полночь</string>
+    <!-- Reminder interval mode -->
+    <string name="reminder_interval_mode_automatic">Автоматический</string>
+    <string name="reminder_interval_mode_custom">Свой интервал</string>
+    <!-- Dark mode preference -->
+    <string name="dark_mode_system">Как в системе</string>
+    <string name="dark_mode_light">Светлая тема</string>
+    <string name="dark_mode_dark">Тёмная тема</string>
+    <!-- Colour source -->
+    <string name="color_source_hydro">Синий HydroTracker</string>
+    <string name="color_source_dynamic">Динамические цвета</string>
+    <string name="color_source_dynamic_desc">Цвета из обоев</string>
+    <!-- Week start day -->
+    <string name="weekday_sunday">Воскресенье</string>
+    <string name="weekday_monday">Понедельник</string>
+    <string name="weekday_tuesday">Вторник</string>
+    <string name="weekday_wednesday">Среда</string>
+    <string name="weekday_thursday">Четверг</string>
+    <string name="weekday_friday">Пятница</string>
+    <string name="weekday_saturday">Суббота</string>
+    <string name="week_start_system">Как в системе</string>
+    <!-- App font (proper-noun font names are not translated) -->
+    <string name="font_system">Системный</string>
+    <string name="font_xiaomi_warning">На HyperOS/MIUI (устройства группы Xiaomi) оформление шрифтов может работать некорректно из-за собственного механизма отображения текста.</string>
+    <!-- Navigation-bar label mode -->
+    <string name="navbar_label_always">Всегда</string>
+    <string name="navbar_label_selected">Только у выбранного пункта</string>
+    <string name="navbar_label_none">Выключены</string>
+    <!-- Home screen edge effect -->
+    <string name="edge_effect_transparent">Прозрачность</string>
+    <string name="edge_effect_blurred">Размытие</string>
+    <string name="edge_effect_scrim">Затемнение</string>
+    <!-- Beverage types -->
+    <string name="beverage_water">Вода</string>
+    <string name="beverage_coffee">Кофе</string>
+    <string name="beverage_tea">Чай</string>
+    <string name="beverage_soft_drink">Газировка</string>
+    <string name="beverage_energy_drink">Энергетик</string>
+    <string name="beverage_sports_drink">Спортивный напиток</string>
+    <string name="beverage_ors">Раствор для регидратации</string>
+    <string name="beverage_milk">Молоко</string>
+    <string name="beverage_fruit_juice">Фруктовый сок</string>
+    <string name="beverage_desc_water">Чистая вода — эталон восполнения жидкости</string>
+    <string name="beverage_desc_coffee">Кофе — эквивалентен воде</string>
+    <string name="beverage_desc_tea">Чай — эквивалентен воде</string>
+    <string name="beverage_desc_soft_drink">Газировка — эквивалентна воде</string>
+    <string name="beverage_desc_energy_drink">Энергетик — эквивалентен воде</string>
+    <string name="beverage_desc_sports_drink">Спортивный напиток — немного эффективнее восполняет жидкость</string>
+    <string name="beverage_desc_ors">Раствор для пероральной регидратации — значительно эффективнее восполняет жидкость</string>
+    <string name="beverage_desc_milk">Молоко — значительно эффективнее восполняет жидкость</string>
+    <string name="beverage_desc_fruit_juice">Фруктовый сок — эффективнее восполняет жидкость</string>
+    <!-- ============================================================================
+         Data Management
+         ============================================================================ -->
+    <string name="data_management_backup_header">Импорт и экспорт</string>
+    <string name="data_management_delete_header">Удаление данных</string>
+    <string name="data_export_csv_title">Экспорт в CSV</string>
+    <string name="data_export_json_title">Экспорт в JSON</string>
+    <string name="data_import_title">Импорт резервной копии</string>
+    <string name="data_import_desc">Восстановить записи из файла CSV или JSON</string>
+    <string name="data_export_scope_desc">Экспортируются только записи HydroTracker. Записи из других приложений для здоровья не включаются.</string>
+    <string name="data_delete_before_date_title">Удалить записи до даты</string>
+    <string name="data_delete_before_date_desc">Удалить записи о потреблении воды по выбранную дату включительно</string>
+    <!-- %1$s = formatted cutoff date -->
+    <string name="data_delete_before_date_model_title">Удалить записи</string>
+    <string name="data_delete_health_connect_include">Включая Health Connect</string>
+    <string name="data_delete_no_entries_affected">Нет записей по эту дату включительно</string>
+    <!-- Number of entries that will be deleted for the selected cutoff date -->
+    <plurals name="data_delete_entries_affected">
+        <item quantity="one">Будет безвозвратно удалена %1$d запись за период по %2$s включительно.</item>
+        <item quantity="few">Будут безвозвратно удалены %1$d записи за период по %2$s включительно.</item>
+        <item quantity="many">Будут безвозвратно удалены %1$d записей за период по %2$s включительно.</item>
+        <item quantity="other">Будет безвозвратно удалено %1$d записи за период по %2$s включительно.</item>
+    </plurals>
+    <string name="data_delete_local_title">Удалить только локальные данные</string>
+    <string name="data_delete_local_desc">Удалить все данные приложения на этом устройстве</string>
+    <string name="data_delete_local_message">Будут удалены все записи о потреблении воды, дневные сводки, шаблоны ёмкостей, пользовательские напитки и ваш профиль. Это действие нельзя отменить.</string>
+    <string name="data_delete_health_connect_title">Удалить только данные Health Connect</string>
+    <string name="data_delete_health_connect_desc">Удалить записи HydroTracker из Health Connect</string>
+    <string name="data_delete_health_connect_message">Записи HydroTracker будут удалены из Health Connect. Записи других приложений не будут затронуты. Это действие нельзя отменить.</string>
+    <string name="data_delete_everything_title">Удалить всё</string>
+    <string name="data_delete_everything_desc">Удалить все локальные данные и данные Health Connect</string>
+    <string name="data_delete_everything_message">Будут удалены все локальные данные и все записи HydroTracker в Health Connect, а ваш профиль будет сброшен. Это действие нельзя отменить.</string>
+    <!-- %1$d = number of entries exported -->
+    <string name="data_export_success">Экспортировано записей: %1$d</string>
+    <!-- %1$s = error message -->
+    <string name="data_export_failed">Ошибка экспорта: %1$s</string>
+    <!-- %1$d = imported count, %2$d = skipped count -->
+    <string name="data_import_success">Импортировано записей: %1$d; пропущено дубликатов: %2$d</string>
+    <!-- %1$s = error message -->
+    <string name="data_import_failed">Ошибка импорта: %1$s</string>
+    <string name="data_delete_success">Данные успешно удалены</string>
+    <!-- %1$s = error message -->
+    <string name="data_delete_failed">Ошибка удаления: %1$s</string>
+    <!-- ============================================================================
+         Health Connect status & badges
+         ============================================================================ -->
+    <string name="hc_status_error">Ошибка: %1$s</string>
+    <string name="hc_badge_hidden">Скрыто</string>
+    <!-- ============================================================================
+         About
+         ============================================================================ -->
+    <string name="app_tagline">Трекер потребления воды с открытым исходным кодом.</string>
+    <string name="label_version">Версия: %1$s</string>
+    <string name="label_build_number">Номер сборки: %1$d</string>
+    <string name="about_section_contributors">Участники проекта</string>
+    <string name="about_contributor_role">Автор и разработчик</string>
+    <string name="about_contributor_bio">Независимый Android-разработчик, создающий простые приложения с уважением к конфиденциальности.</string>
+    <string name="about_contributor_role_contributor">Участник проекта</string>
+    <string name="cd_open_github_profile">Открыть профиль GitHub</string>
+    <string name="about_section_information">Информация</string>
+    <string name="about_changelog">История изменений</string>
+    <string name="about_changelog_desc">Что нового в каждой версии</string>
+    <string name="about_sources">Источники и исследования</string>
+    <string name="about_sources_desc">Научные источники, на которых основано приложение</string>
+    <string name="about_privacy_policy">Политика конфиденциальности</string>
+    <string name="about_privacy_policy_desc">Как обрабатываются ваши данные</string>
+    <string name="about_license">Лицензия</string>
+    <string name="about_license_desc">Лицензия открытого исходного кода HydroTracker</string>
+    <string name="about_third_party_licenses">Лицензии сторонних компонентов</string>
+    <string name="about_third_party_licenses_desc">Используемые библиотеки с открытым исходным кодом</string>
+    <string name="toast_no_app_to_open_link">Не найдено приложение для открытия ссылки</string>
+    <!-- ============================================================================
+         Support Development
+         ============================================================================ -->
+    <string name="support_development_hero">HydroTracker разрабатывает и поддерживает один человек. В приложении нет рекламы и отслеживания. Если оно помогает вам пить больше воды, любое пожертвование поможет его развитию.</string>
+    <string name="support_section_support">Поддержать разработку</string>
+    <string name="support_github_sponsors_blurb">Поддержите дальнейшую разработку</string>
+    <string name="support_paypal_blurb">Сделайте небольшое пожертвование</string>
+    <string name="support_buymeacoffee_blurb">Угостите меня кофе</string>
+    <string name="support_section_other_ways">Другие способы помочь</string>
+    <string name="support_rate_play_store">Оценить в Google Play</string>
+    <string name="support_rate_play_store_desc">Оставьте оценку в Google Play</string>
+    <string name="support_share_app">Поделиться приложением</string>
+    <string name="support_share_app_desc">Расскажите другу о HydroTracker</string>
+    <string name="support_star_github">Поставить звезду на GitHub</string>
+    <string name="support_star_github_desc">Поставьте звезду проекту на GitHub</string>
+    <string name="share_chooser_title">Поделиться HydroTracker</string>
+    <string name="toast_review_successful">Отзыв успешно отправлен</string>
+    <string name="toast_review_failed">Не удалось отправить отзыв</string>
+    <string name="toast_no_app_to_share">Не найдено приложение для отправки</string>
+    <!-- ============================================================================
+         Updates
+         ============================================================================ -->
+    <string name="screen_updates_title">Обновления</string>
+    <string name="updates_section_auto_update">Автообновление</string>
+    <string name="updates_toggle_auto_check">Проверять автоматически</string>
+    <string name="updates_toggle_auto_check_desc">Проверять наличие обновлений примерно раз в день</string>
+    <string name="updates_section_status">Статус</string>
+    <string name="updates_status_checking">Проверка обновлений…</string>
+    <string name="updates_status_failed">Не удалось проверить обновления</string>
+    <string name="updates_status_f_droid">Обновлениями управляет F-Droid</string>
+    <string name="updates_status_f_droid_desc">Откройте F-Droid, чтобы обновить HydroTracker.</string>
+    <string name="updates_status_up_to_date">Установлена последняя версия</string>
+    <string name="updates_status_check_now">Проверить обновления</string>
+    <string name="updates_last_checked_never">Проверка ещё не выполнялась</string>
+    <string name="updates_last_checked">Последняя проверка: %1$s</string>
+    <string name="updates_button_check_now">Проверить сейчас</string>
+    <string name="updates_button_checking">Проверка…</string>
+    <string name="updates_button_restart_install">Перезапустить для установки</string>
+    <string name="updates_available_title">Доступно обновление</string>
+    <string name="updates_available_play_desc">В Google Play доступна новая версия</string>
+    <string name="updates_available_version">Версия %1$s</string>
+    <string name="updates_button_update">Обновить</string>
+    <string name="updates_button_download">Скачать обновление</string>
+    <string name="label_version_simple">Версия</string>
+    <string name="label_build_simple">Сборка</string>
+    <string name="label_install_method">Способ установки</string>
+    <string name="label_source">Источник</string>
+    <string name="install_source_manual">Вручную</string>
+    <string name="install_source_debug">Отладочная сборка</string>
+    <string name="install_source_github">GitHub</string>
+    <string name="toast_could_not_start_update">Не удалось запустить обновление</string>
+    <!-- ============================================================================
+         Licenses
+         ============================================================================ -->
+    <string name="screen_licenses_title">Лицензии сторонних компонентов</string>
+    <string name="licenses_empty">Информация о лицензиях отсутствует.</string>
+    <!-- ============================================================================
+         What\'s New / Update Dialog
+         ============================================================================ -->
+    <string name="whats_new_title">Что нового</string>
+    <string name="whats_new_version">Версия %1$s</string>
+    <string name="update_dialog_title">Доступно обновление</string>
+    <string name="update_dialog_current_version">Текущая версия</string>
+    <string name="update_dialog_new_version">Новая версия</string>
+    <string name="update_dialog_action_play">Откройте Google Play, чтобы обновить HydroTracker.</string>
+    <string name="update_dialog_action_f_droid">Откройте F-Droid, чтобы обновить HydroTracker.</string>
+    <string name="update_dialog_action_github">Скачайте последнюю версию APK с GitHub.</string>
+    <string name="update_button_later">Позже</string>
+    <string name="update_button_update">Обновить</string>
+    <!-- ============================================================================
+         Markdown components
+         ============================================================================ -->
+    <string name="markdown_loading">Загрузка…</string>
+    <string name="markdown_error_loading">Ошибка загрузки %1$s: %2$s</string>
+    <string name="markdown_version_prefix">Версия %1$s</string>
+    <string name="markdown_section_added">Добавлено</string>
+    <string name="markdown_section_changed">Изменено</string>
+    <string name="markdown_section_fixed">Исправлено</string>
+    <!-- ============================================================================
+         Placeholder
+         ============================================================================ -->
+    <!-- ============================================================================
+         Health Connect Data screen
+         ============================================================================ -->
+    <!-- %1$s = beverage name, %2$s = effective amount with unit -->
+    <!-- %1$s = beverage name, %2$s = raw amount with unit, %3$s = effective amount with unit -->
+    <string name="health_connect_status_unavailable">Health Connect недоступен на этом устройстве</string>
+    <string name="health_connect_status_update_required">Приложение Health Connect необходимо обновить</string>
+    <string name="health_connect_status_no_permissions">Не предоставлены разрешения для Health Connect</string>
+    <string name="health_connect_status_ready">Health Connect готов к работе</string>
+    <string name="health_connect_imported_from">Импортировано из %1$s</string>
+    <!-- ============================================================================
+         Home
+         ============================================================================ -->
+    <!-- Snackbars -->
+    <string name="home_snackbar_add_failed">Не удалось добавить воду: %1$s</string>
+    <string name="home_snackbar_delete_failed">Не удалось удалить запись: %1$s</string>
+    <string name="home_snackbar_update_failed">Не удалось обновить запись: %1$s</string>
+    <string name="home_snackbar_synced">Синхронизировано записей из Health Connect: %1$d</string>
+    <string name="home_snackbar_sync_errors">Синхронизация завершена. Ошибок: %1$d</string>
+    <string name="home_snackbar_up_to_date">Данные актуальны</string>
+    <string name="home_snackbar_sync_failed">Ошибка синхронизации: %1$s</string>
+    <string name="home_snackbar_sync_disabled">Синхронизация с Health Connect отключена</string>
+    <string name="home_snackbar_container_added">Добавлена ёмкость «%1$s»</string>
+    <string name="home_snackbar_container_updated">Ёмкость «%1$s» обновлена</string>
+    <string name="home_snackbar_container_deleted">Ёмкость «%1$s» удалена</string>
+    <!-- Dialogue labels -->
+    <string name="home_label_beverage_type">Вид напитка</string>
+    <string name="home_label_amount_ml">Объём (%1$s)</string>
+    <string name="home_label_container_type">Тип ёмкости</string>
+    <string name="home_label_time">Время</string>
+    <!-- %1$s = minimum valid amount, %2$s = maximum valid amount (both with unit) -->
+    <string name="home_error_amount_invalid">Введите допустимый объём (%1$s–%2$s)</string>
+    <string name="home_label_hydration_effectiveness">Эффективность восполнения жидкости: %1$s</string>
+    <string name="home_label_effective_hydration">Зачтённый объём воды: %1$s</string>
+    <string name="home_option_custom">Свой вариант</string>
+    <string name="home_beverage_effective_name">%1$s</string>
+    <string name="home_beverage_effective_amount">%1$s</string>
+    <!-- Content descriptions -->
+    <string name="cd_add_container">Добавить ёмкость</string>
+    <!-- Stats labels -->
+    <string name="home_label_daily_progress">Прогресс за день</string>
+    <string name="home_label_entries">Записи</string>
+    <string name="home_label_first_intake">Первый приём</string>
+    <string name="home_label_latest_intake">Последний приём</string>
+    <string name="home_reminders_paused_hint">Напоминания приостановлены до завтра</string>
+    <string name="home_section_recent_entries">Последние записи</string>
+    <!-- Dialogue titles -->
+    <string name="home_dialog_add_custom_amount">Указать свой объём</string>
+    <string name="home_dialog_edit_entry_title">Изменить запись о воде</string>
+    <string name="home_dialog_external_entry_title">Запись о воде из другого приложения</string>
+    <string name="home_dialog_select_time">Выберите время</string>
+    <string name="home_dialog_delete_message">Удалить эту запись: %1$s %2$s?</string>
+    <string name="home_external_entry_title">Запись из другого приложения</string>
+    <string name="home_external_entry_message">Эта запись импортирована из другого приложения для здоровья и недоступна для изменения. Можно только просмотреть её данные.</string>
+    <!-- Add Container Card -->
+    <string name="home_add_container_label">Добавить</string>
+    <!-- Container preset names (stable English key kept for storage; these are display strings) -->
+    <string name="container_coffee_cup">Чашка для кофе</string>
+    <string name="container_tea_cup">Чашка для чая</string>
+    <string name="container_small_cup">Маленькая чашка</string>
+    <string name="container_medium_glass">Средний стакан</string>
+    <string name="container_large_glass">Большой стакан</string>
+    <string name="container_water_bottle">Бутылка для воды</string>
+    <string name="container_large_bottle">Большая бутылка</string>
+    <!-- Hydration percentage label, e.g. "80% hydration"; %1$s = per cent value including the % sign -->
+    <string name="home_label_hydration_percentage">Восполнение жидкости: %1$s</string>
+    <!-- Motivational messages -->
+    <string name="home_motivation_goal_achieved">Отлично! Дневная цель достигнута!</string>
+    <string name="home_motivation_almost_there">Так держать! Цель уже близко!</string>
+    <string name="home_motivation_halfway">Половина пути пройдена! Продолжайте в том же духе!</string>
+    <string name="home_motivation_good_start">Хорошее начало! Продолжайте регулярно пить воду!</string>
+    <!-- ============================================================================
+         Profile
+         ============================================================================ -->
+    <!-- Time-based greeting shown above the username; keep the trailing comma if the
+         language separates greeting and name with a comma. -->
+    <string name="profile_greeting_morning">Доброе утро,</string>
+    <string name="profile_greeting_afternoon">Добрый день,</string>
+    <string name="profile_greeting_evening">Добрый вечер,</string>
+    <string name="profile_greeting_default">Здравствуйте,</string>
+    <!-- Quick stats under the profile header -->
+    <string name="profile_stat_today_entries">Записи за сегодня</string>
+    <string name="profile_stat_days_tracked">Дней отслеживания</string>
+    <string name="profile_stat_today_goal">Цель на сегодня</string>
+    <!-- Section titles on the Profile screen -->
+    <string name="profile_section_daily_goals">Дневные цели</string>
+    <string name="profile_section_personal">Личные данные</string>
+    <!-- Info-row labels -->
+    <string name="profile_label_gender">Пол</string>
+    <string name="profile_label_daily_goal">Дневная цель по воде</string>
+    <string name="profile_label_activity_level">Уровень активности</string>
+    <!-- e.g. "07:00 - 23:00" -->
+    <!-- Profile photo sheet -->
+    <string name="profile_photo_sheet_title">Обновить фото профиля</string>
+    <!-- Name edit dialogue -->
+    <string name="profile_name_dialog_title">Изменить имя</string>
+    <string name="profile_name_error_empty">Имя не может быть пустым</string>
+    <string name="profile_name_error_too_long">Слишком длинное имя</string>
+    <!-- Daily goal bottom sheet -->
+    <string name="profile_goal_edit_title">Изменить дневную цель</string>
+    <string name="profile_goal_edit_description">Задайте дневную цель по потреблению воды. Она используется для отслеживания прогресса и расчёта напоминаний.</string>
+    <!-- %1$s = formatted amount in the user's volume unit -->
+    <!-- %1$s = minimum valid amount, %2$s = maximum valid amount (both with unit) -->
+    <!-- %1$s = minimum recommended amount, %2$s = maximum recommended amount (both with unit) -->
+    <!-- Activity level bottom sheet -->
+    <string name="profile_activity_title">Уровень активности</string>
+    <!-- Schedule bottom sheet -->
+    <!-- Gender bottom sheet -->
+    <string name="profile_gender_title">Выберите пол</string>
+    <!-- Age group bottom sheet -->
+    <!-- Weight bottom sheet -->
+    <!-- Generic OK button for time pickers and similar dialogues -->
+    <!-- ============================================================================
+         History &amp; Analytics
+         ============================================================================ -->
+    <string name="history_period_weekly">По неделям</string>
+    <string name="history_period_monthly">По месяцам</string>
+    <string name="history_period_yearly">По годам</string>
+    <!-- %1$s = period name, e.g. "Weekly" -->
+    <string name="cd_previous_period">Предыдущий период: %1$s</string>
+    <string name="cd_next_period">Следующий период: %1$s</string>
+    <string name="history_this_week">Эта неделя</string>
+    <string name="history_last_week">Прошлая неделя</string>
+    <string name="history_this_month">Этот месяц</string>
+    <string name="history_last_month">Прошлый месяц</string>
+    <string name="history_this_year">Этот год</string>
+    <string name="history_last_year">Прошлый год</string>
+    <string name="history_stat_total">Всего</string>
+    <string name="history_stat_average">В среднем</string>
+    <string name="history_stat_best_day">Лучший день</string>
+    <string name="history_stat_days_tracked">Дней отслеживания</string>
+    <string name="history_stat_goals_met">Целей достигнуто</string>
+    <string name="history_stat_success_rate">Доля успешных дней</string>
+    <string name="history_stat_total_intake">Общее потребление</string>
+    <string name="history_empty_week">Нет данных за эту неделю</string>
+    <string name="history_empty_month">Нет данных за последние 30 дней</string>
+    <string name="history_empty_year">Нет данных за этот год</string>
+    <string name="history_empty_generic">Нет данных</string>
+    <string name="history_select_day_hint">Нажмите день на графике, чтобы увидеть записи</string>
+    <!-- ============================================================================
+         Statistics
+         All-time insights shown on the dedicated Statistics tab.
+         ============================================================================ -->
+    <string name="statistics_empty_title">Статистики пока нет</string>
+    <string name="statistics_empty_description">Начните записывать потребление воды, чтобы видеть персональную статистику и тенденции.</string>
+    <!-- Section titles -->
+    <string name="statistics_section_overview">Обзор</string>
+    <string name="statistics_section_beverages">По напиткам</string>
+    <string name="statistics_section_containers">Использование ёмкостей</string>
+    <!-- Hero stats -->
+    <string name="statistics_hero_success_rate">Доля успешных дней</string>
+    <string name="statistics_hero_days_tracked">Дней отслеживания</string>
+    <!-- Overview labels -->
+    <string name="statistics_label_current_streak">Текущая серия</string>
+    <string name="statistics_label_average_daily_intake">В среднем за день</string>
+    <string name="statistics_label_total_intake">Общее потребление</string>
+    <string name="statistics_label_success_rate">Доля успешных дней</string>
+    <string name="statistics_label_days_tracked">Дней отслеживания</string>
+    <plurals name="statistics_streak_days">
+        <item quantity="one">%1$d день</item>
+        <item quantity="few">%1$d дня</item>
+        <item quantity="many">%1$d дней</item>
+        <item quantity="other">%1$d дня</item>
+    </plurals>
+    <!-- Drinking pattern labels -->
+    <string name="statistics_label_first_drink">Первый приём</string>
+    <string name="statistics_label_last_drink">Последний приём</string>
+    <string name="statistics_label_average_interval">Средний интервал</string>
+    <string name="statistics_label_average_drink_size">Средняя порция</string>
+    <string name="statistics_label_largest_drink">Самая большая порция</string>
+    <!-- Beverage breakdown -->
+    <!-- %1$d = drink count, %2$s = effective volume with unit -->
+    <!-- %1$s = effective volume with unit -->
+    <string name="statistics_beverage_effective_short">%1$s \nзачтено</string>
+    <!-- Container Usage -->
+    <string name="statistics_container_header_container">Ёмкость</string>
+    <string name="statistics_container_header_volume">Объём</string>
+    <string name="statistics_container_header_uses">Использований</string>
+    <!-- Hydration multiplier -->
+    <!-- %1$s = signed percentage, e.g. "+5%" -->
+    <!-- Health Connect imports -->
+    <!-- %1$s = formatted goal amount -->
+    <!-- %1$d = percentage -->
+    <!-- Short weekday names for the monthly calendar header -->
+    <string name="weekday_short_sun">Вс</string>
+    <string name="weekday_short_mon">Пн</string>
+    <string name="weekday_short_tue">Вт</string>
+    <string name="weekday_short_wed">Ср</string>
+    <string name="weekday_short_thu">Чт</string>
+    <string name="weekday_short_fri">Пт</string>
+    <string name="weekday_short_sat">Сб</string>
+    <!-- ============================================================================
+         Notifications
+         ============================================================================ -->
+    <!-- %1$s = the random water fact -->
+    <string name="notification_fun_fact_title">Знаете ли вы?</string>
+    <!-- %1$d = remaining milliliters -->
+    <string name="notification_minimal_remaining">Осталось %1$s</string>
+    <!-- %1$s = formatted amount with unit, e.g. "500 ml" -->
+    <string name="notification_action_add">Добавить %1$s</string>
+    <string name="notification_action_pause_today">Приостановить на сегодня</string>
+    <string name="notification_quick_add_preset_name">Быстрое добавление</string>
+    <string name="notification_quick_add_note">Добавлено из уведомления</string>
+    <string name="notification_paused_confirmation">Напоминания приостановлены до завтра</string>
+    <string name="notification_quick_add_feedback_title">Добавлено %1$s</string>
+    <!-- %1$s = formatted current intake, %2$s = formatted daily goal -->
+    <string name="notification_quick_add_feedback_message">%1$s / %2$s</string>
+    <!-- Gentle reminder titles -->
+    <string-array name="notification_gentle_titles">
+        <item>Мягкое напоминание о воде</item>
+        <item>Пора попить воды</item>
+        <item>Организм просит воды</item>
+        <item>Небольшой перерыв на воду</item>
+        <item>Ненавязчивое напоминание от HydroTracker</item>
+        <item>Минутка для воды</item>
+        <item>Не забывайте пить воду</item>
+    </string-array>
+    <!-- Gentle reminder messages: low progress (&lt; 25%) -->
+    <string-array name="notification_gentle_messages_low">
+        <item>Ваш организм сейчас не отказался бы от освежающей воды.</item>
+        <item>Как насчёт глотка чего-нибудь освежающего?</item>
+        <item>Небольшое напоминание: позаботьтесь о себе и выпейте воды.</item>
+        <item>Пора дать организму необходимую ему воду.</item>
+        <item>Давайте начнём формировать полезную привычку пить воду.</item>
+        <item>Стакан воды утром — хорошее начало дня.</item>
+        <item>Небольшой стакан сейчас может принести большую пользу позже.</item>
+        <item>Вашим клеткам нужно немного внимания.</item>
+    </string-array>
+    <!-- Gentle reminder messages: mid-progress (25–50%) -->
+    <string-array name="notification_gentle_messages_mid">
+        <item>Вы отлично продвигаетесь! Продолжайте пить воду.</item>
+        <item>Половина пути пройдена! Организм ценит каждую каплю.</item>
+        <item>Всё идёт хорошо! Пора снова освежиться.</item>
+        <item>Вы прекрасно справляетесь с заботой о водном балансе.</item>
+        <item>Продолжайте в том же духе! Пора сделать ещё глоток.</item>
+        <item>Сегодня вы держите отличный ритм.</item>
+        <item>Постепенный прогресс — лучший прогресс.</item>
+        <item>Каждый глоток — шаг к вашей цели.</item>
+    </string-array>
+    <!-- Gentle reminder messages: high progress (50–75%) -->
+    <string-array name="notification_gentle_messages_high">
+        <item>Почти у цели! Вы отлично справляетесь.</item>
+        <item>Ваша забота о водном балансе вдохновляет.</item>
+        <item>Цель совсем близко! Продолжайте в том же духе.</item>
+        <item>Организм благодарен вам за эту заботу.</item>
+        <item>Отличный прогресс! Осталось совсем немного.</item>
+        <item>Ваша регулярность приносит плоды.</item>
+        <item>Вы уже столько прошли — не останавливайтесь.</item>
+        <item>Финиш ближе, чем кажется.</item>
+    </string-array>
+    <!-- Gentle reminder messages: final progress (&gt; 75%) -->
+    <string-array name="notification_gentle_messages_final">
+        <item>Вы совсем близко к дневной цели!</item>
+        <item>Финишная прямая! Вы удивительно последовательны.</item>
+        <item>Почти на финише! У вас всё получится.</item>
+        <item>Сегодня вы проявили невероятное упорство.</item>
+        <item>Ещё немного — и победа за вами.</item>
+        <item>Ещё чуть-чуть до цели.</item>
+        <item>Сегодняшними стараниями можно гордиться.</item>
+        <item>До победы осталось несколько глотков.</item>
+    </string-array>
+    <!-- Motivating reminder titles -->
+    <string-array name="notification_motivating_titles">
+        <item>Чемпион водного баланса!</item>
+        <item>Водный воин, внимание!</item>
+        <item>Зарядитесь силой H2O!</item>
+        <item>Время героев водного баланса!</item>
+        <item>Зарядитесь для успеха!</item>
+        <item>Пора выйти на новый уровень!</item>
+        <item>Режим чемпиона: включён</item>
+    </string-array>
+    <!-- Motivating reminder messages: low progress -->
+    <string-array name="notification_motivating_messages_low">
+        <item>Пора ДОСТИЧЬ цели по воде! ВПЕРЁД!</item>
+        <item>Ваш УСПЕХ начинается со следующего глотка!</item>
+        <item>Чемпионы пьют воду! Готовы ПОБЕЖДАТЬ?</item>
+        <item>РАСКРОЙТЕ свой потенциал с чистой H2O!</item>
+        <item>Победители пьют воду! Пора на НОВЫЙ УРОВЕНЬ!</item>
+        <item>Первый шаг к победе — выпить воды!</item>
+        <item>Каждый чемпион начинает с основ. Пейте воду!</item>
+        <item>Ваши соперники уже пьют воду. А вы?</item>
+    </string-array>
+    <!-- Motivating reminder messages: mid progress -->
+    <string-array name="notification_motivating_messages_mid">
+        <item>ВАС НЕ ОСТАНОВИТЬ! Вы набираете темп!</item>
+        <item>ТАК ДЕРЖАТЬ! Половина пути к победе пройдена!</item>
+        <item>МОЩНЫЙ прогресс! Сохраняйте этот заряд!</item>
+        <item>ОТЛИЧНАЯ работа! Сегодня вы в ударе!</item>
+        <item>Настрой ЧЕМПИОНА! Только вперёд!</item>
+        <item>Темп растёт — продолжайте!</item>
+        <item>Вы сильнее своих отговорок. Пейте воду!</item>
+        <item>Никаких преград и отговорок. Просто пейте воду.</item>
+    </string-array>
+    <!-- Motivating reminder messages: high progress -->
+    <string-array name="notification_motivating_messages_high">
+        <item>НЕВЕРОЯТНОЕ упорство! Победа уже рядом!</item>
+        <item>ПРЕВОСХОДНО! Вы на пути к победе!</item>
+        <item>ФЕНОМЕНАЛЬНО! Осталась последняя четверть — вы справитесь!</item>
+        <item>МАСТЕРСТВО в действии! Продолжайте побеждать!</item>
+        <item>ЛЕГЕНДАРНАЯ настойчивость! Почти на вершине!</item>
+        <item>Финиш уже виден!</item>
+        <item>Выложитесь по полной. Пейте воду!</item>
+        <item>Величие достигается глоток за глотком.</item>
+    </string-array>
+    <!-- Motivating reminder messages: final progress -->
+    <string-array name="notification_motivating_messages_final">
+        <item>ПОСЛЕДНИЙ РЫВОК! Вас ждёт величие!</item>
+        <item>До ПОЛНОЙ ПОБЕДЫ совсем чуть-чуть!</item>
+        <item>МАКСИМУМ усилий ради МАКСИМАЛЬНОГО результата!</item>
+        <item>НАСТОЯЩИЙ герой водного баланса! Завершите с размахом!</item>
+        <item>Статус ЛЕГЕНДЫ уже близко! Завершите миссию!</item>
+        <item>Доведите дело до конца, чемпион!</item>
+        <item>Вот что отличает хороших от великих. К финишу!</item>
+        <item>Последний рывок. Вы рождены для этого.</item>
+    </string-array>
+    <!-- Minimal reminder titles -->
+    <string-array name="notification_minimal_titles">
+        <item>Напоминание о воде</item>
+    </string-array>
+    <!-- Minimal reminder messages -->
+    <string name="notification_minimal_message_low">Пора попить воды</string>
+    <string name="notification_minimal_message_mid">Продолжайте пить воду</string>
+    <string name="date_format_title">Формат даты</string>
+    <string name="week_start_format_title">Первый день недели</string>
+    <string name="profile_photo_sheet_gallery_title">Выбрать из галереи</string>
+    <string name="profile_photo_sheet_camera_title">Сделать фото</string>
+    <string name="profile_photo_sheet_delete">Удалить фото профиля</string>
+    <!-- Profile photo cropper -->
+    <string name="profile_crop_title">Обрезать фото профиля</string>
+    <string name="crop_save">Сохранить</string>
+    <string name="crop_cancel">Отмена</string>
+    <string name="crop_rotate_left">Повернуть на 90 градусов влево</string>
+    <string name="crop_rotate_right">Повернуть на 90 градусов вправо</string>
+    <string name="crop_reset">Сбросить</string>
+    <string name="cd_crop_image">Фото для обрезки</string>
+    <string name="error_saving_image">Не удалось сохранить обрезанное изображение</string>
+    <!-- Water facts shown with gentle reminders -->
+    <string-array name="notification_facts">
+        <item>Ваш мозг на 75% состоит из воды — заботьтесь о нём!</item>
+        <item>Вода помогает регулировать температуру тела.</item>
+        <item>Достаточное потребление воды может улучшить настроение и концентрацию.</item>
+        <item>Ваши мышцы на 75% состоят из воды.</item>
+        <item>Вода помогает переносить питательные вещества по всему организму.</item>
+        <item>Достаточное потребление воды может повысить уровень энергии.</item>
+        <item>Вода помогает почкам эффективно выводить продукты обмена.</item>
+        <item>Достаточное потребление воды поддерживает здоровье кожи.</item>
+        <item>Ваша кровь на 90% состоит из воды.</item>
+        <item>Вода помогает смазывать суставы.</item>
+        <item>Достаточное потребление воды может улучшить физическую работоспособность.</item>
+        <item>Вода участвует в пищеварении и усвоении питательных веществ.</item>
+        <item>Достаточное потребление воды помогает поддерживать нормальное артериальное давление.</item>
+        <item>Вода помогает предотвратить образование камней в почках.</item>
+        <item>Когда организму хватает воды, сердце работает эффективнее.</item>
+        <item>Обезвоживание может вызывать головную боль и усталость.</item>
+        <item>Вода перед едой может помочь контролировать размер порций.</item>
+        <item>Вода необходима для поддержания температуры тела во время тренировок.</item>
+        <item>Даже лёгкое обезвоживание может ухудшить когнитивные функции.</item>
+        <item>Вода составляет около 60% общей массы тела.</item>
+    </string-array>
+    <!-- Water puns shown with motivating reminders. These are language-dependent word
+         play, so they are not translated; each locale should provide its own if desired. -->
+</resources>
