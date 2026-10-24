@@ -8,9 +8,14 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="33" />
     <uses-permission
         android:name="android.permission.USE_EXACT_ALARM"
-        tools:ignore="RestrictedPermission" />
+        tools:ignore="ExactAlarmPolicy,RestrictedPermission" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Lets the app show the native battery-optimization exemption dialogue so
+         reminders stay reliable on devices with aggressive power management -->
+    <uses-permission
+        android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
+        tools:ignore="BatteryLife" />
 
     <!-- Internet access for checking app updates (GitHub releases) -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -25,7 +30,7 @@
         tools:ignore="RestrictedPermission" />
     <uses-permission
         android:name="android.permission.health.WRITE_HYDRATION"
-        tools:ignore="RestrictedPermission" />
+        tools:ignore="HealthConnectPolicy,RestrictedPermission" />
 
     <!-- Health Connect capability declaration -->
     <queries>

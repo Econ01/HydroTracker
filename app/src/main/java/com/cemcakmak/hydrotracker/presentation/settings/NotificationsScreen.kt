@@ -22,8 +22,12 @@ package com.cemcakmak.hydrotracker.presentation.settings
 
 import android.app.Activity
 import android.app.Application
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.format.DateFormat
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.Crossfade
@@ -69,7 +73,6 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -114,6 +117,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.models.ActivityLevel
@@ -123,17 +127,20 @@ import com.cemcakmak.hydrotracker.data.models.Gender
 import com.cemcakmak.hydrotracker.data.models.ReminderStyle
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.UserProfile
+import com.cemcakmak.hydrotracker.notifications.BatteryOptimisationManager
 import com.cemcakmak.hydrotracker.notifications.HydroNotificationScheduler
 import com.cemcakmak.hydrotracker.notifications.NotificationContentProvider
 import com.cemcakmak.hydrotracker.notifications.NotificationPermissionManager
 import com.cemcakmak.hydrotracker.presentation.common.BlurMorph
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
+import com.cemcakmak.hydrotracker.ui.theme.extendedColorScheme
 import com.cemcakmak.hydrotracker.utils.DateTimeFormatters
 import com.cemcakmak.hydrotracker.utils.WaterCalculator
 import kotlinx.coroutines.launch
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+private const val URL_DO_NOT_KILL_MY_APP = "https://dontkillmyapp.com"
+
 @Composable
 fun NotificationsScreen(
     wasPop: Boolean = false,
@@ -185,12 +192,17 @@ fun NotificationsScreen(
         // Permission state
     var refreshTrigger by remember { mutableIntStateOf(0) }
     var hasNotificationPermission by remember {
-        mutableStateOf(if (isPreview) true else NotificationPermissionManager.hasNotificationPermission(context))
+        mutableStateOf(isPreview || NotificationPermissionManager.hasNotificationPermission(context))
     }
     var hasExactAlarmPermission by remember {
-        mutableStateOf(if (isPreview) true else NotificationPermissionManager.hasExactAlarmPermission(context))
+        mutableStateOf(isPreview || NotificationPermissionManager.hasExactAlarmPermission(context))
+    }
+    var isBatteryExempt by remember {
+        mutableStateOf(isPreview || BatteryOptimisationManager.isIgnoringBatteryOptimisations(context))
     }
 
+    // Hard permissions only — battery exemption is a recommendation and must
+    // not block enabling reminders (see the reminders toggle below)
     val allPermissionsGranted = hasNotificationPermission && hasExactAlarmPermission
 
     // Reminders enabled state (persisted on the user profile)
@@ -223,6 +235,7 @@ fun NotificationsScreen(
         if (!isPreview) {
             hasNotificationPermission = NotificationPermissionManager.hasNotificationPermission(context)
             hasExactAlarmPermission = NotificationPermissionManager.hasExactAlarmPermission(context)
+            isBatteryExempt = BatteryOptimisationManager.isIgnoringBatteryOptimisations(context)
         }
     }
 
@@ -242,24 +255,28 @@ fun NotificationsScreen(
                 onNavigateBack = onNavigateBack,
                 themePreferences = themePreferences
             ) {
-                // Permission status banner
-                if (!allPermissionsGranted) {
-                    PermissionStatusBanner(
-                        hasNotificationPermission = hasNotificationPermission,
-                        hasExactAlarmPermission = hasExactAlarmPermission,
-                        onRequestNotificationPermission = onRequestNotificationPermission,
-                        onRequestExactAlarmPermission = {
-                            NotificationPermissionManager.requestExactAlarmPermission(context)
-                        }
-                    )
-                }
-
                 // Notification preview
                 if (userProfile != null) {
                     NotificationPreviewCard(
                         currentStyle = userProfile.reminderStyle,
                         themePreferences = themePreferences,
                         funFactsEnabled = userProfile.funFactsEnabled
+                    )
+                }
+
+                // Permission status banner
+                if (!allPermissionsGranted || !isBatteryExempt) {
+                    PermissionStatusBanner(
+                        hasNotificationPermission = hasNotificationPermission,
+                        hasExactAlarmPermission = hasExactAlarmPermission,
+                        isBatteryExempt = isBatteryExempt,
+                        onRequestNotificationPermission = onRequestNotificationPermission,
+                        onRequestExactAlarmPermission = {
+                            NotificationPermissionManager.requestExactAlarmPermission(context)
+                        },
+                        onRequestBatteryOptimisation = {
+                            BatteryOptimisationManager.requestIgnoreBatteryOptimisations(context)
+                        }
                     )
                 }
 
@@ -734,14 +751,23 @@ private fun NotificationPreviewCard(
     }
 }
 
+private enum class MissingPermission { NOTIFICATION, EXACT_ALARM, BATTERY_OPTIMISATION }
+
 @Composable
 private fun PermissionStatusBanner(
     hasNotificationPermission: Boolean,
     hasExactAlarmPermission: Boolean,
+    isBatteryExempt: Boolean,
     onRequestNotificationPermission: () -> Unit,
-    onRequestExactAlarmPermission: () -> Unit
+    onRequestExactAlarmPermission: () -> Unit,
+    onRequestBatteryOptimisation: () -> Unit
 ) {
-    val haptics = LocalHapticFeedback.current
+    // Collected in display order so the group shapes adapt to 1–3 cards
+    val missing = buildList {
+        if (!hasNotificationPermission) add(MissingPermission.NOTIFICATION)
+        if (!hasExactAlarmPermission) add(MissingPermission.EXACT_ALARM)
+        if (!isBatteryExempt) add(MissingPermission.BATTERY_OPTIMISATION)
+    }
 
     Column(
         modifier = Modifier.padding(top = 24.dp),
@@ -749,88 +775,30 @@ private fun PermissionStatusBanner(
     ) {
         SettingsSectionHeader(stringResource(R.string.notif_permissions_header))
         Column {
-            if (!hasNotificationPermission) {
-                SettingsGroupCard(index = 0, size = if (!hasExactAlarmPermission) 2 else 1) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Notifications,
-                            contentDescription = null,
+            missing.forEachIndexed { index, permission ->
+                SettingsGroupCard(index = index, size = missing.size) {
+                    when (permission) {
+                        MissingPermission.NOTIFICATION -> MissingPermissionRow(
+                            icon = ImageVector.vectorResource(R.drawable.notifications_filled),
                             tint = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.size(24.dp)
+                            title = stringResource(R.string.notif_permission_title),
+                            description = stringResource(R.string.notif_permission_desc),
+                            onAction = onRequestNotificationPermission
                         )
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = stringResource(R.string.notif_permission_title),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Text(
-                                text = stringResource(R.string.notif_permission_desc),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        Button(
-                            onClick = {
-                                haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                onRequestNotificationPermission()
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.error
-                            )
-                        ) {
-                            Text(stringResource(R.string.action_allow))
-                        }
-                    }
-                }
-            }
-            if (!hasExactAlarmPermission) {
-                SettingsGroupCard(
-                    index = if (!hasNotificationPermission) 1 else 0,
-                    size = if (!hasNotificationPermission) 2 else 1
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Schedule,
-                            contentDescription = null,
+                        MissingPermission.EXACT_ALARM -> MissingPermissionRow(
+                            icon = ImageVector.vectorResource(R.drawable.schedule_filled),
                             tint = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.size(24.dp)
+                            title = stringResource(R.string.notif_exact_alarm_title),
+                            description = stringResource(R.string.notif_exact_alarm_desc),
+                            onAction = onRequestExactAlarmPermission
                         )
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = stringResource(R.string.notif_exact_alarm_title),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Text(
-                                text = stringResource(R.string.notif_exact_alarm_desc),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        Button(
-                            onClick = {
-                                haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                onRequestExactAlarmPermission()
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.error
-                            )
-                        ) {
-                            Text(stringResource(R.string.action_allow))
-                        }
+                        MissingPermission.BATTERY_OPTIMISATION -> MissingPermissionRow(
+                            icon = ImageVector.vectorResource(R.drawable.battery_android_frame_alert_filled),
+                            tint = MaterialTheme.extendedColorScheme.warning,
+                            title = stringResource(R.string.notif_battery_optimisation_title),
+                            description = stringResource(R.string.notif_battery_optimisation_desc),
+                            onAction = onRequestBatteryOptimisation
+                        )
                     }
                 }
             }
@@ -838,7 +806,63 @@ private fun PermissionStatusBanner(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun MissingPermissionRow(
+    icon: ImageVector,
+    tint: Color,
+    title: String,
+    description: String,
+    onAction: () -> Unit
+) {
+    val haptics = LocalHapticFeedback.current
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = tint,
+            modifier = Modifier.size(24.dp)
+        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Button(
+            onClick = {
+                haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                onAction()
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = tint
+            )
+        ) {
+            Text(stringResource(R.string.action_allow))
+        }
+    }
+}
+
+private fun openUrl(context: Context) {
+    try {
+        context.startActivity(Intent(Intent.ACTION_VIEW, URL_DO_NOT_KILL_MY_APP.toUri()))
+    } catch (_: ActivityNotFoundException) {
+        Toast.makeText(context, context.getString(R.string.toast_no_app_to_open_link), Toast.LENGTH_SHORT).show()
+    }
+}
+
 @Composable
 private fun ReminderStyleSection(
     currentStyle: ReminderStyle,
@@ -1013,6 +1037,7 @@ private fun ScheduleSection(
     onConfigureClick: () -> Unit
 ) {
     val haptics = LocalHapticFeedback.current
+    val context = LocalContext.current
 
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -1020,7 +1045,7 @@ private fun ScheduleSection(
         SettingsSectionHeader(stringResource(R.string.notif_schedule_header))
 
         Column {
-            val totalSize = if (nextTime != null) 3 else 2
+            val totalSize = if (nextTime != null) 4 else 3
 
             SettingsGroupCard(
                 index = 0,
@@ -1122,6 +1147,47 @@ private fun ScheduleSection(
                     }
                 }
             }
+
+            SettingsGroupCard(
+                index = if (nextTime != null) 3 else 2,
+                size = totalSize,
+                onClick = {
+                    haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                    openUrl(context)
+                }
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.info_filled),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.notif_troubleshooting_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = stringResource(R.string.notif_troubleshooting_desc),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.open_in_new_filled),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
         }
 
         Button(
@@ -1182,7 +1248,6 @@ private fun TimePickerBottomSheet(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TimePickerSheetContent(
     title: String,
