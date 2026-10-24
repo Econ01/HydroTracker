@@ -335,6 +335,10 @@
     <string name="notif_permission_desc">用以发送饮水提醒</string>
     <string name="notif_exact_alarm_title">精确闹钟权限</string>
     <string name="notif_exact_alarm_desc">保证提醒时间精确</string>
+    <string name="notif_battery_optimisation_title">Battery optimisation</string>
+    <string name="notif_battery_optimisation_desc">Exempt HydroTracker so reminders aren\'t delayed or stopped</string>
+    <string name="notif_troubleshooting_title">Not receiving reminders?</string>
+    <string name="notif_troubleshooting_desc">Some devices (OnePlus, Xiaomi, Oppo…) restrict apps aggressively — see device-specific fixes</string>
     <string name="notif_reminder_style_header">提醒风格</string>
     <!-- Short reminder-style labels shown on the toggle buttons -->
     <string name="notif_style_gentle_short">温和</string>

@@ -336,6 +336,10 @@
     <string name="notif_permission_desc">Nécessaire pour envoyer des rappels d\'hydratation</string>
     <string name="notif_exact_alarm_title">Autorisation exacte de l\'alarme</string>
     <string name="notif_exact_alarm_desc">Nécessaire pour un rappel précis</string>
+    <string name="notif_battery_optimisation_title">Battery optimisation</string>
+    <string name="notif_battery_optimisation_desc">Exempt HydroTracker so reminders aren\'t delayed or stopped</string>
+    <string name="notif_troubleshooting_title">Not receiving reminders?</string>
+    <string name="notif_troubleshooting_desc">Some devices (OnePlus, Xiaomi, Oppo…) restrict apps aggressively — see device-specific fixes</string>
     <string name="notif_reminder_style_header">Style de rappel</string>
     <!-- Short reminder-style labels shown on the toggle buttons -->
     <string name="notif_style_gentle_short">Doux</string>
