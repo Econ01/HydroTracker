@@ -21,8 +21,11 @@
 package com.cemcakmak.hydrotracker.presentation.settings
 
 import android.app.AlarmManager
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.os.Build
+import android.provider.Settings
 import android.widget.Toast
 import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.core.animateDp
@@ -47,8 +50,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -78,6 +79,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
@@ -94,6 +96,7 @@ import com.cemcakmak.hydrotracker.data.repository.UserRepository
 import com.cemcakmak.hydrotracker.data.update.UpdateRepository
 import com.cemcakmak.hydrotracker.health.HealthConnectManager
 import com.cemcakmak.hydrotracker.health.HealthConnectSyncManager
+import com.cemcakmak.hydrotracker.notifications.BatteryOptimisationManager
 import com.cemcakmak.hydrotracker.notifications.HydroNotificationScheduler
 import com.cemcakmak.hydrotracker.notifications.HydroNotificationService
 import com.cemcakmak.hydrotracker.notifications.NotificationPermissionManager
@@ -110,7 +113,6 @@ import kotlin.time.Duration.Companion.milliseconds
 /**
  * Developer / debug tools
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun DeveloperOptionsScreen(
     themePreferences: ThemePreferences = ThemePreferences(),
@@ -621,9 +623,7 @@ fun DeveloperOptionsScreen(
                             ) {
                                 runWithToast("System Alarm Info") {
                                     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                                    val canSchedule = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                                        alarmManager.canScheduleExactAlarms()
-                                    } else true
+                                    val canSchedule = Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()
                                     val nextAlarm = alarmManager.nextAlarmClock
                                     buildString {
                                         append("Exact alarms: ${if (canSchedule) "allowed" else "blocked"}")
@@ -699,6 +699,63 @@ fun DeveloperOptionsScreen(
                         )
                     }
                     DevActionList(notifActions, busy)
+                }
+
+                // Battery optimization
+                DevSection("Battery optimization") {
+                    val batteryActions = listOf(
+                        DevAction(
+                            title = "Exemption Status",
+                            description = "Show whether the app is exempt from battery optimisation",
+                            icon = ImageVector.vectorResource(R.drawable.info_filled)
+                        ) {
+                            runWithToast("Exemption Status") {
+                                val exempt = BatteryOptimisationManager.isIgnoringBatteryOptimisations(context)
+                                if (exempt) {
+                                    "Battery optimisation: EXEMPT (app is whitelisted)"
+                                } else {
+                                    "Battery optimisation: ACTIVE (app is being optimised)"
+                                }
+                            }
+                        },
+                        DevAction(
+                            title = "Request Exemption",
+                            description = "Show the native battery optimisation dialog",
+                            icon = ImageVector.vectorResource(R.drawable.battery_android_frame_alert_filled)
+                        ) {
+                            BatteryOptimisationManager.requestIgnoreBatteryOptimisations(context)
+                        },
+                        DevAction(
+                            title = "Battery Optimisation Settings",
+                            description = "Open the stock battery optimisation list",
+                            icon = ImageVector.vectorResource(R.drawable.open_in_new_filled)
+                        ) {
+                            if (!BatteryOptimisationManager.openBatteryOptimisationSettings(context)) {
+                                Toast.makeText(
+                                    context,
+                                    "Stock battery optimisation page not available on this device",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        },
+                        DevAction(
+                            title = "App Battery Settings",
+                            description = "Open App Info",
+                            icon = ImageVector.vectorResource(R.drawable.open_in_new_filled)
+                        ) {
+                            try {
+                                context.startActivity(
+                                    Intent(
+                                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                        "package:${context.packageName}".toUri()
+                                    )
+                                )
+                            } catch (_: ActivityNotFoundException) {
+                                Toast.makeText(context, "No settings app found to open App Info", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    )
+                    DevActionList(batteryActions, busy)
                 }
 
                 // Update testing
@@ -1103,7 +1160,6 @@ private fun ConfirmActionDialog(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun InjectSampleDataDialog(
     selectedDays: Int,

@@ -95,6 +95,7 @@ Google Play Store/
 
 # Release builds and artifacts
 app/release/
+dist/
 
 # Signing keys (sensitive cryptographic keys)
 signing_keys/
