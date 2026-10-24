@@ -133,7 +133,7 @@
     <string name="onboarding_profile_description">Füge deinen Namen und ein Profilbild hinzu, um deine App-Erfahrung zu personalisieren.</string>
     <string name="onboarding_goal_title">Dein personalisiertes Ziel</string>
     <string name="onboarding_goal_description">Prüfe dein berechnetes Ziel.</string>
-    <string name="onboarding_complete_title">You\'re all set!</string>
+    <string name="onboarding_complete_title">Alles bereit!</string>
     <string name="onboarding_complete_description">Tap the button to start hydrating!</string>
     <string name="onboarding_finish">Fertig</string>
     <!-- Welcome step -->
@@ -207,7 +207,7 @@
     <string name="beverage_name_label">Getränk-Name</string>
     <string name="beverage_name_placeholder">e.g., Smoothie</string>
     <string name="beverage_effectiveness_label" formatted="false">Hydration effectiveness (%)</string>
-    <string name="beverage_effectiveness_placeholder">e.g., 100</string>
+    <string name="beverage_effectiveness_placeholder">z. B. 100</string>
     <!-- Validation; %1$d = min, %2$d = max -->
     <string name="beverage_effectiveness_error">Enter a value between %1$d and %2$d</string>
     <string name="beverage_effectiveness_hint" formatted="false">100% counts the full amount toward your goal</string>
@@ -215,9 +215,9 @@
     <string name="container_add_title">Gefäß hinzufügen</string>
     <string name="container_edit_title">Gefäß bearbeiten</string>
     <string name="container_name_label">Name des Gefäßes</string>
-    <string name="container_name_placeholder">e.g., Coffee Mug</string>
+    <string name="container_name_placeholder">z. B. Kaffeebecher</string>
     <string name="container_volume_label">Volumen (%1$s)</string>
-    <string name="container_volume_placeholder">e.g., 250</string>
+    <string name="container_volume_placeholder">z. B. 250</string>
     <!-- %1$s = minimum valid amount, %2$s = maximum valid amount (both with unit) -->
     <string name="container_volume_error">Enter a valid volume (%1$s–%2$s)</string>
     <string name="container_icon_picker_hint">Tap an icon below to override the automatic choice</string>
@@ -299,7 +299,7 @@
     <string name="widget_settings_dynamic_title">Dynamische Farben</string>
     <string name="widget_settings_dynamic_desc">Colours from your wallpaper</string>
     <string name="widget_settings_background_header">Hintergrund</string>
-    <string name="widget_settings_transparent_title">Transparent background</string>
+    <string name="widget_settings_transparent_title">Transparenter Hintergrund</string>
     <string name="widget_settings_transparent_desc">Make the background surface transparent</string>
     <string name="widget_settings_pure_black_title">Rein schwarzer Hintergrund</string>
     <string name="widget_settings_pure_black_desc">Use a true black surface in dark mode</string>
@@ -374,7 +374,7 @@
     <string name="reminder_mode_auto_explain">Reminders are spaced automatically based on your daily goal and active hours.</string>
     <string name="reminder_mode_custom_explain">Reminders are sent at your chosen fixed interval between wake-up and sleep.</string>
     <string name="reminder_dayend_sleep_explain">Your day ends at sleep time. Daily progress resets then.</string>
-    <string name="reminder_dayend_midnight_explain">Your day ends at midnight, matching the calendar day.</string>
+    <string name="reminder_dayend_midnight_explain">Der Tag endet um Mitternacht, passend zum Kalendertag.</string>
     <string name="reminder_slider_min">1 min</string>
     <string name="reminder_slider_max">8 Stunden</string>
     <!-- Cadence phrases used mid-sentence and standalone -->
@@ -463,7 +463,7 @@
     <!-- Inclusive, encouraging greeting shown per gender -->
     <string name="gender_greeting_male">Stay hydrated, champion!</string>
     <string name="gender_greeting_female">Keep glowing with hydration!</string>
-    <string name="gender_greeting_other">You\'ve got this!</string>
+    <string name="gender_greeting_other">Du schaffst das!</string>
     <!-- Age group -->
     <string name="age_group_young_adult">18-30 Jahre</string>
     <string name="age_group_adult">31-50 Jahre</string>
@@ -557,14 +557,14 @@
     <string name="data_export_csv_title">Exportiere als CSV</string>
     <string name="data_export_json_title">Exportiere als JSON</string>
     <string name="data_import_title">Importiere Sicherung</string>
-    <string name="data_import_desc">Restore entries from a CSV or JSON file</string>
+    <string name="data_import_desc">Einträge aus einer CSV- oder JSON-Datei wiederherstellen</string>
     <string name="data_export_scope_desc">Exports only HydroTracker entries. Entries imported from other health apps are excluded.</string>
     <string name="data_delete_before_date_title">Lösche Einträge vor dem Datum</string>
     <string name="data_delete_before_date_desc">Remove intake entries on or before a chosen date</string>
     <!-- %1$s = formatted cutoff date -->
     <string name="data_delete_before_date_model_title">Lösche Einträge</string>
     <string name="data_delete_health_connect_include">Include Health Connect</string>
-    <string name="data_delete_no_entries_affected">No entries on or before this date</string>
+    <string name="data_delete_no_entries_affected">Keine Einträge an oder vor diesem Datum</string>
     <!-- Number of entries that will be deleted for the selected cutoff date -->
     <plurals name="data_delete_entries_affected">
         <item quantity="one">%1$d entry recorded on or before %2$s will be permanently deleted.</item>
