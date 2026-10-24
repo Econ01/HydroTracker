@@ -102,7 +102,7 @@
     <string name="unit_ml_short">ml</string>
     <string name="unit_us_fl_oz">Amerikan sıvı birimleri</string>
     <string name="unit_us_fl_oz_short">fl oz</string>
-    <string name="unit_imperial_fl_oz">Imperial sıvı ons</string>
+    <string name="unit_imperial_fl_oz">Ingiliz sıvı onsu</string>
     <string name="unit_imperial_fl_oz_short">fl oz (UK)</string>
     <!-- Display-only volume units (auto-scaling and call-site overrides) -->
     <string name="unit_litre_short">L</string>
