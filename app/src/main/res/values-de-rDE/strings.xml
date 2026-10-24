@@ -205,8 +205,8 @@
     <!-- Preset effectiveness line, e.g. "150% hydration effectiveness"; %1$s = per cent value including the % sign -->
     <string name="beverage_hydration_effectiveness">%1$s hydration effectiveness</string>
     <string name="beverage_name_label">Getränk-Name</string>
-    <string name="beverage_name_placeholder">e.g., Smoothie</string>
-    <string name="beverage_effectiveness_label" formatted="false">Hydration effectiveness (%)</string>
+    <string name="beverage_name_placeholder">z. B. Smoothie</string>
+    <string name="beverage_effectiveness_label" formatted="false">Hydrationseffektivität (%)</string>
     <string name="beverage_effectiveness_placeholder">z. B. 100</string>
     <!-- Validation; %1$d = min, %2$d = max -->
     <string name="beverage_effectiveness_error">Enter a value between %1$d and %2$d</string>
@@ -892,13 +892,13 @@
          Notifications
          ============================================================================ -->
     <!-- %1$s = the random water fact -->
-    <string name="notification_fun_fact_title">Did you know?</string>
+    <string name="notification_fun_fact_title">Schon gewusst?</string>
     <!-- %1$d = remaining milliliters -->
     <string name="notification_minimal_remaining">%1$s Verbleibend</string>
     <!-- %1$s = formatted amount with unit, e.g. "500 ml" -->
     <string name="notification_action_add">Füge hinzu %1$s</string>
     <string name="notification_action_pause_today">Für heute pausieren</string>
-    <string name="notification_quick_add_preset_name">Quick Add</string>
+    <string name="notification_quick_add_preset_name">Schnell hinzufügen</string>
     <string name="notification_quick_add_note">Aus Benachrichtigungen hinzugefügt</string>
     <string name="notification_paused_confirmation">Reminders paused until tomorrow</string>
     <string name="notification_quick_add_feedback_title">Added %1$s</string>
@@ -1021,16 +1021,16 @@
     <string name="notification_minimal_message_mid">Continue hydrating</string>
     <string name="date_format_title">Date Format</string>
     <string name="week_start_format_title">Week Start</string>
-    <string name="profile_photo_sheet_gallery_title">Choose from Gallery</string>
-    <string name="profile_photo_sheet_camera_title">Take a photo</string>
-    <string name="profile_photo_sheet_delete">Remove profile photo</string>
+    <string name="profile_photo_sheet_gallery_title">Aus Galerie wählen</string>
+    <string name="profile_photo_sheet_camera_title">Foto aufnehmen</string>
+    <string name="profile_photo_sheet_delete">Profilbild entfernen</string>
     <!-- Profile photo cropper -->
-    <string name="profile_crop_title">Crop Profile Photo</string>
-    <string name="crop_save">Save</string>
-    <string name="crop_cancel">Cancel</string>
+    <string name="profile_crop_title">Profilbild zuschneiden</string>
+    <string name="crop_save">Speichern</string>
+    <string name="crop_cancel">Abbrechen</string>
     <string name="crop_rotate_left">Rotate left 90 degrees</string>
     <string name="crop_rotate_right">Rotate right 90 degrees</string>
-    <string name="crop_reset">Reset</string>
+    <string name="crop_reset">Zurücksetzen</string>
     <string name="cd_crop_image">Photo to crop</string>
     <string name="error_saving_image">Could not save cropped image</string>
     <!-- Water facts shown with gentle reminders -->
@@ -1039,22 +1039,22 @@
         <item>Water helps regulate your body temperature.</item>
         <item>Proper hydration can improve your mood and concentration.</item>
         <item>Your muscles are 75% water.</item>
-        <item>Water helps transport nutrients throughout your body.</item>
-        <item>Staying hydrated can boost your energy levels.</item>
-        <item>Water helps your kidneys filter waste efficiently.</item>
-        <item>Proper hydration supports healthy skin.</item>
-        <item>Your blood is 90% water.</item>
-        <item>Water helps lubricate your joints.</item>
-        <item>Hydration can improve your physical performance.</item>
-        <item>Water aids in digestion and nutrient absorption.</item>
-        <item>Staying hydrated helps maintain healthy blood pressure.</item>
-        <item>Water helps prevent kidney stones.</item>
+        <item>Wasser hilft dabei, Nährstoffe durch den Körper zu transportieren.</item>
+        <item>Eine ausreichende Flüssigkeitszufuhr kann Ihr Energieniveau steigern.</item>
+        <item>Wasser hilft den Nieren, Abfallstoffe effizient zu filtern.</item>
+        <item>Ausreichende Flüssigkeitszufuhr fördert die Gesundheit der Haut.</item>
+        <item>Blut besteht zu 90 % Prozent aus Wasser.</item>
+        <item>Wasser hilft bei der Schmierung der Gelenke.</item>
+        <item>Hydration kann Ihre körperliche Leistung verbessern.</item>
+        <item>Wasser unterstützt die Verdauung und die Nährstoffaufnahme.</item>
+        <item>Die Aufrechterhaltung der Hydration trägt zur Aufrechterhaltung des gesunden Blutdrucks bei.</item>
+        <item>Wasser hilft dabei, Nierensteine zu verhindern.</item>
         <item>Your heart works more efficiently when you\'re hydrated.</item>
-        <item>Dehydration can cause headaches and fatigue.</item>
+        <item>Dehydration kann Kopfschmerzen und Müdigkeit verursachen.</item>
         <item>Drinking water before meals can help with portion control.</item>
         <item>Water is essential for maintaining body temperature during exercise.</item>
-        <item>Even mild dehydration can impair cognitive function.</item>
-        <item>Water makes up about 60% of your total body weight.</item>
+        <item>Schon leichte Dehydration kann die kognitiven Funktionen beeinträchtigen.</item>
+        <item>Wasser macht etwa 60 % des gesamten Körpergewichts aus.</item>
     </string-array>
     <!-- Water puns shown with motivating reminders. These are language-dependent word
          play, so they are not translated; each locale should provide its own if desired. -->
