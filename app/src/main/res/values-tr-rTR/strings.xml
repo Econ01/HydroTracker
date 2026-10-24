@@ -146,7 +146,7 @@
     <string name="onboarding_feature_progress_desc">Ayrıntılı içgörüler ve geçmiş</string>
     <string name="onboarding_get_started">Get Started</string>
     <!-- Schedule step -->
-    <string name="onboarding_wake_label">Wake-Up Time</string>
+    <string name="onboarding_wake_label">Uyanma Zamanı</string>
     <string name="onboarding_sleep_label">Sleep Time</string>
     <string name="onboarding_wake_picker_title">Wake Up Time</string>
     <string name="onboarding_wake_picker_subtitle">Choose your wake-up time</string>
