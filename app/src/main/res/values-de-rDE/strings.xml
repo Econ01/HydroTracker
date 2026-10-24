@@ -95,31 +95,31 @@
     <!-- Date format options -->
     <string name="date_format_system">System</string>
     <string name="date_format_day_month_year">16. Juni 2026</string>
-    <string name="date_format_month_day_year">16. Juni, 2026</string>
+    <string name="date_format_month_day_year">16. Juni 2026</string>
     <string name="date_format_year_month_day">16-06-2026</string>
     <!-- Volume unit options -->
     <string name="unit_millilitres">Metrisch</string>
     <string name="unit_ml_short">Milliliter</string>
     <string name="unit_us_fl_oz">US-Flüssigunzen</string>
-    <string name="unit_us_fl_oz_short">Flüssigunzen</string>
+    <string name="unit_us_fl_oz_short">fl oz</string>
     <string name="unit_imperial_fl_oz">Imperiale Flüssigunzen</string>
-    <string name="unit_imperial_fl_oz_short">Flüssigunzen (Großbritannien)</string>
+    <string name="unit_imperial_fl_oz_short">fl oz (UK)</string>
     <!-- Display-only volume units (auto-scaling and call-site overrides) -->
-    <string name="unit_litre_short">Liter</string>
-    <string name="unit_kilolitre_short">Kiloliter</string>
-    <string name="unit_megalitre_short">Mega-Liter</string>
-    <string name="unit_gigalitre_short">Giga-Liter</string>
-    <string name="unit_us_pint_short">Pint</string>
-    <string name="unit_us_quart_short">Quart</string>
-    <string name="unit_us_gallon_short">Gal</string>
-    <string name="unit_imperial_pint_short">Pint</string>
-    <string name="unit_imperial_quart_short">Quarte</string>
-    <string name="unit_imperial_gallon_short">Gallone</string>
+    <string name="unit_litre_short">L</string>
+    <string name="unit_kilolitre_short">kL</string>
+    <string name="unit_megalitre_short">ML</string>
+    <string name="unit_gigalitre_short">GL</string>
+    <string name="unit_us_pint_short">pt</string>
+    <string name="unit_us_quart_short">qt</string>
+    <string name="unit_us_gallon_short">gal</string>
+    <string name="unit_imperial_pint_short">pt</string>
+    <string name="unit_imperial_quart_short">qt</string>
+    <string name="unit_imperial_gallon_short">gal</string>
     <!-- ============================================================================
          Onboarding
          Per-step title + description (shown above each step), plus step controls.
          ============================================================================ -->
-    <string name="onboarding_welcome_title">Willkommen zu Hydration-Zähler</string>
+    <string name="onboarding_welcome_title">Willkommen bei HydroTracker</string>
     <string name="onboarding_welcome_description">Wir werden die App für dich personalisieren.</string>
     <string name="onboarding_gender_title">Erzähl uns über dich</string>
     <string name="onboarding_gender_description">Wähle die Option, die dich am besten beschreibt.</string>
@@ -128,9 +128,9 @@
     <string name="onboarding_activity_title">Wie aktiv bist du?</string>
     <string name="onboarding_activity_description">Wähle dein generelles tägliches Aktivitätslevel aus.</string>
     <string name="onboarding_schedule_title">Wann bist du wach?</string>
-    <string name="onboarding_schedule_description">Sag uns deine Aufwach und Schlafzeiten.</string>
+    <string name="onboarding_schedule_description">Sag uns deine Wach- und Schlafzeiten.</string>
     <string name="onboarding_profile_title">Vervollständige dein Profil</string>
-    <string name="onboarding_profile_description">Gib deinen Namen und ein Profilfoto hinzu, um deine App-Erfahrung zu personalisieren.</string>
+    <string name="onboarding_profile_description">Füge deinen Namen und ein Profilbild hinzu, um deine App-Erfahrung zu personalisieren.</string>
     <string name="onboarding_goal_title">Dein personalisiertes Ziel</string>
     <string name="onboarding_goal_description">Prüfe dein berechnetes Ziel.</string>
     <string name="onboarding_complete_title">You\'re all set!</string>
@@ -144,15 +144,15 @@
     <string name="onboarding_feature_reminders_desc">Gentle nudges during your active hours</string>
     <string name="onboarding_feature_progress_title">Progress Tracking</string>
     <string name="onboarding_feature_progress_desc">Detailed insights and history</string>
-    <string name="onboarding_get_started">Fang an</string>
+    <string name="onboarding_get_started">Anfangen</string>
     <!-- Schedule step -->
     <string name="onboarding_wake_label">Aufwachzeit</string>
     <string name="onboarding_sleep_label">Schlafzeit</string>
     <string name="onboarding_wake_picker_title">Aufwachzeit</string>
     <string name="onboarding_wake_picker_subtitle">Wähle deine Aufwachzeit</string>
     <string name="onboarding_sleep_picker_title">Schlafzeit</string>
-    <string name="onboarding_sleep_picker_subtitle">Wähle deine Schlafzeit</string>
-    <string name="time_picker_set">Setze die Zeit</string>
+    <string name="onboarding_sleep_picker_subtitle">Wähle deine Schlafenszeit</string>
+    <string name="time_picker_set">Zeit festlegen</string>
     <!-- Awake duration, e.g. "Awake for 16h 0m"; %1$d = hours, %2$d = minutes -->
     <string name="onboarding_awake_duration">Wach für %1$dh %2$dm</string>
     <!-- Profile setup step -->
@@ -322,7 +322,7 @@
     <string name="notif_hydration_reminders">Wasserzufuhr Erinnerungen</string>
     <string name="notif_reminders_active">Erinnerungen sind aktiv</string>
     <string name="notif_reminders_paused">Erinnerungen sind pausiert</string>
-    <string name="notif_fun_facts">Tägliche Wasserzufuhr Fakten</string>
+    <string name="notif_fun_facts">Tägliche Wasserzufuhr-Fakten</string>
     <string name="notif_fun_facts_active">A fun fact will be sent each day</string>
     <string name="notif_fun_facts_paused">Tägliche Fakten sind pausiert</string>
     <string name="notif_sample_notification">Sample notification</string>
@@ -333,7 +333,7 @@
     <string name="notif_style_minimal_desc">Simple, unobtrusive reminders</string>
     <string name="notif_permissions_header">Berechtigungen</string>
     <string name="notif_permission_title">Berechtigung für Benachrichtigung</string>
-    <string name="notif_permission_desc">Benötigt, um Hydration Erinnerungen zu senden</string>
+    <string name="notif_permission_desc">Erforderlich, um Hydration-Erinnerungen zu senden</string>
     <string name="notif_exact_alarm_title">Exakte Alarm Berechtigung</string>
     <string name="notif_exact_alarm_desc">Required for precise reminder timing</string>
     <string name="notif_battery_optimisation_title">Battery optimisation</string>
@@ -343,13 +343,13 @@
     <string name="notif_reminder_style_header">Erinnerungsart</string>
     <!-- Short reminder-style labels shown on the toggle buttons -->
     <string name="notif_style_gentle_short">Sanft</string>
-    <string name="notif_style_motivating_short">Intensiv</string>
+    <string name="notif_style_motivating_short">Energiegeladen</string>
     <string name="notif_style_minimal_short">Simpel</string>
     <string name="notif_active_hours_header">Aktive Stunden</string>
     <string name="notif_wake_up">Aufwachen</string>
     <string name="notif_sleep">Schlaf</string>
     <string name="notif_wake_up_time">Aufwachzeit</string>
-    <string name="notif_sleep_time">Schlafzeit</string>
+    <string name="notif_sleep_time">Schlafenszeit</string>
     <string name="notif_schedule_header">Zeitplan</string>
     <string name="notif_configure_schedule">Zeitplan einrichten</string>
     <string name="notif_configure_schedule_desc">Change reminder mode or set a custom interval</string>
@@ -358,11 +358,11 @@
     <string name="notif_pause_reminders">Pausiere Erinnerungen für heute</string>
     <string name="notif_pause_reminders_desc">Stoppe Hydration-Erinnerungen bis zum nächsten Tag</string>
     <string name="notif_resume_reminders">Erinnerungen fortführen</string>
-    <string name="notif_reminders_paused_desc">Hydration Erinnerungen sind bis morgen pausiert</string>
+    <string name="notif_reminders_paused_desc">Hydration-Erinnerungen sind bis morgen pausiert</string>
     <!-- Reminder cadence, e.g. "Every 60 minutes"; %1$d = minutes -->
     <plurals name="every_x_minutes">
         <item quantity="one">Jede %1$d Minute</item>
-        <item quantity="other">Jede %1$d Minuten</item>
+        <item quantity="other">Alle %1$d Minuten</item>
     </plurals>
     <!-- ============================================================================
          Settings — Reminder Schedule
@@ -375,18 +375,18 @@
     <string name="reminder_mode_custom_explain">Reminders are sent at your chosen fixed interval between wake-up and sleep.</string>
     <string name="reminder_dayend_sleep_explain">Your day ends at sleep time. Daily progress resets then.</string>
     <string name="reminder_dayend_midnight_explain">Your day ends at midnight, matching the calendar day.</string>
-    <string name="reminder_slider_min">1 Minute</string>
+    <string name="reminder_slider_min">1 min</string>
     <string name="reminder_slider_max">8 Stunden</string>
     <!-- Cadence phrases used mid-sentence and standalone -->
     <string name="interval_every_hour">Jede Stunde</string>
     <string name="interval_every_h_m">every %1$dh %2$dm</string>
     <plurals name="interval_every_minutes">
         <item quantity="one">Jede %1$d Minute</item>
-        <item quantity="other">Jede %1$d Minuten</item>
+        <item quantity="other">Alle %1$d Minuten</item>
     </plurals>
     <plurals name="interval_every_hours">
         <item quantity="one">Jede %1$d Stunde</item>
-        <item quantity="other">Jede %1$d Stunden</item>
+        <item quantity="other">Alle %1$d Stunden</item>
     </plurals>
     <!-- Schedule preview sentences; auto: %1$s=goal, %2$d=glasses, %3$d=hours, %4$d=minutes -->
     <string name="reminder_preview_auto">Basierend auf deinem %1$s-Ziel erhältst du etwa %2$d Erinnerungen (eine pro Glas) verteilt über deine %3$d aktiven Stunden. Ungefähr alle %4$d Minuten.</string>
