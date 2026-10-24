@@ -1,7 +1,7 @@
 {
   "languages": {
     "de-DE": {
-      "translated": 39,
+      "translated": 38,
       "approved": 0
     },
     "es-ES": {
@@ -9,7 +9,7 @@
       "approved": 0
     },
     "fr-FR": {
-      "translated": 99,
+      "translated": 98,
       "approved": 0
     },
     "pt-PT": {
@@ -17,7 +17,7 @@
       "approved": 0
     },
     "ru-RU": {
-      "translated": 100,
+      "translated": 99,
       "approved": 0
     },
     "tr-TR": {
@@ -25,7 +25,7 @@
       "approved": 9
     },
     "zh-CN": {
-      "translated": 100,
+      "translated": 99,
       "approved": 0
     }
   }
