@@ -25,7 +25,7 @@
     <string name="cd_back">Geri</string>
     <string name="cd_delete_entry">Girişi sil</string>
     <string name="cd_edit_entry">Girişi düzenle</string>
-    <string name="cd_reorder">Reorder</string>
+    <string name="cd_reorder">Yeniden sırala</string>
     <string name="cd_profile_photo">Profil fotoğrafı</string>
     <string name="cd_water_drop">Su damlası</string>
     <string name="cd_pinned">Sabitlenmiş</string>
@@ -45,22 +45,22 @@
          Channel name/description refresh on each createNotificationChannel() call, so
          translating these values is enough — no channel-id bump required.
          ============================================================================ -->
-    <string name="notification_channel_name">Hydration Reminders</string>
-    <string name="notification_channel_description">Notifications to remind you to stay hydrated</string>
-    <string name="notification_channel_fun_facts_name">Daily Hydration Facts</string>
-    <string name="notification_channel_fun_facts_description">A daily hydration tip or fun fact</string>
+    <string name="notification_channel_name">Su İçme Hatırlatıcıları</string>
+    <string name="notification_channel_description">Yeterince su içmenizi hatırlatan bildirimler</string>
+    <string name="notification_channel_fun_facts_name">Günlük Hidrasyon Bilgileri</string>
+    <string name="notification_channel_fun_facts_description">Günlük su içme ile ilgili ipuçları veya eğlenceli bilgiler</string>
     <!-- ============================================================================
          Widgets
          android:label value shown in the home-screen widget picker, plus the text
          rendered inside the Glance widget.
          ============================================================================ -->
-    <string name="widget_large_label">HydroTracker Large</string>
-    <string name="widget_large_description">Track hydration and add water with one tap</string>
-    <string name="widget_of_goal_format">%1$s of %2$s</string>
+    <string name="widget_large_label">HydroTracker Büyük</string>
+    <string name="widget_large_description">Su içme durumunuz takip edin ve te dokunuşla su ekleyin</string>
+    <string name="widget_of_goal_format">%1$s / %2$s</string>
     <string name="widget_goal_reached">Hedefe ulaşıldı!</string>
     <string name="widget_quick_add_cd">%1$s Ekle</string>
-    <string name="widget_daily_hydration">Daily Hydration</string>
-    <string name="widget_card_glass">Cam</string>
+    <string name="widget_daily_hydration">Günlük Hidrasyon</string>
+    <string name="widget_card_glass">Bardak</string>
     <string name="widget_card_bottle">Şişe</string>
     <string name="widget_card_large_bottle">Büyük Şişe</string>
     <!-- ============================================================================
@@ -70,10 +70,10 @@
     <!-- ============================================================================
          Settings: Display &amp; Locale
          ============================================================================ -->
-    <string name="screen_display_locale_title">Display &amp; Locale</string>
+    <string name="screen_display_locale_title">Görüntü &amp; Yerel Ayarlar</string>
     <string name="display_language_header">Dil</string>
     <string name="display_date_and_time_format_header">Tarih&amp; Saat</string>
-    <string name="display_time_format_header">Saat formatı</string>
+    <string name="display_time_format_header">Saat Formatı</string>
     <string name="display_volume_unit_header">Hacim birimi</string>
     <!-- Language option that follows the device language instead of a fixed one -->
     <string name="language_system_default">Sistem varsayılanı</string>
@@ -81,10 +81,10 @@
          Settings: Language & Translation
          ============================================================================ -->
     <string name="screen_language_title">Dil &amp; Çeviri</string>
-    <string name="language_translation_disclaimer">Content is displayed only upon translation approval. Unapproved segments remain hidden.</string>
-    <string name="language_contribute_title">Contribute</string>
+    <string name="language_translation_disclaimer">İçerik, yalnızca çeviri onaylandığında görüntülenir. Onaylanmamış bölümler gizli kalır.</string>
+    <string name="language_contribute_title">Katkıda Bulun</string>
     <string name="language_crowdin_title">HydroTracker\'ın çevrilmesine yardımcı olun</string>
-    <string name="language_crowdin_description">Contribute on Crowdin</string>
+    <string name="language_crowdin_description">Crowdin\'de katkıda bulunun</string>
     <string name="language_progress_header">Çeviri seviyesi</string>
     <string name="language_progress_translated">Çevirildi</string>
     <string name="language_progress_approved">Onaylandı</string>
@@ -100,17 +100,17 @@
     <!-- Volume unit options -->
     <string name="unit_millilitres">Metrik</string>
     <string name="unit_ml_short">ml</string>
-    <string name="unit_us_fl_oz">Amerikan sıvı birimleri</string>
+    <string name="unit_us_fl_oz">Amerikan sıvı onsu</string>
     <string name="unit_us_fl_oz_short">fl oz</string>
     <string name="unit_imperial_fl_oz">Ingiliz sıvı onsu</string>
-    <string name="unit_imperial_fl_oz_short">fl oz (UK)</string>
+    <string name="unit_imperial_fl_oz_short">sıvı ons (Birleşik Krallık)</string>
     <!-- Display-only volume units (auto-scaling and call-site overrides) -->
     <string name="unit_litre_short">L</string>
     <string name="unit_kilolitre_short">kL</string>
     <string name="unit_megalitre_short">ML</string>
     <string name="unit_gigalitre_short">GL</string>
     <string name="unit_us_pint_short">pt</string>
-    <string name="unit_us_quart_short">qt</string>
+    <string name="unit_us_quart_short">aq</string>
     <string name="unit_us_gallon_short">gal</string>
     <string name="unit_imperial_pint_short">pt</string>
     <string name="unit_imperial_quart_short">qt</string>
@@ -119,31 +119,31 @@
          Onboarding
          Per-step title + description (shown above each step), plus step controls.
          ============================================================================ -->
-    <string name="onboarding_welcome_title">Welcome to HydroTracker</string>
-    <string name="onboarding_welcome_description">We\'ll personalize the app for you.</string>
-    <string name="onboarding_gender_title">Tell us about yourself</string>
-    <string name="onboarding_gender_description">Choose the option that best describes you.</string>
-    <string name="onboarding_age_title">What\'s your age group?</string>
-    <string name="onboarding_age_description">Select your age range.</string>
-    <string name="onboarding_activity_title">How active are you?</string>
-    <string name="onboarding_activity_description">Pick your general daily activity level.</string>
-    <string name="onboarding_schedule_title">When are you awake?</string>
-    <string name="onboarding_schedule_description">Tell us your wake and sleep times.</string>
-    <string name="onboarding_profile_title">Complete Your Profile</string>
-    <string name="onboarding_profile_description">Add your name and a profile photo to personalize your experience.</string>
-    <string name="onboarding_goal_title">Your personalized goal</string>
-    <string name="onboarding_goal_description">Review your calculated goal.</string>
-    <string name="onboarding_complete_title">You\'re all set!</string>
-    <string name="onboarding_complete_description">Tap the button to start hydrating!</string>
-    <string name="onboarding_finish">Finish</string>
+    <string name="onboarding_welcome_title">HydroTracker\'a Hoş Geldiniz</string>
+    <string name="onboarding_welcome_description">Uygulamayı sizin için kişiselleştireceğiz.</string>
+    <string name="onboarding_gender_title">Bize kendinizden bahsedin</string>
+    <string name="onboarding_gender_description">Sizi en iyi tanımlayan seçeneği belirleyin.</string>
+    <string name="onboarding_age_title">Yaş grubunuz nedir?</string>
+    <string name="onboarding_age_description">Yaş aralığınızı seçin.</string>
+    <string name="onboarding_activity_title">Ne kadar aktifsiniz?</string>
+    <string name="onboarding_activity_description">Genel günlük aktivite seviyenizi seçin.</string>
+    <string name="onboarding_schedule_title">Ne zaman uyanıksın?</string>
+    <string name="onboarding_schedule_description">Uyanma ve uyuma saatlerinizi bize bildirin.</string>
+    <string name="onboarding_profile_title">Profilinizi Tamamlayın</string>
+    <string name="onboarding_profile_description">Deneyiminizi kişiselleştirmek için adınızı ve bir profil fotoğrafınızı ekleyin.</string>
+    <string name="onboarding_goal_title">Kişiselleştirilmiş hedefiniz</string>
+    <string name="onboarding_goal_description">Hesapladığınız hedefi gözden geçirin.</string>
+    <string name="onboarding_complete_title">Her şey hazır!</string>
+    <string name="onboarding_complete_description">Su içmeye başlamak için düğmeye dokun!</string>
+    <string name="onboarding_finish">Bitir</string>
     <!-- Welcome step -->
-    <string name="onboarding_welcome_subtitle">Let\'s set up your personalized water intake goal based on your lifestyle and preferences.</string>
-    <string name="onboarding_feature_goals_title">Personalized Goals</string>
-    <string name="onboarding_feature_goals_desc">Based on scientific research and your profile</string>
-    <string name="onboarding_feature_reminders_title">Smart Reminders</string>
-    <string name="onboarding_feature_reminders_desc">Gentle nudges during your active hours</string>
-    <string name="onboarding_feature_progress_title">Progress Tracking</string>
-    <string name="onboarding_feature_progress_desc">Detailed insights and history</string>
+    <string name="onboarding_welcome_subtitle">Yaşam tarzınıza ve tercihlerinize göre kişiselleştirilmiş su tüketim hedefinizi belirleyelim.</string>
+    <string name="onboarding_feature_goals_title">Kişiselleştirilmiş Hedefler</string>
+    <string name="onboarding_feature_goals_desc">Bilimsel araştırmalara ve profilinize dayanarak</string>
+    <string name="onboarding_feature_reminders_title">Akıllı Hatırlatıcılar</string>
+    <string name="onboarding_feature_reminders_desc">Aktif olduğunuz saatlerde nazik hatırlatmalar</string>
+    <string name="onboarding_feature_progress_title">İlerleme Takibi</string>
+    <string name="onboarding_feature_progress_desc">Ayrıntılı içgörüler ve geçmiş</string>
     <string name="onboarding_get_started">Get Started</string>
     <!-- Schedule step -->
     <string name="onboarding_wake_label">Wake-Up Time</string>
