@@ -1,3 +1,11 @@
+[1.6]
+Added
+- Battery optimization prompt in Notifications settings: if your device is delaying or stopping reminders to save power, HydroTracker now lets you know and offers a one-tap fix
+- New "Not receiving reminders?" link in Notifications ▸ Schedule with device-specific advice for phones that restrict apps aggressively (OnePlus, Xiaomi, Oppo and others)
+
+Changed
+- Updated translations (German, Spanish, French, Portuguese, Russian, Turkish, Chinese Simplified)
+
 [1.5.1]
 Fixed
 - Fixed the app crashing when picking a beverage other than water in some languages
