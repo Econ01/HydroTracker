@@ -579,6 +579,7 @@ private fun CrowdinContributorPill(
             languageNames.joinToString(", ")
         )
     }
+    val isElise = contributor.username == "elixe11"
 
     Surface(
         modifier = modifier.clearAndSetSemantics {
@@ -602,7 +603,7 @@ private fun CrowdinContributorPill(
                 )
             }
             Text(
-                text = contributor.username,
+                text = if (isElise) "elixe11🤍" else contributor.username,
                 style = MaterialTheme.typography.labelLarge,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
@@ -818,6 +819,14 @@ private val previewCrowdinContributors = listOf(
         languages = listOf(CrowdinLanguage("zh-CN", "Chinese Simplified")),
         translatedWords = 1137,
         approvedWords = 0
+    ),
+    CrowdinContributor(
+        username = "elixe11",
+        languages = listOf(
+            CrowdinLanguage("de", "German")
+        ),
+        translatedWords = 114,
+        approvedWords = 465
     ),
     CrowdinContributor(
         username = "proofPilot",
