@@ -3,7 +3,7 @@
 Update localisation assets and app configuration.
 
 This script is intended to run in GitHub Actions after every merge to master.
-It performs three tasks:
+It performs four tasks:
 
 1. Fetches translation progress from Crowdin and generates
    docs/translation-progress.svg.
@@ -11,17 +11,20 @@ It performs three tasks:
    progress and supported-language list.
 3. Scans app/src/main/res/values-*/ for translation folders and keeps
    AppLocale.SUPPORTED_TAGS and res/xml/locales_config.xml in sync.
+4. Exports every Crowdin contributor with their all-time translated-word count.
 
 Required environment variables:
     CROWDIN_PROJECT_ID  numeric Crowdin project id
-    CROWDIN_API_TOKEN   Crowdin personal API token
+    CROWDIN_API_TOKEN   Crowdin personal API token with Reports read access
 """
 
 import json
 import os
 import re
 import sys
+import time
 from datetime import datetime, timezone
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 
@@ -34,9 +37,14 @@ LOCALES_CONFIG_XML = PROJECT_ROOT / "app/src/main/res/xml/locales_config.xml"
 TRANSLATIONS_MD = PROJECT_ROOT / "TRANSLATIONS.md"
 PROGRESS_SVG = PROJECT_ROOT / "docs/translation-progress.svg"
 TRANSLATION_PROGRESS_JSON = PROJECT_ROOT / "app/src/main/assets/translation_progress.json"
+TRANSLATION_CONTRIBUTORS_JSON = PROJECT_ROOT / "app/src/main/assets/translation_contributors.json"
 RES_VALUES_DIR = PROJECT_ROOT / "app/src/main/res"
 
 CROWDIN_BASE = "https://api.crowdin.com/api/v2"
+# An explicit early bound prevents the report from using a rolling time window.
+CROWDIN_ALL_TIME_FROM = "2000-01-01T00:00:00+00:00"
+REPORT_POLL_INTERVAL_SECONDS = 2
+REPORT_TIMEOUT_SECONDS = 180
 PROGRESS_BAR_COLOUR = "#008080"
 TRACK_COLOUR = "#e0e0e0"
 TEXT_COLOUR = "#333333"
@@ -56,6 +64,14 @@ def crowdin_get(token: str, path: str, params: dict | None = None) -> dict:
     headers = {"Authorization": f"Bearer {token}"}
     url = f"{CROWDIN_BASE}{path}"
     response = requests.get(url, headers=headers, params=params, timeout=30)
+    response.raise_for_status()
+    return response.json()
+
+
+def crowdin_post(token: str, path: str, payload: dict) -> dict:
+    headers = {"Authorization": f"Bearer {token}"}
+    url = f"{CROWDIN_BASE}{path}"
+    response = requests.post(url, headers=headers, json=payload, timeout=30)
     response.raise_for_status()
     return response.json()
 
@@ -85,6 +101,101 @@ def fetch_crowdin_progress(project_id: str, token: str) -> list[dict]:
 def fetch_language_names(token: str) -> dict[str, str]:
     languages = crowdin_paginate(token, "/languages")
     return {lang["id"]: lang.get("name", lang["id"]) for lang in languages}
+
+
+def normalize_word_count(value: object) -> int:
+    """Return a non-negative integer word count from Crowdin's JSON value."""
+    try:
+        count = Decimal(str(value))
+    except (InvalidOperation, ValueError) as error:
+        raise ValueError(f"Invalid translated-word count: {value!r}") from error
+
+    if not count.is_finite() or count < 0 or count != count.to_integral_value():
+        raise ValueError(f"Invalid translated-word count: {value!r}")
+    return int(count)
+
+
+def normalize_translation_contributors(entries: list[dict]) -> list[dict]:
+    """Keep every report contributor and retain only the fields needed by the app."""
+    contributors: list[dict] = []
+    for entry in entries:
+        if not isinstance(entry, dict) or not isinstance(entry.get("user"), dict):
+            raise ValueError("Crowdin returned a malformed Top Members entry")
+
+        user = entry["user"]
+        username = str(user.get("username") or "").strip()
+        full_name = str(user.get("fullName") or "").strip()
+        display_name = full_name or username
+        if not display_name:
+            raise ValueError("Crowdin returned a contributor without a display name")
+
+        contributors.append(
+            {
+                "id": int(user["id"]),
+                "name": display_name,
+                "username": username,
+                "translatedWords": normalize_word_count(entry["translated"]),
+            }
+        )
+
+    contributors.sort(
+        key=lambda contributor: (
+            -contributor["translatedWords"],
+            contributor["name"].casefold(),
+            contributor["username"].casefold(),
+        )
+    )
+    return contributors
+
+
+def fetch_translation_contributors(project_id: str, token: str) -> list[dict]:
+    """Generate and download an all-time, all-language Top Members report."""
+    report = crowdin_post(
+        token,
+        f"/projects/{project_id}/reports",
+        {
+            "name": "top-members",
+            "schema": {
+                "unit": "words",
+                "format": "json",
+                "dateFrom": CROWDIN_ALL_TIME_FROM,
+                "dateTo": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            },
+        },
+    )
+    report_id = report["data"]["identifier"]
+    report_path = f"/projects/{project_id}/reports/{report_id}"
+    deadline = time.monotonic() + REPORT_TIMEOUT_SECONDS
+    last_status = None
+
+    while True:
+        status_response = crowdin_get(token, report_path)
+        status_data = status_response["data"]
+        status = status_data.get("status")
+        if status != last_status:
+            print(f"Contributor report status: {status or 'unknown'}")
+            last_status = status
+
+        if status == "finished":
+            break
+        if status in {"failed", "error", "canceled", "cancelled"}:
+            raise RuntimeError(f"Crowdin contributor report ended with status: {status}")
+        if time.monotonic() >= deadline:
+            raise TimeoutError("Timed out waiting for the Crowdin contributor report")
+        time.sleep(REPORT_POLL_INTERVAL_SECONDS)
+
+    download_response = crowdin_get(token, f"{report_path}/download")
+    download_url = download_response["data"]["url"]
+
+    # The temporary download URL is pre-signed and must not receive the API token.
+    report_response = requests.get(download_url, timeout=30)
+    report_response.raise_for_status()
+    report_payload = report_response.json()
+    entries = report_payload.get("data") if isinstance(report_payload, dict) else report_payload
+    if not isinstance(entries, list):
+        raise ValueError("Crowdin returned an invalid Top Members report")
+
+    return normalize_translation_contributors(entries)
 
 
 def android_dir_to_bcp47(folder_name: str) -> str:
@@ -277,6 +388,16 @@ def update_translation_progress_json(
     print(f"Updated {TRANSLATION_PROGRESS_JSON.relative_to(PROJECT_ROOT)}.")
 
 
+def update_translation_contributors_json(contributors: list[dict]) -> None:
+    """Write the complete all-time contributor list for the app's bundled asset."""
+    payload = {"contributors": contributors}
+    TRANSLATION_CONTRIBUTORS_JSON.parent.mkdir(parents=True, exist_ok=True)
+    TRANSLATION_CONTRIBUTORS_JSON.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
+    print(f"Updated {TRANSLATION_CONTRIBUTORS_JSON.relative_to(PROJECT_ROOT)}.")
+
+
 def main() -> int:
     project_id = os.environ.get("CROWDIN_PROJECT_ID")
     token = os.environ.get("CROWDIN_API_TOKEN")
@@ -294,6 +415,10 @@ def main() -> int:
 
     print("Fetching Crowdin language names...")
     language_names = fetch_language_names(token)
+
+    print("Generating all-time Crowdin contributor report...")
+    contributors = fetch_translation_contributors(project_id, token)
+    print(f"Found {len(contributors)} translation contributor(s).")
 
     print("Discovering supported Android locales...")
     supported_tags = discover_supported_tags()
@@ -313,6 +438,9 @@ def main() -> int:
 
     print("Updating translation progress JSON...")
     update_translation_progress_json(progress, supported_tags)
+
+    print("Updating translation contributor JSON...")
+    update_translation_contributors_json(contributors)
 
     print("Done.")
     return 0

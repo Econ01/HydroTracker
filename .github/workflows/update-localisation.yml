@@ -40,12 +40,13 @@ jobs:
             docs/translation-progress.svg \
             app/src/main/java/com/cemcakmak/hydrotracker/utils/AppLocale.kt \
             app/src/main/res/xml/locales_config.xml \
-            app/src/main/assets/translation_progress.json
+            app/src/main/assets/translation_progress.json \
+            app/src/main/assets/translation_contributors.json
 
           if git diff --cached --quiet; then
             echo "No localisation changes to commit"
             exit 0
           fi
 
-          git commit -m "Update localisation progress and supported locales [skip ci]"
+          git commit -m "Update localisation assets [skip ci]"
           git push
