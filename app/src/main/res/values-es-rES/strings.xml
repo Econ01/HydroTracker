@@ -27,7 +27,7 @@
     <string name="cd_edit_entry">Editar entrada</string>
     <string name="cd_reorder">Reordenar</string>
     <string name="cd_profile_photo">Foto de perfil</string>
-    <string name="cd_water_drop">Water drop</string>
+    <string name="cd_water_drop">Gota de agua</string>
     <string name="cd_pinned">Fijado</string>
     <string name="cd_hidden">Oculto</string>
     <!-- ============================================================================
@@ -39,7 +39,7 @@
     <!-- Percentage with sign appended in code; %1$s = value including the % sign, e.g. "85%" -->
     <string name="percent_format">%1$s</string>
     <!-- Character counter, e.g. "12/15 characters"; %1$d = current length, %2$d = max -->
-    <string name="character_count">%1$d/%2$d characters</string>
+    <string name="character_count">%1$d/%2$d caracteres</string>
     <!-- ============================================================================
          Notification channel (Android 8+)
          Channel name/description refresh on each createNotificationChannel() call, so
@@ -55,8 +55,8 @@
          rendered inside the Glance widget.
          ============================================================================ -->
     <string name="widget_large_label">HydroTracker Grande</string>
-    <string name="widget_large_description">Track hydration and add water with one tap</string>
-    <string name="widget_of_goal_format">%1$s of %2$s</string>
+    <string name="widget_large_description">Registra tu hidratación y añade agua con solo un toque</string>
+    <string name="widget_of_goal_format">%1$s de %2$s</string>
     <string name="widget_goal_reached">¡Objetivo alcanzado!</string>
     <string name="widget_quick_add_cd">Añadir %1$s</string>
     <string name="widget_daily_hydration">Hidratación diaria</string>
@@ -70,7 +70,7 @@
     <!-- ============================================================================
          Settings: Display &amp; Locale
          ============================================================================ -->
-    <string name="screen_display_locale_title">Display &amp; Locale</string>
+    <string name="screen_display_locale_title">Pantalla y Localización</string>
     <string name="display_language_header">Idioma</string>
     <string name="display_date_and_time_format_header">Fecha y hora</string>
     <string name="display_time_format_header">Formato de hora</string>
@@ -91,18 +91,18 @@
     <!-- Time format options -->
     <string name="time_format_system">Sistema</string>
     <string name="time_format_12_hour">12 horas</string>
-    <string name="time_format_24_hour">24-hour</string>
+    <string name="time_format_24_hour">24 horas</string>
     <!-- Date format options -->
-    <string name="date_format_system">System</string>
+    <string name="date_format_system">Sistema</string>
     <string name="date_format_day_month_year">16 Jun 2026</string>
     <string name="date_format_month_day_year">Jun 16, 2026</string>
-    <string name="date_format_year_month_day">2026–06–16</string>
+    <string name="date_format_year_month_day">2026-06-16</string>
     <!-- Volume unit options -->
-    <string name="unit_millilitres">Metric</string>
+    <string name="unit_millilitres">Métrica</string>
     <string name="unit_ml_short">ml</string>
-    <string name="unit_us_fl_oz">US fluid ounces</string>
+    <string name="unit_us_fl_oz">Onzas líquidas (EEUU)</string>
     <string name="unit_us_fl_oz_short">fl oz</string>
-    <string name="unit_imperial_fl_oz">Imperial fluid ounces</string>
+    <string name="unit_imperial_fl_oz">Onzas líquidas (Sistema imperial)</string>
     <string name="unit_imperial_fl_oz_short">fl oz (UK)</string>
     <!-- Display-only volume units (auto-scaling and call-site overrides) -->
     <string name="unit_litre_short">L</string>
@@ -119,72 +119,72 @@
          Onboarding
          Per-step title + description (shown above each step), plus step controls.
          ============================================================================ -->
-    <string name="onboarding_welcome_title">Welcome to HydroTracker</string>
-    <string name="onboarding_welcome_description">We\'ll personalize the app for you.</string>
-    <string name="onboarding_gender_title">Tell us about yourself</string>
-    <string name="onboarding_gender_description">Choose the option that best describes you.</string>
-    <string name="onboarding_age_title">What\'s your age group?</string>
-    <string name="onboarding_age_description">Select your age range.</string>
-    <string name="onboarding_activity_title">How active are you?</string>
-    <string name="onboarding_activity_description">Pick your general daily activity level.</string>
-    <string name="onboarding_schedule_title">When are you awake?</string>
-    <string name="onboarding_schedule_description">Tell us your wake and sleep times.</string>
-    <string name="onboarding_profile_title">Complete Your Profile</string>
-    <string name="onboarding_profile_description">Add your name and a profile photo to personalize your experience.</string>
-    <string name="onboarding_goal_title">Your personalized goal</string>
-    <string name="onboarding_goal_description">Review your calculated goal.</string>
-    <string name="onboarding_complete_title">You\'re all set!</string>
-    <string name="onboarding_complete_description">Tap the button to start hydrating!</string>
-    <string name="onboarding_finish">Finish</string>
+    <string name="onboarding_welcome_title">Bienvenido a HydroTracker</string>
+    <string name="onboarding_welcome_description">Personalizaremos esta aplicación para ti.</string>
+    <string name="onboarding_gender_title">Cuéntanos sobre ti</string>
+    <string name="onboarding_gender_description">Escoge la opción que mejor te describa.</string>
+    <string name="onboarding_age_title">¿Cuál es tu grupo de edad?</string>
+    <string name="onboarding_age_description">Selecciona tu rango de edad.</string>
+    <string name="onboarding_activity_title">¿Qué tan activo eres?</string>
+    <string name="onboarding_activity_description">Elige tu nivel de actividad diaria general.</string>
+    <string name="onboarding_schedule_title">¿Cuándo estás despierto?</string>
+    <string name="onboarding_schedule_description">Dinos a qué horas te despiertas y duermes.</string>
+    <string name="onboarding_profile_title">Completa tu perfil</string>
+    <string name="onboarding_profile_description">Añade tu nombre y tu foto de perfil para personalizar tu experiencia.</string>
+    <string name="onboarding_goal_title">Tu meta personalizada</string>
+    <string name="onboarding_goal_description">Revisa tu meta planificada.</string>
+    <string name="onboarding_complete_title">¡Todo listo!</string>
+    <string name="onboarding_complete_description">¡Dale al botón para empezar a hidratarte!</string>
+    <string name="onboarding_finish">Finalizar</string>
     <!-- Welcome step -->
-    <string name="onboarding_welcome_subtitle">Let\'s set up your personalized water intake goal based on your lifestyle and preferences.</string>
-    <string name="onboarding_feature_goals_title">Personalized Goals</string>
-    <string name="onboarding_feature_goals_desc">Based on scientific research and your profile</string>
-    <string name="onboarding_feature_reminders_title">Smart Reminders</string>
-    <string name="onboarding_feature_reminders_desc">Gentle nudges during your active hours</string>
-    <string name="onboarding_feature_progress_title">Progress Tracking</string>
-    <string name="onboarding_feature_progress_desc">Detailed insights and history</string>
-    <string name="onboarding_get_started">Get Started</string>
+    <string name="onboarding_welcome_subtitle">Vamos a establecer tu objetivo de ingesta de agua basándonos en tu estilo de vida y preferencias.</string>
+    <string name="onboarding_feature_goals_title">Metas Personalizadas</string>
+    <string name="onboarding_feature_goals_desc">Basadas en investigación científica y en tu perfil</string>
+    <string name="onboarding_feature_reminders_title">Recordatorios inteligentes</string>
+    <string name="onboarding_feature_reminders_desc">Empujoncitos suaves durante tus horas activas</string>
+    <string name="onboarding_feature_progress_title">Regristro del progreso</string>
+    <string name="onboarding_feature_progress_desc">Información detallada e historial</string>
+    <string name="onboarding_get_started">Empecemos</string>
     <!-- Schedule step -->
-    <string name="onboarding_wake_label">Wake-Up Time</string>
-    <string name="onboarding_sleep_label">Sleep Time</string>
-    <string name="onboarding_wake_picker_title">Wake Up Time</string>
-    <string name="onboarding_wake_picker_subtitle">Choose your wake-up time</string>
-    <string name="onboarding_sleep_picker_title">Sleep Time</string>
-    <string name="onboarding_sleep_picker_subtitle">Choose your sleep time</string>
-    <string name="time_picker_set">Set Time</string>
+    <string name="onboarding_wake_label">Hora de despertarse</string>
+    <string name="onboarding_sleep_label">Hora de dormir</string>
+    <string name="onboarding_wake_picker_title">Hora de despertarse</string>
+    <string name="onboarding_wake_picker_subtitle">Elige tu hora de despertar</string>
+    <string name="onboarding_sleep_picker_title">Hora de dormir</string>
+    <string name="onboarding_sleep_picker_subtitle">Elige tu hora de dormir</string>
+    <string name="time_picker_set">Establecer hora</string>
     <!-- Awake duration, e.g. "Awake for 16h 0m"; %1$d = hours, %2$d = minutes -->
-    <string name="onboarding_awake_duration">Awake for %1$dh %2$dm</string>
+    <string name="onboarding_awake_duration">Despierto durante %1$dh %2$dm</string>
     <!-- Profile setup step -->
-    <string name="profile_add_photo">Add Photo</string>
-    <string name="profile_remove_photo">Remove Photo</string>
-    <string name="profile_name_prompt">What should we call you?</string>
-    <string name="profile_name_label">Your name</string>
-    <string name="profile_name_placeholder">Enter your name</string>
-    <string name="profile_name_required">Name is required to continue</string>
-    <string name="profile_select_photo">Select Profile Photo</string>
-    <string name="profile_choose_gallery">Choose from Gallery</string>
-    <string name="profile_choose_gallery_desc">Select an existing photo</string>
-    <string name="profile_take_photo">Take Photo</string>
-    <string name="profile_take_photo_desc">Use your camera to take a new photo</string>
+    <string name="profile_add_photo">Añadir foto</string>
+    <string name="profile_remove_photo">Eliminar foto</string>
+    <string name="profile_name_prompt">¿Cómo deberíamos llamarte?</string>
+    <string name="profile_name_label">Tu nombre</string>
+    <string name="profile_name_placeholder">Introduce tu nombre</string>
+    <string name="profile_name_required">Es necesario introducir un nombre para continuar</string>
+    <string name="profile_select_photo">Seleccionar Foto de Perfil</string>
+    <string name="profile_choose_gallery">Elegir de  Galería</string>
+    <string name="profile_choose_gallery_desc">Seleccionar una foto existente</string>
+    <string name="profile_take_photo">Hacer foto</string>
+    <string name="profile_take_photo_desc">Usa tu cámara para hacerte una foto nueva</string>
     <!-- Goal step -->
-    <string name="goal_daily_water_goal">Daily Water Goal</string>
-    <string name="goal_reminder_interval">Reminder Interval</string>
-    <string name="goal_activity_level">Activity Level</string>
-    <string name="goal_personalized_title">How we personalized this</string>
-    <string name="goal_personalized_body">Your goal considers your profile and schedule. These factors influence total intake and notification cadence.</string>
+    <string name="goal_daily_water_goal">Meta Diaria de Agua</string>
+    <string name="goal_reminder_interval">Intervalo de recordatorio</string>
+    <string name="goal_activity_level">Nivel de Actividad</string>
+    <string name="goal_personalized_title">Como personalizamos esto</string>
+    <string name="goal_personalized_body">Tu meta tiene en cuenta tu perfil y tu horario. Estos factores influencian la ingesta total y la frecuencia de notificación.</string>
     <!-- Profile recap chips; %1$s = a time like 07:00 -->
-    <string name="goal_chip_wake">Wake: %1$s</string>
-    <string name="goal_chip_sleep">Sleep: %1$s</string>
+    <string name="goal_chip_wake">Despierto: %1$s</string>
+    <string name="goal_chip_sleep">Dormido: %1$s</string>
     <!-- Reminder interval shown in the Goal step; pluralized on the minute count -->
     <plurals name="reminder_interval_minutes">
-        <item quantity="one">%1$d minute</item>
-        <item quantity="other">%1$d minutes</item>
+        <item quantity="one">%1$d minuto</item>
+        <item quantity="other">%1$d minutos</item>
     </plurals>
     <!-- Complete step -->
-    <string name="complete_subtitle">Your personalized hydration plan is ready.</string>
-    <string name="complete_daily_goal">Your Daily Goal</string>
-    <string name="complete_start_button">Start hydrating</string>
+    <string name="complete_subtitle">Tu plan personalizado de hidratación está listo.</string>
+    <string name="complete_daily_goal">Tu Meta Diaria</string>
+    <string name="complete_start_button">Empieza a hidratarte</string>
     <!-- Abbreviated reminder interval, e.g. "60 min"; %1$d = minutes -->
     <string name="reminder_interval_min_short">%1$d min</string>
     <!-- ============================================================================
@@ -192,147 +192,147 @@
          Add/edit custom beverages and container presets (presentation/common).
          ============================================================================ -->
     <!-- Shared -->
-    <string name="error_name_required">Name is required</string>
-    <string name="label_icon">Icon</string>
+    <string name="error_name_required">Un nombre es necesario</string>
+    <string name="label_icon">Icono</string>
     <!-- Delete confirmation body; %1$s = the item name being deleted -->
-    <string name="delete_confirm_message">Are you sure you want to delete \"%1$s\"? This action cannot be undone.</string>
+    <string name="delete_confirm_message">¿Estás seguro de que quieres borrar %1$s? Esta acción no puede deshacerse.</string>
     <!-- Custom beverage sheet -->
-    <string name="beverage_add">Add Beverage</string>
-    <string name="beverage_edit_title">Edit Beverage</string>
-    <string name="beverage_delete_title">Delete Beverage?</string>
-    <string name="beverage_show_in_quick_add">Show in Quick Add</string>
-    <string name="beverage_hide_from_quick_add">Hide from Quick Add</string>
+    <string name="beverage_add">Añadir Bebida</string>
+    <string name="beverage_edit_title">Editar Bebida</string>
+    <string name="beverage_delete_title">¿Borrar Bebida?</string>
+    <string name="beverage_show_in_quick_add">Mostrar en Añadir Rápido</string>
+    <string name="beverage_hide_from_quick_add">Esconder de Añadir Rápido</string>
     <!-- Preset effectiveness line, e.g. "150% hydration effectiveness"; %1$s = per cent value including the % sign -->
-    <string name="beverage_hydration_effectiveness">%1$s hydration effectiveness</string>
-    <string name="beverage_name_label">Beverage Name</string>
-    <string name="beverage_name_placeholder">e.g., Smoothie</string>
-    <string name="beverage_effectiveness_label" formatted="false">Hydration effectiveness (%)</string>
-    <string name="beverage_effectiveness_placeholder">e.g., 100</string>
+    <string name="beverage_hydration_effectiveness">%1$s efectividad de hidratación</string>
+    <string name="beverage_name_label">Nombre de la Bebida</string>
+    <string name="beverage_name_placeholder">ej., Batido vainilla</string>
+    <string name="beverage_effectiveness_label" formatted="false">Efectividad de la Hidratación (%)</string>
+    <string name="beverage_effectiveness_placeholder">ej. 100</string>
     <!-- Validation; %1$d = min, %2$d = max -->
-    <string name="beverage_effectiveness_error">Enter a value between %1$d and %2$d</string>
-    <string name="beverage_effectiveness_hint" formatted="false">100% counts the full amount toward your goal</string>
+    <string name="beverage_effectiveness_error">Introduce un valor entre %1$d y %2$d</string>
+    <string name="beverage_effectiveness_hint" formatted="false">El 100% cuenta la cantidad total hasta tu meta</string>
     <!-- Container preset sheet -->
-    <string name="container_add_title">Add Container</string>
-    <string name="container_edit_title">Edit Container</string>
-    <string name="container_name_label">Container Name</string>
-    <string name="container_name_placeholder">e.g., Coffee Mug</string>
-    <string name="container_volume_label">Volume (%1$s)</string>
-    <string name="container_volume_placeholder">e.g., 250</string>
+    <string name="container_add_title">Añadir Contenedor</string>
+    <string name="container_edit_title">Editar Contenedor</string>
+    <string name="container_name_label">Nombre del Contenedor</string>
+    <string name="container_name_placeholder">ej., Vaso tubo</string>
+    <string name="container_volume_label">Volumen (%1$s)</string>
+    <string name="container_volume_placeholder">ej., 250</string>
     <!-- %1$s = minimum valid amount, %2$s = maximum valid amount (both with unit) -->
-    <string name="container_volume_error">Enter a valid volume (%1$s–%2$s)</string>
-    <string name="container_icon_picker_hint">Tap an icon below to override the automatic choice</string>
-    <string name="container_icon_preview_description">Selected container icon</string>
-    <string name="container_delete_title">Delete Container?</string>
+    <string name="container_volume_error">Introduce un volumen válido (%1$s-%2$s)</string>
+    <string name="container_icon_picker_hint">Presiona un icono debajo para reemplazar la selección automática</string>
+    <string name="container_icon_preview_description">Icono de contenedor seleccionado</string>
+    <string name="container_delete_title">¿Borrar Contenedor?</string>
     <!-- ============================================================================
          Navigation &amp; top bars
          ============================================================================ -->
-    <string name="nav_home">Home</string>
-    <string name="nav_history">History</string>
-    <string name="nav_statistics">Statistics</string>
-    <string name="nav_profile">Profile</string>
-    <string name="nav_settings">Settings</string>
-    <string name="nav_add_custom">Add Custom</string>
-    <string name="fab_menu_new_beverage">New Beverage</string>
-    <string name="fab_menu_new_container">New Container</string>
-    <string name="fab_menu_add_past_entry">Add Past Entry</string>
-    <string name="fab_menu_toggle_menu">Toggle menu</string>
+    <string name="nav_home">Principal</string>
+    <string name="nav_history">Historial</string>
+    <string name="nav_statistics">Estadísticas</string>
+    <string name="nav_profile">Perfil</string>
+    <string name="nav_settings">Configuración</string>
+    <string name="nav_add_custom">Añadir Personalizado</string>
+    <string name="fab_menu_new_beverage">Nueva Bebida</string>
+    <string name="fab_menu_new_container">Nuevo Contenedor</string>
+    <string name="fab_menu_add_past_entry">Añadir la entrada anterior</string>
+    <string name="fab_menu_toggle_menu">Desplegar el menú</string>
     <!-- ============================================================================
          Settings — hub
          Screen titles are reused as both the hub row title and the screen's app-bar title.
          ============================================================================ -->
-    <string name="screen_appearance_title">Appearance</string>
-    <string name="screen_hydration_title">Hydration &amp; Health</string>
-    <string name="screen_quickadd_title">Quick Add Customization</string>
-    <string name="screen_notifications_title">Notifications</string>
-    <string name="screen_support_title">Support Development</string>
-    <string name="screen_about_title">About</string>
-    <string name="screen_developer_title">Developer Options</string>
-    <string name="settings_about_update_available">About - Update Available</string>
-    <string name="settings_appearance_desc">Theme, colours and AMOLED mode</string>
-    <string name="settings_display_desc">Week start day and locale</string>
-    <string name="settings_hydration_desc">Water goal calculation and Health Connect</string>
-    <string name="settings_quickadd_desc">Container presets and beverage types</string>
-    <string name="settings_notifications_desc">Hydration reminders and permissions</string>
-    <string name="settings_support_desc">Donate and support the app</string>
-    <string name="settings_about_desc">Sources, privacy policy and license</string>
-    <string name="settings_developer_desc">Debug tools and testing</string>
-    <string name="screen_data_management_title">Data Management</string>
-    <string name="settings_data_management_desc">Export, import and delete your data</string>
+    <string name="screen_appearance_title">Apariencia</string>
+    <string name="screen_hydration_title">Hidratación y Salud</string>
+    <string name="screen_quickadd_title">Personalización de Añadir Rápido</string>
+    <string name="screen_notifications_title">Notificaciones</string>
+    <string name="screen_support_title">Desarrollo de Soporte</string>
+    <string name="screen_about_title">Acerca de</string>
+    <string name="screen_developer_title">Opciones de desarrollador</string>
+    <string name="settings_about_update_available">Acerca de - Actualización disponible</string>
+    <string name="settings_appearance_desc">Tema, colores y modo AMOLED</string>
+    <string name="settings_display_desc">Día de inicio semanal y localización</string>
+    <string name="settings_hydration_desc">Cálculo del objetivo de ingesta y Health Connect</string>
+    <string name="settings_quickadd_desc">Contenedores predeterminados y tipos de bebida</string>
+    <string name="settings_notifications_desc">Recordatorios de hidratación y permisos</string>
+    <string name="settings_support_desc">Dona y apoya la aplicación</string>
+    <string name="settings_about_desc">Fuentes, política de privacidad y licencia</string>
+    <string name="settings_developer_desc">Herramientas de debug y testeo</string>
+    <string name="screen_data_management_title">Manejo de los datos</string>
+    <string name="settings_data_management_desc">Exportar, importar y borrar tus datos</string>
     <!-- ============================================================================
          Settings — Appearance
          ============================================================================ -->
-    <string name="appearance_theme_header">Theme</string>
-    <string name="appearance_theme_system">System</string>
-    <string name="appearance_theme_light">Light</string>
-    <string name="appearance_theme_dark">Dark</string>
+    <string name="appearance_theme_header">Tema</string>
+    <string name="appearance_theme_system">Sistema</string>
+    <string name="appearance_theme_light">Claro</string>
+    <string name="appearance_theme_dark">Oscuro</string>
     <string name="appearance_color_header">Color</string>
-    <string name="appearance_amoled_title">AMOLED Mode</string>
-    <string name="appearance_amoled_desc">True black backgrounds in dark mode</string>
-    <string name="appearance_amoled_borders_title">Surface Borders</string>
-    <string name="appearance_amoled_borders_desc">Subtle borders around cards in AMOLED mode</string>
-    <string name="appearance_font_header">Font</string>
-    <string name="appearance_navbar_header">Navigation bar</string>
-    <string name="appearance_autohide_title">Auto-hide on scroll</string>
-    <string name="appearance_autohide_desc">Hide the bar when scrolling down</string>
-    <string name="appearance_labels_title">Labels</string>
-    <string name="appearance_home_header">Home screen</string>
-    <string name="appearance_feedback_header">Interaction &amp; Feedback</string>
-    <string name="appearance_haptics_title">Haptic Feedback</string>
-    <string name="appearance_haptics_desc">Vibrate on button taps and actions</string>
-    <string name="appearance_number_animation_title">Rolling Number Animation</string>
-    <string name="appearance_number_animation_desc">Switch off for a lighter count-up animation</string>
-    <string name="appearance_edge_effect_title">Edge Effect</string>
-    <string name="appearance_beverage_colors_title">Beverage Colours</string>
-    <string name="appearance_beverage_colors_desc">Tint home-screen cards and entries with each beverage’s colour</string>
+    <string name="appearance_amoled_title">Modo AMOLED</string>
+    <string name="appearance_amoled_desc">Verdaderos fondos negros en modo oscuro</string>
+    <string name="appearance_amoled_borders_title">Bordes Superficiales</string>
+    <string name="appearance_amoled_borders_desc">Bordes sutiles alrededor de las tarjetas en modo AMOLED</string>
+    <string name="appearance_font_header">Fuente</string>
+    <string name="appearance_navbar_header">Barra de navegación</string>
+    <string name="appearance_autohide_title">Ocultar automáticamente al desplazar</string>
+    <string name="appearance_autohide_desc">Esconder la barra al desplazar hacia abajo</string>
+    <string name="appearance_labels_title">Etiquetas</string>
+    <string name="appearance_home_header">Pantalla Principal</string>
+    <string name="appearance_feedback_header">Interacción y Feedback</string>
+    <string name="appearance_haptics_title">Feedback háptico</string>
+    <string name="appearance_haptics_desc">Vibrar en pulsaciones de botón y acciones</string>
+    <string name="appearance_number_animation_title">Animación de Número Giratorio</string>
+    <string name="appearance_number_animation_desc">Desactivar para una animación de conteo más ligera</string>
+    <string name="appearance_edge_effect_title">Efecto de Borde</string>
+    <string name="appearance_beverage_colors_title">Colores de Bebida</string>
+    <string name="appearance_beverage_colors_desc">Pintar las tarjetas y entradas de la pantalla principal con cada color de cada bebida</string>
     <!-- Sample data shown in the theme preview card -->
     <string name="appearance_preview_amount">1,250 / 2,500 ml</string>
-    <string name="appearance_preview_entries">Entries</string>
-    <string name="appearance_preview_first">First</string>
-    <string name="appearance_preview_latest">Latest</string>
+    <string name="appearance_preview_entries">Registros</string>
+    <string name="appearance_preview_first">Primero</string>
+    <string name="appearance_preview_latest">Último</string>
     <!-- ============================================================================
          Settings — Widget (Appearance ▸ Widget)
          ============================================================================ -->
     <string name="appearance_widget_section_title">Widgets</string>
-    <string name="appearance_widget_title">Widget Settings</string>
-    <string name="appearance_widget_desc">Change appearance and behaviour</string>
-    <string name="widget_settings_colours_header">Colours</string>
-    <string name="widget_settings_dynamic_title">Dynamic colours</string>
-    <string name="widget_settings_dynamic_desc">Colours from your wallpaper</string>
-    <string name="widget_settings_background_header">Background</string>
-    <string name="widget_settings_transparent_title">Transparent background</string>
-    <string name="widget_settings_transparent_desc">Make the background surface transparent</string>
-    <string name="widget_settings_pure_black_title">Pure black background</string>
-    <string name="widget_settings_pure_black_desc">Use a true black surface in dark mode</string>
-    <string name="widget_settings_pure_white_title">Pure white background</string>
-    <string name="widget_settings_pure_white_desc">Use a true white surface in light mode</string>
-    <string name="widget_settings_quickadd_title">Quick actions</string>
-    <string name="widget_settings_quickadd_desc">Choose the three quick-add buttons</string>
-    <string name="screen_widget_quickadd_title">Widget quick actions</string>
+    <string name="appearance_widget_title">Configuración de Widget</string>
+    <string name="appearance_widget_desc">Cambiar apariencia y comportamiento</string>
+    <string name="widget_settings_colours_header">Colores</string>
+    <string name="widget_settings_dynamic_title">Colores dinámicos</string>
+    <string name="widget_settings_dynamic_desc">Colores de tu fondo de pantalla</string>
+    <string name="widget_settings_background_header">Fondo</string>
+    <string name="widget_settings_transparent_title">Fondo transparente</string>
+    <string name="widget_settings_transparent_desc">Hacer la superficie del fondo transparente</string>
+    <string name="widget_settings_pure_black_title">Fondo de negro puro</string>
+    <string name="widget_settings_pure_black_desc">Usar superficie de negro puro en modo oscuro</string>
+    <string name="widget_settings_pure_white_title">Fondo de blanco puro</string>
+    <string name="widget_settings_pure_white_desc">Usar superficie de blanco puro en modo claro</string>
+    <string name="widget_settings_quickadd_title">Acciones rápidas</string>
+    <string name="widget_settings_quickadd_desc">Escoger los tres botones de acción rápida</string>
+    <string name="screen_widget_quickadd_title">Acciones rápidas del Widget</string>
     <string name="widget_quickadd_auto">Auto</string>
-    <string name="widget_quickadd_beverage_header">Beverage</string>
-    <string name="widget_quickadd_slot_section_title">Quick-add buttons</string>
-    <string name="widget_quickadd_container_sheet_title">Choose container</string>
-    <string name="widget_quickadd_beverage_sheet_title">Choose beverage</string>
-    <string name="widget_quickadd_reset_all">Reset all to automatic</string>
+    <string name="widget_quickadd_beverage_header">Bebida</string>
+    <string name="widget_quickadd_slot_section_title">Botones de acción rápida</string>
+    <string name="widget_quickadd_container_sheet_title">Escoger contenedor</string>
+    <string name="widget_quickadd_beverage_sheet_title">Escoger bebida</string>
+    <string name="widget_quickadd_reset_all">Resetear todo a automático</string>
     <!-- ============================================================================
          Settings — Notifications
          ============================================================================ -->
-    <string name="action_allow">Allow</string>
-    <string name="notif_reminders_header">Reminders</string>
-    <string name="notif_hydration_reminders">Hydration reminders</string>
-    <string name="notif_reminders_active">Reminders are active</string>
-    <string name="notif_reminders_paused">Reminders are paused</string>
-    <string name="notif_fun_facts">Daily hydration facts</string>
-    <string name="notif_fun_facts_active">A fun fact will be sent each day</string>
-    <string name="notif_fun_facts_paused">Daily facts are paused</string>
-    <string name="notif_sample_notification">Sample notification</string>
-    <string name="notif_fun_fact">Fun Fact</string>
+    <string name="action_allow">Permitir</string>
+    <string name="notif_reminders_header">Recordatorios</string>
+    <string name="notif_hydration_reminders">Recordatorios de hidratación</string>
+    <string name="notif_reminders_active">Los recordatorios están activos</string>
+    <string name="notif_reminders_paused">Los recordatorios están pausados</string>
+    <string name="notif_fun_facts">Hechos sobre hidratación diaria</string>
+    <string name="notif_fun_facts_active">Un hecho curioso se enviará cada día</string>
+    <string name="notif_fun_facts_paused">Hechos diarios están pausados</string>
+    <string name="notif_sample_notification">Notificación de ejemplo</string>
+    <string name="notif_fun_fact">Hecho curioso</string>
     <!-- Reminder-style descriptions shown in the preview card -->
-    <string name="notif_style_gentle_desc">Soft, encouraging reminders</string>
-    <string name="notif_style_motivating_desc">Energetic, goal-focused reminders</string>
-    <string name="notif_style_minimal_desc">Simple, unobtrusive reminders</string>
-    <string name="notif_permissions_header">Permissions</string>
-    <string name="notif_permission_title">Notification permission</string>
+    <string name="notif_style_gentle_desc">Recordatorios alentadores</string>
+    <string name="notif_style_motivating_desc">Recordatorios enfocados en el objetivo</string>
+    <string name="notif_style_minimal_desc">Recordatorios discretos</string>
+    <string name="notif_permissions_header">Permisos</string>
+    <string name="notif_permission_title">Permiso de notificación</string>
     <string name="notif_permission_desc">Required to send hydration reminders</string>
     <string name="notif_exact_alarm_title">Exact alarm permission</string>
     <string name="notif_exact_alarm_desc">Required for precise reminder timing</string>
