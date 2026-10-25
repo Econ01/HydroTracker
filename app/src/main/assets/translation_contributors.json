@@ -152,6 +152,19 @@
       "approvedWords": 0
     },
     {
+      "id": 17953397,
+      "name": "Schanbro",
+      "username": "Schanbro",
+      "languages": [
+        {
+          "id": "de",
+          "name": "German"
+        }
+      ],
+      "translatedWords": 16,
+      "approvedWords": 0
+    },
+    {
       "id": 17833283,
       "name": "Laendrun2",
       "username": "Laendrun2",
