@@ -2,14 +2,14 @@
   "languages": {
     "de-DE": {
       "translated": 43,
-      "approved": 16
+      "approved": 15
     },
     "es-ES": {
-      "translated": 25,
+      "translated": 24,
       "approved": 0
     },
     "fr-FR": {
-      "translated": 98,
+      "translated": 97,
       "approved": 0
     },
     "pt-PT": {
@@ -17,15 +17,15 @@
       "approved": 0
     },
     "ru-RU": {
-      "translated": 99,
+      "translated": 98,
       "approved": 0
     },
     "tr-TR": {
       "translated": 9,
-      "approved": 9
+      "approved": 8
     },
     "zh-CN": {
-      "translated": 99,
+      "translated": 98,
       "approved": 0
     }
   }
