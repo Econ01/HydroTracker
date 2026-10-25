@@ -102,7 +102,6 @@
         <item quantity="one">%1$s, %2$s word approved</item>
         <item quantity="other">%1$s, %2$s words approved</item>
     </plurals>
-
     <!-- Time format options -->
     <string name="time_format_system">Sistema</string>
     <string name="time_format_12_hour">12 horas</string>
