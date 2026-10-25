@@ -88,7 +88,7 @@
     <string name="language_progress_header">Übersetzungsfortschritt</string>
     <string name="language_progress_translated">Übersetzt</string>
     <string name="language_progress_approved">Bestätigt</string>
-    <string name="language_translators_header">Translators</string>
+    <string name="language_translators_header">Übersetzer</string>
     <string name="language_translators_description">All-time words translated on Crowdin</string>
     <string name="language_proofreaders_header">Proofreaders</string>
     <string name="language_proofreaders_description">All-time words approved on Crowdin</string>
@@ -343,8 +343,8 @@
     <string name="notif_fun_fact">Fun Fact</string>
     <!-- Reminder-style descriptions shown in the preview card -->
     <string name="notif_style_gentle_desc">Sanfte, motivierende Erinnerungen</string>
-    <string name="notif_style_motivating_desc">Energetic, goal-focused reminders</string>
-    <string name="notif_style_minimal_desc">Simple, unobtrusive reminders</string>
+    <string name="notif_style_motivating_desc">Energische, zielorientierte Erinnerungen</string>
+    <string name="notif_style_minimal_desc">Einfache, unaufdringliche Erinnerungen</string>
     <string name="notif_permissions_header">Berechtigungen</string>
     <string name="notif_permission_title">Berechtigung für Benachrichtigung</string>
     <string name="notif_permission_desc">Erforderlich, um Hydration-Erinnerungen zu senden</string>
@@ -594,11 +594,11 @@
     <string name="data_delete_everything_desc">Remove all local and Health Connect data</string>
     <string name="data_delete_everything_message">This will delete all local data and all HydroTracker records from Health Connect, then reset your profile. This action cannot be undone.</string>
     <!-- %1$d = number of entries exported -->
-    <string name="data_export_success">Exported %1$d entries</string>
+    <string name="data_export_success">%1$d Einträge exportiert</string>
     <!-- %1$s = error message -->
     <string name="data_export_failed">Export failed: %1$s</string>
     <!-- %1$d = imported count, %2$d = skipped count -->
-    <string name="data_import_success">Imported %1$d entries, skipped %2$d duplicates</string>
+    <string name="data_import_success">%1$d Einträge importiert, %2$d Duplikate übersprungen</string>
     <!-- %1$s = error message -->
     <string name="data_import_failed">Import failed: %1$s</string>
     <string name="data_delete_success">Data deleted successfully</string>
