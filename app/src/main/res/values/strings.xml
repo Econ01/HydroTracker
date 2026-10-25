@@ -98,6 +98,20 @@
     <string name="language_progress_header">Translation progress</string>
     <string name="language_progress_translated">Translated</string>
     <string name="language_progress_approved">Approved</string>
+    <string name="language_translators_header">Translators</string>
+    <string name="language_translators_description">All-time words translated on Crowdin</string>
+    <string name="language_proofreaders_header">Proofreaders</string>
+    <string name="language_proofreaders_description">All-time words approved on Crowdin</string>
+    <string name="language_other_contributors_header">Other contributors</string>
+    <string name="language_contributor_languages">%1$s. Languages: %2$s</string>
+    <plurals name="language_translator_words">
+        <item quantity="one">%1$s, %2$s word translated</item>
+        <item quantity="other">%1$s, %2$s words translated</item>
+    </plurals>
+    <plurals name="language_proofreader_words">
+        <item quantity="one">%1$s, %2$s word approved</item>
+        <item quantity="other">%1$s, %2$s words approved</item>
+    </plurals>
 
     <!-- Time format options -->
     <string name="time_format_system">System</string>

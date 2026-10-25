@@ -28,6 +28,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -39,6 +40,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
@@ -55,22 +57,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.text
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.presentation.common.BlurMorph
+import com.cemcakmak.hydrotracker.presentation.common.shapes.PillShape
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
+import com.cemcakmak.hydrotracker.ui.theme.extendedColorScheme
 import com.cemcakmak.hydrotracker.utils.AppLocale
 import org.json.JSONObject
-import androidx.core.net.toUri
-import com.cemcakmak.hydrotracker.ui.theme.extendedColorScheme
+import java.text.NumberFormat
 
 /** Per-language translation and approval percentages. */
 private data class LanguageProgress(
@@ -111,7 +121,76 @@ private fun loadTranslationProgress(context: android.content.Context): Translati
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+/** A language reported against a Crowdin contributor's activity. */
+private data class CrowdinLanguage(
+    val id: String,
+    val name: String
+)
+
+/** A Crowdin contributor and their all-time translation and proofreading activity. */
+private data class CrowdinContributor(
+    val username: String,
+    val languages: List<CrowdinLanguage>,
+    val translatedWords: Int,
+    val approvedWords: Int
+)
+
+private enum class CrowdinContributionType {
+    TRANSLATION,
+    PROOFREADING,
+    OTHER
+}
+
+private fun parseContributorLanguages(entry: JSONObject): List<CrowdinLanguage> {
+    val languages = entry.optJSONArray("languages") ?: return emptyList()
+    return buildList {
+        for (index in 0 until languages.length()) {
+            val language = languages.getJSONObject(index)
+            val id = language.optString("id")
+            if (id.isNotBlank()) {
+                add(
+                    CrowdinLanguage(
+                        id = id,
+                        name = language.optString("name").ifBlank { id }
+                    )
+                )
+            }
+        }
+    }.distinctBy { it.id }
+}
+
+/**
+ * Reads every contributor from `assets/translation_contributors.json`. Newer fields are optional
+ * so the previous asset remains usable while Crowdin's next export is pending.
+ */
+private fun loadCrowdinContributors(
+    context: android.content.Context
+): List<CrowdinContributor> {
+    return try {
+        val json = context.assets.open("translation_contributors.json")
+            .bufferedReader()
+            .use { it.readText() }
+        val contributors = JSONObject(json).getJSONArray("contributors")
+        buildList {
+            for (index in 0 until contributors.length()) {
+                val entry = contributors.getJSONObject(index)
+                add(
+                    CrowdinContributor(
+                        username = entry.optString("username").ifBlank {
+                            entry.getString("name")
+                        },
+                        languages = parseContributorLanguages(entry),
+                        translatedWords = entry.optInt("translatedWords"),
+                        approvedWords = entry.optInt("approvedWords")
+                    )
+                )
+            }
+        }
+    } catch (_: Exception) {
+        emptyList()
+    }
+}
+
 @Composable
 fun LanguageScreen(
     themePreferences: ThemePreferences = ThemePreferences(),
@@ -127,6 +206,8 @@ fun LanguageScreen(
         CrowdinSection()
 
         TranslationProgressSection()
+
+        CrowdinContributorSections()
     }
 }
 
@@ -343,6 +424,227 @@ private fun TranslationProgressSection() {
 }
 
 @Composable
+private fun CrowdinContributorSections() {
+    val context = LocalContext.current
+    val isPreview = LocalInspectionMode.current
+    val contributors = remember(context, isPreview) {
+        if (isPreview) previewCrowdinContributors else loadCrowdinContributors(context)
+    }
+    if (contributors.isEmpty()) return
+
+    CrowdinContributorSectionsContent(contributors = contributors)
+}
+
+@Composable
+private fun CrowdinContributorSectionsContent(
+    contributors: List<CrowdinContributor>
+) {
+    val translators = remember(contributors) {
+        contributors
+            .filter { it.translatedWords > 0 }
+            .sortedWith(
+                compareByDescending<CrowdinContributor> { it.translatedWords }
+                    .thenBy { it.username.lowercase() }
+            )
+    }
+    val proofreaders = remember(contributors) {
+        contributors
+            .filter { it.approvedWords > 0 }
+            .sortedWith(
+                compareByDescending<CrowdinContributor> { it.approvedWords }
+                    .thenBy { it.username.lowercase() }
+            )
+    }
+    val otherContributors = remember(contributors) {
+        contributors
+            .filter { it.translatedWords == 0 && it.approvedWords == 0 }
+            .sortedBy { it.username.lowercase() }
+    }
+
+    if (translators.isNotEmpty()) {
+        CrowdinContributorActivitySection(
+            title = stringResource(R.string.language_translators_header),
+            description = stringResource(R.string.language_translators_description),
+            contributors = translators,
+            contributionType = CrowdinContributionType.TRANSLATION
+        )
+    }
+    if (proofreaders.isNotEmpty()) {
+        CrowdinContributorActivitySection(
+            title = stringResource(R.string.language_proofreaders_header),
+            description = stringResource(R.string.language_proofreaders_description),
+            contributors = proofreaders,
+            contributionType = CrowdinContributionType.PROOFREADING
+        )
+    }
+    if (otherContributors.isNotEmpty()) {
+        CrowdinContributorActivitySection(
+            title = stringResource(R.string.language_other_contributors_header),
+            description = null,
+            contributors = otherContributors,
+            contributionType = CrowdinContributionType.OTHER
+        )
+    }
+}
+
+@Composable
+private fun CrowdinContributorActivitySection(
+    title: String,
+    description: String?,
+    contributors: List<CrowdinContributor>,
+    contributionType: CrowdinContributionType,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        SettingsSectionHeader(title)
+        description?.let {
+            Text(
+                text = it,
+                modifier = Modifier.padding(horizontal = 4.dp),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            itemVerticalAlignment = Alignment.CenterVertically
+        ) {
+            contributors.forEach { contributor ->
+                CrowdinContributorPill(
+                    contributor = contributor,
+                    contributionType = contributionType
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CrowdinContributorPill(
+    contributor: CrowdinContributor,
+    contributionType: CrowdinContributionType,
+    modifier: Modifier = Modifier
+) {
+    val wordCount = when (contributionType) {
+        CrowdinContributionType.TRANSLATION -> contributor.translatedWords
+        CrowdinContributionType.PROOFREADING -> contributor.approvedWords
+        CrowdinContributionType.OTHER -> null
+    }
+    val locale = LocalConfiguration.current.locales[0]
+    val formattedWordCount = remember(locale, wordCount) {
+        wordCount?.let { NumberFormat.getIntegerInstance(locale).format(it) }.orEmpty()
+    }
+    val activityLabel = when (contributionType) {
+        CrowdinContributionType.TRANSLATION -> pluralStringResource(
+            R.plurals.language_translator_words,
+            contributor.translatedWords,
+            contributor.username,
+            formattedWordCount
+        )
+        CrowdinContributionType.PROOFREADING -> pluralStringResource(
+            R.plurals.language_proofreader_words,
+            contributor.approvedWords,
+            contributor.username,
+            formattedWordCount
+        )
+        CrowdinContributionType.OTHER -> contributor.username
+    }
+    val containerColor = when (contributionType) {
+        CrowdinContributionType.TRANSLATION -> MaterialTheme.colorScheme.primaryContainer
+        CrowdinContributionType.PROOFREADING -> MaterialTheme.colorScheme.secondaryContainer
+        CrowdinContributionType.OTHER -> MaterialTheme.colorScheme.tertiaryContainer
+    }
+    val flags = remember(contributor.languages) {
+        // Keep one marker per language; distinct unknown languages may each need a globe.
+        contributor.languages.map { crowdinLanguageFlag(it.id) }
+    }
+    val languageNames = remember(contributor.languages) {
+        contributor.languages.map { language ->
+            resolveAppLanguageTag(language.id)
+                ?.let { AppLocale.displayName(it) }
+                ?: language.name
+        }
+    }
+    val accessibilityLabel = if (languageNames.isEmpty()) {
+        activityLabel
+    } else {
+        stringResource(
+            R.string.language_contributor_languages,
+            activityLabel,
+            languageNames.joinToString(", ")
+        )
+    }
+    val isElise = contributor.username == "elixe11"
+
+    Surface(
+        modifier = modifier.clearAndSetSemantics {
+            text = AnnotatedString(accessibilityLabel)
+        },
+        shape = PillShape,
+        color = containerColor
+    ) {
+        // Let content wrap below unusually long names instead of clipping either value.
+        FlowRow(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+            itemVerticalAlignment = Alignment.CenterVertically
+        ) {
+            if (flags.isNotEmpty()) {
+                Text(
+                    text = flags.joinToString(" "),
+                    style = MaterialTheme.typography.labelLarge,
+                    maxLines = 2
+                )
+            }
+            Text(
+                text = if (isElise) "elixe11🤍" else contributor.username,
+                style = MaterialTheme.typography.labelLarge,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            if (contributionType != CrowdinContributionType.OTHER) {
+                Text(
+                    text = formattedWordCount,
+                    style = MaterialTheme.typography.labelLargeEmphasized,
+                    maxLines = 1
+                )
+            }
+        }
+    }
+}
+
+private fun resolveAppLanguageTag(languageId: String): String? {
+    val normalizedId = languageId.replace('_', '-')
+    AppLocale.SUPPORTED_TAGS.firstOrNull { it.equals(normalizedId, ignoreCase = true) }?.let {
+        return it
+    }
+    if ('-' in normalizedId) return null
+
+    return AppLocale.SUPPORTED_TAGS.singleOrNull {
+        it.substringBefore('-').equals(normalizedId, ignoreCase = true)
+    }
+}
+
+private fun crowdinLanguageFlag(languageId: String): String {
+    val tag = resolveAppLanguageTag(languageId) ?: return "🌐"
+    val country = java.util.Locale.forLanguageTag(tag).country.uppercase(java.util.Locale.ROOT)
+    if (country.length != 2 || country.any { it !in 'A'..'Z' }) return "🌐"
+
+    return buildString {
+        country.forEach { letter ->
+            val regionalIndicator = 0x1F1E6 + (letter - 'A')
+            append(String(Character.toChars(regionalIndicator)))
+        }
+    }
+}
+
+@Composable
 private fun LegendItem(colour: Color, label: String) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -487,10 +789,82 @@ private fun LanguageBottomSheet(
     }
 }
 
+private val previewCrowdinContributors = listOf(
+    CrowdinContributor(
+        username = "avkurach",
+        languages = listOf(
+            CrowdinLanguage("ru", "Russian"),
+            CrowdinLanguage("de", "German")
+        ),
+        translatedWords = 2940,
+        approvedWords = 350
+    ),
+    CrowdinContributor(
+        username = "cccClyde",
+        languages = listOf(CrowdinLanguage("zh-CN", "Chinese Simplified")),
+        translatedWords = 2867,
+        approvedWords = 0
+    ),
+    CrowdinContributor(
+        username = "TytoAlbaGuttata",
+        languages = listOf(
+            CrowdinLanguage("tr", "Turkish"),
+            CrowdinLanguage("de", "German")
+        ),
+        translatedWords = 2840,
+        approvedWords = 120
+    ),
+    CrowdinContributor(
+        username = "zhx000",
+        languages = listOf(CrowdinLanguage("zh-CN", "Chinese Simplified")),
+        translatedWords = 1137,
+        approvedWords = 0
+    ),
+    CrowdinContributor(
+        username = "elixe11",
+        languages = listOf(
+            CrowdinLanguage("de", "German")
+        ),
+        translatedWords = 114,
+        approvedWords = 465
+    ),
+    CrowdinContributor(
+        username = "proofPilot",
+        languages = listOf(CrowdinLanguage("fr", "French")),
+        translatedWords = 0,
+        approvedWords = 640
+    ),
+    CrowdinContributor(
+        username = "singleWord",
+        languages = listOf(CrowdinLanguage("es", "Spanish")),
+        translatedWords = 1,
+        approvedWords = 0
+    ),
+    CrowdinContributor(
+        username = "quietVoter",
+        languages = listOf(CrowdinLanguage("pt", "Portuguese")),
+        translatedWords = 0,
+        approvedWords = 0
+    )
+)
+
 @Preview(showBackground = true)
 @Composable
 private fun LanguageScreenPreview() {
     HydroTrackerTheme {
         LanguageScreen()
+    }
+}
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 800)
+@Composable
+private fun CrowdinContributorSectionsPreview() {
+    HydroTrackerTheme {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            CrowdinContributorSectionsContent(contributors = previewCrowdinContributors)
+        }
     }
 }

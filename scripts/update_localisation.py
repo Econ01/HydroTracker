@@ -11,7 +11,7 @@ It performs four tasks:
    progress and supported-language list.
 3. Scans app/src/main/res/values-*/ for translation folders and keeps
    AppLocale.SUPPORTED_TAGS and res/xml/locales_config.xml in sync.
-4. Exports every Crowdin contributor with their all-time translated-word count.
+4. Exports every Crowdin contributor with their all-time activity and languages.
 
 Required environment variables:
     CROWDIN_PROJECT_ID  numeric Crowdin project id
@@ -115,6 +115,37 @@ def normalize_word_count(value: object) -> int:
     return int(count)
 
 
+def normalize_contributor_languages(value: object) -> list[dict]:
+    """Return de-duplicated language IDs and names from a Top Members entry."""
+    if value is None:
+        return []
+    if not isinstance(value, list):
+        raise ValueError("Crowdin returned invalid contributor languages")
+
+    languages: list[dict] = []
+    seen_ids: set[str] = set()
+    for language in value:
+        if not isinstance(language, dict):
+            raise ValueError("Crowdin returned an invalid contributor language")
+
+        language_id = str(language.get("id") or "").strip()
+        if not language_id:
+            raise ValueError("Crowdin returned a contributor language without an ID")
+        if language_id in seen_ids:
+            continue
+
+        seen_ids.add(language_id)
+        languages.append(
+            {
+                "id": language_id,
+                "name": str(language.get("name") or language_id).strip(),
+            }
+        )
+
+    languages.sort(key=lambda language: language["id"].casefold())
+    return languages
+
+
 def normalize_translation_contributors(entries: list[dict]) -> list[dict]:
     """Keep every report contributor and retain only the fields needed by the app."""
     contributors: list[dict] = []
@@ -134,15 +165,17 @@ def normalize_translation_contributors(entries: list[dict]) -> list[dict]:
                 "id": int(user["id"]),
                 "name": display_name,
                 "username": username,
+                "languages": normalize_contributor_languages(entry.get("languages")),
                 "translatedWords": normalize_word_count(entry["translated"]),
+                "approvedWords": normalize_word_count(entry["approved"]),
             }
         )
 
     contributors.sort(
         key=lambda contributor: (
             -contributor["translatedWords"],
-            contributor["name"].casefold(),
             contributor["username"].casefold(),
+            contributor["name"].casefold(),
         )
     )
     return contributors
