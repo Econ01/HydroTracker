@@ -91,20 +91,20 @@
     <string name="language_translators_header">Переводчики</string>
     <string name="language_translators_description">Переведено на платформе Crowdin</string>
     <string name="language_proofreaders_header">Корректоры</string>
-    <string name="language_proofreaders_description">Все слова одобрены на Crowdin</string>
+    <string name="language_proofreaders_description">Слова, одобренные на Crowdin, за все время</string>
     <string name="language_other_contributors_header">Другие участники</string>
     <string name="language_contributor_languages">%1$sЯзыки: %2$s</string>
     <plurals name="language_translator_words">
-        <item quantity="one">%1$s, %2$s word translated</item>
-        <item quantity="few">%1$s, %2$s words translated</item>
-        <item quantity="many">%1$s, %2$s words translated</item>
-        <item quantity="other">%1$s, %2$s words translated</item>
+        <item quantity="one">%1$s, %2$s слово переведено</item>
+        <item quantity="few">%1$s, %2$s слова переведены</item>
+        <item quantity="many">%1$s, %2$s слов переведено</item>
+        <item quantity="other">%1$s, %2$s слов переведено</item>
     </plurals>
     <plurals name="language_proofreader_words">
-        <item quantity="one">%1$s, %2$s word approved</item>
-        <item quantity="few">%1$s, %2$s words approved</item>
-        <item quantity="many">%1$s, %2$s words approved</item>
-        <item quantity="other">%1$s, %2$s words approved</item>
+        <item quantity="one">%1$s, %2$s слово одобрено</item>
+        <item quantity="few">%1$s, %2$s слова одобрено</item>
+        <item quantity="many">%1$s, %2$s слов одобрено</item>
+        <item quantity="other">%1$s, %2$s слов одобрено</item>
     </plurals>
     <!-- Time format options -->
     <string name="time_format_system">Как в системе</string>
