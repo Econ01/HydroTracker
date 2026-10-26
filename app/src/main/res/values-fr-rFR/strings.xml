@@ -55,12 +55,12 @@
          rendered inside the Glance widget.
          ============================================================================ -->
     <string name="widget_large_label">HydroTracker</string>
-    <string name="widget_large_description">Suivre l\'hydratation et ajouter de l\'eau en un clic</string>
-    <string name="widget_quick_add_label">HydroTracker — Ajout rapide</string>
-    <string name="widget_quick_add_description">Boutons redimensionnables pour ajouter de l’eau d’un geste</string>
-    <string name="widget_progress_cd">Hydratation quotidienne : %1$s</string>
+    <string name="widget_large_description">Adaptive hydration progress and quick-add actions</string>
+    <string name="widget_quick_add_label">HydroTracker Quick Add</string>
+    <string name="widget_quick_add_description">Resizable buttons for adding water with one tap</string>
     <string name="widget_of_goal_format">%1$s sur %2$s</string>
     <string name="widget_goal_reached">Objectif atteint !</string>
+    <string name="widget_progress_cd">Daily hydration: %1$s</string>
     <string name="widget_quick_add_cd">Ajouter %1$s</string>
     <string name="widget_daily_hydration">Hydratation quotidienne</string>
     <string name="widget_card_glass">Verre</string>
