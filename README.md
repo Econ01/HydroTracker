@@ -54,11 +54,10 @@
 - **Multi-App Support:** Import data from Samsung Health, Google Fit, Fitbit, Garmin, Strava, and other health apps (*As long as they use Health Connect API*)
 - **External Entry Management:** Identify and manage entries from different sources. The app can **read** messy data from other apps that you have
 
-### Home Screen Widget
-HydroTracker Large Widget (4x2):
-- Progress ring with quick-add action cards
-- Dynamic Theming
-- Real-Time Updates
+### Home Screen Widgets
+- **Adaptive Hydration Widget:** Progress ring for 1x1, linear progress for short sizes, and ring plus quick-add cards for larger sizes
+- **Quick Add Widget:** One to three resizable quick-action buttons using your pinned or most-used combinations
+- Dynamic theming, transparent/pure-colour backgrounds, and real-time updates shared by both widgets
 
 ### Smart Notifications
 - **Context-Aware Reminders:** Intelligent notifications that respect your sleep schedule

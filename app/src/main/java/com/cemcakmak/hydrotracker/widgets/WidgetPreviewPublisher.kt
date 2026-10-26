@@ -31,29 +31,37 @@ object WidgetPreviewPublisher {
      * that published an older revision re-publish once; the revision is only persisted on
      * success, so rate-limited attempts are retried on a later app launch.
      */
-    private const val PREVIEW_REVISION = 2
+    private const val PREVIEW_REVISION = 3
 
     private val receivers: List<KClass<out GlanceAppWidgetReceiver>> = listOf(
         HydroLargeWidget::class,
+        HydroQuickAddWidget::class,
     )
 
     suspend fun publishIfNeeded(context: Context, userRepository: UserRepository) {
         if (Build.VERSION.SDK_INT < 35) return
         val publishedRevision = userRepository.appPreferences.first().widgetPreviewRevision
         val manager = GlanceAppWidgetManager(context)
+        var allPublished = true
         receivers.forEach { receiver ->
             try {
                 val upToDate = publishedRevision >= PREVIEW_REVISION &&
                     hasGeneratedPreview(context, receiver)
                 if (upToDate) return@forEach
                 val result = manager.setWidgetPreviews(receiver)
-                if (result == GlanceAppWidgetManager.SET_WIDGET_PREVIEWS_RESULT_SUCCESS) {
-                    userRepository.updateWidgetPreviewRevision(PREVIEW_REVISION)
+                if (result != GlanceAppWidgetManager.SET_WIDGET_PREVIEWS_RESULT_SUCCESS) {
+                    allPublished = false
                 }
                 Log.d(TAG, "🖼️ Generated preview for ${receiver.simpleName}: result=$result")
             } catch (e: Exception) {
+                allPublished = false
                 Log.w(TAG, "⚠️ Failed to publish preview for ${receiver.simpleName}", e)
             }
+        }
+        // The revision is shared, so do not record it when only one provider succeeded. Otherwise,
+        // an older generated preview on the other provider would incorrectly count as up to date.
+        if (allPublished && publishedRevision < PREVIEW_REVISION) {
+            userRepository.updateWidgetPreviewRevision(PREVIEW_REVISION)
         }
     }
 

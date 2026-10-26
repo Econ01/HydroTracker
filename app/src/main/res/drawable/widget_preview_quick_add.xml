@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Static picker preview for the adaptive quick-actions widget on Android 14 and below.
+  Depicts the 180x180 default layout in the HYDRO light palette: header and three
+  quick-add cards. Rounded bars simulate text because vector drawables cannot render it.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="180dp"
+    android:height="180dp"
+    android:viewportWidth="180"
+    android:viewportHeight="180">
+
+    <path
+        android:pathData="M16,0 L164,0 Q180,0 180,16 L180,164 Q180,180 164,180 L16,180 Q0,180 0,164 L0,16 Q0,0 16,0 Z"
+        android:fillColor="#EAF7FF"/>
+
+    <!-- Header drop and app-name placeholder -->
+    <group
+        android:translateX="12"
+        android:translateY="8"
+        android:scaleX="0.014"
+        android:scaleY="0.014">
+        <path
+            android:pathData="M251.5,786Q160,692 160,552q0,-62 28,-124t70,-119q42,-57 91,-107t91,-87q8,-8 18.5,-11.5T480,100q11,0 21.5,3.5T520,115q42,37 91,87t91,107t70,119t28,124q0,140 -91.5,234T480,880q-137,0 -228.5,-94ZM491,760q12,-1 20.5,-9.5T520,730q0,-14 -9,-22.5t-23,-7.5q-41,3 -87,-22.5T343,585q-2,-11 -10.5,-18t-19.5,-7q-14,0 -23,10.5t-6,24.5q17,91 80,130t127,35Z"
+            android:fillColor="#0077BE"/>
+    </group>
+    <path
+        android:pathData="M31,15 L94,15"
+        android:strokeWidth="6"
+        android:strokeColor="#191C1E"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+
+    <!-- Quick-add card backgrounds -->
+    <path
+        android:pathData="M24,32 L156,32 Q168,32 168,44 L168,60 Q168,72 156,72 L24,72 Q12,72 12,60 L12,44 Q12,32 24,32 Z"
+        android:fillColor="#BFE4FF"/>
+    <path
+        android:pathData="M24,80 L156,80 Q168,80 168,92 L168,108 Q168,120 156,120 L24,120 Q12,120 12,108 L12,92 Q12,80 24,80 Z"
+        android:fillColor="#D6E4F0"/>
+    <path
+        android:pathData="M24,128 L156,128 Q168,128 168,140 L168,156 Q168,168 156,168 L24,168 Q12,168 12,156 L12,140 Q12,128 24,128 Z"
+        android:fillColor="#E5D9F8"/>
+
+    <!-- Icon pills -->
+    <path
+        android:pathData="M28,38 L38,38 Q48,38 48,52 Q48,66 38,66 L28,66 Q18,66 18,52 Q18,38 28,38 Z"
+        android:fillColor="#0077BE"/>
+    <path
+        android:pathData="M28,86 L38,86 Q48,86 48,100 Q48,114 38,114 L28,114 Q18,114 18,100 Q18,86 28,86 Z"
+        android:fillColor="#445E75"/>
+    <path
+        android:pathData="M28,134 L38,134 Q48,134 48,148 Q48,162 38,162 L28,162 Q18,162 18,148 Q18,134 28,134 Z"
+        android:fillColor="#6B4FA3"/>
+
+    <!-- White add glyphs -->
+    <path
+        android:pathData="M33,44 L33,60 M25,52 L41,52 M33,92 L33,108 M25,100 L41,100 M33,140 L33,156 M25,148 L41,148"
+        android:strokeWidth="3"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+
+    <!-- Label and amount placeholders -->
+    <path
+        android:pathData="M58,43 L112,43 M58,58 L91,58 M58,91 L112,91 M58,106 L91,106 M58,139 L112,139 M58,154 L91,154"
+        android:strokeWidth="6"
+        android:strokeColor="#27333D"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+</vector>
