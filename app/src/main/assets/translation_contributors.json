@@ -126,6 +126,19 @@
       "approvedWords": 476
     },
     {
+      "id": 17914089,
+      "name": "centuriofortis",
+      "username": "centuriofortis",
+      "languages": [
+        {
+          "id": "ru",
+          "name": "Russian"
+        }
+      ],
+      "translatedWords": 70,
+      "approvedWords": 0
+    },
+    {
       "id": 17817915,
       "name": "Mehmet Akif Sağır (mehmetakifsagir2283)",
       "username": "mehmetakifsagir2283",
