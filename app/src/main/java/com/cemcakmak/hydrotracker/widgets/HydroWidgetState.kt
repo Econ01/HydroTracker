@@ -8,6 +8,10 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.glance.GlanceId
+import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.state.getAppWidgetState
+import androidx.glance.appwidget.state.updateAppWidgetState
 import com.cemcakmak.hydrotracker.data.database.DatabaseInitializer
 import com.cemcakmak.hydrotracker.data.database.dao.MostUsedQuickAddCombo
 import com.cemcakmak.hydrotracker.data.models.BeverageType
@@ -63,7 +67,7 @@ private val KEY_TRANSPARENT_BG = booleanPreferencesKey("hydro_widget_transparent
 private val KEY_PURE_BLACK = booleanPreferencesKey("hydro_widget_pure_black")
 private val KEY_PURE_WHITE = booleanPreferencesKey("hydro_widget_pure_white")
 
-/** Number of quick-add cards on the Large widget. */
+/** Shared quick-add capacity mirrored into both home-screen widget providers. */
 internal const val QUICK_ADD_SLOT_COUNT = 3
 
 // Quick-add card slots: the user's top (container, volume, beverage) combos by entry count.
@@ -128,6 +132,26 @@ fun Preferences.toHydroWidgetState(): HydroWidgetState {
         usePureWhite = this[KEY_PURE_WHITE] ?: empty.usePureWhite,
     )
 }
+
+/**
+ * Populates a newly placed instance before its first composition. Existing instances deliberately
+ * skip this load: their state remains owned by [HydroWidgetUpdater], so live sessions cannot capture
+ * repository data and later republish it stale. The returned snapshot is used only until the active
+ * session observes a real preferences write; afterwards `currentState` remains authoritative.
+ */
+internal suspend fun GlanceAppWidget.initialiseHydroWidgetState(
+    context: Context,
+    id: GlanceId,
+): HydroWidgetState? {
+    val preferences: Preferences = getAppWidgetState(context, id)
+    if (preferences.hasHydroWidgetState()) return null
+    val state = HydroWidgetStateLoader.load(context)
+    updateAppWidgetState(context, id) { prefs -> state.writeTo(prefs) }
+    return state
+}
+
+/** Whether this store contains a snapshot rather than Glance's initial empty preferences. */
+internal fun Preferences.hasHydroWidgetState(): Boolean = this[KEY_CURRENT_INTAKE] != null
 
 /**
  * Loads the current [HydroWidgetState] from the repositories.

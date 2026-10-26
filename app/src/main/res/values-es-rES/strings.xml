@@ -54,8 +54,11 @@
          android:label value shown in the home-screen widget picker, plus the text
          rendered inside the Glance widget.
          ============================================================================ -->
-    <string name="widget_large_label">HydroTracker Grande</string>
+    <string name="widget_large_label">HydroTracker</string>
     <string name="widget_large_description">Registra tu hidratación y añade agua con solo un toque</string>
+    <string name="widget_quick_add_label">HydroTracker — Añadir rápido</string>
+    <string name="widget_quick_add_description">Botones redimensionables para añadir agua con un toque</string>
+    <string name="widget_progress_cd">Hidratación diaria: %1$s</string>
     <string name="widget_of_goal_format">%1$s de %2$s</string>
     <string name="widget_goal_reached">¡Objetivo alcanzado!</string>
     <string name="widget_quick_add_cd">Añadir %1$s</string>

@@ -7,14 +7,13 @@ import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.appwidget.updateAll
 
 /**
- * Pushes fresh content to the HydroTracker home-screen widget.
+ * Pushes fresh content to every HydroTracker home-screen widget.
  * Called from the data layer (e.g. [com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository])
  * whenever hydration data changes. Never throws — widget updates must not break app flows.
  *
- * The latest snapshot is mirrored into each widget's Glance preferences *before* the update is
- * requested. A live Glance session recomposes from that state store on every update, so this
- * ordering is what guarantees the UI renders current data (a bare `updateAll` would recompose
- * whatever the session had already captured).
+ * One snapshot is mirrored into every hydration and quick-actions instance before either provider
+ * is refreshed. A live Glance session recomposes from that state store on every update, so this
+ * ordering guarantees current data even when only the quick-actions provider is placed.
  */
 object HydroWidgetUpdater {
 
@@ -22,16 +21,26 @@ object HydroWidgetUpdater {
 
     suspend fun updateAll(context: Context) {
         try {
-            val glanceIds = GlanceAppWidgetManager(context)
-                .getGlanceIds(HydroLargeGlanceWidget::class.java)
-            if (glanceIds.isEmpty()) return
+            val manager = GlanceAppWidgetManager(context)
+            val hydrationIds = manager.getGlanceIds(HydroLargeGlanceWidget::class.java)
+            val quickAddIds = manager.getGlanceIds(HydroQuickAddGlanceWidget::class.java)
+            if (hydrationIds.isEmpty() && quickAddIds.isEmpty()) return
+
             val state = HydroWidgetStateLoader.load(context)
-            glanceIds.forEach { glanceId ->
+            (hydrationIds + quickAddIds).forEach { glanceId ->
                 updateAppWidgetState(context, glanceId) { prefs -> state.writeTo(prefs) }
             }
-            HydroLargeGlanceWidget().updateAll(context)
+
+            val widgets = listOf(HydroLargeGlanceWidget(), HydroQuickAddGlanceWidget())
+            widgets.forEach { widget ->
+                try {
+                    widget.updateAll(context)
+                } catch (e: Exception) {
+                    Log.w(TAG, "⚠️ Failed to refresh ${widget.javaClass.simpleName}", e)
+                }
+            }
         } catch (e: Exception) {
-            Log.w(TAG, "⚠️ Failed to update large widget", e)
+            Log.w(TAG, "⚠️ Failed to update home-screen widgets", e)
         }
     }
 }

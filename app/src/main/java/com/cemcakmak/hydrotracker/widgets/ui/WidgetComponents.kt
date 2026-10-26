@@ -31,10 +31,17 @@ import androidx.glance.background
 import androidx.glance.color.ColorProvider
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
+import androidx.glance.layout.Row
+import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.height
 import androidx.glance.layout.size
+import androidx.glance.layout.width
 import androidx.glance.preview.ExperimentalGlancePreviewApi
 import androidx.glance.preview.Preview
+import androidx.glance.semantics.contentDescription
+import androidx.glance.semantics.semantics
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
@@ -99,6 +106,74 @@ private fun Context.withNightMode(night: Boolean): Context {
     config.uiMode = (config.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or
         if (night) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO
     return createConfigurationContext(config)
+}
+
+/** Total space occupied by the standard [WidgetHeader] and the spacer below it. */
+internal val WIDGET_HEADER_BLOCK = 24.dp
+
+/** Total space occupied by a compact [WidgetHeader] and its smaller spacer. */
+internal val WIDGET_COMPACT_HEADER_BLOCK = 18.dp
+
+/** The shared drop icon and app-name header, with a compact variant for one-row widgets. */
+@Composable
+internal fun WidgetHeader(compact: Boolean = false) {
+    Row(verticalAlignment = Alignment.Vertical.CenterVertically) {
+        Image(
+            provider = ImageProvider(R.drawable.water_drop_filled),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(GlanceTheme.colors.secondary),
+            modifier = GlanceModifier.size(if (compact) 14.dp else 16.dp),
+        )
+        Spacer(GlanceModifier.width(if (compact) 4.dp else 5.dp))
+        Text(
+            text = LocalContext.current.getString(R.string.app_name),
+            style = TextStyle(
+                color = GlanceTheme.colors.secondary,
+                fontSize = if (compact) 11.sp else 12.sp,
+            ),
+            maxLines = 1,
+        )
+    }
+}
+
+/**
+ * A determinate linear hydration bar. Glance's stock linear indicator is indeterminate-only, so
+ * this uses two rounded boxes for the track and filled portion instead.
+ */
+@Composable
+internal fun LinearHydrationProgress(
+    state: HydroWidgetState,
+    width: Dp,
+    modifier: GlanceModifier = GlanceModifier,
+    height: Dp = 12.dp,
+) {
+    val context = LocalContext.current
+    val percent = (state.progress * 100).toInt().coerceIn(0, 100)
+    val progressColour = if (state.isGoalAchieved) {
+        HydroWidgetColors.success(context, state.useDynamicColors)
+    } else {
+        GlanceTheme.colors.primary
+    }
+    Box(
+        modifier = modifier
+            .width(width)
+            .height(height)
+            .background(GlanceTheme.colors.primaryContainer)
+            .cornerRadius(height / 2)
+            .semantics {
+                contentDescription = context.getString(R.string.widget_progress_cd, "$percent%")
+            },
+    ) {
+        if (state.progress > 0f) {
+            Box(
+                modifier = GlanceModifier
+                    .width(width * state.progress.coerceIn(0f, 1f))
+                    .fillMaxHeight()
+                    .background(progressColour)
+                    .cornerRadius(height / 2),
+            ) {}
+        }
+    }
 }
 
 /**
@@ -291,6 +366,7 @@ fun ProgressRing(
     state: HydroWidgetState,
     size: Dp,
     strokeWidth: Dp,
+    modifier: GlanceModifier = GlanceModifier,
     arcTitle: String? = null,
     arcSubtitle: String? = null,
     centreContent: @GlanceComposable @Composable () -> Unit,
@@ -309,7 +385,18 @@ fun ProgressRing(
         GlanceTheme.colors.primary.getColor(context)
     }
 
-    val bitmap = remember(size, strokeWidth, state.progress, state.isGoalAchieved, arcTitle, arcSubtitle) {
+    val bitmap = remember(
+        size,
+        strokeWidth,
+        state.progress,
+        state.isGoalAchieved,
+        ringColour,
+        trackColour,
+        arcTitle,
+        arcTitleColour,
+        arcSubtitle,
+        arcSubtitleColour,
+    ) {
         WidgetRingRenderer.createRingBitmap(
             context = context,
             sizeDp = size,
@@ -325,7 +412,7 @@ fun ProgressRing(
     }
 
     Box(
-        modifier = GlanceModifier.size(size),
+        modifier = modifier.size(size),
         contentAlignment = Alignment.Center,
     ) {
         Image(

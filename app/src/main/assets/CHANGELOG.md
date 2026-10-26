@@ -1,3 +1,11 @@
+[1.7]
+Added
+- Adaptive home-screen widgets: the hydration widget now reshapes its progress and quick-add UI from 1x1 upwards, and a separate quick-add widget provides one to three actions without a progress display
+- Localization contributors are listed in the language selection settings page
+
+Fixed
+- Fixed custom beverages added from a home-screen widget being logged as water
+
 [1.6]
 Added
 - Battery optimization prompt in Notifications settings: if your device is delaying or stopping reminders to save power, HydroTracker now lets you know and offers a one-tap fix

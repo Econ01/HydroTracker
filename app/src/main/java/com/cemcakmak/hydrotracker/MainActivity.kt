@@ -32,8 +32,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import androidx.datastore.preferences.core.mutablePreferencesOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 import androidx.navigation3.runtime.entryProvider
@@ -52,6 +54,8 @@ import com.cemcakmak.hydrotracker.data.models.BeveragePreferences
 import com.cemcakmak.hydrotracker.data.models.ContainerPreset
 import com.cemcakmak.hydrotracker.data.models.VolumeUnit
 import com.cemcakmak.hydrotracker.data.models.WidgetPreferences
+import com.cemcakmak.hydrotracker.widgets.HydroWidgetStateLoader
+import com.cemcakmak.hydrotracker.widgets.writeTo
 import androidx.navigationevent.NavigationEvent
 import com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository
 import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
@@ -278,22 +282,39 @@ class MainActivity : ComponentActivity() {
 
     /**
      * Debug-only helper: triggers the system widget pin dialogue for the widget named in the
-     * `debug_pin_widget` extra ("large"). Used for emulator UI testing.
+     * `debug_pin_widget` extra ("large" or "quick_add"). Used for emulator UI testing.
      */
     private fun handleDebugPinIntent(intent: android.content.Intent) {
         intent.getStringExtra("debug_pin_widget")?.let { name ->
             val receiver = when (name.lowercase()) {
                 "large" -> com.cemcakmak.hydrotracker.widgets.HydroLargeWidget::class.java
+                "quick_add" -> com.cemcakmak.hydrotracker.widgets.HydroQuickAddWidget::class.java
                 else -> null
             }
             val preview = when (name.lowercase()) {
                 "large" -> com.cemcakmak.hydrotracker.widgets.HydroLargeGlanceWidget()
+                "quick_add" -> com.cemcakmak.hydrotracker.widgets.HydroQuickAddGlanceWidget()
                 else -> null
             }
-            if (receiver != null) {
+            val previewSize = when (name.lowercase()) {
+                "large" -> DpSize(330.dp, 180.dp)
+                "quick_add" -> DpSize(180.dp, 180.dp)
+                else -> null
+            }
+            if (receiver != null && preview != null && previewSize != null) {
                 lifecycleScope.launch {
+                    // Pin previews use an invalid, unbound widget ID. Supply fresh state explicitly
+                    // rather than reusing that ID's cached preferences from an earlier dialogue.
+                    val previewState = mutablePreferencesOf().apply {
+                        HydroWidgetStateLoader.load(applicationContext).writeTo(this)
+                    }
                     val pinned = androidx.glance.appwidget.GlanceAppWidgetManager(applicationContext)
-                        .requestPinGlanceAppWidget(receiver, preview)
+                        .requestPinGlanceAppWidget(
+                            receiver = receiver,
+                            preview = preview,
+                            previewSize = previewSize,
+                            previewState = previewState,
+                        )
                     android.util.Log.d("MainActivity", "📌 Pin request for $name widget: $pinned")
                 }
             }

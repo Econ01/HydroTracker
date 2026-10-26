@@ -54,8 +54,11 @@
          android:label value shown in the home-screen widget picker, plus the text
          rendered inside the Glance widget.
          ============================================================================ -->
-    <string name="widget_large_label">大尺寸 HydroTracker</string>
+    <string name="widget_large_label">HydroTracker</string>
     <string name="widget_large_description">跟踪饮水习惯，一键添加饮水记录</string>
+    <string name="widget_quick_add_label">HydroTracker — 快速添加</string>
+    <string name="widget_quick_add_description">可调整大小的按钮，轻点即可添加饮水</string>
+    <string name="widget_progress_cd">每日饮水量：%1$s</string>
     <string name="widget_of_goal_format">%2$s 中的 %1$s</string>
     <string name="widget_goal_reached">达成目标！</string>
     <string name="widget_quick_add_cd">添加 %1$s</string>

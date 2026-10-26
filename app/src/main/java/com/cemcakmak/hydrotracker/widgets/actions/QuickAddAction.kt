@@ -12,7 +12,7 @@ import com.cemcakmak.hydrotracker.data.repository.UserRepository
 import kotlinx.coroutines.flow.first
 
 /**
- * Handles quick-add taps from the Large widget: writes the intake entry to the database.
+ * Handles quick-add taps from either home-screen widget: writes the intake entry to the database.
  * [com.cemcakmak.hydrotracker.data.database.repository.WaterIntakeRepository.addWaterIntake]
  * refreshes every widget (and Health Connect) after the write, so no explicit widget
  * update is needed here.
