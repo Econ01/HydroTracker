@@ -23,8 +23,8 @@
     <text x="612" y="225" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">99%</text>
     <text x="20" y="265" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">Spanish</text>
     <rect x="220" y="251" width="380" height="18" rx="4" fill="#e0e0e0"/>
-    <rect x="220" y="251" width="91" height="18" rx="4" fill="#008080"/>
-    <text x="612" y="265" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">24%</text>
+    <rect x="220" y="251" width="121" height="18" rx="4" fill="#008080"/>
+    <text x="612" y="265" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">32%</text>
     <text x="20" y="305" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" fill="#333333">Turkish</text>
     <rect x="220" y="291" width="380" height="18" rx="4" fill="#e0e0e0"/>
     <rect x="220" y="291" width="30" height="18" rx="4" fill="#008080"/>
