@@ -93,8 +93,8 @@
     <string name="language_progress_approved">Aprobado</string>
     <string name="language_translators_header">Traductores</string>
     <string name="language_translators_description">All-time words translated on Crowdin</string>
-    <string name="language_proofreaders_header">Proofreaders</string>
-    <string name="language_proofreaders_description">All-time words approved on Crowdin</string>
+    <string name="language_proofreaders_header">Correctores</string>
+    <string name="language_proofreaders_description">Todas las palabras aprobadas en Crowdin</string>
     <string name="language_other_contributors_header">Otros colaboradores</string>
     <string name="language_contributor_languages">%1$s. Idiomas: %2$s</string>
     <plurals name="language_translator_words">
@@ -359,7 +359,7 @@
     <string name="notif_troubleshooting_desc">Algunos dispositivos restringen agresivamente las aplicaciones, vea arreglos específicos del dispositivo</string>
     <string name="notif_reminder_style_header">Estilo de Recordatorio</string>
     <!-- Short reminder-style labels shown on the toggle buttons -->
-    <string name="notif_style_gentle_short">Gentle</string>
+    <string name="notif_style_gentle_short">Gentil</string>
     <string name="notif_style_motivating_short">Energético</string>
     <string name="notif_style_minimal_short">Simple</string>
     <string name="notif_active_hours_header">Horas activas</string>
@@ -587,132 +587,132 @@
         <item quantity="one">%1$d entry recorded on or before %2$s will be permanently deleted.</item>
         <item quantity="other">%1$d entries recorded on or before %2$s will be permanently deleted.</item>
     </plurals>
-    <string name="data_delete_local_title">Delete local data only</string>
-    <string name="data_delete_local_desc">Remove all app data stored on this device</string>
-    <string name="data_delete_local_message">This will delete all water intake entries, daily summaries, container presets, custom beverages, and your profile. This action cannot be undone.</string>
-    <string name="data_delete_health_connect_title">Delete Health Connect data only</string>
-    <string name="data_delete_health_connect_desc">Remove HydroTracker records from Health Connect</string>
+    <string name="data_delete_local_title">Borrar sólo datos locales</string>
+    <string name="data_delete_local_desc">Eliminar todos los datos de la aplicación almacenados en este dispositivo</string>
+    <string name="data_delete_local_message">Esto eliminará todas las entradas de entrada de agua, sumarios diarios, preajustes de contenedores, bebidas personalizadas y tu perfil. Esta acción no se puede deshacer.</string>
+    <string name="data_delete_health_connect_title">Borrar sólo datos de Health Connect</string>
+    <string name="data_delete_health_connect_desc">Eliminar registros de HydroTracker de Health Connect</string>
     <string name="data_delete_health_connect_message">This will delete HydroTracker records from Health Connect. Entries from other apps will not be affected. This action cannot be undone.</string>
-    <string name="data_delete_everything_title">Delete everything</string>
-    <string name="data_delete_everything_desc">Remove all local and Health Connect data</string>
+    <string name="data_delete_everything_title">Eliminar todo</string>
+    <string name="data_delete_everything_desc">Eliminar todos los datos locales y de Health Connect</string>
     <string name="data_delete_everything_message">This will delete all local data and all HydroTracker records from Health Connect, then reset your profile. This action cannot be undone.</string>
     <!-- %1$d = number of entries exported -->
-    <string name="data_export_success">Exported %1$d entries</string>
+    <string name="data_export_success">Se exportaron %1$d entradas</string>
     <!-- %1$s = error message -->
-    <string name="data_export_failed">Export failed: %1$s</string>
+    <string name="data_export_failed">Error al exportar: %1$s</string>
     <!-- %1$d = imported count, %2$d = skipped count -->
-    <string name="data_import_success">Imported %1$d entries, skipped %2$d duplicates</string>
+    <string name="data_import_success">Entradas importadas %1$d , omitidas %2$d duplicados</string>
     <!-- %1$s = error message -->
-    <string name="data_import_failed">Import failed: %1$s</string>
-    <string name="data_delete_success">Data deleted successfully</string>
+    <string name="data_import_failed">Importación fallida: %1$s</string>
+    <string name="data_delete_success">¡Los datos se han eliminado correctamente!</string>
     <!-- %1$s = error message -->
-    <string name="data_delete_failed">Delete failed: %1$s</string>
+    <string name="data_delete_failed">Error al eliminar: %1$s</string>
     <!-- ============================================================================
          Health Connect status & badges
          ============================================================================ -->
     <string name="hc_status_error">Error: %1$s</string>
-    <string name="hc_badge_hidden">Hidden</string>
+    <string name="hc_badge_hidden">Oculto</string>
     <!-- ============================================================================
          About
          ============================================================================ -->
     <string name="app_tagline">Open source water intake tracker.</string>
-    <string name="label_version">Version: %1$s</string>
-    <string name="label_build_number">Build Number: %1$d</string>
-    <string name="about_section_contributors">Contributors</string>
-    <string name="about_contributor_role">Creator &amp; maintainer</string>
-    <string name="about_contributor_bio">Indie Android developer focused on clean, privacy-respecting apps.</string>
-    <string name="about_contributor_role_contributor">Contributor</string>
-    <string name="cd_open_github_profile">Open GitHub profile</string>
-    <string name="about_section_information">Information</string>
-    <string name="about_changelog">Changelog</string>
-    <string name="about_changelog_desc">What\'s new in each version</string>
-    <string name="about_sources">Sources &amp; Research</string>
-    <string name="about_sources_desc">Scientific sources behind the app</string>
-    <string name="about_privacy_policy">Privacy Policy</string>
-    <string name="about_privacy_policy_desc">How your data is handled</string>
-    <string name="about_license">License</string>
-    <string name="about_license_desc">HydroTracker\'s open-source license</string>
-    <string name="about_third_party_licenses">Third-party licenses</string>
-    <string name="about_third_party_licenses_desc">Open-source libraries we depend on</string>
-    <string name="toast_no_app_to_open_link">No app found to open this link</string>
+    <string name="label_version">Versión: %1$s</string>
+    <string name="label_build_number">Build: %1$d</string>
+    <string name="about_section_contributors">Colaboradores</string>
+    <string name="about_contributor_role">Creador &amp; desarrollador</string>
+    <string name="about_contributor_bio">Desarrollador Indie Android centrado en aplicaciones limpias y respetuosas con la privacidad.</string>
+    <string name="about_contributor_role_contributor">Colaborador</string>
+    <string name="cd_open_github_profile">Abrir perfil de GitHub</string>
+    <string name="about_section_information">Información</string>
+    <string name="about_changelog">Registro de cambios</string>
+    <string name="about_changelog_desc">Novedades en cada versión</string>
+    <string name="about_sources">Fuentes &amp; Investigación</string>
+    <string name="about_sources_desc">Fuentes científicas detrás de la aplicación</string>
+    <string name="about_privacy_policy">Política de Privacidad</string>
+    <string name="about_privacy_policy_desc">Cómo se manejan tus datos</string>
+    <string name="about_license">Licencia</string>
+    <string name="about_license_desc">Licencia de código abierto de HydroTracker</string>
+    <string name="about_third_party_licenses">Licencias de terceros</string>
+    <string name="about_third_party_licenses_desc">Bibliotecas de código abierto de las que dependemos</string>
+    <string name="toast_no_app_to_open_link">No se encontró ninguna aplicación para abrir este enlace</string>
     <!-- ============================================================================
          Support Development
          ============================================================================ -->
-    <string name="support_development_hero">HydroTracker is built and maintained by one person, with no ads and no tracking. If it has helped you drink more water, anything you chip in keeps it growing.</string>
-    <string name="support_section_support">Support development</string>
-    <string name="support_github_sponsors_blurb">Support ongoing development</string>
-    <string name="support_paypal_blurb">Send a quick donation</string>
-    <string name="support_buymeacoffee_blurb">Treat me to a coffee</string>
-    <string name="support_section_other_ways">Other ways to help</string>
-    <string name="support_rate_play_store">Rate on Google Play</string>
-    <string name="support_rate_play_store_desc">Leave a rating on the Play Store</string>
-    <string name="support_share_app">Share the app</string>
-    <string name="support_share_app_desc">Tell a friend about HydroTracker</string>
+    <string name="support_development_hero">HydroTracker está construido y mantenido por una persona, sin anuncios ni seguimiento. Si le ha ayudado a beber más agua, cualquier pequeña ayuda lo mantiene creciendo.</string>
+    <string name="support_section_support">Apoyar el desarrollo</string>
+    <string name="support_github_sponsors_blurb">Apoyo al desarrollo en curso</string>
+    <string name="support_paypal_blurb">Enviar una donación rápida</string>
+    <string name="support_buymeacoffee_blurb">Invítame un café</string>
+    <string name="support_section_other_ways">Otros modos de ayudar</string>
+    <string name="support_rate_play_store">Valorar en Google Play</string>
+    <string name="support_rate_play_store_desc">Deja una calificación en Play Store</string>
+    <string name="support_share_app">Compartir la aplicación</string>
+    <string name="support_share_app_desc">Cuenta a un amigo sobre HydroTracker</string>
     <string name="support_star_github">Star on GitHub</string>
     <string name="support_star_github_desc">Star the project on GitHub</string>
-    <string name="share_chooser_title">Share HydroTracker</string>
-    <string name="toast_review_successful">Review is successful</string>
-    <string name="toast_review_failed">Review failed</string>
-    <string name="toast_no_app_to_share">No app found to share</string>
+    <string name="share_chooser_title">Compartir HydroTracker</string>
+    <string name="toast_review_successful">Revisión exitosa</string>
+    <string name="toast_review_failed">Revisión fallida</string>
+    <string name="toast_no_app_to_share">Aplicación no encontrada para compartir</string>
     <!-- ============================================================================
          Updates
          ============================================================================ -->
-    <string name="screen_updates_title">Updates</string>
-    <string name="updates_section_auto_update">Auto Update</string>
-    <string name="updates_toggle_auto_check">Check automatically</string>
-    <string name="updates_toggle_auto_check_desc">Look for updates about once a day</string>
-    <string name="updates_section_status">Status</string>
-    <string name="updates_status_checking">Checking for updates…</string>
-    <string name="updates_status_failed">Couldn\'t check for updates</string>
-    <string name="updates_status_f_droid">Updates are handled by F-Droid</string>
-    <string name="updates_status_f_droid_desc">Open the F-Droid app to update HydroTracker.</string>
-    <string name="updates_status_up_to_date">You\'re on the latest version</string>
-    <string name="updates_status_check_now">Check for updates</string>
-    <string name="updates_last_checked_never">Not checked yet</string>
-    <string name="updates_last_checked">Last checked %1$s</string>
-    <string name="updates_button_check_now">Check now</string>
-    <string name="updates_button_checking">Checking…</string>
-    <string name="updates_button_restart_install">Restart to install</string>
-    <string name="updates_available_title">Update available</string>
-    <string name="updates_available_play_desc">A new version is available on Google Play</string>
-    <string name="updates_available_version">Version %1$s</string>
-    <string name="updates_button_update">Update</string>
-    <string name="updates_button_download">Download update</string>
-    <string name="label_version_simple">Version</string>
+    <string name="screen_updates_title">Actualizaciones</string>
+    <string name="updates_section_auto_update">Actualización automática</string>
+    <string name="updates_toggle_auto_check">Comprobar automáticamente</string>
+    <string name="updates_toggle_auto_check_desc">Buscar actualizaciones una vez al día</string>
+    <string name="updates_section_status">Estado</string>
+    <string name="updates_status_checking">Buscando actualizaciones…</string>
+    <string name="updates_status_failed">No se pudieron comprobar actualizaciones</string>
+    <string name="updates_status_f_droid">Las actualizaciones son manejadas por F-Droid</string>
+    <string name="updates_status_f_droid_desc">Abre la aplicación F-Droid para actualizar HydroTracker.</string>
+    <string name="updates_status_up_to_date">Ya tienes la versión más reciente</string>
+    <string name="updates_status_check_now">Buscar actualizaciones</string>
+    <string name="updates_last_checked_never">Aún no comprobado</string>
+    <string name="updates_last_checked">Última comprobación hace %1$s</string>
+    <string name="updates_button_check_now">Comprobar ahora</string>
+    <string name="updates_button_checking">Comprobando…</string>
+    <string name="updates_button_restart_install">Reiniciar para instalar</string>
+    <string name="updates_available_title">Actualización disponible</string>
+    <string name="updates_available_play_desc">Una nueva versión está disponible en Google Play</string>
+    <string name="updates_available_version">Versión %1$s</string>
+    <string name="updates_button_update">Actualización</string>
+    <string name="updates_button_download">Descargar actualización</string>
+    <string name="label_version_simple">Versión</string>
     <string name="label_build_simple">Build</string>
-    <string name="label_install_method">Install Method</string>
-    <string name="label_source">Source</string>
+    <string name="label_install_method">Método de instalación</string>
+    <string name="label_source">Fuente</string>
     <string name="install_source_manual">Manual</string>
     <string name="install_source_debug">Debug</string>
     <string name="install_source_github">GitHub</string>
-    <string name="toast_could_not_start_update">Couldn\'t start the update</string>
+    <string name="toast_could_not_start_update">No se ha podido iniciar la actualización</string>
     <!-- ============================================================================
          Licenses
          ============================================================================ -->
-    <string name="screen_licenses_title">Third-party licenses</string>
-    <string name="licenses_empty">No licence information available.</string>
+    <string name="screen_licenses_title">Licencias de terceros</string>
+    <string name="licenses_empty">No hay información disponible de licencia.</string>
     <!-- ============================================================================
          What\'s New / Update Dialog
          ============================================================================ -->
-    <string name="whats_new_title">What\'s New</string>
-    <string name="whats_new_version">Version %1$s</string>
-    <string name="update_dialog_title">Update Available</string>
-    <string name="update_dialog_current_version">Current version</string>
-    <string name="update_dialog_new_version">New version</string>
-    <string name="update_dialog_action_play">Open Google Play to update HydroTracker.</string>
-    <string name="update_dialog_action_f_droid">Open the F-Droid app to update HydroTracker.</string>
-    <string name="update_dialog_action_github">Download the latest APK from GitHub.</string>
-    <string name="update_button_later">Later</string>
-    <string name="update_button_update">Update</string>
+    <string name="whats_new_title">Novedades</string>
+    <string name="whats_new_version">Versión %1$s</string>
+    <string name="update_dialog_title">Actualización disponible</string>
+    <string name="update_dialog_current_version">Versión actual</string>
+    <string name="update_dialog_new_version">Nueva versión</string>
+    <string name="update_dialog_action_play">Abre Google Play para actualizar HydroTracker.</string>
+    <string name="update_dialog_action_f_droid">Abre la aplicación F-Droid para actualizar HydroTracker.</string>
+    <string name="update_dialog_action_github">Descargue el APK más reciente de GitHub.</string>
+    <string name="update_button_later">Después</string>
+    <string name="update_button_update">Actualizar</string>
     <!-- ============================================================================
          Markdown components
          ============================================================================ -->
-    <string name="markdown_loading">Loading…</string>
-    <string name="markdown_error_loading">Error loading %1$s: %2$s</string>
-    <string name="markdown_version_prefix">Version %1$s</string>
-    <string name="markdown_section_added">Added</string>
-    <string name="markdown_section_changed">Changed</string>
-    <string name="markdown_section_fixed">Fixed</string>
+    <string name="markdown_loading">Cargando…</string>
+    <string name="markdown_error_loading">Error al cargar %1$s: %2$s</string>
+    <string name="markdown_version_prefix">Versión %1$s</string>
+    <string name="markdown_section_added">Añadido</string>
+    <string name="markdown_section_changed">Modificado</string>
+    <string name="markdown_section_fixed">Arreglado</string>
     <!-- ============================================================================
          Placeholder
          ============================================================================ -->
@@ -721,83 +721,83 @@
          ============================================================================ -->
     <!-- %1$s = beverage name, %2$s = effective amount with unit -->
     <!-- %1$s = beverage name, %2$s = raw amount with unit, %3$s = effective amount with unit -->
-    <string name="health_connect_status_unavailable">Health Connect is not available on this device</string>
-    <string name="health_connect_status_update_required">Health Connect app needs to be updated</string>
-    <string name="health_connect_status_no_permissions">Permissions not granted for Health Connect</string>
-    <string name="health_connect_status_ready">Health Connect is ready</string>
-    <string name="health_connect_imported_from">Imported from %1$s</string>
+    <string name="health_connect_status_unavailable">Health Connect no está disponible en este dispositivo.</string>
+    <string name="health_connect_status_update_required">La aplicación Health Connect necesita ser actualizada</string>
+    <string name="health_connect_status_no_permissions">Permisos no otorgados para Health Connect</string>
+    <string name="health_connect_status_ready">Health Connect está listo</string>
+    <string name="health_connect_imported_from">Importado desde %1$s</string>
     <!-- ============================================================================
          Home
          ============================================================================ -->
     <!-- Snackbars -->
-    <string name="home_snackbar_add_failed">Failed to add water: %1$s</string>
-    <string name="home_snackbar_delete_failed">Failed to delete entry: %1$s</string>
-    <string name="home_snackbar_update_failed">Failed to update entry: %1$s</string>
-    <string name="home_snackbar_synced">Synced %1$d entries from Health Connect</string>
-    <string name="home_snackbar_sync_errors">Sync completed with %1$d errors</string>
-    <string name="home_snackbar_up_to_date">Data is up to date</string>
-    <string name="home_snackbar_sync_failed">Sync failed: %1$s</string>
-    <string name="home_snackbar_sync_disabled">Health Connect sync is disabled</string>
-    <string name="home_snackbar_container_added">Added \"%1$s\" container</string>
-    <string name="home_snackbar_container_updated">Updated \"%1$s\" container</string>
-    <string name="home_snackbar_container_deleted">Deleted \"%1$s\" container</string>
+    <string name="home_snackbar_add_failed">Error al añadir agua: %1$s</string>
+    <string name="home_snackbar_delete_failed">No se ha podido borrar la entrada: %1</string>
+    <string name="home_snackbar_update_failed">Error al actualizar la entrada: %1$s</string>
+    <string name="home_snackbar_synced">%1$d entradas sincronizadas desde Health Connect</string>
+    <string name="home_snackbar_sync_errors">Sincronización completada con errores %1$d</string>
+    <string name="home_snackbar_up_to_date">Los datos están actualizados</string>
+    <string name="home_snackbar_sync_failed">Sincronización fallida: %1$s</string>
+    <string name="home_snackbar_sync_disabled">La sincronización de Health Connect está desactivada</string>
+    <string name="home_snackbar_container_added">Se agregó el contenedor \"%1$s\"</string>
+    <string name="home_snackbar_container_updated">Se actualizó el contenedor \"%1$s\"</string>
+    <string name="home_snackbar_container_deleted">Se eliminó el contenedor \"%1$s\"</string>
     <!-- Dialogue labels -->
-    <string name="home_label_beverage_type">Beverage Type</string>
-    <string name="home_label_amount_ml">Amount (%1$s)</string>
-    <string name="home_label_container_type">Container Type</string>
-    <string name="home_label_time">Time</string>
+    <string name="home_label_beverage_type">Tipo de bebida</string>
+    <string name="home_label_amount_ml">Cantidad (%1$s)</string>
+    <string name="home_label_container_type">Tipo de contenedor</string>
+    <string name="home_label_time">Hora</string>
     <!-- %1$s = minimum valid amount, %2$s = maximum valid amount (both with unit) -->
-    <string name="home_error_amount_invalid">Please enter a valid amount (%1$s–%2$s)</string>
-    <string name="home_label_hydration_effectiveness">Hydration effectiveness: %1$s</string>
-    <string name="home_label_effective_hydration">Effective Hydration: %1$s</string>
-    <string name="home_option_custom">Custom</string>
+    <string name="home_error_amount_invalid">Por favor, introduzca una cantidad válida (%1$s–%2$s)</string>
+    <string name="home_label_hydration_effectiveness">Efectividad de la Hidratación (%)</string>
+    <string name="home_label_effective_hydration">Hydración Efectiva: %1$s</string>
+    <string name="home_option_custom">Personalizado</string>
     <string name="home_beverage_effective_name">%1$s</string>
     <string name="home_beverage_effective_amount">%1$s</string>
     <!-- Content descriptions -->
-    <string name="cd_add_container">Add container</string>
+    <string name="cd_add_container">Añadir contenedor</string>
     <!-- Stats labels -->
-    <string name="home_label_daily_progress">Daily Progress</string>
-    <string name="home_label_entries">Entries</string>
-    <string name="home_label_first_intake">First</string>
-    <string name="home_label_latest_intake">Latest</string>
-    <string name="home_reminders_paused_hint">Reminders paused until tomorrow</string>
-    <string name="home_section_recent_entries">Recent Entries</string>
+    <string name="home_label_daily_progress">Progreso Diario</string>
+    <string name="home_label_entries">Registros</string>
+    <string name="home_label_first_intake">Primero</string>
+    <string name="home_label_latest_intake">Último</string>
+    <string name="home_reminders_paused_hint">Recordatorios pausados hasta mañana</string>
+    <string name="home_section_recent_entries">Entradas recientes</string>
     <!-- Dialogue titles -->
-    <string name="home_dialog_add_custom_amount">Add Custom Amount</string>
-    <string name="home_dialog_edit_entry_title">Edit Water Entry</string>
-    <string name="home_dialog_external_entry_title">External Water Entry</string>
-    <string name="home_dialog_select_time">Select Time</string>
-    <string name="home_dialog_delete_message">Are you sure you want to delete this %1$s %2$s entry?</string>
-    <string name="home_external_entry_title">Entry from another app</string>
-    <string name="home_external_entry_message">This entry was imported from another health app and cannot be edited. You can only view its details.</string>
+    <string name="home_dialog_add_custom_amount">Añadir cantidad personalizada</string>
+    <string name="home_dialog_edit_entry_title">Editar Entrada de Agua</string>
+    <string name="home_dialog_external_entry_title">Entrada externa de agua</string>
+    <string name="home_dialog_select_time">Seleccionar hora</string>
+    <string name="home_dialog_delete_message">¿Está seguro que desea eliminar esta entrada %1$s %2$s?</string>
+    <string name="home_external_entry_title">Entrada desde otra aplicación</string>
+    <string name="home_external_entry_message">Esta entrada fue importada desde otra aplicación de salud y no puede ser editada. Solo puede ver sus detalles.</string>
     <!-- Add Container Card -->
-    <string name="home_add_container_label">Add</string>
+    <string name="home_add_container_label">Añadir</string>
     <!-- Container preset names (stable English key kept for storage; these are display strings) -->
-    <string name="container_coffee_cup">Coffee Cup</string>
-    <string name="container_tea_cup">Tea Cup</string>
-    <string name="container_small_cup">Small Cup</string>
-    <string name="container_medium_glass">Medium Glass</string>
-    <string name="container_large_glass">Large Glass</string>
-    <string name="container_water_bottle">Water Bottle</string>
-    <string name="container_large_bottle">Large Bottle</string>
+    <string name="container_coffee_cup">Taza de Café</string>
+    <string name="container_tea_cup">Taza de Té</string>
+    <string name="container_small_cup">Taza pequeña</string>
+    <string name="container_medium_glass">Vaso mediano</string>
+    <string name="container_large_glass">Vaso grande</string>
+    <string name="container_water_bottle">Botella de agua</string>
+    <string name="container_large_bottle">Botella grande</string>
     <!-- Hydration percentage label, e.g. "80% hydration"; %1$s = per cent value including the % sign -->
-    <string name="home_label_hydration_percentage">%1$s hydration</string>
+    <string name="home_label_hydration_percentage">%1$s de hidratación</string>
     <!-- Motivational messages -->
-    <string name="home_motivation_goal_achieved">Amazing! You\'ve reached your daily goal!</string>
-    <string name="home_motivation_almost_there">You\'re doing great! Almost there!</string>
-    <string name="home_motivation_halfway">Halfway there! Keep up the good work!</string>
-    <string name="home_motivation_good_start">Good start! Stay consistent!</string>
+    <string name="home_motivation_goal_achieved">¡Increíble! ¡Has alcanzado tu meta diaria!</string>
+    <string name="home_motivation_almost_there">¡Lo estás haciendo genial! ¡Ya casi está!</string>
+    <string name="home_motivation_halfway">¡A medio camino! ¡Sigue adelante con el buen trabajo!</string>
+    <string name="home_motivation_good_start">¡Buen comienzo! ¡Mantente constante!</string>
     <!-- ============================================================================
          Profile
          ============================================================================ -->
     <!-- Time-based greeting shown above the username; keep the trailing comma if the
          language separates greeting and name with a comma. -->
-    <string name="profile_greeting_morning">Good morning,</string>
-    <string name="profile_greeting_afternoon">Good afternoon,</string>
-    <string name="profile_greeting_evening">Good evening,</string>
-    <string name="profile_greeting_default">Hello,</string>
+    <string name="profile_greeting_morning">¡Buenos días!</string>
+    <string name="profile_greeting_afternoon">¡Buenas tardes!</string>
+    <string name="profile_greeting_evening">Buenas noches,</string>
+    <string name="profile_greeting_default">Hola,</string>
     <!-- Quick stats under the profile header -->
-    <string name="profile_stat_today_entries">Today\'s Entries</string>
+    <string name="profile_stat_today_entries">Entradas de hoy</string>
     <string name="profile_stat_days_tracked">Days Tracked</string>
     <string name="profile_stat_today_goal">Today\'s Goal</string>
     <!-- Section titles on the Profile screen -->
