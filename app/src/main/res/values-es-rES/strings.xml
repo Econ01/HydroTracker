@@ -54,13 +54,13 @@
          android:label value shown in the home-screen widget picker, plus the text
          rendered inside the Glance widget.
          ============================================================================ -->
-    <string name="widget_large_label">HydroTracker</string>
-    <string name="widget_large_description">Adaptive hydration progress and quick-add actions</string>
-    <string name="widget_quick_add_label">HydroTracker Quick Add</string>
-    <string name="widget_quick_add_description">Resizable buttons for adding water with one tap</string>
+    <string name="widget_large_label">Hidrorastreador</string>
+    <string name="widget_large_description">Progreso de Hidratación Adaptativa y Acciones Rápidas</string>
+    <string name="widget_quick_add_label">Añadir rápido HidroTracker</string>
+    <string name="widget_quick_add_description">Botones ajustables para añadir agua con un toque</string>
     <string name="widget_of_goal_format">%1$s de %2$s</string>
     <string name="widget_goal_reached">¡Objetivo alcanzado!</string>
-    <string name="widget_progress_cd">Daily hydration: %1$s</string>
+    <string name="widget_progress_cd">Hidratación diaria: %1$s</string>
     <string name="widget_quick_add_cd">Añadir %1$s</string>
     <string name="widget_daily_hydration">Hidratación diaria</string>
     <string name="widget_card_glass">Vaso</string>
@@ -91,19 +91,19 @@
     <string name="language_progress_header">Progreso de la traducción</string>
     <string name="language_progress_translated">Traducido</string>
     <string name="language_progress_approved">Aprobado</string>
-    <string name="language_translators_header">Translators</string>
+    <string name="language_translators_header">Traductores</string>
     <string name="language_translators_description">All-time words translated on Crowdin</string>
     <string name="language_proofreaders_header">Proofreaders</string>
     <string name="language_proofreaders_description">All-time words approved on Crowdin</string>
-    <string name="language_other_contributors_header">Other contributors</string>
-    <string name="language_contributor_languages">%1$s. Languages: %2$s</string>
+    <string name="language_other_contributors_header">Otros colaboradores</string>
+    <string name="language_contributor_languages">%1$s. Idiomas: %2$s</string>
     <plurals name="language_translator_words">
-        <item quantity="one">%1$s, %2$s word translated</item>
-        <item quantity="other">%1$s, %2$s words translated</item>
+        <item quantity="one">%1$s, %2$s palabra traducida</item>
+        <item quantity="other">%1$s, %2$s palabras traducidas</item>
     </plurals>
     <plurals name="language_proofreader_words">
-        <item quantity="one">%1$s, %2$s word approved</item>
-        <item quantity="other">%1$s, %2$s words approved</item>
+        <item quantity="one">%1$s, %2$s palabra aprobada</item>
+        <item quantity="other">%1$s, %2$s palabras aprobadas</item>
     </plurals>
     <!-- Time format options -->
     <string name="time_format_system">Sistema</string>
@@ -350,73 +350,73 @@
     <string name="notif_style_minimal_desc">Recordatorios discretos</string>
     <string name="notif_permissions_header">Permisos</string>
     <string name="notif_permission_title">Permiso de notificación</string>
-    <string name="notif_permission_desc">Required to send hydration reminders</string>
-    <string name="notif_exact_alarm_title">Exact alarm permission</string>
-    <string name="notif_exact_alarm_desc">Required for precise reminder timing</string>
-    <string name="notif_battery_optimisation_title">Battery optimisation</string>
-    <string name="notif_battery_optimisation_desc">Exempt HydroTracker so reminders aren\'t delayed or stopped</string>
-    <string name="notif_troubleshooting_title">Not receiving reminders?</string>
-    <string name="notif_troubleshooting_desc">Some devices restrict apps aggressively, see device-specific fixes</string>
-    <string name="notif_reminder_style_header">Reminder style</string>
+    <string name="notif_permission_desc">Se requiere enviar recordatorios de hidratación</string>
+    <string name="notif_exact_alarm_title">Permiso de alarma exacta</string>
+    <string name="notif_exact_alarm_desc">Requerido para un recordatorio preciso</string>
+    <string name="notif_battery_optimisation_title">Optimización de batería</string>
+    <string name="notif_battery_optimisation_desc">Exenta HydroTracker para que los recordatorios no se retrasen o se detengan</string>
+    <string name="notif_troubleshooting_title">¿No estás recibiendo recordatorios?</string>
+    <string name="notif_troubleshooting_desc">Algunos dispositivos restringen agresivamente las aplicaciones, vea arreglos específicos del dispositivo</string>
+    <string name="notif_reminder_style_header">Estilo de Recordatorio</string>
     <!-- Short reminder-style labels shown on the toggle buttons -->
     <string name="notif_style_gentle_short">Gentle</string>
-    <string name="notif_style_motivating_short">Energetic</string>
+    <string name="notif_style_motivating_short">Energético</string>
     <string name="notif_style_minimal_short">Simple</string>
-    <string name="notif_active_hours_header">Active hours</string>
-    <string name="notif_wake_up">Wake up</string>
-    <string name="notif_sleep">Sleep</string>
-    <string name="notif_wake_up_time">Wake up time</string>
-    <string name="notif_sleep_time">Sleep time</string>
-    <string name="notif_schedule_header">Schedule</string>
-    <string name="notif_configure_schedule">Configure schedule</string>
-    <string name="notif_configure_schedule_desc">Change reminder mode or set a custom interval</string>
-    <string name="notif_reminder_interval">Reminder interval</string>
-    <string name="notif_scheduled_for">Scheduled for</string>
-    <string name="notif_pause_reminders">Pause reminders for today</string>
-    <string name="notif_pause_reminders_desc">Stop hydration reminders until the next day</string>
-    <string name="notif_resume_reminders">Resume reminders</string>
-    <string name="notif_reminders_paused_desc">Hydration reminders are paused until tomorrow</string>
+    <string name="notif_active_hours_header">Horas activas</string>
+    <string name="notif_wake_up">Despertar</string>
+    <string name="notif_sleep">Dormir</string>
+    <string name="notif_wake_up_time">Hora de despertar</string>
+    <string name="notif_sleep_time">Hora de dormir</string>
+    <string name="notif_schedule_header">Programar</string>
+    <string name="notif_configure_schedule">Configurar programación</string>
+    <string name="notif_configure_schedule_desc"></string>
+    <string name="notif_reminder_interval">Intérvalo de recordatorio</string>
+    <string name="notif_scheduled_for">Programado para</string>
+    <string name="notif_pause_reminders">Pausar recordatorios por hoy</string>
+    <string name="notif_pause_reminders_desc">Detener recordatorios de hidratación hasta el día siguiente</string>
+    <string name="notif_resume_reminders">Reanudar recordatorios</string>
+    <string name="notif_reminders_paused_desc">Los recordatorios de hidración están en pausa hasta mañana</string>
     <!-- Reminder cadence, e.g. "Every 60 minutes"; %1$d = minutes -->
     <plurals name="every_x_minutes">
-        <item quantity="one">Every %1$d minute</item>
-        <item quantity="other">Every %1$d minutes</item>
+        <item quantity="one">Cada %1$d minuto</item>
+        <item quantity="other">Cada %1$d minutos</item>
     </plurals>
     <!-- ============================================================================
          Settings — Reminder Schedule
          ============================================================================ -->
-    <string name="screen_reminder_schedule_title">Reminder Schedule</string>
-    <string name="reminder_mode_header">Mode</string>
-    <string name="reminder_day_end_header">Day end</string>
-    <string name="reminder_day_end_divider">Day End</string>
-    <string name="reminder_mode_auto_explain">Reminders are spaced automatically based on your daily goal and active hours.</string>
-    <string name="reminder_mode_custom_explain">Reminders are sent at your chosen fixed interval between wake-up and sleep.</string>
-    <string name="reminder_dayend_sleep_explain">Your day ends at sleep time. Daily progress resets then.</string>
-    <string name="reminder_dayend_midnight_explain">Your day ends at midnight, matching the calendar day.</string>
-    <string name="reminder_slider_min">1 min</string>
-    <string name="reminder_slider_max">8 hours</string>
+    <string name="screen_reminder_schedule_title">Programación de recordatorio</string>
+    <string name="reminder_mode_header">Modo</string>
+    <string name="reminder_day_end_header">Fin de día</string>
+    <string name="reminder_day_end_divider">Fin del día</string>
+    <string name="reminder_mode_auto_explain">Los recordatorios se espacian automáticamente en función de su meta diaria y horas activas.</string>
+    <string name="reminder_mode_custom_explain">Los recordatorios se envían en el intervalo fijo elegido entre despertar y dormir.</string>
+    <string name="reminder_dayend_sleep_explain">Tu día termina en el tiempo de sueño. El progreso diario se reinicia entonces.</string>
+    <string name="reminder_dayend_midnight_explain">Tu día termina a medianoche, coincidiendo con el día calendario.</string>
+    <string name="reminder_slider_min">1 minuto</string>
+    <string name="reminder_slider_max">8 horas</string>
     <!-- Cadence phrases used mid-sentence and standalone -->
-    <string name="interval_every_hour">every hour</string>
+    <string name="interval_every_hour">cada hora</string>
     <string name="interval_every_h_m">every %1$dh %2$dm</string>
     <plurals name="interval_every_minutes">
-        <item quantity="one">every %1$d minute</item>
-        <item quantity="other">every %1$d minutes</item>
+        <item quantity="one">cada %1$d minuto</item>
+        <item quantity="other">cada %1$d minutos</item>
     </plurals>
     <plurals name="interval_every_hours">
-        <item quantity="one">every %1$d hour</item>
-        <item quantity="other">every %1$d hours</item>
+        <item quantity="one">cada %1$d hora</item>
+        <item quantity="other">cada %1$d horas</item>
     </plurals>
     <!-- Schedule preview sentences; auto: %1$s=goal, %2$d=glasses, %3$d=hours, %4$d=minutes -->
     <string name="reminder_preview_auto">Based on your %1$s goal, you\'ll get about %2$d reminders (one per glass) spread across your %3$d active hours. Roughly every %4$d minutes.</string>
     <!-- custom: %1$s=cadence phrase, %2$s=wake time, %3$s=sleep time -->
-    <string name="reminder_preview_custom">You\'ll receive a reminder %1$s between %2$s and %3$s.</string>
+    <string name="reminder_preview_custom">Recibirás un recordatorio %1$s entre %2$s y %3$s.</string>
     <!-- ============================================================================
          Settings — Quick Add customization
          ============================================================================ -->
-    <string name="quickadd_containers_header">Container presets</string>
-    <string name="quickadd_containers_desc">Quick-select containers on the home screen. Tap to edit, drag to reorder.</string>
-    <string name="quickadd_edit_containers">Edit container presets</string>
-    <string name="quickadd_beverages_header">Beverage types</string>
-    <string name="quickadd_beverages_desc">Beverages offered in quick add. Drag to reorder, drag into Hidden to hide.</string>
+    <string name="quickadd_containers_header">Contenedores predefinidos</string>
+    <string name="quickadd_containers_desc">Contenedores de selección rápida en la pantalla de inicio. Toca para editar, arrastrar o reordenar.</string>
+    <string name="quickadd_edit_containers">Editar preajustes de contenedor</string>
+    <string name="quickadd_beverages_header">Tipo de bebida</string>
+    <string name="quickadd_beverages_desc">Bebidas ofrecidas en adición rápida. Arrastre para reordenar, arrastre hacia ocultos para ocultar.</string>
     <string name="quickadd_edit_beverages">Edit beverage presets</string>
     <!-- Container presets list/editor -->
     <string name="container_presets_screen_title">Container Presets</string>
