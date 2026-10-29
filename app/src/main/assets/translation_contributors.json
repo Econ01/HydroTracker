@@ -40,6 +40,19 @@
       "approvedWords": 0
     },
     {
+      "id": 17954795,
+      "name": "Camilo Mejia (Kami88)",
+      "username": "Kami88",
+      "languages": [
+        {
+          "id": "es-ES",
+          "name": "Spanish"
+        }
+      ],
+      "translatedWords": 1265,
+      "approvedWords": 0
+    },
+    {
       "id": 17788561,
       "name": "zhx000",
       "username": "zhx000",
@@ -63,19 +76,6 @@
         }
       ],
       "translatedWords": 726,
-      "approvedWords": 0
-    },
-    {
-      "id": 17954795,
-      "name": "Camilo Mejia (Kami88)",
-      "username": "Kami88",
-      "languages": [
-        {
-          "id": "es-ES",
-          "name": "Spanish"
-        }
-      ],
-      "translatedWords": 240,
       "approvedWords": 0
     },
     {
