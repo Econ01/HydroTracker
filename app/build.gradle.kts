@@ -159,6 +159,7 @@ dependencies {
     implementation(libs.androidx.graphics.shapes)
 
     // Compose BOM (Bill of Materials) - Use the latest stable version
+    // noinspection AvoidDuplicateDependencies
     implementation(platform(libs.compose.bom))
 
     // Core Compose UI dependencies (versions controlled by BOM)
@@ -216,6 +217,8 @@ dependencies {
     testImplementation(libs.androidx.sqlite.framework)
 
     // Instrumented Compose UI tests for the complete update-flow modal
+    // noinspection AvoidDuplicateDependencies
+    androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.androidx.test.espresso.core)
 }
