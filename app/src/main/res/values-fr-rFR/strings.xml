@@ -91,18 +91,18 @@
     <string name="language_progress_header">Progrès de traduction</string>
     <string name="language_progress_translated">Traduit</string>
     <string name="language_progress_approved">Approuvé</string>
-    <string name="language_translators_header">Translators</string>
+    <string name="language_translators_header">Traducteurs</string>
     <string name="language_translators_description">All-time words translated on Crowdin</string>
-    <string name="language_proofreaders_header">Proofreaders</string>
+    <string name="language_proofreaders_header">Relecteurs</string>
     <string name="language_proofreaders_description">All-time words approved on Crowdin</string>
-    <string name="language_other_contributors_header">Other contributors</string>
+    <string name="language_other_contributors_header">Autres contributeurs</string>
     <string name="language_contributor_languages">%1$s. Languages: %2$s</string>
     <plurals name="language_translator_words">
-        <item quantity="one">%1$s, %2$s word translated</item>
+        <item quantity="one">%1$s, %2$s mots traduits</item>
         <item quantity="other">%1$s, %2$s words translated</item>
     </plurals>
     <plurals name="language_proofreader_words">
-        <item quantity="one">%1$s, %2$s word approved</item>
+        <item quantity="one">%1$s, %2$s mots approuvés</item>
         <item quantity="other">%1$s, %2$s words approved</item>
     </plurals>
     <!-- Time format options -->
@@ -355,7 +355,7 @@
     <string name="notif_exact_alarm_desc">Nécessaire pour un rappel précis</string>
     <string name="notif_battery_optimisation_title">Battery optimisation</string>
     <string name="notif_battery_optimisation_desc">Exempt HydroTracker so reminders aren\'t delayed or stopped</string>
-    <string name="notif_troubleshooting_title">Not receiving reminders?</string>
+    <string name="notif_troubleshooting_title">Vous ne recevez pas de rappels ?</string>
     <string name="notif_troubleshooting_desc">Some devices restrict apps aggressively, see device-specific fixes</string>
     <string name="notif_reminder_style_header">Style de rappel</string>
     <!-- Short reminder-style labels shown on the toggle buttons -->
@@ -433,7 +433,7 @@
     <string name="screen_beverage_types_title">Types de Boisson</string>
     <string name="beverage_types_helper">Boissons disponibles en ajout rapide. Appuie pour modifier, glisse vers pour réordonner.</string>
     <!-- e.g. "150% hydration"; %1$s = per cent value including the % sign -->
-    <string name="beverage_hydration_short">%1$s hydration</string>
+    <string name="beverage_hydration_short">%1$s d\'hydration</string>
     <string name="beverage_reset_title">Réinitialiser les Boissons ?</string>
     <string name="beverage_reset_message">Ceci restaure l\'ordre par défaut des boissons, démasque tous les préréglages et supprime toutes les boissons personnalisées. Cette action est irréversible.</string>
     <!-- ============================================================================
@@ -781,7 +781,7 @@
     <string name="container_water_bottle">Bouteille d\'eau</string>
     <string name="container_large_bottle">Grande bouteille</string>
     <!-- Hydration percentage label, e.g. "80% hydration"; %1$s = per cent value including the % sign -->
-    <string name="home_label_hydration_percentage">%1$s hydration</string>
+    <string name="home_label_hydration_percentage">%1$s d\'hydration</string>
     <!-- Motivational messages -->
     <string name="home_motivation_goal_achieved">Incroyable ! Tu as atteint ton objectif quotidien !</string>
     <string name="home_motivation_almost_there">Tu t\'en sors bien ! Tu y es presque !</string>
