@@ -1,3 +1,13 @@
+[1.8]
+Added
+- Distribution-specific update handling, including user-confirmed APK downloads and installation through Android for GitHub builds
+
+Changed
+- F-Droid builds now rely entirely on F-Droid for updates and have no self-updater or Internet permission
+- Google Play updates and reviews are included only in the Google Play build
+
+[1.7]
+
 [1.7]
 Added
 - Adaptive home-screen widgets: the hydration widget now reshapes its progress and quick-add UI from 1x1 upwards, and a separate quick-add widget provides one to three actions without a progress display
