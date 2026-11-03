@@ -15,6 +15,12 @@ if (localPropertiesFile.exists()) {
     localPropertiesFile.inputStream().use { localProperties.load(it) }
 }
 
+// Optional build-only overrides used by the local update-test APK generator. Release defaults
+// remain unchanged unless these properties are explicitly supplied on the Gradle command line.
+val configuredVersionCode = (findProperty("hydroVersionCode") as String?)?.toIntOrNull() ?: 38
+val configuredVersionName = findProperty("hydroVersionName") as String? ?: "1.8"
+val configuredDebugApplicationIdSuffix = findProperty("hydroApplicationIdSuffix") as String? ?: ".debug"
+
 android {
     namespace = "com.cemcakmak.hydrotracker"
     compileSdk {
@@ -27,8 +33,8 @@ android {
         applicationId = "com.cemcakmak.hydrotracker"
         minSdk = 26
         targetSdk = 37
-        versionCode = 37
-        versionName = "1.7"
+        versionCode = configuredVersionCode
+        versionName = configuredVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -47,7 +53,7 @@ android {
     buildTypes {
         debug {
             // Install debug builds beside the release app (package gets a ".debug" suffix)
-            applicationIdSuffix = ".debug"
+            applicationIdSuffix = configuredDebugApplicationIdSuffix
             versionNameSuffix = "-debug"
             signingConfig = signingConfigs.findByName("release")
                 ?: signingConfigs.getByName("debug")
@@ -67,6 +73,26 @@ android {
             }
         }
     }
+
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("play") {
+            dimension = "distribution"
+            buildConfigField("boolean", "HAS_PLAY_STORE", "true")
+            buildConfigField("boolean", "HAS_GITHUB_UPDATER", "false")
+        }
+        create("github") {
+            dimension = "distribution"
+            buildConfigField("boolean", "HAS_PLAY_STORE", "false")
+            buildConfigField("boolean", "HAS_GITHUB_UPDATER", "true")
+        }
+        create("fdroid") {
+            dimension = "distribution"
+            buildConfigField("boolean", "HAS_PLAY_STORE", "false")
+            buildConfigField("boolean", "HAS_GITHUB_UPDATER", "false")
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -89,6 +115,23 @@ android {
         // Robolectric reads the debug variant's merged assets, so expose the exported Room schemas
         // there for MigrationTestHelper. Scoped to debug only, so they never ship in the release APK.
         getByName("debug").assets.directories.add("$projectDir/schemas")
+    }
+}
+
+val playDebugUpdateSources =
+    tasks.register<CopyUpdateSourcesTask>("preparePlayDebugUpdateSources") {
+        description = "Copies GitHub updater sources for unified playDebug variant."
+        group = "build"
+        inputDir.set(project.layout.projectDirectory.dir("src/github/java"))
+}
+
+// The unified debug app includes both Play and GitHub update implementations. Release flavours
+// select exactly one implementation through their own source sets.
+androidComponents {
+    onVariants { variant ->
+        if (variant.name == "playDebug") {
+            variant.sources.java?.addGeneratedSourceDirectory(playDebugUpdateSources) { it.outputDir }
+        }
     }
 }
 
@@ -156,9 +199,9 @@ dependencies {
     implementation(libs.androidx.glance.preview)
     debugImplementation(libs.androidx.glance.appwidget.preview)
 
-    // Google Play Store
-    implementation(libs.review.ktx)
-    implementation(libs.app.update.ktx)
+    // Google Play Store (never included in the GitHub or F-Droid artefacts)
+    "playImplementation"(libs.review.ktx)
+    "playImplementation"(libs.app.update.ktx)
 
     // Debug tools
     debugImplementation(libs.androidx.ui.tooling)
@@ -171,6 +214,21 @@ dependencies {
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.androidx.test.ext.junit)
     testImplementation(libs.androidx.sqlite.framework)
+
+    // Instrumented Compose UI tests for the complete update-flow modal
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.androidx.test.espresso.core)
+}
+
+// Only Play has a debug variant. GitHub and F-Droid are still built independently for release validation
+androidComponents {
+    beforeVariants { variantBuilder ->
+        if (variantBuilder.buildType == "debug" &&
+            variantBuilder.productFlavors.any { it.first == "distribution" && it.second != "play" }
+        ) {
+            variantBuilder.enable = false
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -303,5 +361,26 @@ abstract class GenerateLicensesTask : DefaultTask() {
         private val LICENSE_OVERRIDES = mapOf(
             "com.google.guava" to ("Apache-2.0" to "https://www.apache.org/licenses/LICENSE-2.0.txt")
         )
+    }
+}
+
+/** Copies the shared GitHub updater into the unified debug variant's generated source directory. */
+abstract class CopyUpdateSourcesTask : DefaultTask() {
+    @get:InputDirectory
+    abstract val inputDir: DirectoryProperty
+
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
+
+    @TaskAction
+    fun copySources() {
+        outputDir.get().asFile.deleteRecursively()
+        project.copy {
+            from(inputDir) {
+                // Play already provides the real review implementation; GitHub's is a no-op.
+                exclude("**/ReviewLauncher.kt")
+            }
+            into(outputDir)
+        }
     }
 }
