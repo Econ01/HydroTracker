@@ -2,8 +2,9 @@
 #
 # HydroTracker release builder.
 #
-# Builds the signed release APK and AAB in one go, renames the artifacts to
-# "HydroTracker-<versionName>.apk/.aab" and collects them under dist/.
+# Builds the signed Play AAB plus GitHub and F-Droid APKs in one go, renames them
+# to "HydroTracker-<versionName>.aab", "HydroTracker-<versionName>.apk" and
+# "HydroTracker-<versionName>-fdroid.apk", and collects them under dist/.
 #
 # Usage:
 #   ./scripts/release.sh                 Build a release (pre-flight checks enforced)
@@ -42,6 +43,7 @@ APP_NAME="HydroTracker"
 APP_BUILD_FILE="app/build.gradle.kts"
 CHANGELOG_FILE="app/src/main/assets/CHANGELOG.md"
 DIST_DIR="dist"
+EXPECTED_CERT_SHA256="9455bb56bd4c5352f9d8308e46b94aaa7014ccb8301778556e65bc0a9f943140"
 ALLOW_DIRTY=0
 
 for arg in "$@"; do
@@ -65,10 +67,10 @@ header "Running pre-flight checks…"
 
 [[ -f "$APP_BUILD_FILE" ]] || fail "$APP_BUILD_FILE not found"
 
-VERSION_NAME=$(grep -E '^[[:space:]]*versionName[[:space:]]*=' "$APP_BUILD_FILE" \
-    | head -n 1 | sed -E 's/.*"([^"]+)".*/\1/')
-VERSION_CODE=$(grep -E '^[[:space:]]*versionCode[[:space:]]*=' "$APP_BUILD_FILE" \
-    | head -n 1 | sed -E 's/[^0-9]//g')
+VERSION_NAME=$(grep -E '^val configuredVersionName = .* \?: "[^"]+"' "$APP_BUILD_FILE" \
+    | head -n 1 | sed -E 's/.*\?: "([^"]+)".*/\1/')
+VERSION_CODE=$(grep -E '^val configuredVersionCode = .* \?: [0-9]+' "$APP_BUILD_FILE" \
+    | head -n 1 | sed -E 's/.*\?: ([0-9]+).*/\1/')
 
 [[ -n "$VERSION_NAME" ]] || fail "Could not read versionName from $APP_BUILD_FILE"
 [[ -n "$VERSION_CODE" ]] || fail "Could not read versionCode from $APP_BUILD_FILE"
@@ -114,23 +116,27 @@ grep -qE "^\[$VERSION_NAME\]" "$CHANGELOG_FILE" \
 
 success "   [ok] Changelog: [$VERSION_NAME] entry found"
 
-# --- 5. Build both artifacts ---------------------------------------------------
+# --- 5. Build all three distribution artefacts ----------------------------------
 
 header "Building $APP_NAME $VERSION_NAME (this takes a minute)…"
-./gradlew --console=plain assembleRelease bundleRelease
+./gradlew --console=plain bundlePlayRelease assembleGithubRelease assembleFdroidRelease
 
-APK_SRC="app/build/outputs/apk/release/app-release.apk"
-AAB_SRC="app/build/outputs/bundle/release/app-release.aab"
-[[ -f "$APK_SRC" ]] || fail "Expected APK missing at $APK_SRC"
-[[ -f "$AAB_SRC" ]] || fail "Expected AAB missing at $AAB_SRC"
+PLAY_AAB_SRC="app/build/outputs/bundle/playRelease/app-play-release.aab"
+GITHUB_APK_SRC="app/build/outputs/apk/github/release/app-github-release.apk"
+FDROID_APK_SRC="app/build/outputs/apk/fdroid/release/app-fdroid-release.apk"
+[[ -f "$PLAY_AAB_SRC" ]] || fail "Expected Play AAB missing at $PLAY_AAB_SRC"
+[[ -f "$GITHUB_APK_SRC" ]] || fail "Expected GitHub APK missing at $GITHUB_APK_SRC"
+[[ -f "$FDROID_APK_SRC" ]] || fail "Expected F-Droid APK missing at $FDROID_APK_SRC"
 
 mkdir -p "$DIST_DIR"
-APK_OUT="$DIST_DIR/$APP_NAME-$VERSION_NAME.apk"
-AAB_OUT="$DIST_DIR/$APP_NAME-$VERSION_NAME.aab"
-cp "$APK_SRC" "$APK_OUT"
-cp "$AAB_SRC" "$AAB_OUT"
+PLAY_AAB_OUT="$DIST_DIR/$APP_NAME-$VERSION_NAME.aab"
+GITHUB_APK_OUT="$DIST_DIR/$APP_NAME-$VERSION_NAME.apk"
+FDROID_APK_OUT="$DIST_DIR/$APP_NAME-$VERSION_NAME-fdroid.apk"
+cp "$PLAY_AAB_SRC" "$PLAY_AAB_OUT"
+cp "$GITHUB_APK_SRC" "$GITHUB_APK_OUT"
+cp "$FDROID_APK_SRC" "$FDROID_APK_OUT"
 
-# --- 6. Verify the signature (eyeball that it is the upload key) ---------------
+# --- 6. Verify both APK signatures and their upload-key fingerprints ------------
 
 APKSIGNER="$(command -v apksigner || true)"
 if [[ -z "$APKSIGNER" ]]; then
@@ -146,33 +152,50 @@ if [[ -z "$APKSIGNER" ]]; then
 fi
 
 CERT_SHA256=""
-if [[ -n "$APKSIGNER" ]]; then
+verify_apk_certificate() {
+    local apk_path="$1"
+    local verify_output
+
     # stderr is discarded: apksigner's Conscrypt dependency emits JDK 24+ native-access
     # warnings there, which are JVM noise rather than a problem with the artefacts.
-    CERT_SHA256=$("$APKSIGNER" verify --print-certs "$APK_OUT" 2>/dev/null \
-        | sed -nE 's/.*SHA-256 digest: ([0-9a-f]+).*/\1/p' | head -n 1)
-    if [[ -n "$CERT_SHA256" ]]; then
-        info "Signer certificate (verify this matches your upload key):"
-        echo "   SHA-256: $CERT_SHA256"
-    else
-        warn "Could not read the signer certificate from $APK_OUT"
+    if ! verify_output=$("$APKSIGNER" verify --print-certs "$apk_path" 2>/dev/null); then
+        fail "APK signature verification failed: $apk_path"
     fi
+
+    CERT_SHA256=$(printf '%s\n' "$verify_output" \
+        | sed -nE 's/.*SHA-256 digest: ([0-9a-f]+).*/\1/p' | head -n 1)
+    [[ -n "$CERT_SHA256" ]] || fail "Could not read the signer certificate from $apk_path"
+    [[ "$CERT_SHA256" == "$EXPECTED_CERT_SHA256" ]] \
+        || fail "Unexpected signer certificate in $apk_path: $CERT_SHA256"
+}
+
+if [[ -n "$APKSIGNER" ]]; then
+    verify_apk_certificate "$GITHUB_APK_OUT"
+    GITHUB_CERT_SHA256="$CERT_SHA256"
+    verify_apk_certificate "$FDROID_APK_OUT"
+    FDROID_CERT_SHA256="$CERT_SHA256"
+    [[ "$GITHUB_CERT_SHA256" == "$FDROID_CERT_SHA256" ]] \
+        || fail "GitHub and F-Droid APK signer certificates do not match"
+
+    info "Verified the upload-key signature on both APKs:"
+    echo "   SHA-256: $CERT_SHA256"
 else
-    warn "apksigner not found — skipping signature verification"
+    warn "apksigner not found — skipping signature verification for both APKs"
 fi
 
 # --- 7. Summary -----------------------------------------------------------------
 
 echo ""
-success "Release $VERSION_NAME ($VERSION_CODE) built:"
-ls -lh "$APK_OUT" "$AAB_OUT" | awk '{print "   " $NF " (" $5 ")"}'
+success "Release $VERSION_NAME ($VERSION_CODE) built; nothing has been published:"
+ls -lh "$PLAY_AAB_OUT" "$GITHUB_APK_OUT" "$FDROID_APK_OUT" \
+    | awk '{print "   " $NF " (" $5 ")"}'
 if [[ -n "$CERT_SHA256" ]]; then
     echo ""
     header "For the GitHub release notes (certificate fingerprint — safe to publish):"
     echo "   SHA-256 certificate fingerprint: $CERT_SHA256"
 fi
 echo ""
-header "Next steps:"
-echo "   1. Upload $AAB_OUT to the Play Console"
-echo "   2. Attach $APK_OUT to the GitHub release"
+header "Manual next steps (not performed by this script):"
+echo "   1. Upload $PLAY_AAB_OUT to the Play Console"
+echo "   2. Attach all three artefacts in $DIST_DIR/ to GitHub release v$VERSION_NAME"
 echo "   3. Tag the release: git tag v$VERSION_NAME && git push origin v$VERSION_NAME"

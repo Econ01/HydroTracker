@@ -1,7 +1,7 @@
 # Privacy Policy for HydroTracker
 
 **Effective Date:** September 16, 2025
-**Last Updated:** October 16, 2025
+**Last Updated:** October 31, 2026
 
 ## Introduction
 
@@ -86,9 +86,12 @@ We do not share, sell, rent, or disclose any information to third parties.
 - You can review and revoke permissions at any time through your device settings
 
 ### Network:
-- We do not transmit any data over the internet
-- No cloud synchronization or backup to external servers is performed
-- The app operates entirely offline after installation
+- The F-Droid flavour has no Internet permission and operates entirely offline
+- Play and GitHub flavours can contact their distribution service to check for app updates
+- The GitHub flavour downloads an APK only after you explicitly request the update
+- Update requests do not include your hydration records, profile, preferences or other app data
+- As with any network connection, the distribution provider can observe standard connection information such as your IP address
+- No cloud synchronization or backup of your app data to external servers is performed
 
 ## Permissions Required
 
@@ -108,6 +111,12 @@ HydroTracker requests the following permissions to provide its functionality:
 ### Camera and Photo Permissions:
 - **CAMERA:** To take profile photos directly within the app
 - **Android Photo Picker:** To select an existing photo from your device gallery for your profile. The picker grants the app temporary access only to the specific photo you choose; no broad storage permissions are used.
+
+### Distribution-specific Permissions:
+- **INTERNET:** Used by Play and GitHub flavours for distribution updates; not present in the F-Droid flavour
+- **ACCESS_LOCAL_NETWORK:** Requested only by the debug update-test harness before connecting to a local test server on Android 17 or later
+- **REQUEST_INSTALL_PACKAGES:** Present only in the GitHub flavour to let you confirm and install an explicitly requested APK update through Android
+- **FOREGROUND_SERVICE and FOREGROUND_SERVICE_DATA_SYNC:** Present only in the GitHub flavour to keep an explicitly requested APK download active with progress visible while it runs
 
 All permissions can be managed through your device settings, and the app will function with limited features if certain permissions are denied.
 
