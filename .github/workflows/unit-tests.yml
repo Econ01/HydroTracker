@@ -7,7 +7,28 @@ on:
 
 jobs:
   unit-tests:
+    name: ${{ matrix.variant }} ${{ matrix.buildType }} checks
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - flavour: play
+            variant: Play
+            buildType: Debug
+            artifact: play-debug
+          - flavour: play
+            variant: Play
+            buildType: Release
+            artifact: play-release
+          - flavour: github
+            variant: Github
+            buildType: Release
+            artifact: github-release
+          - flavour: fdroid
+            variant: Fdroid
+            buildType: Release
+            artifact: fdroid-release
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -29,26 +50,74 @@ jobs:
       - name: Set up Gradle (caching + wrapper validation)
         uses: gradle/actions/setup-gradle@v5
 
-      - name: Run unit tests
+      - name: Compile variant
         run: |
           chmod +x gradlew
-          ./gradlew testDebugUnitTest --stacktrace
+          ./gradlew "compile${{ matrix.variant }}${{ matrix.buildType }}Kotlin" --stacktrace
+
+      - name: Run unit tests
+        if: matrix.buildType == 'Debug'
+        run: ./gradlew "test${{ matrix.variant }}${{ matrix.buildType }}UnitTest" --stacktrace
 
       - name: Upload test report
-        if: always()
+        if: matrix.buildType == 'Debug' && always()
         uses: actions/upload-artifact@v5
         with:
-          name: unit-test-report
-          path: app/build/reports/tests/testDebugUnitTest/
+          name: unit-test-report-${{ matrix.artifact }}
+          path: app/build/reports/tests/test${{ matrix.variant }}${{ matrix.buildType }}UnitTest/
 
       # Lint validates translated format strings (StringFormatInvalid/StringFormatMatches),
       # so a malformed community translation fails CI instead of crashing the app.
       - name: Run Android lint
-        run: ./gradlew lintDebug --stacktrace
+        run: ./gradlew "lint${{ matrix.variant }}${{ matrix.buildType }}" --stacktrace
 
       - name: Upload lint report
         if: always()
         uses: actions/upload-artifact@v5
         with:
-          name: lint-report
-          path: app/build/reports/lint-results-debug.html
+          name: lint-report-${{ matrix.artifact }}
+          path: app/build/reports/lint-results-${{ matrix.flavour }}${{ matrix.buildType }}.html
+
+  compose-ui-tests:
+    name: Update modal Compose UI tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Android SDK
+        run: echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+
+      - name: Install compileSDK platform
+        run: sdkmanager "platforms;android-37.1"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Run Compose UI tests on an emulator
+        uses: ReactiveCircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          script: ./gradlew connectedPlayDebugAndroidTest --stacktrace
+
+  update-test-server:
+    name: Local update-test server
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run server scenario tests
+        run: python3 -m unittest scripts.test_update_test_server -v
