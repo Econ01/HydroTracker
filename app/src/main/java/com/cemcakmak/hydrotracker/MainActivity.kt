@@ -24,8 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.text.ExperimentalTextApi
 import com.cemcakmak.hydrotracker.utils.AppLocale
 import com.cemcakmak.hydrotracker.utils.SmartComposeHapticFeedback
 import androidx.compose.animation.core.tween
@@ -43,8 +43,12 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.navigation3.ui.NavDisplay
 import com.cemcakmak.hydrotracker.data.repository.*
+import com.cemcakmak.hydrotracker.data.update.ACTION_SHOW_UPDATE
+import com.cemcakmak.hydrotracker.data.update.EXTRA_SHOW_UPDATE
 import com.cemcakmak.hydrotracker.data.update.UpdateRepository
+import com.cemcakmak.hydrotracker.data.update.UpdateRepositoryFactory
 import com.cemcakmak.hydrotracker.data.update.UpdateStatus
+import com.cemcakmak.hydrotracker.data.update.UpdateUiVisibility
 import com.cemcakmak.hydrotracker.data.database.DatabaseInitializer
 import com.cemcakmak.hydrotracker.data.database.DatabaseMigrationHelper
 import kotlinx.coroutines.launch
@@ -71,6 +75,7 @@ import com.cemcakmak.hydrotracker.presentation.statistics.StatisticsViewModelFac
 import com.cemcakmak.hydrotracker.presentation.settings.SettingsHubScreen
 import com.cemcakmak.hydrotracker.presentation.settings.AboutScreen
 import com.cemcakmak.hydrotracker.presentation.settings.UpdatesScreen
+import com.cemcakmak.hydrotracker.presentation.settings.UpdateTestingScreen
 import com.cemcakmak.hydrotracker.presentation.settings.WhatsNewBottomSheet
 import com.cemcakmak.hydrotracker.presentation.settings.UpdateAvailableDialog
 import com.cemcakmak.hydrotracker.presentation.settings.AppearanceScreen
@@ -112,7 +117,6 @@ private val TOP_LEVEL_TAB_KEYS: Set<NavigationRoutes> = setOf(
     NavigationRoutes.Settings,
 )
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
 class MainActivity : ComponentActivity() {
     private lateinit var userRepository: UserRepository
     private lateinit var waterIntakeRepository: WaterIntakeRepository
@@ -137,6 +141,8 @@ class MainActivity : ComponentActivity() {
 
     // Health Connect permission launcher - using proper Activity context
     private lateinit var healthConnectPermissionLauncher: ActivityResultLauncher<Set<String>>
+
+    private val updateModalRequests = mutableIntStateOf(0)
 
     // Listener so a system contrast change (Android 14+) re-applies the dynamic colours live
     private var contrastChangeListener: UiModeManager.ContrastChangeListener? = null
@@ -167,7 +173,7 @@ class MainActivity : ComponentActivity() {
 
         // Init
         userRepository = UserRepository(applicationContext)
-        updateRepository = UpdateRepository(applicationContext)
+        updateRepository = UpdateRepositoryFactory.create(applicationContext)
 
         // Perform comprehensive database health check (critical for Room 2.8.1 compatibility)
         lifecycleScope.launch {
@@ -236,6 +242,8 @@ class MainActivity : ComponentActivity() {
             handleDebugPinIntent(intent)
         }
 
+        handleUpdateIntent(intent)
+
         // Seed default container presets if needed
         lifecycleScope.launch {
             containerPresetRepository.seedDefaultsIfNeeded()
@@ -257,11 +265,22 @@ class MainActivity : ComponentActivity() {
                     containerPresetRepository,
                     customBeverageRepository,
                     updateRepository,
+                    updateModalRequests,
                     notificationPermissionLauncher,
                     healthConnectPermissionLauncher
                 )
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        UpdateUiVisibility.isAppInForeground = true
+    }
+
+    override fun onPause() {
+        UpdateUiVisibility.isAppInForeground = false
+        super.onPause()
     }
 
     override fun onDestroy() {
@@ -275,8 +294,17 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
+        setIntent(intent)
+        handleUpdateIntent(intent)
         if (BuildConfig.DEBUG) {
             handleDebugPinIntent(intent)
+        }
+    }
+
+    private fun handleUpdateIntent(intent: android.content.Intent) {
+        if (intent.action == ACTION_SHOW_UPDATE && intent.getBooleanExtra(EXTRA_SHOW_UPDATE, false)) {
+            updateModalRequests.intValue += 1
+            intent.removeExtra(EXTRA_SHOW_UPDATE)
         }
     }
 
@@ -330,6 +358,7 @@ fun HydroTrackerApp(
     containerPresetRepository: ContainerPresetRepository,
     customBeverageRepository: CustomBeverageRepository,
     updateRepository: UpdateRepository,
+    updateModalRequests: State<Int>,
     notificationPermissionLauncher: ActivityResultLauncher<String>,
     healthConnectPermissionLauncher: ActivityResultLauncher<Set<String>>
 ) {
@@ -434,16 +463,28 @@ fun HydroTrackerApp(
                 updateRepository.maybeAutoCheck()
             }
 
-            // Home-screen update dialogue — only shown when on Home and an update is available.
+            // Home-screen update dialogue — retained throughout the active update flow.
             var showUpdateDialog by remember { mutableStateOf(false) }
             val updateStatus by updateRepository.updateStatus.collectAsState()
             LaunchedEffect(currentKey, updateStatus) {
-                showUpdateDialog = currentKey == NavigationRoutes.Home && updateStatus is UpdateStatus.Available
+                if (currentKey == NavigationRoutes.Home && updateStatus is UpdateStatus.Available) {
+                    showUpdateDialog = true
+                }
+                if (updateStatus is UpdateStatus.UpToDate) {
+                    showUpdateDialog = false
+                }
             }
-            if (showUpdateDialog && updateStatus is UpdateStatus.Available) {
-                val availableStatus = updateStatus as UpdateStatus.Available
+            val updateModalRequest = updateModalRequests.value
+            LaunchedEffect(updateModalRequest, isOnboardingCompleted) {
+                if (updateModalRequest > 0 && isOnboardingCompleted) {
+                    backStack.clear()
+                    backStack.add(NavigationRoutes.Home)
+                    showUpdateDialog = true
+                }
+            }
+            if (showUpdateDialog && currentKey == NavigationRoutes.Home) {
                 UpdateAvailableDialog(
-                    status = availableStatus,
+                    status = updateStatus,
                     installSource = updateRepository.installSource,
                     updateRepository = updateRepository,
                     themePreferences = themePreferences,
@@ -850,6 +891,7 @@ fun HydroTrackerApp(
                         entry<NavigationRoutes.SettingsSupport> {
                             SupportDevelopmentScreen(
                                 themePreferences = themePreferences,
+                                installSource = updateRepository.installSource,
                                 onNavigateBack = popBackStack
                             )
                         }
@@ -910,7 +952,18 @@ fun HydroTrackerApp(
                                 onNavigateToAnimationMotionLab = {
                                     developerOptionsWasPop = true
                                     backStack.add(NavigationRoutes.SettingsDeveloperMotion)
+                                },
+                                onNavigateToUpdateTesting = {
+                                    developerOptionsWasPop = true
+                                    backStack.add(NavigationRoutes.SettingsDeveloperUpdates)
                                 }
+                            )
+                        }
+                        entry<NavigationRoutes.SettingsDeveloperUpdates> {
+                            UpdateTestingScreen(
+                                updateRepository = updateRepository,
+                                themePreferences = themePreferences,
+                                onNavigateBack = popBackStack
                             )
                         }
                         entry<NavigationRoutes.SettingsDeveloperHaptics> {
@@ -1088,12 +1141,12 @@ private fun LoadingScreen() {
             CircularProgressIndicator()
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                "Loading HydroTracker...",
+                stringResource(R.string.loading_hydrotracker),
                 style = MaterialTheme.typography.headlineSmall
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Checking your hydration data",
+                stringResource(R.string.loading_hydration_data),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
