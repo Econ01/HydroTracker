@@ -49,7 +49,7 @@
           "name": "Spanish"
         }
       ],
-      "translatedWords": 1265,
+      "translatedWords": 2241,
       "approvedWords": 0
     },
     {
@@ -175,6 +175,19 @@
         }
       ],
       "translatedWords": 53,
+      "approvedWords": 0
+    },
+    {
+      "id": 15946001,
+      "name": "Shozutko",
+      "username": "Shozutko",
+      "languages": [
+        {
+          "id": "fr",
+          "name": "French"
+        }
+      ],
+      "translatedWords": 21,
       "approvedWords": 0
     },
     {
