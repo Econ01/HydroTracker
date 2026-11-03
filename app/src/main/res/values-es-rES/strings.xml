@@ -92,7 +92,7 @@
     <string name="language_progress_translated">Traducido</string>
     <string name="language_progress_approved">Aprobado</string>
     <string name="language_translators_header">Traductores</string>
-    <string name="language_translators_description">All-time words translated on Crowdin</string>
+    <string name="language_translators_description">Total histórico de palabras traducidas en Crowdin</string>
     <string name="language_proofreaders_header">Correctores</string>
     <string name="language_proofreaders_description">Todas las palabras aprobadas en Crowdin</string>
     <string name="language_other_contributors_header">Otros colaboradores</string>
@@ -406,7 +406,7 @@
         <item quantity="other">cada %1$d horas</item>
     </plurals>
     <!-- Schedule preview sentences; auto: %1$s=goal, %2$d=glasses, %3$d=hours, %4$d=minutes -->
-    <string name="reminder_preview_auto">Based on your %1$s goal, you\'ll get about %2$d reminders (one per glass) spread across your %3$d active hours. Roughly every %4$d minutes.</string>
+    <string name="reminder_preview_auto">Basándote en tu objetivo %1$s , recibirás recordatorios %2$d (uno por vaso) repartidos por tus horas activas %3$d . Cada %4$d minutos.</string>
     <!-- custom: %1$s=cadence phrase, %2$s=wake time, %3$s=sleep time -->
     <string name="reminder_preview_custom">Recibirás un recordatorio %1$s entre %2$s y %3$s.</string>
     <!-- ============================================================================
@@ -546,7 +546,7 @@
     <!-- Home screen edge effect -->
     <string name="edge_effect_transparent">Transparente</string>
     <string name="edge_effect_blurred">Difuminado</string>
-    <string name="edge_effect_scrim">Scrim</string>
+    <string name="edge_effect_scrim">Sombra de fondo</string>
     <!-- Beverage types -->
     <string name="beverage_water">Agua</string>
     <string name="beverage_coffee">Café</string>
@@ -581,21 +581,21 @@
     <!-- %1$s = formatted cutoff date -->
     <string name="data_delete_before_date_model_title">Eliminar entradas</string>
     <string name="data_delete_health_connect_include">Incluir Health Connect</string>
-    <string name="data_delete_no_entries_affected">No entries on or before this date</string>
+    <string name="data_delete_no_entries_affected">No hay entradas ahora ni antes de esta fecha</string>
     <!-- Number of entries that will be deleted for the selected cutoff date -->
     <plurals name="data_delete_entries_affected">
-        <item quantity="one">%1$d entry recorded on or before %2$s will be permanently deleted.</item>
-        <item quantity="other">%1$d entries recorded on or before %2$s will be permanently deleted.</item>
+        <item quantity="one">%1$d Entrada guardada actualmente o anteriormente %2$s será eliminada permanentemente.</item>
+        <item quantity="other">%1$d Entradas guardadas actualmente o anteriormente %2$s serán eliminadas permanentemente.</item>
     </plurals>
     <string name="data_delete_local_title">Borrar sólo datos locales</string>
     <string name="data_delete_local_desc">Eliminar todos los datos de la aplicación almacenados en este dispositivo</string>
     <string name="data_delete_local_message">Esto eliminará todas las entradas de entrada de agua, sumarios diarios, preajustes de contenedores, bebidas personalizadas y tu perfil. Esta acción no se puede deshacer.</string>
     <string name="data_delete_health_connect_title">Borrar sólo datos de Health Connect</string>
     <string name="data_delete_health_connect_desc">Eliminar registros de HydroTracker de Health Connect</string>
-    <string name="data_delete_health_connect_message">This will delete HydroTracker records from Health Connect. Entries from other apps will not be affected. This action cannot be undone.</string>
+    <string name="data_delete_health_connect_message">Esto eliminará los registros de HydroTracker compartidos con Health Connect. Las entradas de otras aplicaciones no se verán afectadas. Esta acción no se puede deshacer.</string>
     <string name="data_delete_everything_title">Eliminar todo</string>
     <string name="data_delete_everything_desc">Eliminar todos los datos locales y de Health Connect</string>
-    <string name="data_delete_everything_message">This will delete all local data and all HydroTracker records from Health Connect, then reset your profile. This action cannot be undone.</string>
+    <string name="data_delete_everything_message">Esto eliminará todos los datos locales y todos los registros de HydroTracker registrados en Health Connect, luego restablecerá tu perfil. Esta acción no se puede deshacer.</string>
     <!-- %1$d = number of entries exported -->
     <string name="data_export_success">Se exportaron %1$d entradas</string>
     <!-- %1$s = error message -->
@@ -615,7 +615,8 @@
     <!-- ============================================================================
          About
          ============================================================================ -->
-    <string name="app_tagline">Open source water intake tracker.</string>
+    <string name="app_tagline">Rastreador de ingesta de agua de código abierto
+</string>
     <string name="label_version">Versión: %1$s</string>
     <string name="label_build_number">Build: %1$d</string>
     <string name="about_section_contributors">Colaboradores</string>
@@ -648,8 +649,8 @@
     <string name="support_rate_play_store_desc">Deja una calificación en Play Store</string>
     <string name="support_share_app">Compartir la aplicación</string>
     <string name="support_share_app_desc">Cuenta a un amigo sobre HydroTracker</string>
-    <string name="support_star_github">Star on GitHub</string>
-    <string name="support_star_github_desc">Star the project on GitHub</string>
+    <string name="support_star_github">Dar estrella en GitHub</string>
+    <string name="support_star_github_desc">Califica el proyecto en Github</string>
     <string name="share_chooser_title">Compartir HydroTracker</string>
     <string name="toast_review_successful">Revisión exitosa</string>
     <string name="toast_review_failed">Revisión fallida</string>
@@ -847,7 +848,7 @@
     <string name="history_stat_average">Promedio</string>
     <string name="history_stat_best_day">Mejor día</string>
     <string name="history_stat_days_tracked">Días rastreados</string>
-    <string name="history_stat_goals_met">Goals Met</string>
+    <string name="history_stat_goals_met">Metas cumplidas</string>
     <string name="history_stat_success_rate">Índice de Éxito</string>
     <string name="history_stat_total_intake">Ingesta Total
 </string>
@@ -878,7 +879,7 @@
     <string name="statistics_label_days_tracked">Días rastreados</string>
     <plurals name="statistics_streak_days">
         <item quantity="one">%1$d día</item>
-        <item quantity="other">%1$d days</item>
+        <item quantity="other">%1$d días</item>
     </plurals>
     <!-- Drinking pattern labels -->
     <string name="statistics_label_first_drink">Primera bebida</string>
@@ -928,7 +929,7 @@
         <item>Aviso de hidratación</item>
         <item>Hora de beber algo de agua</item>
         <item>Su cuerpo está llamando</item>
-        <item>Gentle Hydration Break</item>
+        <item>Descanso de hidratación</item>
         <item>Recordatorio suave de Hydrotracker</item>
         <item>Un momento para la hidración</item>
         <item>Chequeo de bienestar de agua</item>
@@ -982,8 +983,8 @@
         <item>Campeón de la hidratación!</item>
         <item>¡Alerta, guerrero del agua!</item>
         <item>¡Poder con H2O!</item>
-        <item>Hydration Hero Time!</item>
-        <item>Fuel Your Success!</item>
+        <item>¡Hora de hidratarte HEROE!</item>
+        <item>¡Alimenta tu progreso!</item>
         <item>¡Es hora de subir de nivel!</item>
         <item>Modo Campeón: Activado</item>
     </string-array>
@@ -993,55 +994,55 @@
         <item>¡Tu ÉXITO empieza con el siguiente sorbo!</item>
         <item>¡Campeones de la hidratación! ¿Están listos para DOMINAR?</item>
         <item>¡Alimenta tu potencial con agua de calidad!</item>
-        <item>Winners stay hydrated! Time to LEVEL UP!</item>
-        <item>First step to victory — grab some water!</item>
-        <item>Every champion starts with the basics. Hydrate!</item>
-        <item>Your competition is hydrating. Are you?</item>
+        <item>¡Los ganadores permanecen hidratados! ¡Es hora de SUBIR DE NIVEL!</item>
+        <item>Primer paso hacia la victoria, ¡toma algo de agua!</item>
+        <item>Cada campeón comienza con lo básico. ¡Hidrátate!</item>
+        <item>Su competencia está hidratándose. ¿Y tú?</item>
     </string-array>
     <!-- Motivating reminder messages: mid progress -->
     <string-array name="notification_motivating_messages_mid">
-        <item>UNSTOPPABLE! You\'re building momentum!</item>
-        <item>CRUSHING IT! Halfway to hydration victory!</item>
-        <item>POWERFUL progress! Keep that energy flowing!</item>
-        <item>AMAZING work! You\'re on fire today!</item>
-        <item>CHAMPION mindset! Push forward!</item>
-        <item>Momentum is building, keep it going!</item>
-        <item>You are stronger than your excuses. Drink up!</item>
-        <item>No limits, no excuses. Just hydration.</item>
+        <item>¡IMPARABLE! ¡Estás construyendo un gran impulso!</item>
+        <item>¡DESTROZANDOLO! ¡A medio camino por la victoria de la hidratación!</item>
+        <item>¡PODEROSO PROGRESO! ¡Mantén esa corriente de energía!</item>
+        <item>¡IMPRESIONANTE trabajo! ¡Estás en llamas hoy!</item>
+        <item>¡MENTALIDAD DE CAMPEÓN! ¡Empuja hacia adelante!</item>
+        <item>Impulso en construcción, ¡manténgalo en marcha!</item>
+        <item>Eres más fuerte que tus excusas. ¡Bebe!</item>
+        <item>No hay límites, no hay excusas. Sólo la hidratación.</item>
     </string-array>
     <!-- Motivating reminder messages: high progress -->
     <string-array name="notification_motivating_messages_high">
-        <item>INCREDIBLE dedication! Victory is within reach!</item>
-        <item>OUTSTANDING! You\'re in the winner\'s zone!</item>
-        <item>PHENOMENAL! Final quarter — you\'ve got this!</item>
-        <item>EXCELLENCE in action! Keep dominating!</item>
-        <item>LEGENDARY persistence! Almost at the summit!</item>
-        <item>The finish line is in sight!</item>
-        <item>Leave it all on the field. Hydrate!</item>
-        <item>Greatness is earned one sip at a time.</item>
+        <item>¡INCREÍBLE dedicación! ¡La victoria está al alcance!</item>
+        <item>¡FUERA DE SERIE! ¡Estás en la zona de ganadores!</item>
+        <item>¡FENOMENAL! El último tramo, ¡tienes esto!</item>
+        <item>¡EXCELENCIA en acción! ¡Sigue dominando!</item>
+        <item>¡Persistencia LEGENDARIA! ¡Casi en la cumbre!</item>
+        <item>¡La línea de meta está a la vista!</item>
+        <item>Déjalo todo en el campo. ¡Hidrátate!</item>
+        <item>La grandeza se gana un sorbo a la vez.</item>
     </string-array>
     <!-- Motivating reminder messages: final progress -->
     <string-array name="notification_motivating_messages_final">
-        <item>FINAL PUSH! Greatness awaits!</item>
-        <item>SO CLOSE to TOTAL VICTORY!</item>
-        <item>MAXIMUM effort for MAXIMUM results!</item>
-        <item>ULTIMATE hydration hero! Finish strong!</item>
-        <item>LEGENDARY status incoming! Complete the mission!</item>
-        <item>Close it out strong, champion!</item>
-        <item>This is what separates good from great. Finish!</item>
-        <item>One last push. You were born for this.</item>
+        <item>¡Último sorbo! ¡La grandeza espera!</item>
+        <item>TAN CERCA de una VICTORIA TOTAL</item>
+        <item>MAXIMO esfuerzo para MAXIMOS resultados!</item>
+        <item>¡HEROE DE LA HIDRATACIÓN! ¡TERMINA CON TODO!</item>
+        <item>¡Momento legendario en camino! ¡Completa la misión!</item>
+        <item>¡Cerrando fuerte, campeón!</item>
+        <item>Esto es lo que separa lo increíble de lo bueno. ¡Termina!</item>
+        <item>Un último empujón. Has nacido para esto.</item>
     </string-array>
     <!-- Minimal reminder titles -->
     <string-array name="notification_minimal_titles">
-        <item>Water reminder</item>
+        <item>Recordatorio de agua</item>
     </string-array>
     <!-- Minimal reminder messages -->
-    <string name="notification_minimal_message_low">Time to hydrate</string>
-    <string name="notification_minimal_message_mid">Continue hydrating</string>
-    <string name="date_format_title">Date Format</string>
-    <string name="week_start_format_title">Week Start</string>
-    <string name="profile_photo_sheet_gallery_title">Choose from Gallery</string>
-    <string name="profile_photo_sheet_camera_title">Take a photo</string>
+    <string name="notification_minimal_message_low">Hora de la hidratación</string>
+    <string name="notification_minimal_message_mid">Continuar hidratando</string>
+    <string name="date_format_title">Formato de la fecha</string>
+    <string name="week_start_format_title">Inicio de la semana</string>
+    <string name="profile_photo_sheet_gallery_title">Elija desde la galería</string>
+    <string name="profile_photo_sheet_camera_title">Tomar una foto</string>
     <string name="profile_photo_sheet_delete">Remover foto de perfil</string>
     <!-- Profile photo cropper -->
     <string name="profile_crop_title">Recortar foto de perfil</string>
@@ -1063,7 +1064,7 @@
         <item>El agua ayuda a sus riñones a filtrar los residuos de manera eficiente.</item>
         <item>La hidratación adecuada apoya la piel saludable.</item>
         <item>Tu sangre es 90% de agua.</item>
-        <item>Water helps lubricate your joints.</item>
+        <item>El agua ayuda a lubricar tus pliegues corporales</item>
         <item>La hidración puede mejorar su rendimiento físico.</item>
         <item>El agua ayuda en la digestión y la absorción de nutrientes.</item>
         <item>Mantener hidratado ayuda a mantener una presión sanguínea saludable.</item>
