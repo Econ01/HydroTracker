@@ -18,6 +18,9 @@
     <string name="action_reset">Zurücksetzen</string>
     <string name="action_next">Weiter</string>
     <string name="action_continue">Fortfahren</string>
+    <!-- Loading -->
+    <string name="loading_hydrotracker">HydroTracker wird geladen…</string>
+    <string name="loading_hydration_data">Deine Hydrationsdaten werden geprüft</string>
     <!-- ============================================================================
          Accessibility content descriptions
          Spoken by TalkBack / screen readers. Keep concise.
@@ -663,6 +666,35 @@
     <string name="updates_toggle_auto_check_desc">Schaue einmal am Tag nach Aktualisierungen</string>
     <string name="updates_section_status">Status</string>
     <string name="updates_status_checking">Nach Updates prüfen…</string>
+    <string name="updates_status_downloading">Update wird heruntergeladen…</string>
+    <string name="updates_status_downloading_progress">%1$d%%</string>
+    <string name="updates_status_installing">Update wird installiert…</string>
+    <string name="updates_status_installing_desc">Bestätige die Installation im Systemdialog von Android.</string>
+    <string name="updates_status_verifying">Heruntergeladenes Update wird überprüft</string>
+    <string name="updates_status_verifying_desc">Die heruntergeladene APK-Datei wird vor der Installation überprüft.</string>
+    <string name="updates_status_ready_title">Update bereit zur Installation</string>
+    <string name="updates_status_ready_version">Version %1$s wurde heruntergeladen und überprüft.</string>
+    <string name="updates_status_ready_to_install">Das Update wurde heruntergeladen und überprüft. Installiere es, wenn du bereit bist.</string>
+    <string name="updates_status_permission_title">Berechtigung zur Installation erforderlich</string>
+    <string name="updates_status_install_permission_required">Android benötigt die Berechtigung zum Installieren von Updates, damit der Download fortgesetzt werden kann.</string>
+    <string name="updates_status_failed_title">Update fehlgeschlagen</string>
+    <string name="updates_notification_downloading_title">HydroTracker-Update wird heruntergeladen</string>
+    <string name="updates_notification_downloading_text">Download läuft</string>
+    <string name="updates_notification_ready_text">Öffne HydroTracker, um das Update zu prüfen und zu installieren</string>
+    <string name="update_error_unknown">Das Update konnte nicht abgeschlossen werden. Versuche es erneut.</string>
+    <string name="update_error_check_failed">Es konnte nicht nach Updates gesucht werden. Prüfe deine Verbindung und versuche es erneut.</string>
+    <string name="update_error_start_failed">Das Update konnte nicht gestartet werden. Versuche es erneut.</string>
+    <string name="update_error_install_failed">Android konnte das Update nicht installieren. Versuche es erneut.</string>
+    <string name="update_error_no_downloaded_update">Das heruntergeladene Update ist nicht mehr verfügbar. Lade es erneut herunter.</string>
+    <string name="update_error_play_recheck_required">Prüfe Google Play erneut, bevor du das Update durchführst.</string>
+    <string name="update_error_play_update_unavailable">Google Play bietet derzeit kein Update für diese App an.</string>
+    <string name="update_error_update_not_available">Es ist kein kompatibles Update verfügbar.</string>
+    <string name="update_error_invalid_update_metadata">Die Update-Informationen sind unvollständig oder ungültig. Versuche es später erneut.</string>
+    <string name="update_error_download_failed">Das Update konnte nicht heruntergeladen werden. Prüfe deine Verbindung und versuche es erneut.</string>
+    <string name="update_error_verification_failed">Das heruntergeladene Update konnte nicht überprüft werden. Lade es erneut von der offiziellen Veröffentlichungsseite herunter.</string>
+    <string name="update_error_install_confirmation_unavailable">Android konnte die Installationsbestätigung nicht öffnen. Versuche es erneut.</string>
+    <string name="update_error_insecure_url">Die Update-URL muss HTTPS verwenden.</string>
+    <string name="update_error_local_network_permission">Für den Update-Testserver ist die Android-Berechtigung für den Zugriff auf das lokale Netzwerk erforderlich.</string>
     <string name="updates_status_failed">Konnte nicht nach Aktualisierungen prüfen</string>
     <string name="updates_status_f_droid">Aktualisierungen werden von F/Droid verwaltet</string>
     <string name="updates_status_f_droid_desc">Öffne die F/Droid Anwendung, um Hydration-Zähler zu aktualisieren.</string>
@@ -673,6 +705,7 @@
     <string name="updates_button_check_now">Prüfe jetzt</string>
     <string name="updates_button_checking">Prüfen…</string>
     <string name="updates_button_restart_install">Neu starten zum Installieren</string>
+    <string name="updates_button_continue_install">Installation fortsetzen</string>
     <string name="updates_available_title">Aktualisierung verfügbar</string>
     <string name="updates_available_play_desc">Eine neue Version ist im Play Store verfügbar</string>
     <string name="updates_available_version">Version %1$s</string>
@@ -701,9 +734,13 @@
     <string name="update_dialog_new_version">Neue Version</string>
     <string name="update_dialog_action_play">Öffne den Play Store, um Hydration-Zähler zu aktualisieren.</string>
     <string name="update_dialog_action_f_droid">Öffne die F/Droid Anwendung, um Hydration-Zähler zu aktualisieren.</string>
-    <string name="update_dialog_action_github">Lade die letzte APK aus GitHub herunter.</string>
+    <string name="update_dialog_action_github">Lade die neueste APK-Datei von GitHub herunter und installiere sie über Android.</string>
     <string name="update_button_later">Später</string>
     <string name="update_button_update">Aktualisierung</string>
+    <string name="update_button_install">Update installieren</string>
+    <string name="update_button_allow_install">Installation zulassen</string>
+    <string name="update_button_failed_retry">Erneut versuchen</string>
+    <string name="update_button_failed_dismiss">Verwerfen</string>
     <!-- ============================================================================
          Markdown components
          ============================================================================ -->

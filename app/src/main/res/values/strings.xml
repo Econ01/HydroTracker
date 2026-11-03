@@ -22,6 +22,10 @@
     <string name="action_next">Next</string>
     <string name="action_continue">Continue</string>
 
+    <!-- Loading -->
+    <string name="loading_hydrotracker">Loading HydroTracker…</string>
+    <string name="loading_hydration_data">Checking your hydration data</string>
+
     <!-- ============================================================================
          Accessibility content descriptions
          Spoken by TalkBack / screen readers. Keep concise.
@@ -731,7 +735,36 @@
     <string name="updates_toggle_auto_check">Check automatically</string>
     <string name="updates_toggle_auto_check_desc">Look for updates about once a day</string>
     <string name="updates_section_status">Status</string>
-    <string name="updates_status_checking">Checking for updates…</string>
+    <string name="updates_status_checking">Checking for updates</string>
+    <string name="updates_status_downloading">Downloading update</string>
+    <string name="updates_status_downloading_progress">%1$d%%</string>
+    <string name="updates_status_installing">Installing update</string>
+    <string name="updates_status_installing_desc">Confirm the installation in Android\'s system dialogue.</string>
+    <string name="updates_status_verifying">Verifying the downloaded update</string>
+    <string name="updates_status_verifying_desc">Checking the downloaded APK before installation.</string>
+    <string name="updates_status_ready_title">Update ready to install</string>
+    <string name="updates_status_ready_version">Version %1$s has been downloaded and verified.</string>
+    <string name="updates_status_ready_to_install">The update has been downloaded and verified. Install it when you’re ready.</string>
+    <string name="updates_status_permission_title">Installation permission required</string>
+    <string name="updates_status_install_permission_required">Android needs authorisation to install updates before the download can continue.</string>
+    <string name="updates_status_failed_title">Update failed</string>
+    <string name="updates_notification_downloading_title">Downloading HydroTracker update</string>
+    <string name="updates_notification_downloading_text">Download in progress</string>
+    <string name="updates_notification_ready_text">Open HydroTracker to review and install the update</string>
+    <string name="update_error_unknown">The update couldn’t be completed. Try again.</string>
+    <string name="update_error_check_failed">Couldn’t check for updates. Check your connection and try again.</string>
+    <string name="update_error_start_failed">Couldn’t start the update. Try again.</string>
+    <string name="update_error_install_failed">Android couldn’t install the update. Try again.</string>
+    <string name="update_error_no_downloaded_update">The downloaded update is no longer available. Download it again.</string>
+    <string name="update_error_play_recheck_required">Check Google Play again before updating.</string>
+    <string name="update_error_play_update_unavailable">Google Play doesn’t currently offer an update for this app.</string>
+    <string name="update_error_update_not_available">No compatible update is available.</string>
+    <string name="update_error_invalid_update_metadata">The update information is incomplete or invalid. Try again later.</string>
+    <string name="update_error_download_failed">The update couldn’t be downloaded. Check your connection and try again.</string>
+    <string name="update_error_verification_failed">The downloaded update couldn’t be verified. Download it again from the official release.</string>
+    <string name="update_error_install_confirmation_unavailable">Android couldn’t open the installation confirmation. Try again.</string>
+    <string name="update_error_insecure_url">The update URL must use HTTPS.</string>
+    <string name="update_error_local_network_permission">Android’s local network permission is required for the update test server.</string>
     <string name="updates_status_failed">Couldn\'t check for updates</string>
     <string name="updates_status_f_droid">Updates are handled by F-Droid</string>
     <string name="updates_status_f_droid_desc">Open the F-Droid app to update HydroTracker.</string>
@@ -742,6 +775,7 @@
     <string name="updates_button_check_now">Check now</string>
     <string name="updates_button_checking">Checking…</string>
     <string name="updates_button_restart_install">Restart to install</string>
+    <string name="updates_button_continue_install">Continue installation</string>
     <string name="updates_available_title">Update available</string>
     <string name="updates_available_play_desc">A new version is available on Google Play</string>
     <string name="updates_available_version">Version %1$s</string>
@@ -774,9 +808,13 @@
     <string name="update_dialog_new_version">New version</string>
     <string name="update_dialog_action_play">Open Google Play to update HydroTracker.</string>
     <string name="update_dialog_action_f_droid">Open the F-Droid app to update HydroTracker.</string>
-    <string name="update_dialog_action_github">Download the latest APK from GitHub.</string>
+    <string name="update_dialog_action_github">Download the latest APK from GitHub and install it through Android.</string>
     <string name="update_button_later">Later</string>
     <string name="update_button_update">Update</string>
+    <string name="update_button_install">Install update</string>
+    <string name="update_button_allow_install">Allow installation</string>
+    <string name="update_button_failed_retry">Retry</string>
+    <string name="update_button_failed_dismiss">Dismiss</string>
 
     <!-- ============================================================================
          Markdown components

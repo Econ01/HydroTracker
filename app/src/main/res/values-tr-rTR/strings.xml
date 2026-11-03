@@ -18,6 +18,9 @@
     <string name="action_reset">Sıfırla</string>
     <string name="action_next">Sonraki</string>
     <string name="action_continue">Devam et</string>
+    <!-- Loading -->
+    <string name="loading_hydrotracker">HydroTracker yükleniyor…</string>
+    <string name="loading_hydration_data">Hidrasyon verilerin kontrol ediliyor</string>
     <!-- ============================================================================
          Accessibility content descriptions
          Spoken by TalkBack / screen readers. Keep concise.
@@ -663,6 +666,35 @@
     <string name="updates_toggle_auto_check_desc">Look for updates about once a day</string>
     <string name="updates_section_status">Status</string>
     <string name="updates_status_checking">Checking for updates…</string>
+    <string name="updates_status_downloading">Güncelleme indiriliyor…</string>
+    <string name="updates_status_downloading_progress">%1$d%%</string>
+    <string name="updates_status_installing">Güncelleme yükleniyor…</string>
+    <string name="updates_status_installing_desc">Android sistem iletişim kutusundan yüklemeyi onaylayın.</string>
+    <string name="updates_status_verifying">İndirilen güncelleme doğrulanıyor</string>
+    <string name="updates_status_verifying_desc">İndirilen APK, yüklenmeden önce kontrol ediliyor.</string>
+    <string name="updates_status_ready_title">Güncelleme yüklenmeye hazır</string>
+    <string name="updates_status_ready_version">%1$s sürümü indirildi ve doğrulandı.</string>
+    <string name="updates_status_ready_to_install">Güncelleme indirildi ve doğrulandı. Hazır olduğunda yükle.</string>
+    <string name="updates_status_permission_title">Yükleme izni gerekli</string>
+    <string name="updates_status_install_permission_required">İndirme işleminin devam edebilmesi için Android\'in güncellemeleri yükleme iznine sahip olması gerekiyor.</string>
+    <string name="updates_status_failed_title">Güncelleme başarısız oldu</string>
+    <string name="updates_notification_downloading_title">HydroTracker güncellemesi indiriliyor</string>
+    <string name="updates_notification_downloading_text">İndirme devam ediyor</string>
+    <string name="updates_notification_ready_text">Güncellemeyi incelemek ve yüklemek için HydroTracker uygulamasını aç</string>
+    <string name="update_error_unknown">Güncelleme tamamlanamadı. Tekrar dene.</string>
+    <string name="update_error_check_failed">Güncellemeler kontrol edilemedi. Bağlantını kontrol et ve tekrar dene.</string>
+    <string name="update_error_start_failed">Güncelleme başlatılamadı. Tekrar dene.</string>
+    <string name="update_error_install_failed">Android güncellemeyi yükleyemedi. Tekrar dene.</string>
+    <string name="update_error_no_downloaded_update">İndirilen güncelleme artık mevcut değil. Güncellemeyi tekrar indir.</string>
+    <string name="update_error_play_recheck_required">Güncellemeden önce Google Play\'i tekrar kontrol et.</string>
+    <string name="update_error_play_update_unavailable">Google Play şu anda bu uygulama için bir güncelleme sunmuyor.</string>
+    <string name="update_error_update_not_available">Uyumlu bir güncelleme mevcut değil.</string>
+    <string name="update_error_invalid_update_metadata">Güncelleme bilgileri eksik veya geçersiz. Daha sonra tekrar dene.</string>
+    <string name="update_error_download_failed">Güncelleme indirilemedi. Bağlantını kontrol et ve tekrar dene.</string>
+    <string name="update_error_verification_failed">İndirilen güncelleme doğrulanamadı. Güncellemeyi resmî sürümden tekrar indir.</string>
+    <string name="update_error_install_confirmation_unavailable">Android yükleme onayını açamadı. Tekrar dene.</string>
+    <string name="update_error_insecure_url">Güncelleme URL\'si HTTPS kullanmalıdır.</string>
+    <string name="update_error_local_network_permission">Güncelleme test sunucusu için Android\'in yerel ağ izni gereklidir.</string>
     <string name="updates_status_failed">Couldn\'t check for updates</string>
     <string name="updates_status_f_droid">Updates are handled by F-Droid</string>
     <string name="updates_status_f_droid_desc">Open the F-Droid app to update HydroTracker.</string>
@@ -673,6 +705,7 @@
     <string name="updates_button_check_now">Check now</string>
     <string name="updates_button_checking">Checking…</string>
     <string name="updates_button_restart_install">Restart to install</string>
+    <string name="updates_button_continue_install">Yüklemeye devam et</string>
     <string name="updates_available_title">Update available</string>
     <string name="updates_available_play_desc">A new version is available on Google Play</string>
     <string name="updates_available_version">Version %1$s</string>
@@ -701,9 +734,13 @@
     <string name="update_dialog_new_version">New version</string>
     <string name="update_dialog_action_play">Open Google Play to update HydroTracker.</string>
     <string name="update_dialog_action_f_droid">Open the F-Droid app to update HydroTracker.</string>
-    <string name="update_dialog_action_github">Download the latest APK from GitHub.</string>
+    <string name="update_dialog_action_github">GitHub\'dan en güncel APK dosyasını indir ve Android aracılığıyla yükle.</string>
     <string name="update_button_later">Later</string>
     <string name="update_button_update">Update</string>
+    <string name="update_button_install">Güncellemeyi yükle</string>
+    <string name="update_button_allow_install">Yüklemeye izin ver</string>
+    <string name="update_button_failed_retry">Tekrar dene</string>
+    <string name="update_button_failed_dismiss">Kapat</string>
     <!-- ============================================================================
          Markdown components
          ============================================================================ -->
