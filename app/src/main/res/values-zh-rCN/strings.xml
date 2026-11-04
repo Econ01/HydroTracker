@@ -19,8 +19,8 @@
     <string name="action_next">下一步</string>
     <string name="action_continue">继续</string>
     <!-- Loading -->
-    <string name="loading_hydrotracker">Loading HydroTracker…</string>
-    <string name="loading_hydration_data">Checking your hydration data</string>
+    <string name="loading_hydrotracker">正在加载 HydroTracker……</string>
+    <string name="loading_hydration_data">正在检查你的饮水数据</string>
     <!-- ============================================================================
          Accessibility content descriptions
          Spoken by TalkBack / screen readers. Keep concise.
@@ -658,40 +658,40 @@
     <string name="updates_toggle_auto_check">自动检查更新</string>
     <string name="updates_toggle_auto_check_desc">每天自动查询一次更新</string>
     <string name="updates_section_status">状态</string>
-    <string name="updates_status_checking">Checking for updates</string>
-    <string name="updates_status_downloading">Downloading update</string>
+    <string name="updates_status_checking">正在检查更新……</string>
+    <string name="updates_status_downloading">正在下载更新……</string>
     <string name="updates_status_progress">%1$d%%</string>
-    <string name="updates_status_downloading_progress">Progress • %1$d%%</string>
-    <string name="updates_status_installing">Installing update</string>
-    <string name="updates_status_installing_desc">Confirm the installation in Android\'s system dialogue.</string>
-    <string name="updates_status_verifying">Verifying the downloaded update</string>
-    <string name="updates_status_verifying_desc">Checking the downloaded APK before installation.</string>
-    <string name="updates_status_ready_title">Update ready to install</string>
-    <string name="updates_status_ready_version">Version %1$s has been downloaded and verified.</string>
-    <string name="updates_status_ready_to_install">The update has been downloaded and verified. Install it when you’re ready.</string>
-    <string name="updates_status_permission_title">Installation permission required</string>
-    <string name="updates_status_install_permission_required">Android needs authorisation to install the downloaded update.</string>
-    <string name="updates_status_failed_title">Update failed</string>
-    <string name="updates_notification_downloading_title">Downloading HydroTracker update</string>
-    <string name="updates_notification_downloading_text">Download in progress</string>
-    <string name="updates_notification_ready_text">Open HydroTracker to review and install the update</string>
-    <string name="updates_live_updates_title">Live Updates</string>
-    <string name="updates_live_updates_desc">Show ongoing download progress as a live activity.</string>
-    <string name="updates_live_updates_disabled_desc">Live Updates are disabled in Android settings. Enable them to use this feature.</string>
-    <string name="update_error_unknown">The update couldn’t be completed. Try again.</string>
-    <string name="update_error_check_failed">Couldn’t check for updates. Check your connection and try again.</string>
-    <string name="update_error_start_failed">Couldn’t start the update. Try again.</string>
-    <string name="update_error_install_failed">Android couldn’t install the update. Try again.</string>
-    <string name="update_error_no_downloaded_update">The downloaded update is no longer available. Download it again.</string>
-    <string name="update_error_play_recheck_required">Check Google Play again before updating.</string>
-    <string name="update_error_play_update_unavailable">Google Play doesn’t currently offer an update for this app.</string>
-    <string name="update_error_update_not_available">No compatible update is available.</string>
-    <string name="update_error_invalid_update_metadata">The update information is incomplete or invalid. Try again later.</string>
-    <string name="update_error_download_failed">The update couldn’t be downloaded. Check your connection and try again.</string>
-    <string name="update_error_verification_failed">The downloaded update couldn’t be verified. Download it again from the official release.</string>
-    <string name="update_error_install_confirmation_unavailable">Android couldn’t open the installation confirmation. Try again.</string>
-    <string name="update_error_insecure_url">The update URL must use HTTPS.</string>
-    <string name="update_error_local_network_permission">Android’s local network permission is required for the update test server.</string>
+    <string name="updates_status_downloading_progress">进度 • %1$d%%</string>
+    <string name="updates_status_installing">正在安装更新……</string>
+    <string name="updates_status_installing_desc">请在 Android 系统对话框中确认安装。</string>
+    <string name="updates_status_verifying">正在验证已下载的更新</string>
+    <string name="updates_status_verifying_desc">安装前会检查已下载的 APK。</string>
+    <string name="updates_status_ready_title">更新已就绪，可以安装</string>
+    <string name="updates_status_ready_version">版本 %1$s 已下载并通过验证。</string>
+    <string name="updates_status_ready_to_install">更新已下载并通过验证。准备好后即可安装。</string>
+    <string name="updates_status_permission_title">需要安装权限</string>
+    <string name="updates_status_install_permission_required">Android 需要获得授权才能安装已下载的更新。</string>
+    <string name="updates_status_failed_title">更新失败</string>
+    <string name="updates_notification_downloading_title">正在下载 HydroTracker 更新</string>
+    <string name="updates_notification_downloading_text">下载进行中</string>
+    <string name="updates_notification_ready_text">打开 HydroTracker 以查看并安装更新</string>
+    <string name="updates_live_updates_title">实时更新</string>
+    <string name="updates_live_updates_desc">在受支持的系统界面中显示当前下载的进度。</string>
+    <string name="updates_live_updates_disabled_desc">实时更新已在 Android 设置中停用。启用后即可使用此功能。</string>
+    <string name="update_error_unknown">无法完成更新。请重试。</string>
+    <string name="update_error_check_failed">无法检查更新。请检查网络连接后重试。</string>
+    <string name="update_error_start_failed">无法启动更新。请重试。</string>
+    <string name="update_error_install_failed">Android 无法安装更新。请重试。</string>
+    <string name="update_error_no_downloaded_update">已下载的更新不再可用。请重新下载。</string>
+    <string name="update_error_play_recheck_required">更新前请再次检查 Google Play。</string>
+    <string name="update_error_play_update_unavailable">Google Play 目前没有提供此应用的更新。</string>
+    <string name="update_error_update_not_available">没有可用的兼容更新。</string>
+    <string name="update_error_invalid_update_metadata">更新信息不完整或无效。请稍后重试。</string>
+    <string name="update_error_download_failed">无法下载更新。请检查网络连接后重试。</string>
+    <string name="update_error_verification_failed">无法验证已下载的更新。请从官方发布版本重新下载。</string>
+    <string name="update_error_install_confirmation_unavailable">Android 无法打开安装确认界面。请重试。</string>
+    <string name="update_error_insecure_url">更新链接必须使用 HTTPS。</string>
+    <string name="update_error_local_network_permission">更新测试服务器需要 Android 的本地网络权限。</string>
     <string name="updates_status_failed">无法检查更新</string>
     <string name="updates_status_f_droid">更新由 F-Droid 管理</string>
     <string name="updates_status_f_droid_desc">打开 F-Droid 应用来更新 HydroTracker。</string>
@@ -702,7 +702,7 @@
     <string name="updates_button_check_now">现在检查</string>
     <string name="updates_button_checking">正在检查……</string>
     <string name="updates_button_restart_install">重启以安装</string>
-    <string name="updates_button_continue_install">Continue installation</string>
+    <string name="updates_button_continue_install">继续安装</string>
     <string name="updates_available_title">更新可用</string>
     <string name="updates_available_play_desc">新版本在 Google Play 上可用</string>
     <string name="updates_available_version">版本 %1$s</string>
@@ -731,14 +731,14 @@
     <string name="update_dialog_new_version">新版本</string>
     <string name="update_dialog_action_play">打开 Google Play 以更新 HydroTracker。</string>
     <string name="update_dialog_action_f_droid">打开 F-Droid 应用以更新 HydroTracker。</string>
-    <string name="update_dialog_action_github">Download the latest APK from GitHub and install it through Android.</string>
+    <string name="update_dialog_action_github">从 GitHub 下载最新的 APK，并通过 Android 安装。</string>
     <string name="update_button_later">稍后</string>
     <string name="update_button_update">更新</string>
-    <string name="update_button_install">Install update</string>
-    <string name="update_button_allow_install">Allow installation</string>
-    <string name="update_button_failed_retry">Retry</string>
-    <string name="update_button_failed_dismiss">Dismiss</string>
-    <string name="update_cancel_download">Cancel download</string>
+    <string name="update_button_install">安装更新</string>
+    <string name="update_button_allow_install">允许安装</string>
+    <string name="update_button_failed_retry">重试</string>
+    <string name="update_button_failed_dismiss">关闭</string>
+    <string name="update_cancel_download">取消下载</string>
     <!-- ============================================================================
          Markdown components
          ============================================================================ -->
@@ -768,7 +768,7 @@
     <string name="home_snackbar_add_failed">添加饮水失败：%1$s</string>
     <string name="home_snackbar_delete_failed">删除条目失败：%1$s</string>
     <string name="home_snackbar_update_failed">更新条目失败：%1$s</string>
-    <string name="home_update_available">Update available: %1$s</string>
+    <string name="home_update_available">有可用更新：%1$s</string>
     <string name="home_snackbar_synced">已从 Health Connect 同步 %1$d 则条目</string>
     <string name="home_snackbar_sync_errors">已完成同步，有 %1$d 处错误</string>
     <string name="home_snackbar_up_to_date">日期已更新</string>
