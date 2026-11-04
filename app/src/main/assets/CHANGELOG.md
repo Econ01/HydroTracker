@@ -1,3 +1,7 @@
+[1.8.1]
+Changed
+- Update translations
+
 [1.8]
 Added
 - Distribution-specific update handling, including verified, user-confirmed APK downloads and installation through Android for GitHub builds

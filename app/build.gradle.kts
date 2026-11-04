@@ -17,8 +17,8 @@ if (localPropertiesFile.exists()) {
 
 // Optional build-only overrides used by the local update-test APK generator. Release defaults
 // remain unchanged unless these properties are explicitly supplied on the Gradle command line.
-val configuredVersionCode = (findProperty("hydroVersionCode") as String?)?.toIntOrNull() ?: 38
-val configuredVersionName = findProperty("hydroVersionName") as String? ?: "1.8"
+val configuredVersionCode = (findProperty("hydroVersionCode") as String?)?.toIntOrNull() ?: 39
+val configuredVersionName = findProperty("hydroVersionName") as String? ?: "1.8.1"
 val configuredDebugApplicationIdSuffix = findProperty("hydroApplicationIdSuffix") as String? ?: ".debug"
 
 android {
@@ -62,6 +62,11 @@ android {
         }
         release {
             isMinifyEnabled = false
+
+            dependenciesInfo {
+                includeInApk = false
+            }
+
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
