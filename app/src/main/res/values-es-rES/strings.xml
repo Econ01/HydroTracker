@@ -19,8 +19,8 @@
     <string name="action_next">Siguiente</string>
     <string name="action_continue">Continuar</string>
     <!-- Loading -->
-    <string name="loading_hydrotracker">Loading HydroTracker…</string>
-    <string name="loading_hydration_data">Checking your hydration data</string>
+    <string name="loading_hydrotracker">Cargando HydroTracker…</string>
+    <string name="loading_hydration_data">Comprobando tus datos de hidratación</string>
     <!-- ============================================================================
          Accessibility content descriptions
          Spoken by TalkBack / screen readers. Keep concise.
@@ -372,7 +372,7 @@
     <string name="notif_sleep_time">Hora de dormir</string>
     <string name="notif_schedule_header">Programar</string>
     <string name="notif_configure_schedule">Configurar programación</string>
-    <string name="notif_configure_schedule_desc"></string>
+    <string name="notif_configure_schedule_desc">Cambia el modo de recordatorio o define un intervalo personalizado</string>
     <string name="notif_reminder_interval">Intérvalo de recordatorio</string>
     <string name="notif_scheduled_for">Programado para</string>
     <string name="notif_pause_reminders">Pausar recordatorios por hoy</string>
@@ -666,40 +666,40 @@
     <string name="updates_toggle_auto_check">Comprobar automáticamente</string>
     <string name="updates_toggle_auto_check_desc">Buscar actualizaciones una vez al día</string>
     <string name="updates_section_status">Estado</string>
-    <string name="updates_status_checking">Checking for updates</string>
-    <string name="updates_status_downloading">Downloading update</string>
+    <string name="updates_status_checking">Buscando actualizaciones…</string>
+    <string name="updates_status_downloading">Descargando actualización…</string>
     <string name="updates_status_progress">%1$d%%</string>
-    <string name="updates_status_downloading_progress">Progress • %1$d%%</string>
-    <string name="updates_status_installing">Installing update</string>
-    <string name="updates_status_installing_desc">Confirm the installation in Android\'s system dialogue.</string>
-    <string name="updates_status_verifying">Verifying the downloaded update</string>
-    <string name="updates_status_verifying_desc">Checking the downloaded APK before installation.</string>
-    <string name="updates_status_ready_title">Update ready to install</string>
-    <string name="updates_status_ready_version">Version %1$s has been downloaded and verified.</string>
-    <string name="updates_status_ready_to_install">The update has been downloaded and verified. Install it when you’re ready.</string>
-    <string name="updates_status_permission_title">Installation permission required</string>
-    <string name="updates_status_install_permission_required">Android needs authorisation to install the downloaded update.</string>
-    <string name="updates_status_failed_title">Update failed</string>
-    <string name="updates_notification_downloading_title">Downloading HydroTracker update</string>
-    <string name="updates_notification_downloading_text">Download in progress</string>
-    <string name="updates_notification_ready_text">Open HydroTracker to review and install the update</string>
-    <string name="updates_live_updates_title">Live Updates</string>
-    <string name="updates_live_updates_desc">Show ongoing download progress as a live activity.</string>
-    <string name="updates_live_updates_disabled_desc">Live Updates are disabled in Android settings. Enable them to use this feature.</string>
-    <string name="update_error_unknown">The update couldn’t be completed. Try again.</string>
-    <string name="update_error_check_failed">Couldn’t check for updates. Check your connection and try again.</string>
-    <string name="update_error_start_failed">Couldn’t start the update. Try again.</string>
-    <string name="update_error_install_failed">Android couldn’t install the update. Try again.</string>
-    <string name="update_error_no_downloaded_update">The downloaded update is no longer available. Download it again.</string>
-    <string name="update_error_play_recheck_required">Check Google Play again before updating.</string>
-    <string name="update_error_play_update_unavailable">Google Play doesn’t currently offer an update for this app.</string>
-    <string name="update_error_update_not_available">No compatible update is available.</string>
-    <string name="update_error_invalid_update_metadata">The update information is incomplete or invalid. Try again later.</string>
-    <string name="update_error_download_failed">The update couldn’t be downloaded. Check your connection and try again.</string>
-    <string name="update_error_verification_failed">The downloaded update couldn’t be verified. Download it again from the official release.</string>
-    <string name="update_error_install_confirmation_unavailable">Android couldn’t open the installation confirmation. Try again.</string>
-    <string name="update_error_insecure_url">The update URL must use HTTPS.</string>
-    <string name="update_error_local_network_permission">Android’s local network permission is required for the update test server.</string>
+    <string name="updates_status_downloading_progress">Progreso • %1$d%%</string>
+    <string name="updates_status_installing">Instalando actualización…</string>
+    <string name="updates_status_installing_desc">Confirma la instalación en el diálogo del sistema de Android.</string>
+    <string name="updates_status_verifying">Verificando la actualización descargada</string>
+    <string name="updates_status_verifying_desc">Se está comprobando el APK descargado antes de la instalación.</string>
+    <string name="updates_status_ready_title">Actualización lista para instalar</string>
+    <string name="updates_status_ready_version">La versión %1$s se ha descargado y verificado.</string>
+    <string name="updates_status_ready_to_install">La actualización se ha descargado y verificado. Instálala cuando quieras.</string>
+    <string name="updates_status_permission_title">Se requiere permiso de instalación</string>
+    <string name="updates_status_install_permission_required">Android necesita autorización para instalar la actualización descargada.</string>
+    <string name="updates_status_failed_title">Error en la actualización</string>
+    <string name="updates_notification_downloading_title">Descargando la actualización de HydroTracker</string>
+    <string name="updates_notification_downloading_text">Descarga en curso</string>
+    <string name="updates_notification_ready_text">Abre HydroTracker para revisar e instalar la actualización</string>
+    <string name="updates_live_updates_title">Actualizaciones en tiempo real</string>
+    <string name="updates_live_updates_desc">Muestra el progreso de la descarga en curso en las interfaces del sistema compatibles.</string>
+    <string name="updates_live_updates_disabled_desc">Las actualizaciones en tiempo real están desactivadas en la configuración de Android. Actívalas para usar esta función.</string>
+    <string name="update_error_unknown">No se pudo completar la actualización. Inténtalo de nuevo.</string>
+    <string name="update_error_check_failed">No se pudo comprobar si hay actualizaciones. Comprueba tu conexión e inténtalo de nuevo.</string>
+    <string name="update_error_start_failed">No se pudo iniciar la actualización. Inténtalo de nuevo.</string>
+    <string name="update_error_install_failed">Android no pudo instalar la actualización. Inténtalo de nuevo.</string>
+    <string name="update_error_no_downloaded_update">La actualización descargada ya no está disponible. Descárgala de nuevo.</string>
+    <string name="update_error_play_recheck_required">Vuelve a comprobar Google Play antes de actualizar.</string>
+    <string name="update_error_play_update_unavailable">Google Play no ofrece actualmente ninguna actualización para esta aplicación.</string>
+    <string name="update_error_update_not_available">No hay ninguna actualización compatible disponible.</string>
+    <string name="update_error_invalid_update_metadata">La información de la actualización está incompleta o no es válida. Inténtalo de nuevo más tarde.</string>
+    <string name="update_error_download_failed">No se pudo descargar la actualización. Comprueba tu conexión e inténtalo de nuevo.</string>
+    <string name="update_error_verification_failed">No se pudo verificar la actualización descargada. Descárgala de nuevo desde la versión oficial.</string>
+    <string name="update_error_install_confirmation_unavailable">Android no pudo abrir la confirmación de instalación. Inténtalo de nuevo.</string>
+    <string name="update_error_insecure_url">La URL de actualización debe usar HTTPS.</string>
+    <string name="update_error_local_network_permission">Se necesita el permiso de red local de Android para el servidor de pruebas de actualizaciones.</string>
     <string name="updates_status_failed">No se pudieron comprobar actualizaciones</string>
     <string name="updates_status_f_droid">Las actualizaciones son manejadas por F-Droid</string>
     <string name="updates_status_f_droid_desc">Abre la aplicación F-Droid para actualizar HydroTracker.</string>
@@ -710,7 +710,7 @@
     <string name="updates_button_check_now">Comprobar ahora</string>
     <string name="updates_button_checking">Comprobando…</string>
     <string name="updates_button_restart_install">Reiniciar para instalar</string>
-    <string name="updates_button_continue_install">Continue installation</string>
+    <string name="updates_button_continue_install">Continuar instalación</string>
     <string name="updates_available_title">Actualización disponible</string>
     <string name="updates_available_play_desc">Una nueva versión está disponible en Google Play</string>
     <string name="updates_available_version">Versión %1$s</string>
@@ -739,14 +739,14 @@
     <string name="update_dialog_new_version">Nueva versión</string>
     <string name="update_dialog_action_play">Abre Google Play para actualizar HydroTracker.</string>
     <string name="update_dialog_action_f_droid">Abre la aplicación F-Droid para actualizar HydroTracker.</string>
-    <string name="update_dialog_action_github">Download the latest APK from GitHub and install it through Android.</string>
+    <string name="update_dialog_action_github">Descarga el APK más reciente de GitHub e instálalo a través de Android.</string>
     <string name="update_button_later">Después</string>
     <string name="update_button_update">Actualizar</string>
-    <string name="update_button_install">Install update</string>
-    <string name="update_button_allow_install">Allow installation</string>
-    <string name="update_button_failed_retry">Retry</string>
-    <string name="update_button_failed_dismiss">Dismiss</string>
-    <string name="update_cancel_download">Cancel download</string>
+    <string name="update_button_install">Instalar actualización</string>
+    <string name="update_button_allow_install">Permitir instalación</string>
+    <string name="update_button_failed_retry">Reintentar</string>
+    <string name="update_button_failed_dismiss">Descartar</string>
+    <string name="update_cancel_download">Cancelar descarga</string>
     <!-- ============================================================================
          Markdown components
          ============================================================================ -->
@@ -774,9 +774,9 @@
          ============================================================================ -->
     <!-- Snackbars -->
     <string name="home_snackbar_add_failed">Error al añadir agua: %1$s</string>
-    <string name="home_snackbar_delete_failed">No se ha podido borrar la entrada: %1</string>
+    <string name="home_snackbar_delete_failed">No se ha podido borrar la entrada: %1$s</string>
     <string name="home_snackbar_update_failed">Error al actualizar la entrada: %1$s</string>
-    <string name="home_update_available">Update available: %1$s</string>
+    <string name="home_update_available">Actualización disponible: %1$s</string>
     <string name="home_snackbar_synced">%1$d entradas sincronizadas desde Health Connect</string>
     <string name="home_snackbar_sync_errors">Sincronización completada con errores %1$d</string>
     <string name="home_snackbar_up_to_date">Los datos están actualizados</string>
@@ -792,7 +792,7 @@
     <string name="home_label_time">Hora</string>
     <!-- %1$s = minimum valid amount, %2$s = maximum valid amount (both with unit) -->
     <string name="home_error_amount_invalid">Por favor, introduzca una cantidad válida (%1$s–%2$s)</string>
-    <string name="home_label_hydration_effectiveness">Efectividad de la Hidratación (%)</string>
+    <string name="home_label_hydration_effectiveness">Efectividad de la Hidratación: %1$s</string>
     <string name="home_label_effective_hydration">Hydración Efectiva: %1$s</string>
     <string name="home_option_custom">Personalizado</string>
     <string name="home_beverage_effective_name">%1$s</string>
