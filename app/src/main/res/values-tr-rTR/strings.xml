@@ -55,12 +55,12 @@
          rendered inside the Glance widget.
          ============================================================================ -->
     <string name="widget_large_label">HydroTracker</string>
-    <string name="widget_large_description">Adaptive hydration progress and quick-add actions</string>
-    <string name="widget_quick_add_label">HydroTracker Quick Add</string>
-    <string name="widget_quick_add_description">Resizable buttons for adding water with one tap</string>
+    <string name="widget_large_description">Uyarlanabilir hidrasyon takibi ve hızlı ekle eylemleri</string>
+    <string name="widget_quick_add_label">HydroTracker Hızlı Ekle</string>
+    <string name="widget_quick_add_description">Tek dokunuşla su eklemeye yarayan, boyutu değiştirilebilir düğmeler</string>
     <string name="widget_of_goal_format">%1$s / %2$s</string>
     <string name="widget_goal_reached">Hedefe ulaşıldı!</string>
-    <string name="widget_progress_cd">Daily hydration: %1$s</string>
+    <string name="widget_progress_cd">Günlük hidrasyon: %1$s</string>
     <string name="widget_quick_add_cd">%1$s Ekle</string>
     <string name="widget_daily_hydration">Günlük Hidrasyon</string>
     <string name="widget_card_glass">Bardak</string>
@@ -91,19 +91,19 @@
     <string name="language_progress_header">Çeviri seviyesi</string>
     <string name="language_progress_translated">Çevirildi</string>
     <string name="language_progress_approved">Onaylandı</string>
-    <string name="language_translators_header">Translators</string>
-    <string name="language_translators_description">All-time words translated on Crowdin</string>
-    <string name="language_proofreaders_header">Proofreaders</string>
-    <string name="language_proofreaders_description">All-time words approved on Crowdin</string>
-    <string name="language_other_contributors_header">Other contributors</string>
-    <string name="language_contributor_languages">%1$s. Languages: %2$s</string>
+    <string name="language_translators_header">Çevirmenler</string>
+    <string name="language_translators_description">Crowdin\'de çevirilen tüm kelimeler</string>
+    <string name="language_proofreaders_header">Düzeltmenler</string>
+    <string name="language_proofreaders_description">Crowdin\'de onaylanan tüm kelimeler</string>
+    <string name="language_other_contributors_header">Diğer katkıda bulunanlar</string>
+    <string name="language_contributor_languages">%1$s. Diller: %2$s</string>
     <plurals name="language_translator_words">
-        <item quantity="one">%1$s, %2$s word translated</item>
-        <item quantity="other">%1$s, %2$s words translated</item>
+        <item quantity="one">%1$s, %2$s kelime çevrildi</item>
+        <item quantity="other">%1$s, %2$s kelime çevrildi</item>
     </plurals>
     <plurals name="language_proofreader_words">
-        <item quantity="one">%1$s, %2$s word approved</item>
-        <item quantity="other">%1$s, %2$s words approved</item>
+        <item quantity="one">%1$s, %2$s kelime onaylandı</item>
+        <item quantity="other">%1$s, %2$s kelime onaylandı</item>
     </plurals>
     <!-- Time format options -->
     <string name="time_format_system">Sistem</string>
@@ -161,66 +161,66 @@
     <string name="onboarding_feature_reminders_desc">Aktif olduğunuz saatlerde nazik hatırlatmalar</string>
     <string name="onboarding_feature_progress_title">İlerleme Takibi</string>
     <string name="onboarding_feature_progress_desc">Ayrıntılı içgörüler ve geçmiş</string>
-    <string name="onboarding_get_started">Get Started</string>
+    <string name="onboarding_get_started">Başla</string>
     <!-- Schedule step -->
     <string name="onboarding_wake_label">Uyanma Zamanı</string>
-    <string name="onboarding_sleep_label">Sleep Time</string>
-    <string name="onboarding_wake_picker_title">Wake Up Time</string>
-    <string name="onboarding_wake_picker_subtitle">Choose your wake-up time</string>
-    <string name="onboarding_sleep_picker_title">Sleep Time</string>
-    <string name="onboarding_sleep_picker_subtitle">Choose your sleep time</string>
-    <string name="time_picker_set">Set Time</string>
+    <string name="onboarding_sleep_label">Uyku Zamanı</string>
+    <string name="onboarding_wake_picker_title">Uyanma Zamanı</string>
+    <string name="onboarding_wake_picker_subtitle">Uyanma saatinizi seçin</string>
+    <string name="onboarding_sleep_picker_title">Uyku Zamanı</string>
+    <string name="onboarding_sleep_picker_subtitle">Uyku saatinizi seçin</string>
+    <string name="time_picker_set">Zamanı Ayarla</string>
     <!-- Awake duration, e.g. "Awake for 16h 0m"; %1$d = hours, %2$d = minutes -->
-    <string name="onboarding_awake_duration">Awake for %1$dh %2$dm</string>
+    <string name="onboarding_awake_duration">%1$d saat %2$d dakika uyanık</string>
     <!-- Profile setup step -->
-    <string name="profile_add_photo">Add Photo</string>
-    <string name="profile_remove_photo">Remove Photo</string>
-    <string name="profile_name_prompt">What should we call you?</string>
-    <string name="profile_name_label">Your name</string>
-    <string name="profile_name_placeholder">Enter your name</string>
-    <string name="profile_name_required">Name is required to continue</string>
-    <string name="profile_select_photo">Select Profile Photo</string>
-    <string name="profile_choose_gallery">Choose from Gallery</string>
-    <string name="profile_choose_gallery_desc">Select an existing photo</string>
-    <string name="profile_take_photo">Take Photo</string>
-    <string name="profile_take_photo_desc">Use your camera to take a new photo</string>
+    <string name="profile_add_photo">Resim ekle</string>
+    <string name="profile_remove_photo">Resmi kaldır</string>
+    <string name="profile_name_prompt">Size nasıl hitap edelim?</string>
+    <string name="profile_name_label">Adınız</string>
+    <string name="profile_name_placeholder">İsminizi girin</string>
+    <string name="profile_name_required">İsim ilerlemek için gerekli</string>
+    <string name="profile_select_photo">Profil Fotoğrafı Seç</string>
+    <string name="profile_choose_gallery">Galeriden Seç</string>
+    <string name="profile_choose_gallery_desc">Mevcut bir fotoğraf seçin</string>
+    <string name="profile_take_photo">Fotoğraf Çek</string>
+    <string name="profile_take_photo_desc">Yeni bir fotoğraf çekmek için kameranızı kullanın</string>
     <!-- Goal step -->
-    <string name="goal_daily_water_goal">Daily Water Goal</string>
-    <string name="goal_reminder_interval">Reminder Interval</string>
-    <string name="goal_activity_level">Activity Level</string>
-    <string name="goal_personalized_title">How we personalized this</string>
-    <string name="goal_personalized_body">Your goal considers your profile and schedule. These factors influence total intake and notification cadence.</string>
+    <string name="goal_daily_water_goal">Günlük Su İçme Hedefi</string>
+    <string name="goal_reminder_interval">Hatırlatma Aralığı</string>
+    <string name="goal_activity_level">Aktivite Düzeyi</string>
+    <string name="goal_personalized_title">Bunu nasıl kişiselleştirdik</string>
+    <string name="goal_personalized_body">Hedefiniz; profiliniz ve programınız dikkate alınarak belirlenir. Bu faktörler, toplam alım miktarınızı ve bildirim sıklığınızı etkiler.</string>
     <!-- Profile recap chips; %1$s = a time like 07:00 -->
-    <string name="goal_chip_wake">Wake: %1$s</string>
-    <string name="goal_chip_sleep">Sleep: %1$s</string>
+    <string name="goal_chip_wake">Uyanık: %1$s</string>
+    <string name="goal_chip_sleep">Uyku: %1$s</string>
     <!-- Reminder interval shown in the Goal step; pluralized on the minute count -->
     <plurals name="reminder_interval_minutes">
-        <item quantity="one">%1$d minute</item>
-        <item quantity="other">%1$d minutes</item>
+        <item quantity="one">%1$d dakika</item>
+        <item quantity="other">%1$d dakika</item>
     </plurals>
     <!-- Complete step -->
-    <string name="complete_subtitle">Your personalized hydration plan is ready.</string>
-    <string name="complete_daily_goal">Your Daily Goal</string>
-    <string name="complete_start_button">Start hydrating</string>
+    <string name="complete_subtitle">Kişiselleştirilmiş su içme planınız hazır.</string>
+    <string name="complete_daily_goal">Günlük Hedefiniz</string>
+    <string name="complete_start_button">Su içmeye başlayın</string>
     <!-- Abbreviated reminder interval, e.g. "60 min"; %1$d = minutes -->
-    <string name="reminder_interval_min_short">%1$d min</string>
+    <string name="reminder_interval_min_short">%1$d dakika</string>
     <!-- ============================================================================
          Beverages &amp; containers — shared bottom sheets
          Add/edit custom beverages and container presets (presentation/common).
          ============================================================================ -->
     <!-- Shared -->
-    <string name="error_name_required">Name is required</string>
-    <string name="label_icon">Icon</string>
+    <string name="error_name_required">İsim gerekli</string>
+    <string name="label_icon">İkon</string>
     <!-- Delete confirmation body; %1$s = the item name being deleted -->
-    <string name="delete_confirm_message">Are you sure you want to delete \"%1$s\"? This action cannot be undone.</string>
+    <string name="delete_confirm_message">\"%1$s\" öğesini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</string>
     <!-- Custom beverage sheet -->
-    <string name="beverage_add">Add Beverage</string>
-    <string name="beverage_edit_title">Edit Beverage</string>
-    <string name="beverage_delete_title">Delete Beverage?</string>
-    <string name="beverage_show_in_quick_add">Show in Quick Add</string>
-    <string name="beverage_hide_from_quick_add">Hide from Quick Add</string>
+    <string name="beverage_add">İçecek Ekle</string>
+    <string name="beverage_edit_title">İçeceği Düzenle</string>
+    <string name="beverage_delete_title">İçeceği Sil?</string>
+    <string name="beverage_show_in_quick_add">Hızlı Ekle\'de göster</string>
+    <string name="beverage_hide_from_quick_add">Hızlı Ekle\'de gizle</string>
     <!-- Preset effectiveness line, e.g. "150% hydration effectiveness"; %1$s = per cent value including the % sign -->
-    <string name="beverage_hydration_effectiveness">%1$s hydration effectiveness</string>
+    <string name="beverage_hydration_effectiveness">%1$s efektif hidrasyon</string>
     <string name="beverage_name_label">Beverage Name</string>
     <string name="beverage_name_placeholder">e.g., Smoothie</string>
     <string name="beverage_effectiveness_label" formatted="false">Hydration effectiveness (%)</string>
