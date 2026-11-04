@@ -119,7 +119,11 @@ success "   [ok] Changelog: [$VERSION_NAME] entry found"
 # --- 5. Build all three distribution artefacts ----------------------------------
 
 header "Building $APP_NAME $VERSION_NAME (this takes a minute)…"
-./gradlew --console=plain bundlePlayRelease assembleGithubRelease assembleFdroidRelease
+# Isolate each variant in a single-use Gradle process so their combined memory
+# requirements cannot exhaust the daemon during a release build.
+./gradlew --console=plain --no-daemon bundlePlayRelease
+./gradlew --console=plain --no-daemon assembleGithubRelease
+./gradlew --console=plain --no-daemon assembleFdroidRelease
 
 PLAY_AAB_SRC="app/build/outputs/bundle/playRelease/app-play-release.aab"
 GITHUB_APK_SRC="app/build/outputs/apk/github/release/app-github-release.apk"
