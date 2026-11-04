@@ -81,6 +81,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
+import com.cemcakmak.hydrotracker.BuildConfig
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.database.repository.ContainerPresetRepository
 import com.cemcakmak.hydrotracker.data.database.repository.CustomBeverageRepository
@@ -127,7 +128,8 @@ fun DeveloperOptionsScreen(
     onNavigateToOnboarding: () -> Unit = {},
     onNavigateToHapticsTest: () -> Unit = {},
     onNavigateToHapticsLab: () -> Unit = {},
-    onNavigateToAnimationMotionLab: () -> Unit = {}
+    onNavigateToAnimationMotionLab: () -> Unit = {},
+    onNavigateToUpdateTesting: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -762,31 +764,48 @@ fun DeveloperOptionsScreen(
                 if (updateRepository != null) {
                     DevSection("Update testing") {
                         val simulatedDownloaded by updateRepository.simulatedDownloaded.collectAsState()
-                        val updateActions = listOf(
-                            DevAction(
-                                title = "Simulate update available",
-                                description = "Force the update status to Available for UI testing",
-                                icon = ImageVector.vectorResource(R.drawable.update_filled)
-                            ) {
-                                updateRepository.simulateUpdateAvailable()
-                                Toast.makeText(context, "Simulated update available", Toast.LENGTH_SHORT).show()
-                            },
-                            DevAction(
-                                title = "Reset What's New",
-                                description = "Trigger the What's New bottom sheet on next launch",
-                                icon = ImageVector.vectorResource(R.drawable.reset_exposure_filled)
-                            ) {
-                                updateRepository.resetWhatsNew()
-                                Toast.makeText(context, "What's New reset — sheet will appear", Toast.LENGTH_SHORT).show()
-                            },
-                            DevAction(
-                                title = if (simulatedDownloaded) "Simulate downloaded: ON" else "Simulate downloaded: OFF",
-                                description = "Toggle the \"Restart to install\" button state",
-                                icon = ImageVector.vectorResource(R.drawable.cloud_download_filled)
-                            ) {
-                                updateRepository.setSimulatedDownloaded(!simulatedDownloaded)
+                        val updateActions = buildList {
+                            add(
+                                DevAction(
+                                    title = "Open update test suite",
+                                    description = "Simulate states and run local end-to-end update scenarios",
+                                    icon = ImageVector.vectorResource(R.drawable.update_filled)
+                                ) {
+                                    onNavigateToUpdateTesting()
+                                }
+                            )
+                            add(
+                                DevAction(
+                                    title = "Simulate update available",
+                                    description = "Force the update status to Available for UI testing",
+                                    icon = ImageVector.vectorResource(R.drawable.update_filled)
+                                ) {
+                                    updateRepository.simulateUpdateAvailable()
+                                    Toast.makeText(context, "Simulated update available", Toast.LENGTH_SHORT).show()
+                                }
+                            )
+                            add(
+                                DevAction(
+                                    title = "Reset What's New",
+                                    description = "Trigger the What's New bottom sheet on next launch",
+                                    icon = ImageVector.vectorResource(R.drawable.reset_exposure_filled)
+                                ) {
+                                    updateRepository.resetWhatsNew()
+                                    Toast.makeText(context, "What's New reset — sheet will appear", Toast.LENGTH_SHORT).show()
+                                }
+                            )
+                            if (BuildConfig.HAS_PLAY_STORE) {
+                                add(
+                                    DevAction(
+                                        title = if (simulatedDownloaded) "Simulate downloaded: ON" else "Simulate downloaded: OFF",
+                                        description = "Toggle the \"Restart to install\" button state",
+                                        icon = ImageVector.vectorResource(R.drawable.cloud_download_filled)
+                                    ) {
+                                        updateRepository.setSimulatedDownloaded(!simulatedDownloaded)
+                                    }
+                                )
                             }
-                        )
+                        }
                         DevActionList(updateActions, busy)
                     }
                 }

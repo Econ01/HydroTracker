@@ -89,6 +89,7 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -109,6 +110,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -127,6 +129,7 @@ import com.cemcakmak.hydrotracker.data.models.Gender
 import com.cemcakmak.hydrotracker.data.models.ReminderStyle
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.models.UserProfile
+import com.cemcakmak.hydrotracker.data.update.UpdateRepository
 import com.cemcakmak.hydrotracker.notifications.BatteryOptimisationManager
 import com.cemcakmak.hydrotracker.notifications.HydroNotificationScheduler
 import com.cemcakmak.hydrotracker.notifications.NotificationContentProvider
@@ -149,9 +152,11 @@ fun NotificationsScreen(
     userProfile: UserProfile? = null,
     onNavigateBack: () -> Unit = {},
     onRequestNotificationPermission: () -> Unit = {},
-    onUserProfileUpdate: (UserProfile) -> Unit = {}
+    onUserProfileUpdate: (UserProfile) -> Unit = {},
+    updateRepository: UpdateRepository? = null
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val coroutineScope = rememberCoroutineScope()
     val haptics = LocalHapticFeedback.current
     
@@ -205,8 +210,12 @@ fun NotificationsScreen(
     // not block enabling reminders (see the reminders toggle below)
     val allPermissionsGranted = hasNotificationPermission && hasExactAlarmPermission
 
-    // Reminders enabled state (persisted on the user profile)
-    val isRemindersEnabled = userProfile?.notificationsEnabled == true
+    val liveUpdatesSupported = updateRepository?.liveUpdatesSupported == true
+    val liveUpdatesEnabled = updateRepository?.liveUpdatesEnabled?.collectAsState()?.value ?: true
+    val liveUpdatesSystemAllowed = updateRepository?.liveUpdatesSystemAllowed?.collectAsState()?.value ?: false
+
+    // Show reminders as active only when the user opted in and Android allows notifications.
+    val isRemindersEnabled = userProfile?.notificationsEnabled == true && hasNotificationPermission
 
     // Time picker sheet state
     var showWakeUpPicker by remember { mutableStateOf(false) }
@@ -236,6 +245,7 @@ fun NotificationsScreen(
             hasNotificationPermission = NotificationPermissionManager.hasNotificationPermission(context)
             hasExactAlarmPermission = NotificationPermissionManager.hasExactAlarmPermission(context)
             isBatteryExempt = BatteryOptimisationManager.isIgnoringBatteryOptimisations(context)
+            updateRepository?.refreshLiveUpdatesSystemAllowed()
         }
     }
 
@@ -265,18 +275,39 @@ fun NotificationsScreen(
                 }
 
                 // Permission status banner
-                if (!allPermissionsGranted || !isBatteryExempt) {
+                if (!allPermissionsGranted || !isBatteryExempt ||
+                    (liveUpdatesSupported && !liveUpdatesSystemAllowed)
+                ) {
                     PermissionStatusBanner(
                         hasNotificationPermission = hasNotificationPermission,
                         hasExactAlarmPermission = hasExactAlarmPermission,
                         isBatteryExempt = isBatteryExempt,
+                        liveUpdatesSupported = liveUpdatesSupported,
+                        liveUpdatesSystemAllowed = liveUpdatesSystemAllowed,
                         onRequestNotificationPermission = onRequestNotificationPermission,
                         onRequestExactAlarmPermission = {
                             NotificationPermissionManager.requestExactAlarmPermission(context)
                         },
                         onRequestBatteryOptimisation = {
                             BatteryOptimisationManager.requestIgnoreBatteryOptimisations(context)
+                        },
+                        onOpenLiveUpdatesSettings = {
+                            if (updateRepository?.openLiveUpdatesSettings() != true) {
+                                Toast.makeText(
+                                    context,
+                                    resources.getString(R.string.toast_no_app_to_open_link),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
+                    )
+                }
+
+                if (liveUpdatesSupported) {
+                    LiveUpdatesSettingsSection(
+                        enabledPreference = liveUpdatesEnabled,
+                        systemAllowed = liveUpdatesSystemAllowed,
+                        onToggle = { enabled -> updateRepository.setLiveUpdatesEnabled(enabled) }
                     )
                 }
 
@@ -751,22 +782,96 @@ private fun NotificationPreviewCard(
     }
 }
 
-private enum class MissingPermission { NOTIFICATION, EXACT_ALARM, BATTERY_OPTIMISATION }
+@Composable
+private fun LiveUpdatesSettingsSection(
+    enabledPreference: Boolean,
+    systemAllowed: Boolean,
+    onToggle: (Boolean) -> Unit
+) {
+    val haptics = LocalHapticFeedback.current
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        SettingsSectionHeader(stringResource(R.string.updates_live_updates_title))
+        SettingsGroupCard(index = 0, size = 1) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Crossfade(
+                    targetState = enabledPreference && systemAllowed,
+                    animationSpec = tween(400),
+                    label = "reminderIcon"
+                ) { enabled ->
+                    Icon(
+                        imageVector = if (enabled) {
+                            ImageVector.vectorResource(R.drawable.view_stream_filled)
+                        } else {
+                            ImageVector.vectorResource(R.drawable.view_stream)
+                        },
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.updates_live_updates_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = stringResource(R.string.updates_live_updates_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Switch(
+                    checked = enabledPreference && systemAllowed,
+                    onCheckedChange = { enabled ->
+                        haptics.performHapticFeedback(
+                            if (enabled) HapticFeedbackType.ToggleOn else HapticFeedbackType.ToggleOff
+                        )
+                        onToggle(enabled)
+                    },
+                    enabled = systemAllowed,
+                    thumbContent = if (enabledPreference && systemAllowed) {
+                        {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(R.drawable.check_filled),
+                                contentDescription = null,
+                                modifier = Modifier.size(SwitchDefaults.IconSize)
+                            )
+                        }
+                    } else null
+                )
+            }
+        }
+    }
+}
+
+private enum class MissingPermission { NOTIFICATION, EXACT_ALARM, BATTERY_OPTIMISATION, LIVE_UPDATES }
 
 @Composable
 private fun PermissionStatusBanner(
     hasNotificationPermission: Boolean,
     hasExactAlarmPermission: Boolean,
     isBatteryExempt: Boolean,
+    liveUpdatesSupported: Boolean,
+    liveUpdatesSystemAllowed: Boolean,
     onRequestNotificationPermission: () -> Unit,
     onRequestExactAlarmPermission: () -> Unit,
-    onRequestBatteryOptimisation: () -> Unit
+    onRequestBatteryOptimisation: () -> Unit,
+    onOpenLiveUpdatesSettings: () -> Unit
 ) {
     // Collected in display order so the group shapes adapt to 1–3 cards
     val missing = buildList {
         if (!hasNotificationPermission) add(MissingPermission.NOTIFICATION)
         if (!hasExactAlarmPermission) add(MissingPermission.EXACT_ALARM)
         if (!isBatteryExempt) add(MissingPermission.BATTERY_OPTIMISATION)
+        if (liveUpdatesSupported && !liveUpdatesSystemAllowed) add(MissingPermission.LIVE_UPDATES)
     }
 
     Column(
@@ -798,6 +903,13 @@ private fun PermissionStatusBanner(
                             title = stringResource(R.string.notif_battery_optimisation_title),
                             description = stringResource(R.string.notif_battery_optimisation_desc),
                             onAction = onRequestBatteryOptimisation
+                        )
+                        MissingPermission.LIVE_UPDATES -> MissingPermissionRow(
+                            icon = ImageVector.vectorResource(R.drawable.view_stream_filled),
+                            tint = MaterialTheme.extendedColorScheme.warning,
+                            title = stringResource(R.string.updates_live_updates_title),
+                            description = stringResource(R.string.updates_live_updates_disabled_desc),
+                            onAction = onOpenLiveUpdatesSettings
                         )
                     }
                 }

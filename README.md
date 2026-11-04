@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>A modern and private water intake tracking application</strong><br>
-  No Ads, No Subscription, No Internet
+  No Ads, No Subscription, No Tracking
 </p>
 
 <p align="center">
@@ -118,6 +118,11 @@ You can find all of the source inside the **settings page** of the app or from [
     <img src="https://img.shields.io/github/v/release/Econ01/HydroTracker?label=Download&style=for-the-badge&logo=github&color=blue" alt="GitHub Release">
   </a>
 </p>
+
+### Distribution-specific updates
+- **Google Play:** Updates and reviews are handled through Google Play.
+- **GitHub:** The app can check releases and, after your explicit approval, download and install an update through Android's package installer.
+- **F-Droid:** Updates are handled by F-Droid. This flavour has no self-updater or Internet permission.
 
 ---
 

@@ -18,6 +18,9 @@
     <string name="action_reset">Сбросить</string>
     <string name="action_next">Далее</string>
     <string name="action_continue">Продолжить</string>
+    <!-- Loading -->
+    <string name="loading_hydrotracker">Загрузка HydroTracker…</string>
+    <string name="loading_hydration_data">Проверка данных о потреблении жидкости</string>
     <!-- ============================================================================
          Accessibility content descriptions
          Spoken by TalkBack / screen readers. Keep concise.
@@ -677,6 +680,39 @@
     <string name="updates_toggle_auto_check_desc">Проверять наличие обновлений примерно раз в день</string>
     <string name="updates_section_status">Статус</string>
     <string name="updates_status_checking">Проверка обновлений…</string>
+    <string name="updates_status_downloading">Загрузка обновления…</string>
+    <string name="updates_status_downloading_progress">Прогресс • %1$d%%</string>
+    <string name="updates_status_progress">%1$d%%</string>
+    <string name="updates_status_installing">Установка обновления…</string>
+    <string name="updates_status_installing_desc">Подтвердите установку в системном диалоге Android.</string>
+    <string name="updates_status_verifying">Проверка загруженного обновления</string>
+    <string name="updates_status_verifying_desc">Проверка загруженного APK-файла перед установкой.</string>
+    <string name="updates_status_ready_title">Обновление готово к установке</string>
+    <string name="updates_status_ready_version">Версия %1$s загружена и проверена.</string>
+    <string name="updates_status_ready_to_install">Обновление загружено и проверено. Установите его, когда будете готовы.</string>
+    <string name="updates_status_permission_title">Требуется разрешение на установку</string>
+    <string name="updates_status_install_permission_required">Android требуется разрешение на установку загруженного обновления.</string>
+    <string name="updates_status_failed_title">Ошибка обновления</string>
+    <string name="updates_notification_downloading_title">Загрузка обновления HydroTracker</string>
+    <string name="updates_notification_downloading_text">Идёт загрузка</string>
+    <string name="updates_notification_ready_text">Откройте HydroTracker, чтобы просмотреть сведения об обновлении и установить его</string>
+    <string name="updates_live_updates_title">Обновления в реальном времени</string>
+    <string name="updates_live_updates_desc">Показывать ход текущей загрузки в поддерживаемых элементах системного интерфейса.</string>
+    <string name="updates_live_updates_disabled_desc">Обновления в реальном времени отключены в настройках Android. Включите их, чтобы использовать эту функцию.</string>
+    <string name="update_error_unknown">Не удалось завершить обновление. Повторите попытку.</string>
+    <string name="update_error_check_failed">Не удалось проверить наличие обновлений. Проверьте соединение и повторите попытку.</string>
+    <string name="update_error_start_failed">Не удалось запустить обновление. Повторите попытку.</string>
+    <string name="update_error_install_failed">Android не смог установить обновление. Повторите попытку.</string>
+    <string name="update_error_no_downloaded_update">Загруженное обновление больше недоступно. Загрузите его снова.</string>
+    <string name="update_error_play_recheck_required">Ещё раз проверьте Google Play перед обновлением.</string>
+    <string name="update_error_play_update_unavailable">В настоящее время в Google Play нет обновления для этого приложения.</string>
+    <string name="update_error_update_not_available">Совместимое обновление недоступно.</string>
+    <string name="update_error_invalid_update_metadata">Информация об обновлении неполна или недействительна. Повторите попытку позже.</string>
+    <string name="update_error_download_failed">Не удалось загрузить обновление. Проверьте соединение и повторите попытку.</string>
+    <string name="update_error_verification_failed">Не удалось проверить загруженное обновление. Загрузите его снова из официального релиза.</string>
+    <string name="update_error_install_confirmation_unavailable">Android не смог открыть окно подтверждения установки. Повторите попытку.</string>
+    <string name="update_error_insecure_url">URL обновления должен использовать HTTPS.</string>
+    <string name="update_error_local_network_permission">Для тестового сервера обновлений требуется разрешение Android на доступ к локальной сети.</string>
     <string name="updates_status_failed">Не удалось проверить обновления</string>
     <string name="updates_status_f_droid">Обновлениями управляет F-Droid</string>
     <string name="updates_status_f_droid_desc">Откройте F-Droid, чтобы обновить HydroTracker.</string>
@@ -687,6 +723,7 @@
     <string name="updates_button_check_now">Проверить сейчас</string>
     <string name="updates_button_checking">Проверка…</string>
     <string name="updates_button_restart_install">Перезапустить для установки</string>
+    <string name="updates_button_continue_install">Продолжить установку</string>
     <string name="updates_available_title">Доступно обновление</string>
     <string name="updates_available_play_desc">В Google Play доступна новая версия</string>
     <string name="updates_available_version">Версия %1$s</string>
@@ -715,9 +752,14 @@
     <string name="update_dialog_new_version">Новая версия</string>
     <string name="update_dialog_action_play">Откройте Google Play, чтобы обновить HydroTracker.</string>
     <string name="update_dialog_action_f_droid">Откройте F-Droid, чтобы обновить HydroTracker.</string>
-    <string name="update_dialog_action_github">Скачайте последнюю версию APK с GitHub.</string>
+    <string name="update_dialog_action_github">Скачайте последнюю версию APK с GitHub и установите её через Android.</string>
     <string name="update_button_later">Позже</string>
     <string name="update_button_update">Обновить</string>
+    <string name="update_button_install">Установить обновление</string>
+    <string name="update_button_allow_install">Разрешить установку</string>
+    <string name="update_button_failed_retry">Повторить</string>
+    <string name="update_button_failed_dismiss">Закрыть</string>
+    <string name="update_cancel_download">Отменить загрузку</string>
     <!-- ============================================================================
          Markdown components
          ============================================================================ -->
@@ -747,6 +789,7 @@
     <string name="home_snackbar_add_failed">Не удалось добавить воду: %1$s</string>
     <string name="home_snackbar_delete_failed">Не удалось удалить запись: %1$s</string>
     <string name="home_snackbar_update_failed">Не удалось обновить запись: %1$s</string>
+    <string name="home_update_available">Доступно обновление: %1$s</string>
     <string name="home_snackbar_synced">Синхронизировано записей из Health Connect: %1$d</string>
     <string name="home_snackbar_sync_errors">Синхронизация завершена. Ошибок: %1$d</string>
     <string name="home_snackbar_up_to_date">Данные актуальны</string>

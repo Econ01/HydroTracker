@@ -17,9 +17,6 @@
         android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
         tools:ignore="BatteryLife" />
 
-    <!-- Internet access for checking app updates (GitHub releases) -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    
     <!-- Permissions for profile photo capture and selection -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
@@ -56,6 +53,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTop"
             android:configChanges="uiMode|density|fontScale|locale|layoutDirection|screenSize|smallestScreenSize|screenLayout|orientation|keyboardHidden|navigation" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -55,8 +55,8 @@ import androidx.core.net.toUri
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.models.DarkModePreference
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
+import com.cemcakmak.hydrotracker.data.update.InstallSource
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
-import com.google.android.play.core.review.ReviewManagerFactory
 
 private const val URL_GITHUB_SPONSORS = "https://github.com/sponsors/Econ01"
 private const val URL_PAYPAL = "https://www.paypal.com/donate/?hosted_button_id=CQUZLNRM79CAU"
@@ -69,6 +69,7 @@ private const val URL_GITHUB_REPO = "https://github.com/Econ01/HydroTracker"
 @Composable
 fun SupportDevelopmentScreen(
     themePreferences: ThemePreferences = ThemePreferences(),
+    installSource: InstallSource = InstallSource.PLAY_STORE,
     onNavigateBack: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -133,26 +134,30 @@ fun SupportDevelopmentScreen(
         // Free, non-monetary actions — standard primary-coloured icons.
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsSectionHeader(stringResource(R.string.support_section_other_ways))
-            val helpSize = 3
+            val showPlayReview = installSource == InstallSource.PLAY_STORE
+            val helpSize = if (showPlayReview) 3 else 2
+            var actionIndex = 0
             Column {
-                SettingsGroupCard(
-                    index = 0,
-                    size = helpSize,
-                    onClick = {
-                        haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
-                        launchInAppReview(context)
+                if (showPlayReview) {
+                    SettingsGroupCard(
+                        index = actionIndex++,
+                        size = helpSize,
+                        onClick = {
+                            haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                            launchInAppReview(context)
+                        }
+                    ) {
+                        SupportRowContent(
+                            icon = ImageVector.vectorResource(R.drawable.star_rate_filled),
+                            iconTint = MaterialTheme.colorScheme.primary,
+                            title = stringResource(R.string.support_rate_play_store),
+                            blurb = stringResource(R.string.support_rate_play_store_desc),
+                            trailing = null
+                        )
                     }
-                ) {
-                    SupportRowContent(
-                        icon = ImageVector.vectorResource(R.drawable.star_rate_filled),
-                        iconTint = MaterialTheme.colorScheme.primary,
-                        title = stringResource(R.string.support_rate_play_store),
-                        blurb = stringResource(R.string.support_rate_play_store_desc),
-                        trailing = null
-                    )
                 }
                 SettingsGroupCard(
-                    index = 1,
+                    index = actionIndex++,
                     size = helpSize,
                     onClick = {
                         haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
@@ -168,7 +173,7 @@ fun SupportDevelopmentScreen(
                     )
                 }
                 SettingsGroupCard(
-                    index = 2,
+                    index = actionIndex++,
                     size = helpSize,
                     onClick = {
                         haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
@@ -279,29 +284,6 @@ private data class SupportLink(
     val blurb: String,
     val url: String
 )
-
-fun launchInAppReview(context: Context) {
-    val manager = ReviewManagerFactory.create(context)
-    val request = manager.requestReviewFlow()
-
-    request.addOnCompleteListener { task ->
-        if (task.isSuccessful) {
-            // Success Message
-            Toast.makeText(context, context.getString(R.string.toast_review_successful), Toast.LENGTH_SHORT).show()
-
-            val reviewInfo = task.result
-            // The reviewInfo object is only valid for a limited amount of time
-            val flow = manager.launchReviewFlow(context as android.app.Activity, reviewInfo)
-            flow.addOnCompleteListener {
-                // Review flow finished. Continue app flow.
-                // Note: The API does not inform you if the user actually reviewed or not.
-            }
-        } else {
-            // Fail Message
-            Toast.makeText(context, context.getString(R.string.toast_review_failed), Toast.LENGTH_SHORT).show()
-        }
-    }
-}
 
 private fun openUrl(context: Context, url: String) {
     try {
