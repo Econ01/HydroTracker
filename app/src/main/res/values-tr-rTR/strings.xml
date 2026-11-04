@@ -221,109 +221,109 @@
     <string name="beverage_hide_from_quick_add">Hızlı Ekle\'de gizle</string>
     <!-- Preset effectiveness line, e.g. "150% hydration effectiveness"; %1$s = per cent value including the % sign -->
     <string name="beverage_hydration_effectiveness">%1$s efektif hidrasyon</string>
-    <string name="beverage_name_label">Beverage Name</string>
-    <string name="beverage_name_placeholder">e.g., Smoothie</string>
-    <string name="beverage_effectiveness_label" formatted="false">Hydration effectiveness (%)</string>
-    <string name="beverage_effectiveness_placeholder">e.g., 100</string>
+    <string name="beverage_name_label">İçecek İsmi</string>
+    <string name="beverage_name_placeholder">örneğin, Smoothie</string>
+    <string name="beverage_effectiveness_label" formatted="false">Hidrasyon efektifliği (%)</string>
+    <string name="beverage_effectiveness_placeholder">örneğin, 100</string>
     <!-- Validation; %1$d = min, %2$d = max -->
-    <string name="beverage_effectiveness_error">Enter a value between %1$d and %2$d</string>
-    <string name="beverage_effectiveness_hint" formatted="false">100% counts the full amount toward your goal</string>
+    <string name="beverage_effectiveness_error">%1$d ve %2$d arasında bir değer girin</string>
+    <string name="beverage_effectiveness_hint" formatted="false">%100, tam tutarın hedefinize dahil edilmesini sağlar</string>
     <!-- Container preset sheet -->
-    <string name="container_add_title">Add Container</string>
-    <string name="container_edit_title">Edit Container</string>
-    <string name="container_name_label">Container Name</string>
-    <string name="container_name_placeholder">e.g., Coffee Mug</string>
-    <string name="container_volume_label">Volume (%1$s)</string>
-    <string name="container_volume_placeholder">e.g., 250</string>
+    <string name="container_add_title">Konteyner Ekle</string>
+    <string name="container_edit_title">Konteyner Düzenle</string>
+    <string name="container_name_label">Konteyner adı</string>
+    <string name="container_name_placeholder">örnek, kahve fincanı</string>
+    <string name="container_volume_label">Hacim (%1$s)</string>
+    <string name="container_volume_placeholder">örneğin, 250</string>
     <!-- %1$s = minimum valid amount, %2$s = maximum valid amount (both with unit) -->
-    <string name="container_volume_error">Enter a valid volume (%1$s–%2$s)</string>
-    <string name="container_icon_picker_hint">Tap an icon below to override the automatic choice</string>
-    <string name="container_icon_preview_description">Selected container icon</string>
-    <string name="container_delete_title">Delete Container?</string>
+    <string name="container_volume_error">Geçerli bir hacim girin (%1$s–%2$s)</string>
+    <string name="container_icon_picker_hint">Otomatik ikon seçimini geçersiz kılmak için aşağıdaki simgelerden birine dokunun</string>
+    <string name="container_icon_preview_description">Seçili konteyner simgesi</string>
+    <string name="container_delete_title">Konteyner Sil?</string>
     <!-- ============================================================================
          Navigation &amp; top bars
          ============================================================================ -->
-    <string name="nav_home">Home</string>
-    <string name="nav_history">History</string>
-    <string name="nav_statistics">Statistics</string>
-    <string name="nav_profile">Profile</string>
-    <string name="nav_settings">Settings</string>
-    <string name="nav_add_custom">Add Custom</string>
-    <string name="fab_menu_new_beverage">New Beverage</string>
-    <string name="fab_menu_new_container">New Container</string>
-    <string name="fab_menu_add_past_entry">Add Past Entry</string>
-    <string name="fab_menu_toggle_menu">Toggle menu</string>
+    <string name="nav_home">Ana Sayfa</string>
+    <string name="nav_history">Geçmiş</string>
+    <string name="nav_statistics">İstatistikler</string>
+    <string name="nav_profile">Profil</string>
+    <string name="nav_settings">Ayarlar</string>
+    <string name="nav_add_custom">Özel Ekle</string>
+    <string name="fab_menu_new_beverage">İçecek Ekle</string>
+    <string name="fab_menu_new_container">Konteyner Ekle</string>
+    <string name="fab_menu_add_past_entry">Geçmiş Kayıt Ekle</string>
+    <string name="fab_menu_toggle_menu">Menüyü aç/kapat</string>
     <!-- ============================================================================
          Settings — hub
          Screen titles are reused as both the hub row title and the screen's app-bar title.
          ============================================================================ -->
-    <string name="screen_appearance_title">Appearance</string>
-    <string name="screen_hydration_title">Hydration &amp; Health</string>
-    <string name="screen_quickadd_title">Quick Add Customization</string>
-    <string name="screen_notifications_title">Notifications</string>
-    <string name="screen_support_title">Support Development</string>
-    <string name="screen_about_title">About</string>
-    <string name="screen_developer_title">Developer Options</string>
-    <string name="settings_about_update_available">About - Update Available</string>
-    <string name="settings_appearance_desc">Theme, colours and AMOLED mode</string>
-    <string name="settings_display_desc">Week start day and locale</string>
-    <string name="settings_hydration_desc">Water goal calculation and Health Connect</string>
-    <string name="settings_quickadd_desc">Container presets and beverage types</string>
-    <string name="settings_notifications_desc">Hydration reminders and permissions</string>
-    <string name="settings_support_desc">Donate and support the app</string>
-    <string name="settings_about_desc">Sources, privacy policy and license</string>
-    <string name="settings_developer_desc">Debug tools and testing</string>
-    <string name="screen_data_management_title">Data Management</string>
-    <string name="settings_data_management_desc">Export, import and delete your data</string>
+    <string name="screen_appearance_title">Görünüm</string>
+    <string name="screen_hydration_title">Hidrasyon &amp; Sağlık</string>
+    <string name="screen_quickadd_title">Hızlı Ekleme Özelleştirmesi</string>
+    <string name="screen_notifications_title">Bildirimler</string>
+    <string name="screen_support_title">Geliştirmeye Destek Olun</string>
+    <string name="screen_about_title">Hakkında</string>
+    <string name="screen_developer_title">Geliştirici Seçenekleri</string>
+    <string name="settings_about_update_available">Hakkında - Güncelleme Mevcut</string>
+    <string name="settings_appearance_desc">Tema, renkler ve AMOLED modu</string>
+    <string name="settings_display_desc">Haftanın başlangıç ​​günü ve yerel ayar</string>
+    <string name="settings_hydration_desc">Su hedefi hesaplama ve Health Connect</string>
+    <string name="settings_quickadd_desc">Konteyner ön ayarları ve içecek türleri</string>
+    <string name="settings_notifications_desc">Su içme hatırlatıcıları ve izinler</string>
+    <string name="settings_support_desc">Bağış yapın ve uygulamayı destekleyin</string>
+    <string name="settings_about_desc">Kaynaklar, gizlilik politikası ve lisans</string>
+    <string name="settings_developer_desc">Hata ayıklama araçları ve test etme</string>
+    <string name="screen_data_management_title">Veri Yönetimi</string>
+    <string name="settings_data_management_desc">Verilerinizi dışa aktarın, içe aktarın ve silin</string>
     <!-- ============================================================================
          Settings — Appearance
          ============================================================================ -->
-    <string name="appearance_theme_header">Theme</string>
-    <string name="appearance_theme_system">System</string>
-    <string name="appearance_theme_light">Light</string>
-    <string name="appearance_theme_dark">Dark</string>
-    <string name="appearance_color_header">Color</string>
-    <string name="appearance_amoled_title">AMOLED Mode</string>
-    <string name="appearance_amoled_desc">True black backgrounds in dark mode</string>
-    <string name="appearance_amoled_borders_title">Surface Borders</string>
-    <string name="appearance_amoled_borders_desc">Subtle borders around cards in AMOLED mode</string>
-    <string name="appearance_font_header">Font</string>
-    <string name="appearance_navbar_header">Navigation bar</string>
-    <string name="appearance_autohide_title">Auto-hide on scroll</string>
-    <string name="appearance_autohide_desc">Hide the bar when scrolling down</string>
-    <string name="appearance_labels_title">Labels</string>
-    <string name="appearance_home_header">Home screen</string>
-    <string name="appearance_feedback_header">Interaction &amp; Feedback</string>
-    <string name="appearance_haptics_title">Haptic Feedback</string>
-    <string name="appearance_haptics_desc">Vibrate on button taps and actions</string>
-    <string name="appearance_number_animation_title">Rolling Number Animation</string>
-    <string name="appearance_number_animation_desc">Switch off for a lighter count-up animation</string>
-    <string name="appearance_edge_effect_title">Edge Effect</string>
-    <string name="appearance_beverage_colors_title">Beverage Colours</string>
-    <string name="appearance_beverage_colors_desc">Tint home-screen cards and entries with each beverage’s colour</string>
+    <string name="appearance_theme_header">Tema</string>
+    <string name="appearance_theme_system">Sistem</string>
+    <string name="appearance_theme_light">Aydınlık</string>
+    <string name="appearance_theme_dark">Karanlık</string>
+    <string name="appearance_color_header">Renk</string>
+    <string name="appearance_amoled_title">AMOLED Modu</string>
+    <string name="appearance_amoled_desc">Koyu modda tam siyah arka planlar</string>
+    <string name="appearance_amoled_borders_title">Yüzey Çerçevesi</string>
+    <string name="appearance_amoled_borders_desc">AMOLED modunda kartların çevresinde ince kenarlıklar</string>
+    <string name="appearance_font_header">Yazı Tipi</string>
+    <string name="appearance_navbar_header">Gezinme çubuğu</string>
+    <string name="appearance_autohide_title">Kaydırırken otomatik gizle</string>
+    <string name="appearance_autohide_desc">Aşağı kaydırırken araç çubuğunu gizle</string>
+    <string name="appearance_labels_title">Etiketler</string>
+    <string name="appearance_home_header">Ana ekran</string>
+    <string name="appearance_feedback_header">Etkileşim &amp; Geri Bildirim</string>
+    <string name="appearance_haptics_title">Titreşim</string>
+    <string name="appearance_haptics_desc">Düğmelere dokunulduğunda ve işlemler gerçekleştirildiğinde titreşim ver</string>
+    <string name="appearance_number_animation_title">Dönen Sayı Animasyonu</string>
+    <string name="appearance_number_animation_desc">Daha hafif bir yukarı doğru sayma animasyonu için kapatın</string>
+    <string name="appearance_edge_effect_title">Kenar Etkisi</string>
+    <string name="appearance_beverage_colors_title">İçecek Renkleri</string>
+    <string name="appearance_beverage_colors_desc">Ana ekran kartlarını ve girdileri, her bir içeceğin rengiyle renklendirin</string>
     <!-- Sample data shown in the theme preview card -->
     <string name="appearance_preview_amount">1,250 / 2,500 ml</string>
-    <string name="appearance_preview_entries">Entries</string>
-    <string name="appearance_preview_first">First</string>
-    <string name="appearance_preview_latest">Latest</string>
+    <string name="appearance_preview_entries">Girdiler</string>
+    <string name="appearance_preview_first">İlk</string>
+    <string name="appearance_preview_latest">Son</string>
     <!-- ============================================================================
          Settings — Widget (Appearance ▸ Widget)
          ============================================================================ -->
-    <string name="appearance_widget_section_title">Widgets</string>
-    <string name="appearance_widget_title">Widget Settings</string>
-    <string name="appearance_widget_desc">Change appearance and behaviour</string>
-    <string name="widget_settings_colours_header">Colours</string>
-    <string name="widget_settings_dynamic_title">Dynamic colours</string>
-    <string name="widget_settings_dynamic_desc">Colours from your wallpaper</string>
-    <string name="widget_settings_background_header">Background</string>
-    <string name="widget_settings_transparent_title">Transparent background</string>
-    <string name="widget_settings_transparent_desc">Make the background surface transparent</string>
-    <string name="widget_settings_pure_black_title">Pure black background</string>
-    <string name="widget_settings_pure_black_desc">Use a true black surface in dark mode</string>
-    <string name="widget_settings_pure_white_title">Pure white background</string>
-    <string name="widget_settings_pure_white_desc">Use a true white surface in light mode</string>
-    <string name="widget_settings_quickadd_title">Quick actions</string>
-    <string name="widget_settings_quickadd_desc">Choose the three quick-add buttons</string>
+    <string name="appearance_widget_section_title">Araçlar</string>
+    <string name="appearance_widget_title">Araç Ayarları</string>
+    <string name="appearance_widget_desc">Görünümü ve davranışı değiştirin</string>
+    <string name="widget_settings_colours_header">Renkler</string>
+    <string name="widget_settings_dynamic_title">Dinamik Renkler</string>
+    <string name="widget_settings_dynamic_desc">Duvar kağıdınızdan renkler</string>
+    <string name="widget_settings_background_header">Ark plan</string>
+    <string name="widget_settings_transparent_title">Şeffaf arka plan</string>
+    <string name="widget_settings_transparent_desc">Arka plan yüzeyini şeffaf yapın</string>
+    <string name="widget_settings_pure_black_title">Saf siyah arka plan</string>
+    <string name="widget_settings_pure_black_desc">Koyu modda tam siyah bir yüzey kullanın</string>
+    <string name="widget_settings_pure_white_title">Saf beyaz arka plan</string>
+    <string name="widget_settings_pure_white_desc">Aydınlık modda tam beyaz bir yüzey kullanın</string>
+    <string name="widget_settings_quickadd_title">Hızlı eylemler</string>
+    <string name="widget_settings_quickadd_desc">Üç hızlı ekleme düğmesini seçin</string>
     <string name="screen_widget_quickadd_title">Widget quick actions</string>
     <string name="widget_quickadd_auto">Auto</string>
     <string name="widget_quickadd_beverage_header">Beverage</string>
