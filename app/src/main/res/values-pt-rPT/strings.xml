@@ -667,8 +667,8 @@
     <string name="updates_section_status">Status</string>
     <string name="updates_status_checking">Checking for updates…</string>
     <string name="updates_status_downloading">A transferir a atualização…</string>
-    <string name="updates_status_downloading_progress">Progresso • %1$d%%</string>
     <string name="updates_status_progress">%1$d%%</string>
+    <string name="updates_status_downloading_progress">Progresso • %1$d%%</string>
     <string name="updates_status_installing">A instalar a atualização…</string>
     <string name="updates_status_installing_desc">Confirme a instalação na caixa de diálogo do sistema Android.</string>
     <string name="updates_status_verifying">A verificar a atualização transferida</string>

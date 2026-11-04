@@ -667,8 +667,8 @@
     <string name="updates_section_status">Status</string>
     <string name="updates_status_checking">Checking for updates…</string>
     <string name="updates_status_downloading">Güncelleme indiriliyor…</string>
-    <string name="updates_status_downloading_progress">İlerleme • %1$d%%</string>
     <string name="updates_status_progress">%1$d%%</string>
+    <string name="updates_status_downloading_progress">İlerleme • %1$d%%</string>
     <string name="updates_status_installing">Güncelleme yükleniyor…</string>
     <string name="updates_status_installing_desc">Android sistem iletişim kutusundan yüklemeyi onaylayın.</string>
     <string name="updates_status_verifying">İndirilen güncelleme doğrulanıyor</string>

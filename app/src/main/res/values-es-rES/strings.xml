@@ -668,8 +668,8 @@
     <string name="updates_section_status">Estado</string>
     <string name="updates_status_checking">Buscando actualizaciones…</string>
     <string name="updates_status_downloading">Descargando actualización…</string>
-    <string name="updates_status_downloading_progress">Progreso • %1$d%%</string>
     <string name="updates_status_progress">%1$d%%</string>
+    <string name="updates_status_downloading_progress">Progreso • %1$d%%</string>
     <string name="updates_status_installing">Instalando actualización…</string>
     <string name="updates_status_installing_desc">Confirma la instalación en el diálogo del sistema de Android.</string>
     <string name="updates_status_verifying">Verificando la actualización descargada</string>
