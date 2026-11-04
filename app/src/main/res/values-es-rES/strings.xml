@@ -372,7 +372,7 @@
     <string name="notif_sleep_time">Hora de dormir</string>
     <string name="notif_schedule_header">Programar</string>
     <string name="notif_configure_schedule">Configurar programación</string>
-    <string name="notif_configure_schedule_desc"></string>
+    <string name="notif_configure_schedule_desc">Cambia el modo de recordatorio o define un intervalo personalizado</string>
     <string name="notif_reminder_interval">Intérvalo de recordatorio</string>
     <string name="notif_scheduled_for">Programado para</string>
     <string name="notif_pause_reminders">Pausar recordatorios por hoy</string>
@@ -667,7 +667,8 @@
     <string name="updates_section_status">Estado</string>
     <string name="updates_status_checking">Buscando actualizaciones…</string>
     <string name="updates_status_downloading">Descargando actualización…</string>
-    <string name="updates_status_downloading_progress">%1$d%%</string>
+    <string name="updates_status_downloading_progress">Progreso • %1$d%%</string>
+    <string name="updates_status_progress">%1$d%%</string>
     <string name="updates_status_installing">Instalando actualización…</string>
     <string name="updates_status_installing_desc">Confirma la instalación en el diálogo del sistema de Android.</string>
     <string name="updates_status_verifying">Verificando la actualización descargada</string>
@@ -676,11 +677,14 @@
     <string name="updates_status_ready_version">La versión %1$s se ha descargado y verificado.</string>
     <string name="updates_status_ready_to_install">La actualización se ha descargado y verificado. Instálala cuando quieras.</string>
     <string name="updates_status_permission_title">Se requiere permiso de instalación</string>
-    <string name="updates_status_install_permission_required">Android necesita autorización para instalar actualizaciones antes de que pueda continuar la descarga.</string>
+    <string name="updates_status_install_permission_required">Android necesita autorización para instalar la actualización descargada.</string>
     <string name="updates_status_failed_title">Error en la actualización</string>
     <string name="updates_notification_downloading_title">Descargando la actualización de HydroTracker</string>
     <string name="updates_notification_downloading_text">Descarga en curso</string>
     <string name="updates_notification_ready_text">Abre HydroTracker para revisar e instalar la actualización</string>
+    <string name="updates_live_updates_title">Actualizaciones en tiempo real</string>
+    <string name="updates_live_updates_desc">Muestra el progreso de la descarga en curso en las interfaces del sistema compatibles.</string>
+    <string name="updates_live_updates_disabled_desc">Las actualizaciones en tiempo real están desactivadas en la configuración de Android. Actívalas para usar esta función.</string>
     <string name="update_error_unknown">No se pudo completar la actualización. Inténtalo de nuevo.</string>
     <string name="update_error_check_failed">No se pudo comprobar si hay actualizaciones. Comprueba tu conexión e inténtalo de nuevo.</string>
     <string name="update_error_start_failed">No se pudo iniciar la actualización. Inténtalo de nuevo.</string>
@@ -741,6 +745,7 @@
     <string name="update_button_allow_install">Permitir instalación</string>
     <string name="update_button_failed_retry">Reintentar</string>
     <string name="update_button_failed_dismiss">Descartar</string>
+    <string name="update_cancel_download">Cancelar descarga</string>
     <!-- ============================================================================
          Markdown components
          ============================================================================ -->
@@ -770,6 +775,7 @@
     <string name="home_snackbar_add_failed">Error al añadir agua: %1$s</string>
     <string name="home_snackbar_delete_failed">No se ha podido borrar la entrada: %1$s</string>
     <string name="home_snackbar_update_failed">Error al actualizar la entrada: %1$s</string>
+    <string name="home_update_available">Actualización disponible: %1$s</string>
     <string name="home_snackbar_synced">%1$d entradas sincronizadas desde Health Connect</string>
     <string name="home_snackbar_sync_errors">Sincronización completada con errores %1$d</string>
     <string name="home_snackbar_up_to_date">Los datos están actualizados</string>

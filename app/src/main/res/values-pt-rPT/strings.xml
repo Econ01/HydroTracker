@@ -667,7 +667,8 @@
     <string name="updates_section_status">Status</string>
     <string name="updates_status_checking">Checking for updates…</string>
     <string name="updates_status_downloading">A transferir a atualização…</string>
-    <string name="updates_status_downloading_progress">%1$d%%</string>
+    <string name="updates_status_downloading_progress">Progresso • %1$d%%</string>
+    <string name="updates_status_progress">%1$d%%</string>
     <string name="updates_status_installing">A instalar a atualização…</string>
     <string name="updates_status_installing_desc">Confirme a instalação na caixa de diálogo do sistema Android.</string>
     <string name="updates_status_verifying">A verificar a atualização transferida</string>
@@ -676,11 +677,14 @@
     <string name="updates_status_ready_version">A versão %1$s foi transferida e verificada.</string>
     <string name="updates_status_ready_to_install">A atualização foi transferida e verificada. Instale-a quando quiser.</string>
     <string name="updates_status_permission_title">Permissão de instalação necessária</string>
-    <string name="updates_status_install_permission_required">O Android precisa de autorização para instalar atualizações antes de a transferência poder continuar.</string>
+    <string name="updates_status_install_permission_required">O Android precisa de autorização para instalar a atualização transferida.</string>
     <string name="updates_status_failed_title">Falha na atualização</string>
     <string name="updates_notification_downloading_title">A transferir a atualização do HydroTracker</string>
     <string name="updates_notification_downloading_text">Transferência em curso</string>
     <string name="updates_notification_ready_text">Abra o HydroTracker para rever e instalar a atualização</string>
+    <string name="updates_live_updates_title">Atualizações em tempo real</string>
+    <string name="updates_live_updates_desc">Mostre o progresso da transferência em curso nas interfaces do sistema suportadas.</string>
+    <string name="updates_live_updates_disabled_desc">As atualizações em tempo real estão desativadas nas definições do Android. Ative-as para utilizar esta funcionalidade.</string>
     <string name="update_error_unknown">Não foi possível concluir a atualização. Tente novamente.</string>
     <string name="update_error_check_failed">Não foi possível procurar atualizações. Verifique a sua ligação e tente novamente.</string>
     <string name="update_error_start_failed">Não foi possível iniciar a atualização. Tente novamente.</string>
@@ -741,6 +745,7 @@
     <string name="update_button_allow_install">Permitir instalação</string>
     <string name="update_button_failed_retry">Tentar novamente</string>
     <string name="update_button_failed_dismiss">Fechar</string>
+    <string name="update_cancel_download">Cancelar transferência</string>
     <!-- ============================================================================
          Markdown components
          ============================================================================ -->
@@ -770,6 +775,7 @@
     <string name="home_snackbar_add_failed">Failed to add water: %1$s</string>
     <string name="home_snackbar_delete_failed">Failed to delete entry: %1$s</string>
     <string name="home_snackbar_update_failed">Failed to update entry: %1$s</string>
+    <string name="home_update_available">Atualização disponível: %1$s</string>
     <string name="home_snackbar_synced">Synced %1$d entries from Health Connect</string>
     <string name="home_snackbar_sync_errors">Sync completed with %1$d errors</string>
     <string name="home_snackbar_up_to_date">Data is up to date</string>

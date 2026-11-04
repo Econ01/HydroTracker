@@ -122,7 +122,8 @@ fun UpdateAvailableDialog(
                 }
             },
             onInstallUpdate = updateRepository::installUpdate,
-            onResumeUpdate = { updateRepository.resumeUpdate() }
+            onResumeUpdate = { updateRepository.resumeUpdate() },
+            onCancelDownload = updateRepository::cancelUpdate
         )
     }
 }
@@ -137,7 +138,8 @@ internal fun UpdateAvailableDialogContent(
     onDismiss: () -> Unit = {},
     onStartUpdate: (UpdateStatus.Available) -> Unit = {},
     onInstallUpdate: () -> Unit = {},
-    onResumeUpdate: () -> Unit = {}
+    onResumeUpdate: () -> Unit = {},
+    onCancelDownload: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val density = LocalDensity.current
@@ -231,9 +233,7 @@ internal fun UpdateAvailableDialogContent(
             { onStartUpdate(status) }
         }
         is UpdateStatus.ReadyToInstall -> onInstallUpdate
-        is UpdateStatus.PermissionRequired -> {
-            { onStartUpdate(status.available) }
-        }
+        is UpdateStatus.PermissionRequired -> onInstallUpdate
         UpdateStatus.Installing -> onResumeUpdate
         is UpdateStatus.Failed -> if (activeUpdate != null) {
             { onStartUpdate(activeUpdate) }
@@ -242,6 +242,8 @@ internal fun UpdateAvailableDialogContent(
         }
         else -> null
     }
+    val canCancelDownload = installSource == InstallSource.OTHER &&
+        (status is UpdateStatus.Downloading || status == UpdateStatus.Verifying)
 
     Surface(
         shape = RoundedCornerShape(deviceCornerRadius),
@@ -399,15 +401,22 @@ internal fun UpdateAvailableDialogContent(
                     FilledTonalButton(
                         onClick = {
                             haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                            if (canCancelDownload) onCancelDownload()
                             onDismiss()
                         },
                         shapes = ButtonDefaults.shapes(),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp)
-                            .testTag("update_secondary_action")
+                            .testTag(if (canCancelDownload) "update_cancel_action" else "update_secondary_action")
                     ) {
-                        Text(stringResource(R.string.update_button_later), maxLines = 1)
+                        Text(
+                            text = stringResource(
+                                if (canCancelDownload) R.string.update_cancel_download
+                                else R.string.update_button_later
+                            ),
+                            maxLines = 1
+                        )
                     }
                 }
             }

@@ -1,6 +1,7 @@
 package com.cemcakmak.hydrotracker.data.update
 
 import android.Manifest
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -14,6 +15,7 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.IconCompat
 import com.cemcakmak.hydrotracker.MainActivity
 import com.cemcakmak.hydrotracker.R
 import kotlinx.coroutines.CoroutineScope
@@ -25,16 +27,30 @@ import kotlinx.coroutines.launch
 /** User-initiated foreground download with progress and ready-to-install notifications. */
 class GitHubUpdateDownloadService : Service() {
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private var activeDownloadId = ""
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == ACTION_CANCEL_DOWNLOAD) {
+            val downloadId = intent.getStringExtra(EXTRA_DOWNLOAD_ID)
+            if (downloadId == activeDownloadId) {
+                GitHubApkInstaller.cancelActiveDownload(downloadId)
+                serviceScope.cancel()
+                stopForegroundAndSelf(startId)
+            } else {
+                stopSelfResult(startId)
+            }
+            return START_NOT_STICKY
+        }
+
         val available = intent?.toAvailableUpdate()
         if (available == null) {
             stopSelfResult(startId)
             return START_NOT_STICKY
         }
 
+        activeDownloadId = available.downloadSha256 ?: available.versionName
         createNotificationChannel()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(
@@ -107,25 +123,93 @@ class GitHubUpdateDownloadService : Service() {
         }
     }
 
-    private fun progressNotification(status: UpdateStatus.Downloading) = NotificationCompat
+    private fun progressNotification(status: UpdateStatus.Downloading): Notification {
+        if (!shouldRequestLiveUpdate()) {
+            return notificationBuilder(status)
+                .setProgress(100, status.progress ?: 0, status.progress == null)
+                .build()
+        }
+
+        val progressStyle = updateProgressStyle(status.progress)
+        val liveUpdate = notificationBuilder(status)
+            .setRequestPromotedOngoing(true)
+            .setStyle(progressStyle)
+            .setDeleteIntent(liveUpdateDeleteIntent())
+            .apply {
+                status.progress?.let { progress ->
+                    setShortCriticalText(getString(R.string.updates_status_progress, progress))
+                }
+            }
+            .build()
+
+        // OEMs may reject otherwise eligible notifications; always retain the standard fallback.
+        if (Build.VERSION.SDK_INT >= 36 && !liveUpdate.hasPromotableCharacteristics()) {
+            return notificationBuilder(status)
+                .setProgress(100, status.progress ?: 0, status.progress == null)
+                .build()
+        }
+        return liveUpdate
+    }
+
+    private fun notificationBuilder(status: UpdateStatus.Downloading) = NotificationCompat
         .Builder(this, CHANNEL_ID)
-        .setSmallIcon(R.drawable.cloud_download_filled)
+        .setSmallIcon(R.drawable.download_filled)
         .setContentTitle(getString(R.string.updates_notification_downloading_title))
         .setContentText(
             status.progress?.let { getString(R.string.updates_status_downloading_progress, it) }
                 ?: getString(R.string.updates_notification_downloading_text)
         )
-        .setProgress(100, status.progress ?: 0, status.progress == null)
         .setOngoing(true)
         .setOnlyAlertOnce(true)
         .setPriority(NotificationCompat.PRIORITY_LOW)
         .setContentIntent(updatePendingIntent(NOTIFICATION_ID))
-        .build()
+        .addAction(
+            NotificationCompat.Action.Builder(
+                R.drawable.cancel_filled,
+                getString(R.string.update_cancel_download),
+                cancelDownloadPendingIntent()
+            ).build()
+        )
+
+    private fun cancelDownloadPendingIntent(): PendingIntent {
+        val intent = Intent(this, GitHubUpdateDownloadService::class.java).apply {
+            action = ACTION_CANCEL_DOWNLOAD
+            putExtra(EXTRA_DOWNLOAD_ID, activeDownloadId)
+        }
+        return PendingIntent.getService(
+            this,
+            NOTIFICATION_ID,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+
+    private fun shouldRequestLiveUpdate(): Boolean {
+        return shouldUseLiveUpdates(
+            sdkInt = Build.VERSION.SDK_INT,
+            systemAllowed = canPostLiveUpdates(),
+            preferenceEnabled = liveUpdatesPreferenceEnabled(),
+            dismissed = dismissedDownloadId == activeDownloadId
+        )
+    }
+
+    private fun liveUpdateDeleteIntent(): PendingIntent {
+        val intent = Intent(this, GitHubUpdateLiveUpdateReceiver::class.java).apply {
+            action = ACTION_DISMISS_LIVE_UPDATE
+            putExtra(EXTRA_DOWNLOAD_ID, activeDownloadId)
+        }
+        return PendingIntent.getBroadcast(
+            this,
+            NOTIFICATION_ID,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }
 
     private fun showReadyNotificationIfNeeded() {
         if (UpdateUiVisibility.isUpdateModalVisible && UpdateUiVisibility.isAppInForeground) return
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.update_filled)
+            .setSmallIcon(R.drawable.download_done_filled)
             .setContentTitle(getString(R.string.updates_status_ready_title))
             .setContentText(getString(R.string.updates_notification_ready_text))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -181,8 +265,31 @@ class GitHubUpdateDownloadService : Service() {
     }
 
     companion object {
+        const val ACTION_DISMISS_LIVE_UPDATE =
+            "com.cemcakmak.hydrotracker.action.DISMISS_LIVE_UPDATE"
+        const val ACTION_CANCEL_DOWNLOAD =
+            "com.cemcakmak.hydrotracker.action.CANCEL_DOWNLOAD"
+        const val EXTRA_DOWNLOAD_ID = "download_id"
+
+        @Volatile
+        private var dismissedDownloadId: String? = null
+
+        /** Suppresses promotion only for the matching download; a new attempt resets this state. */
+        fun dismissLiveUpdate(downloadId: String?) {
+            dismissedDownloadId = downloadId ?: return
+        }
+
         fun cancelReadyNotification(context: Context) {
             NotificationManagerCompat.from(context).cancel(READY_NOTIFICATION_ID)
+        }
+
+        /** Routes notification and in-app cancellation through the active service instance. */
+        fun cancel(context: Context, downloadId: String) {
+            val intent = Intent(context, GitHubUpdateDownloadService::class.java).apply {
+                action = ACTION_CANCEL_DOWNLOAD
+                putExtra(EXTRA_DOWNLOAD_ID, downloadId)
+            }
+            context.startService(intent)
         }
 
         private const val CHANNEL_ID = "app_updates"
@@ -208,6 +315,7 @@ class GitHubUpdateDownloadService : Service() {
                 UpdateError.INVALID_UPDATE_METADATA,
                 "Missing APK digest"
             )
+            dismissedDownloadId = null
             running = true
             cancelReadyNotification(context)
             val intent = Intent(context, GitHubUpdateDownloadService::class.java).apply {
@@ -225,4 +333,15 @@ class GitHubUpdateDownloadService : Service() {
             }
         }
     }
+}
+
+/** Builds the Android 16 progress style; older platforms retain NotificationCompat's fallback. */
+internal fun updateProgressStyle(progress: Int?): NotificationCompat.ProgressStyle {
+    val style = NotificationCompat.ProgressStyle()
+    if (progress == null) {
+        style.setProgressIndeterminate(true)
+    } else {
+        style.setProgress(progress)
+    }
+    return style
 }

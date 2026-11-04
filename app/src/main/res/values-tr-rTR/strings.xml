@@ -667,7 +667,8 @@
     <string name="updates_section_status">Status</string>
     <string name="updates_status_checking">Checking for updates…</string>
     <string name="updates_status_downloading">Güncelleme indiriliyor…</string>
-    <string name="updates_status_downloading_progress">%1$d%%</string>
+    <string name="updates_status_downloading_progress">İlerleme • %1$d%%</string>
+    <string name="updates_status_progress">%1$d%%</string>
     <string name="updates_status_installing">Güncelleme yükleniyor…</string>
     <string name="updates_status_installing_desc">Android sistem iletişim kutusundan yüklemeyi onaylayın.</string>
     <string name="updates_status_verifying">İndirilen güncelleme doğrulanıyor</string>
@@ -676,11 +677,14 @@
     <string name="updates_status_ready_version">%1$s sürümü indirildi ve doğrulandı.</string>
     <string name="updates_status_ready_to_install">Güncelleme indirildi ve doğrulandı. Hazır olduğunda yükle.</string>
     <string name="updates_status_permission_title">Yükleme izni gerekli</string>
-    <string name="updates_status_install_permission_required">İndirme işleminin devam edebilmesi için Android\'in güncellemeleri yükleme iznine sahip olması gerekiyor.</string>
+    <string name="updates_status_install_permission_required">Android\'in indirilen güncellemeyi yüklemek için izne ihtiyacı var.</string>
     <string name="updates_status_failed_title">Güncelleme başarısız oldu</string>
     <string name="updates_notification_downloading_title">HydroTracker güncellemesi indiriliyor</string>
     <string name="updates_notification_downloading_text">İndirme devam ediyor</string>
     <string name="updates_notification_ready_text">Güncellemeyi incelemek ve yüklemek için HydroTracker uygulamasını aç</string>
+    <string name="updates_live_updates_title">Canlı güncellemeler</string>
+    <string name="updates_live_updates_desc">Devam eden indirme işleminin ilerlemesini desteklenen sistem arayüzlerinde göster.</string>
+    <string name="updates_live_updates_disabled_desc">Canlı güncellemeler Android ayarlarında devre dışı. Bu özelliği kullanmak için onları etkinleştir.</string>
     <string name="update_error_unknown">Güncelleme tamamlanamadı. Tekrar dene.</string>
     <string name="update_error_check_failed">Güncellemeler kontrol edilemedi. Bağlantını kontrol et ve tekrar dene.</string>
     <string name="update_error_start_failed">Güncelleme başlatılamadı. Tekrar dene.</string>
@@ -741,6 +745,7 @@
     <string name="update_button_allow_install">Yüklemeye izin ver</string>
     <string name="update_button_failed_retry">Tekrar dene</string>
     <string name="update_button_failed_dismiss">Kapat</string>
+    <string name="update_cancel_download">İndirmeyi iptal et</string>
     <!-- ============================================================================
          Markdown components
          ============================================================================ -->
@@ -770,6 +775,7 @@
     <string name="home_snackbar_add_failed">Failed to add water: %1$s</string>
     <string name="home_snackbar_delete_failed">Failed to delete entry: %1$s</string>
     <string name="home_snackbar_update_failed">Failed to update entry: %1$s</string>
+    <string name="home_update_available">Güncelleme mevcut: %1$s</string>
     <string name="home_snackbar_synced">Synced %1$d entries from Health Connect</string>
     <string name="home_snackbar_sync_errors">Sync completed with %1$d errors</string>
     <string name="home_snackbar_up_to_date">Data is up to date</string>

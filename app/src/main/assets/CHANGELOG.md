@@ -1,10 +1,14 @@
 [1.8]
 Added
-- Distribution-specific update handling, including user-confirmed APK downloads and installation through Android for GitHub builds
+- Distribution-specific update handling, including verified, user-confirmed APK downloads and installation through Android for GitHub builds
+- Download progress notifications with Live Updates on Android 16+
+- Pull-to-refresh update checks on Home
 
 Changed
 - F-Droid builds now rely entirely on F-Droid for updates and have no self-updater or Internet permission
 - Google Play updates and reviews are included only in the Google Play build
+- Hydration reminders are now opt-in for new users and only show as active when notification permission is granted
+- Updated translations
 
 [1.7]
 

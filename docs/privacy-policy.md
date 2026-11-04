@@ -115,6 +115,7 @@ HydroTracker requests the following permissions to provide its functionality:
 - **ACCESS_LOCAL_NETWORK:** Requested only by the debug update-test harness before connecting to a local test server on Android 17 or later
 - **REQUEST_INSTALL_PACKAGES:** Present only in the GitHub flavour to let you confirm and install an explicitly requested APK update through Android
 - **FOREGROUND_SERVICE and FOREGROUND_SERVICE_DATA_SYNC:** Present only in the GitHub flavour to keep an explicitly requested APK download active with progress visible while it runs
+- **POST_PROMOTED_NOTIFICATIONS:** Present only in the GitHub flavour and unified debug app to show user-initiated update downloads as Live Updates on supported Android versions
 
 All permissions can be managed through your device settings, and the app will function with limited features if certain permissions are denied.
 

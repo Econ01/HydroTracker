@@ -370,6 +370,7 @@ private fun UpdateStatusCard(
                     subtitle = status.progress?.let { progress ->
                         stringResource(R.string.updates_status_downloading_progress, progress)
                     },
+                    progress = status.progress?.div(100f),
                     showSpinner = true
                 )
                 UpdateStatus.Verifying -> StatusLine(
@@ -445,7 +446,7 @@ private fun UpdateStatusCard(
                 Button(
                     onClick = {
                         haptics.performHapticFeedback(HapticFeedbackType.Confirm)
-                        onPrimaryAction(status.available)
+                        onInstallUpdate()
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -514,7 +515,8 @@ private fun StatusLine(
     icon: Int?,
     title: String,
     subtitle: String?,
-    showSpinner: Boolean = false
+    showSpinner: Boolean = false,
+    progress: Float? = null
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -522,7 +524,14 @@ private fun StatusLine(
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         if (showSpinner) {
-            CircularWavyProgressIndicator(modifier = Modifier.size(24.dp))
+            if (progress != null) {
+                CircularWavyProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier.size(24.dp)
+                )
+            } else {
+                CircularWavyProgressIndicator(modifier = Modifier.size(24.dp))
+            }
         } else if (icon != null) {
             Icon(
                 imageVector = ImageVector.vectorResource(icon),

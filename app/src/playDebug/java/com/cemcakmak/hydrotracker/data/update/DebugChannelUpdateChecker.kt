@@ -37,6 +37,8 @@ class DebugChannelUpdateChecker(context: Context) : UpdateChecker, UpdateActionH
     override suspend fun installUpdate(onStatusChanged: (UpdateStatus) -> Unit) =
         delegateAsHandler().installUpdate(onStatusChanged)
 
+    override fun cancelUpdate(status: UpdateStatus.Available) = delegateAsHandler().cancelUpdate(status)
+
     override fun restoreActionListener(onStatusChanged: (UpdateStatus) -> Unit) {
         (delegate as? UpdateActionHandler)?.restoreActionListener(onStatusChanged)
     }

@@ -667,7 +667,8 @@
     <string name="updates_section_status">Status</string>
     <string name="updates_status_checking">Nach Updates prüfen…</string>
     <string name="updates_status_downloading">Update wird heruntergeladen…</string>
-    <string name="updates_status_downloading_progress">%1$d%%</string>
+    <string name="updates_status_downloading_progress">Fortschritt • %1$d%%</string>
+    <string name="updates_status_progress">%1$d%%</string>
     <string name="updates_status_installing">Update wird installiert…</string>
     <string name="updates_status_installing_desc">Bestätige die Installation im Systemdialog von Android.</string>
     <string name="updates_status_verifying">Heruntergeladenes Update wird überprüft</string>
@@ -676,11 +677,14 @@
     <string name="updates_status_ready_version">Version %1$s wurde heruntergeladen und überprüft.</string>
     <string name="updates_status_ready_to_install">Das Update wurde heruntergeladen und überprüft. Installiere es, wenn du bereit bist.</string>
     <string name="updates_status_permission_title">Berechtigung zur Installation erforderlich</string>
-    <string name="updates_status_install_permission_required">Android benötigt die Berechtigung zum Installieren von Updates, damit der Download fortgesetzt werden kann.</string>
+    <string name="updates_status_install_permission_required">Android benötigt die Berechtigung zur Installation des heruntergeladenen Updates.</string>
     <string name="updates_status_failed_title">Update fehlgeschlagen</string>
     <string name="updates_notification_downloading_title">HydroTracker-Update wird heruntergeladen</string>
     <string name="updates_notification_downloading_text">Download läuft</string>
     <string name="updates_notification_ready_text">Öffne HydroTracker, um das Update zu prüfen und zu installieren</string>
+    <string name="updates_live_updates_title">Live-Updates</string>
+    <string name="updates_live_updates_desc">Zeige den Fortschritt laufender Downloads auf unterstützten Systemoberflächen an.</string>
+    <string name="updates_live_updates_disabled_desc">Live-Updates sind in den Android-Einstellungen deaktiviert. Aktiviere sie, um diese Funktion zu verwenden.</string>
     <string name="update_error_unknown">Das Update konnte nicht abgeschlossen werden. Versuche es erneut.</string>
     <string name="update_error_check_failed">Es konnte nicht nach Updates gesucht werden. Prüfe deine Verbindung und versuche es erneut.</string>
     <string name="update_error_start_failed">Das Update konnte nicht gestartet werden. Versuche es erneut.</string>
@@ -741,6 +745,7 @@
     <string name="update_button_allow_install">Installation zulassen</string>
     <string name="update_button_failed_retry">Erneut versuchen</string>
     <string name="update_button_failed_dismiss">Verwerfen</string>
+    <string name="update_cancel_download">Download abbrechen</string>
     <!-- ============================================================================
          Markdown components
          ============================================================================ -->
@@ -770,6 +775,7 @@
     <string name="home_snackbar_add_failed">Wasser hinzufügen ist fehlgeschlagen: %1$s</string>
     <string name="home_snackbar_delete_failed">Eintrag löschen ist fehlgeschlagen: %1$s</string>
     <string name="home_snackbar_update_failed">Eintrag Aktualisierung ist fehlgeschlagen: %1$s</string>
+    <string name="home_update_available">Update verfügbar: %1$s</string>
     <string name="home_snackbar_synced">Synced %1$d entries from Health Connect</string>
     <string name="home_snackbar_sync_errors">Sync completed with %1$d errors</string>
     <string name="home_snackbar_up_to_date">Daten sind auf aktuellem Stand</string>
@@ -1097,7 +1103,7 @@
         <item>Eine ausreichende Flüssigkeitszufuhr kann Ihr Energieniveau steigern.</item>
         <item>Wasser hilft den Nieren, Abfallstoffe effizient zu filtern.</item>
         <item>Ausreichende Flüssigkeitszufuhr fördert die Gesundheit der Haut.</item>
-        <item>Blut besteht zu 90 % Prozent aus Wasser.</item>
+        <item>Blut besteht zu 90 % aus Wasser.</item>
         <item>Wasser hilft bei der Schmierung der Gelenke.</item>
         <item>Hydration kann Ihre körperliche Leistung verbessern.</item>
         <item>Wasser unterstützt die Verdauung und die Nährstoffaufnahme.</item>

@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -114,7 +115,9 @@ fun HomeScreen(
     activeBeverages: List<BeverageOption> = BeverageType.getAllSorted().map { it.toOption() },
     paddingValues: PaddingValues,
     showCustomDialog: Boolean = false,
-    onCustomDialogChange: (Boolean) -> Unit = {}
+    onCustomDialogChange: (Boolean) -> Unit = {},
+    onCheckForUpdates: (suspend () -> Unit)? = null,
+    activeUpdateVersion: String? = null
 ) {
     // Check for new user day when HomeScreen is displayed
     LaunchedEffect(Unit) {
@@ -146,6 +149,7 @@ fun HomeScreen(
     // Vibration and haptics
     val haptics = LocalHapticFeedback.current
     val context = LocalContext.current
+    val resources = LocalResources.current
 
     // Coroutine scope for database operations
     val coroutineScope = rememberCoroutineScope()
@@ -252,6 +256,18 @@ fun HomeScreen(
     // Function to perform manual sync with Health Connect
     fun performManualSync() {
         coroutineScope.launch {
+            if (activeUpdateVersion != null) {
+                Toast.makeText(
+                    context,
+                    resources.getString(R.string.home_update_available, activeUpdateVersion),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                onCheckForUpdates?.let { checkForUpdates ->
+                    launch { checkForUpdates() }
+                }
+            }
+
             if (!userProfile.healthConnectSyncEnabled) {
                 Toast.makeText(
                     context,

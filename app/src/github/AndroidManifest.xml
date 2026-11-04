@@ -4,8 +4,12 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS" />
 
     <application>
+        <receiver
+            android:name=".data.update.GitHubUpdateLiveUpdateReceiver"
+            android:exported="false" />
         <receiver
             android:name=".data.update.GitHubUpdateInstallReceiver"
             android:exported="false" />

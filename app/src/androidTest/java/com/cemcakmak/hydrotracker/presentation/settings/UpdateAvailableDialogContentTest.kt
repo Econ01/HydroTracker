@@ -92,8 +92,39 @@ class UpdateAvailableDialogContentTest {
     }
 
     @Test
-    fun permissionRequiredRetriesSameUpdate() {
-        var retried: UpdateStatus.Available? = null
+    fun downloadingAndVerifyingCancelAndDismissDialog() {
+        var status by mutableStateOf<UpdateStatus>(UpdateStatus.Downloading(50))
+        var cancellations = 0
+        var dismissed = false
+
+        compose.setContent {
+            HydroTrackerTheme {
+                UpdateAvailableDialogContent(
+                    status = status,
+                    activeUpdate = available,
+                    installSource = InstallSource.OTHER,
+                    onDismiss = { dismissed = true },
+                    onCancelDownload = { cancellations++ }
+                )
+            }
+        }
+
+        compose.onNodeWithTag("update_secondary_action").assertDoesNotExist()
+        compose.onNodeWithTag("update_cancel_action").assertIsDisplayed().performClick()
+        assertEquals(1, cancellations)
+        assertEquals(true, dismissed)
+
+        compose.runOnIdle { status = UpdateStatus.Verifying }
+        compose.onNodeWithTag("update_cancel_action").assertIsDisplayed()
+
+        compose.runOnIdle { status = UpdateStatus.ReadyToInstall(available) }
+        compose.onNodeWithTag("update_cancel_action").assertDoesNotExist()
+    }
+
+    @Test
+    fun permissionRequiredInstallsDownloadedUpdateWithoutRestartingDownload() {
+        var installs = 0
+        var starts = 0
 
         compose.setContent {
             HydroTrackerTheme {
@@ -101,13 +132,15 @@ class UpdateAvailableDialogContentTest {
                     status = UpdateStatus.PermissionRequired(available),
                     activeUpdate = available,
                     installSource = InstallSource.OTHER,
-                    onStartUpdate = { retried = it }
+                    onInstallUpdate = { installs++ },
+                    onStartUpdate = { starts++ }
                 )
             }
         }
 
         compose.onNodeWithTag("update_primary_action").performClick()
-        assertEquals(available, retried)
+        assertEquals(1, installs)
+        assertEquals(0, starts)
     }
 
     @Test

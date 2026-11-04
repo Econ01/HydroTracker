@@ -1,6 +1,7 @@
 package com.cemcakmak.hydrotracker.data.update
 
 import android.content.Context
+import android.os.Build
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.core.content.edit
@@ -31,6 +32,8 @@ open class UpdateRepository(
     private var updateInProgress = false
 
     val installSource: InstallSource get() = checker.source
+    val liveUpdatesSupported: Boolean
+        get() = installSource == InstallSource.OTHER && Build.VERSION.SDK_INT >= 36
 
     private val restoredStatus = checker.restoreState()
     private val _updateStatus = MutableStateFlow(
@@ -57,6 +60,12 @@ open class UpdateRepository(
 
     private val _autoCheckEnabled = MutableStateFlow(prefs.getBoolean(KEY_AUTO_CHECK, true))
     val autoCheckEnabled: StateFlow<Boolean> = _autoCheckEnabled.asStateFlow()
+
+    private val _liveUpdatesEnabled = MutableStateFlow(appContext.liveUpdatesPreferenceEnabled())
+    val liveUpdatesEnabled: StateFlow<Boolean> = _liveUpdatesEnabled.asStateFlow()
+
+    private val _liveUpdatesSystemAllowed = MutableStateFlow(appContext.canPostLiveUpdates())
+    val liveUpdatesSystemAllowed: StateFlow<Boolean> = _liveUpdatesSystemAllowed.asStateFlow()
 
     private val _lastCheckTime = MutableStateFlow(prefs.getLong(KEY_LAST_CHECK, 0L))
     val lastCheckTime: StateFlow<Long> = _lastCheckTime.asStateFlow()
@@ -141,6 +150,14 @@ open class UpdateRepository(
         }
     }
 
+    /** Cancels the active download and keeps its metadata available for an immediate retry. */
+    fun cancelUpdate() {
+        val available = _activeUpdate.value ?: return
+        val handler = checker as? UpdateActionHandler ?: return
+        handler.cancelUpdate(available)
+        _updateStatus.value = available
+    }
+
     /** Starts Android's installer for an APK that has already been downloaded and verified. */
     fun installUpdate() {
         val available = _activeUpdate.value
@@ -181,7 +198,13 @@ open class UpdateRepository(
 
     /** Resumes Android's installation confirmation after returning to the app. */
     fun resumeUpdate(): Boolean {
-        return (checker as? UpdateActionHandler)?.resumeUpdate() ?: false
+        val handler = checker as? UpdateActionHandler ?: return false
+        if (_updateStatus.value is UpdateStatus.PermissionRequired) {
+            if (!handler.hasInstallPermission()) return false
+            installUpdate()
+            return true
+        }
+        return handler.resumeUpdate()
     }
 
     /** Observes Play's downloaded state; other flavours return a no-op clean-up action. */
@@ -201,6 +224,19 @@ open class UpdateRepository(
         prefs.edit { putBoolean(KEY_AUTO_CHECK, enabled) }
         _autoCheckEnabled.value = enabled
     }
+
+    /** Updates Android's promoted-notification state after returning from system settings. */
+    fun refreshLiveUpdatesSystemAllowed() {
+        _liveUpdatesSystemAllowed.value = appContext.canPostLiveUpdates()
+    }
+
+    fun setLiveUpdatesEnabled(enabled: Boolean) {
+        prefs.edit { putBoolean(KEY_LIVE_UPDATES_ENABLED, enabled) }
+        _liveUpdatesEnabled.value = enabled
+    }
+
+    /** Opens Android's per-app Live Updates settings, or returns false when unavailable. */
+    fun openLiveUpdatesSettings(): Boolean = appContext.openLiveUpdatesSettings()
 
     /** Clears session metadata without cancelling platform work, used by debug channel switching. */
     fun clearUpdateSession() {

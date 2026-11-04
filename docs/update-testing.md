@@ -105,7 +105,7 @@ The phone and computer must be on the same reachable network. Allow inbound TCP 
 
 Each release response builds its `browser_download_url` from the request's `Host` header. Consequently, an emulator feed produces emulator-reachable APK URLs and a LAN feed produces LAN APK URLs without rewriting scenario files.
 
-In the app, open **Settings → Developer Options → Update testing**. Under **Local server**, enter only the base URL (for example `http://10.0.2.2:8765`), cycle to the required scenario and tap **Save and check for updates**. The debug-only configuration is persisted between launches. On the first installation attempt, Android may ask for **Install unknown apps** permission for HydroTracker; allow it for the debug app, return to the test screen and start the download again.
+In the app, open **Settings → Developer Options → Update testing**. Under **Local server**, enter only the base URL (for example `http://10.0.2.2:8765`), cycle to the required scenario and tap **Save and check for updates**. The debug-only configuration is persisted between launches. The first installation attempt does not request install permission until the APK has downloaded and been verified. Tap **Install update** when it is ready; Android may then ask for **Install unknown apps** permission for HydroTracker. Allow it for the debug app and return to the app to resume installation automatically. If permission is denied, **Allow installation** remains available as a retry without downloading again.
 
 ## 4. GitHub scenario expectations
 
@@ -139,6 +139,21 @@ Use `slow_download` for these tests so the download does not finish before the a
 3. Press Home and leave the app in the background until the download and staging complete.
 4. Expect the progress notification to be replaced by **Update ready to install**. Tapping it should open HydroTracker's Home screen with the update modal visible.
 5. Tap **Install update** in the modal to reach Android's system confirmation, then confirm or cancel and verify the final installer result.
+
+### Live Updates on Android 16 and later
+
+1. On an Android 16+ device, open **Settings → Notifications → Live Updates**. If Android blocks promoted notifications, use **Allow** to open Android's Live Updates settings, then return and confirm that the in-app toggle is available.
+2. Start `slow_download` and verify that determinate progress uses the cloud-download icon and percentage, while an indeterminate response uses the icon without a percentage.
+3. Dismiss the Live Update during the same download. Subsequent progress updates must use the standard notification rather than repeatedly requesting promotion. A new download attempt resets this dismissal.
+4. Disable the in-app Live Updates toggle and verify the standard progress notification returns without changing the download itself. Disable Live Updates in Android settings and verify that the in-app toggle becomes unavailable with a link back to system settings.
+5. Complete the download and confirm that the ongoing Live Update is removed. The ready-to-install notification remains a standard notification.
+
+### Cancelling a download
+
+1. Start `slow_download`, then use **Cancel download** in both the regular and Live Update notifications and in the Home update modal. Verify that the connection stops, the ongoing notification is removed, partial files are deleted, and the same update returns to **Available** for retry. In the modal, **Cancel download** also dismisses the dialog without immediately reopening it.
+2. Repeat cancellation while verification is in progress. Ready-to-install and Android's system installation confirmation are not cancellable through this action.
+3. Use **Later** instead and verify that only the modal closes while the download continues in the background.
+4. Pull to refresh on Home to check for updates. A new check may reopen the update modal; an already active update session is not checked redundantly and shows an **Update available** Toast with its version instead.
 
 ### Continue installation fallback
 

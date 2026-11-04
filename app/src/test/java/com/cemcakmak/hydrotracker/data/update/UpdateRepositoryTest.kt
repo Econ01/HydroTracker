@@ -40,6 +40,51 @@ class UpdateRepositoryTest {
     }
 
     @Test
+    fun `cancelling restores the same update for retry`() {
+        val checker = CancellableUpdateChecker()
+        val repository = UpdateRepository(
+            ApplicationProvider.getApplicationContext(),
+            checker
+        )
+        val status = UpdateStatus.Available(
+            versionName = "1.8.1",
+            mechanism = UpdateMechanism.GITHUB_APK,
+            downloadUrl = "https://example.com/update.apk"
+        )
+
+        repository.startUpdate(status, NoopLauncher)
+        repository.cancelUpdate()
+
+        assertEquals(status, repository.updateStatus.value)
+        assertEquals(status, repository.activeUpdate.value)
+        assertEquals(status, checker.cancelledUpdate)
+    }
+
+    @Test
+    fun `permission required resumes installation only when permission is granted`() {
+        val checker = CancellableUpdateChecker()
+        val repository = UpdateRepository(
+            ApplicationProvider.getApplicationContext(),
+            checker
+        )
+        val status = UpdateStatus.Available(
+            versionName = "1.8.1",
+            mechanism = UpdateMechanism.GITHUB_APK,
+            downloadUrl = "https://example.com/update.apk"
+        )
+        checker.installPermissionGranted = false
+        checker.startStatus = UpdateStatus.PermissionRequired(status)
+        repository.startUpdate(status, NoopLauncher)
+
+        assertEquals(false, repository.resumeUpdate())
+        assertEquals(0, checker.installCalls)
+
+        checker.installPermissionGranted = true
+        assertEquals(true, repository.resumeUpdate())
+        assertEquals(1, checker.installCalls)
+    }
+
+    @Test
     fun `repeated starts are single-flight until the active operation completes`() = runBlocking {
         val checker = BlockingUpdateChecker()
         val repository = UpdateRepository(
@@ -64,6 +109,36 @@ class UpdateRepositoryTest {
         assertEquals(2, checker.startCalls)
         checker.completeCurrent()
         Shadows.shadowOf(Looper.getMainLooper()).idle()
+    }
+
+    private class CancellableUpdateChecker : UpdateChecker, UpdateActionHandler {
+        var cancelledUpdate: UpdateStatus.Available? = null
+            private set
+        var installPermissionGranted = true
+        var installCalls = 0
+            private set
+        var startStatus: UpdateStatus? = null
+
+        override val source = InstallSource.OTHER
+        override suspend fun check(): UpdateStatus = UpdateStatus.UpToDate
+
+        override suspend fun startUpdate(
+            status: UpdateStatus.Available,
+            launcher: ActivityResultLauncher<IntentSenderRequest>,
+            onStatusChanged: (UpdateStatus) -> Unit
+        ) {
+            startStatus?.let(onStatusChanged)
+        }
+
+        override suspend fun installUpdate(onStatusChanged: (UpdateStatus) -> Unit) {
+            installCalls++
+        }
+
+        override fun hasInstallPermission(): Boolean = installPermissionGranted
+
+        override fun cancelUpdate(status: UpdateStatus.Available) {
+            cancelledUpdate = status
+        }
     }
 
     private class BlockingUpdateChecker : UpdateChecker, UpdateActionHandler {

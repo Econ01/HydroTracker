@@ -667,7 +667,8 @@
     <string name="updates_section_status">Statut</string>
     <string name="updates_status_checking">Recherche de mises à jour…</string>
     <string name="updates_status_downloading">Téléchargement de la mise à jour…</string>
-    <string name="updates_status_downloading_progress">%1$d%%</string>
+    <string name="updates_status_downloading_progress">Progression • %1$d%%</string>
+    <string name="updates_status_progress">%1$d%%</string>
     <string name="updates_status_installing">Installation de la mise à jour…</string>
     <string name="updates_status_installing_desc">Confirmez l\'installation dans la boîte de dialogue système d\'Android.</string>
     <string name="updates_status_verifying">Vérification de la mise à jour téléchargée</string>
@@ -676,11 +677,14 @@
     <string name="updates_status_ready_version">La version %1$s a été téléchargée et vérifiée.</string>
     <string name="updates_status_ready_to_install">La mise à jour a été téléchargée et vérifiée. Installe-la quand tu veux.</string>
     <string name="updates_status_permission_title">Autorisation d\'installation requise</string>
-    <string name="updates_status_install_permission_required">Android a besoin d\'une autorisation pour installer des mises à jour avant que le téléchargement puisse continuer.</string>
+    <string name="updates_status_install_permission_required">Android a besoin d\'une autorisation pour installer la mise à jour téléchargée.</string>
     <string name="updates_status_failed_title">Échec de la mise à jour</string>
     <string name="updates_notification_downloading_title">Téléchargement de la mise à jour HydroTracker</string>
     <string name="updates_notification_downloading_text">Téléchargement en cours</string>
     <string name="updates_notification_ready_text">Ouvre HydroTracker pour consulter la mise à jour et l\'installer</string>
+    <string name="updates_live_updates_title">Mises à jour en direct</string>
+    <string name="updates_live_updates_desc">Affiche la progression du téléchargement en cours sur les interfaces système prises en charge.</string>
+    <string name="updates_live_updates_disabled_desc">Les mises à jour en direct sont désactivées dans les paramètres d\'Android. Active-les pour utiliser cette fonctionnalité.</string>
     <string name="update_error_unknown">Impossible de terminer la mise à jour. Réessaie.</string>
     <string name="update_error_check_failed">Impossible de rechercher des mises à jour. Vérifie ta connexion et réessaie.</string>
     <string name="update_error_start_failed">Impossible de démarrer la mise à jour. Réessaie.</string>
@@ -741,6 +745,7 @@
     <string name="update_button_allow_install">Autoriser l\'installation</string>
     <string name="update_button_failed_retry">Réessayer</string>
     <string name="update_button_failed_dismiss">Fermer</string>
+    <string name="update_cancel_download">Annuler le téléchargement</string>
     <!-- ============================================================================
          Markdown components
          ============================================================================ -->
@@ -770,6 +775,7 @@
     <string name="home_snackbar_add_failed">Échec d\'ajout de l\'eau : %1$s</string>
     <string name="home_snackbar_delete_failed">Échec de suppression de l\'entrée : %1$s</string>
     <string name="home_snackbar_update_failed">Échec de mise à jour de l\'entrée : %1$s</string>
+    <string name="home_update_available">Mise à jour disponible : %1$s</string>
     <string name="home_snackbar_synced">%1$d entrées synchronisées depuis Health Connect</string>
     <string name="home_snackbar_sync_errors">Synchronisation termine avec %1$d erreurs</string>
     <string name="home_snackbar_up_to_date">Les données sont à jour</string>

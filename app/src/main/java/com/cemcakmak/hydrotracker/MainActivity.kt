@@ -276,6 +276,10 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         UpdateUiVisibility.isAppInForeground = true
+        updateRepository.refreshLiveUpdatesSystemAllowed()
+        if (updateRepository.updateStatus.value is UpdateStatus.PermissionRequired) {
+            updateRepository.resumeUpdate()
+        }
     }
 
     override fun onPause() {
@@ -465,13 +469,21 @@ fun HydroTrackerApp(
 
             // Home-screen update dialogue — retained throughout the active update flow.
             var showUpdateDialog by remember { mutableStateOf(false) }
+            var updateDialogDismissed by remember { mutableStateOf(false) }
             val updateStatus by updateRepository.updateStatus.collectAsState()
+            val activeUpdate by updateRepository.activeUpdate.collectAsState()
             LaunchedEffect(currentKey, updateStatus) {
-                if (currentKey == NavigationRoutes.Home && updateStatus is UpdateStatus.Available) {
+                if (updateStatus is UpdateStatus.Checking) {
+                    updateDialogDismissed = false
+                }
+                if (currentKey == NavigationRoutes.Home &&
+                    updateStatus is UpdateStatus.Available && !updateDialogDismissed
+                ) {
                     showUpdateDialog = true
                 }
                 if (updateStatus is UpdateStatus.UpToDate) {
                     showUpdateDialog = false
+                    updateDialogDismissed = false
                 }
             }
             val updateModalRequest = updateModalRequests.value
@@ -488,7 +500,10 @@ fun HydroTrackerApp(
                     installSource = updateRepository.installSource,
                     updateRepository = updateRepository,
                     themePreferences = themePreferences,
-                    onDismiss = { showUpdateDialog = false }
+                    onDismiss = {
+                        showUpdateDialog = false
+                        updateDialogDismissed = true
+                    }
                 )
             }
 
@@ -637,7 +652,13 @@ fun HydroTrackerApp(
                                     activeBeverages = activeBeverages,
                                     paddingValues = paddingValues,
                                     showCustomDialog = homeShowCustomDialog,
-                                    onCustomDialogChange = { homeShowCustomDialog = it }
+                                    onCustomDialogChange = { homeShowCustomDialog = it },
+                                    onCheckForUpdates = { updateRepository.checkForUpdates() },
+                                    activeUpdateVersion = if (updateStatus !is UpdateStatus.Failed) {
+                                        activeUpdate?.versionName
+                                    } else {
+                                        null
+                                    }
                                 )
                             } ?: LoadingScreen()
                         }
@@ -872,7 +893,8 @@ fun HydroTrackerApp(
                                         userRepository.saveUserProfile(updatedProfile)
                                         HydroNotificationScheduler.rescheduleNotifications(context, updatedProfile)
                                     }
-                                }
+                                },
+                                updateRepository = updateRepository
                             )
                         }
                         entry<NavigationRoutes.SettingsReminderInterval> {

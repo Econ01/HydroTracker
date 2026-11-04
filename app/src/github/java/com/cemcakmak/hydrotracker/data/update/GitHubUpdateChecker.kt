@@ -89,9 +89,18 @@ class GitHubUpdateChecker(
         installer.installDownloadedUpdate(onStatusChanged)
     }
 
+    override fun cancelUpdate(status: UpdateStatus.Available) {
+        GitHubUpdateDownloadService.cancel(
+            appContext,
+            status.downloadSha256 ?: status.versionName
+        )
+    }
+
     override fun restoreActionListener(onStatusChanged: (UpdateStatus) -> Unit) {
         GitHubApkInstaller.registerStatusChanged(appContext, onStatusChanged)
     }
+
+    override fun hasInstallPermission(): Boolean = appContext.packageManager.canRequestPackageInstalls()
 
     override fun resumeUpdate(): Boolean = installer.resumePendingInstallation()
 

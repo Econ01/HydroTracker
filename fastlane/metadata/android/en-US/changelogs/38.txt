@@ -1,1 +1,1 @@
-Added distribution-specific update handling. GitHub builds support user-confirmed APK downloads and installation through Android; F-Droid builds rely on F-Droid and have no Internet permission.
+Added distribution-specific updates with verified GitHub APK downloads, Android 16+ Live Updates, cancellation/retry, and user-confirmed installation. F-Droid builds rely on F-Droid without Internet permission. Reminders are now opt-in for new users. Updated translations.

@@ -21,6 +21,9 @@ interface UpdateActionHandler {
         throw UpdateException(UpdateError.NO_DOWNLOADED_UPDATE, "No downloaded update is ready")
     }
 
+    /** Cancels an in-progress download and restores the supplied update for a later retry. */
+    fun cancelUpdate(status: UpdateStatus.Available) = Unit
+
     /** Reattaches an existing operation to a newly created repository after recreation. */
     fun restoreActionListener(onStatusChanged: (UpdateStatus) -> Unit) = Unit
 
@@ -28,6 +31,9 @@ interface UpdateActionHandler {
     fun onUpdateFlowResult(resultCode: Int) = Unit
 
     fun completeUpdate() = Unit
+
+    /** Returns whether this app can request package installation without opening system settings. */
+    fun hasInstallPermission(): Boolean = true
 
     /** Resumes a pending system installation confirmation, if one exists. */
     fun resumeUpdate(): Boolean = false

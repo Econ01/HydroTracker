@@ -1,5 +1,6 @@
 package com.cemcakmak.hydrotracker.data.update
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -51,11 +52,8 @@ internal class GitHubApkInstaller(
         onStatusChanged: (UpdateStatus) -> Unit
     ) = withContext(Dispatchers.IO) {
         check(status.mechanism == UpdateMechanism.GITHUB_APK)
-        if (!ensureInstallPermission()) {
-            onStatusChanged(UpdateStatus.PermissionRequired(status))
-            return@withContext
-        }
 
+        cancelledDownloadId = null
         clearReadyUpdate()
         activeContext = context.applicationContext
         activeAvailable = status
@@ -65,11 +63,19 @@ internal class GitHubApkInstaller(
 
         try {
             val downloaded = downloadApk(status, apk, onStatusChanged)
+            ensureDownloadNotCancelled(status)
             onStatusChanged(UpdateStatus.Verifying)
             verifyApk(downloaded)
+            ensureDownloadNotCancelled(status)
             saveReadyUpdate(status, downloaded)
+            ensureDownloadNotCancelled(status)
             onStatusChanged(UpdateStatus.ReadyToInstall(status))
         } catch (e: Exception) {
+            if (isDownloadCancelled(status)) {
+                onStatusChanged(status)
+                clearActiveUpdate(context)
+                return@withContext
+            }
             onStatusChanged(e.toUpdateFailure(UpdateError.DOWNLOAD_FAILED))
             clearActiveUpdate(context)
             throw e
@@ -96,6 +102,15 @@ internal class GitHubApkInstaller(
                 UpdateError.NO_DOWNLOADED_UPDATE,
                 "The downloaded update is no longer available"
             )
+        }
+
+        val available = activeAvailable ?: throw UpdateException(
+            UpdateError.NO_DOWNLOADED_UPDATE,
+            "The downloaded update is no longer available"
+        )
+        if (!ensureInstallPermission()) {
+            onStatusChanged(UpdateStatus.PermissionRequired(available))
+            return@withContext
         }
 
         try {
@@ -148,6 +163,7 @@ internal class GitHubApkInstaller(
             setRequestProperty("User-Agent", "HydroTracker")
         }
 
+        activeConnection = connection
         try {
             if (connection.responseCode != HttpURLConnection.HTTP_OK) {
                 throw UpdateException(
@@ -165,6 +181,7 @@ internal class GitHubApkInstaller(
                 partial.outputStream().use { output ->
                     val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
                     while (true) {
+                        ensureDownloadNotCancelled(status)
                         val count = input.read(buffer)
                         if (count < 0) break
                         output.write(buffer, 0, count)
@@ -192,6 +209,7 @@ internal class GitHubApkInstaller(
                 )
             }
 
+            ensureDownloadNotCancelled(status)
             apk.delete()
             if (!partial.renameTo(apk)) {
                 throw UpdateException(UpdateError.DOWNLOAD_FAILED, "Couldn't store the downloaded APK")
@@ -202,7 +220,14 @@ internal class GitHubApkInstaller(
             partial.delete()
             throw e
         } finally {
+            activeConnection = null
             connection.disconnect()
+        }
+    }
+
+    private fun ensureDownloadNotCancelled(status: UpdateStatus.Available) {
+        if (isDownloadCancelled(status)) {
+            throw UpdateException(UpdateError.UNKNOWN, "Download cancelled")
         }
     }
 
@@ -233,6 +258,7 @@ internal class GitHubApkInstaller(
         }
     }
 
+    @SuppressLint("RequestInstallPackagesPolicy")
     private fun stageApk(apk: File) {
         val packageInstaller = context.packageManager.packageInstaller
         activeSessionId?.let { oldSessionId ->
@@ -426,6 +452,12 @@ internal class GitHubApkInstaller(
         private var activeAvailable: UpdateStatus.Available? = null
 
         @Volatile
+        private var activeConnection: HttpURLConnection? = null
+
+        @Volatile
+        private var cancelledDownloadId: String? = null
+
+        @Volatile
         private var activeStatusChanged: ((UpdateStatus) -> Unit)? = null
 
         @Volatile
@@ -439,6 +471,30 @@ internal class GitHubApkInstaller(
 
         @Volatile
         private var activeSessionId: Int? = null
+
+        private fun UpdateStatus.Available.downloadId(): String = downloadSha256 ?: versionName
+
+        private fun isDownloadCancelled(status: UpdateStatus.Available): Boolean {
+            return cancelledDownloadId == status.downloadId()
+        }
+
+        /** Disconnects the active socket, removes partial files and restores the update for retry. */
+        fun cancelActiveDownload(downloadId: String): UpdateStatus.Available? {
+            val available = activeAvailable
+            if (available != null && available.downloadId() != downloadId) return null
+
+            cancelledDownloadId = downloadId
+            activeConnection?.disconnect()
+            activeConnection = null
+            activeApk?.let { apk ->
+                File(apk.parentFile, "${apk.name}.part").delete()
+            }
+
+            val callback = activeStatusChanged
+            clearActiveUpdate(activeContext)
+            available?.let { availableUpdate -> callback?.invoke(availableUpdate) }
+            return available
+        }
 
         fun registerStatusChanged(context: Context, listener: (UpdateStatus) -> Unit) {
             activeContext = context.applicationContext
