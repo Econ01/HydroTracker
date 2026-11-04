@@ -681,8 +681,8 @@
     <string name="updates_section_status">Статус</string>
     <string name="updates_status_checking">Проверка обновлений…</string>
     <string name="updates_status_downloading">Загрузка обновления…</string>
-    <string name="updates_status_progress">%1$d%%</string>
     <string name="updates_status_downloading_progress">Прогресс • %1$d%%</string>
+    <string name="updates_status_progress">%1$d%%</string>
     <string name="updates_status_installing">Установка обновления…</string>
     <string name="updates_status_installing_desc">Подтвердите установку в системном диалоге Android.</string>
     <string name="updates_status_verifying">Проверка загруженного обновления</string>

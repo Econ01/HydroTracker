@@ -20,9 +20,6 @@
 
 package com.cemcakmak.hydrotracker.presentation.settings
 
-import android.content.ActivityNotFoundException
-import android.content.Context
-import android.content.Intent
 import android.text.format.DateUtils
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -40,7 +37,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -62,23 +59,21 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import com.cemcakmak.hydrotracker.BuildConfig
 import com.cemcakmak.hydrotracker.R
 import com.cemcakmak.hydrotracker.data.models.ColorSource
 import com.cemcakmak.hydrotracker.data.models.DarkModePreference
 import com.cemcakmak.hydrotracker.data.models.ThemePreferences
 import com.cemcakmak.hydrotracker.data.update.InstallSource
+import com.cemcakmak.hydrotracker.data.update.UpdateMechanism
 import com.cemcakmak.hydrotracker.data.update.UpdateRepository
 import com.cemcakmak.hydrotracker.data.update.UpdateStatus
 import com.cemcakmak.hydrotracker.ui.theme.HydroTrackerTheme
-import com.google.android.play.core.appupdate.AppUpdateOptions
-import com.google.android.play.core.install.InstallStateUpdatedListener
-import com.google.android.play.core.install.model.InstallStatus
 import kotlinx.coroutines.launch
 
 /**
@@ -91,9 +86,9 @@ fun UpdatesScreen(
     onNavigateBack: () -> Unit = {}
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val haptics = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
-    val couldNotStartUpdate = stringResource(R.string.toast_could_not_start_update)
 
     val status by updateRepository.updateStatus.collectAsState()
     val autoCheckEnabled by updateRepository.autoCheckEnabled.collectAsState()
@@ -102,26 +97,14 @@ fun UpdatesScreen(
 
     var downloaded by remember { mutableStateOf(false) }
 
-    val appUpdateManager = updateRepository.appUpdateManager
     val updateLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()
-    ) { /* The install-state listener and the next check reflect the outcome. */ }
+    ) { result -> updateRepository.onUpdateFlowResult(result.resultCode) }
 
     // Surface Play's "downloaded → restart" state as an inline action.
-    DisposableEffect(appUpdateManager) {
-        if (appUpdateManager == null) {
-            onDispose { }
-        } else {
-            val listener = InstallStateUpdatedListener { state ->
-                if (state.installStatus() == InstallStatus.DOWNLOADED) downloaded = true
-            }
-            appUpdateManager.registerListener(listener)
-            // Reflect an update that finished downloading while we were away.
-            appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
-                if (info.installStatus() == InstallStatus.DOWNLOADED) downloaded = true
-            }
-            onDispose { appUpdateManager.unregisterListener(listener) }
-        }
+    DisposableEffect(updateRepository) {
+        val stopObserving = updateRepository.observeDownloaded { downloaded = true }
+        onDispose(stopObserving)
     }
 
     UpdatesContent(
@@ -137,20 +120,12 @@ fun UpdatesScreen(
             scope.launch { updateRepository.checkForUpdates() }
         },
         onToggleAuto = updateRepository::setAutoCheckEnabled,
-        onCompleteInstall = { appUpdateManager?.completeUpdate() },
+        onCompleteInstall = updateRepository::completeUpdate,
+        onInstallUpdate = updateRepository::installUpdate,
+        onResumeUpdate = { updateRepository.resumeUpdate() },
         onPrimaryAction = { available ->
-            if (available.playUpdateInfo != null && available.playUpdateType != null) {
-                try {
-                    appUpdateManager?.startUpdateFlowForResult(
-                        available.playUpdateInfo,
-                        updateLauncher,
-                        AppUpdateOptions.defaultOptions(available.playUpdateType)
-                    )
-                } catch (_: Exception) {
-                    Toast.makeText(context, couldNotStartUpdate, Toast.LENGTH_SHORT).show()
-                }
-            } else if (available.downloadUrl != null) {
-                openUrl(context, available.downloadUrl)
+            updateRepository.startUpdate(available, updateLauncher) { error ->
+                Toast.makeText(context, resources.getString(error.messageRes()), Toast.LENGTH_LONG).show()
             }
         }
     )
@@ -168,6 +143,8 @@ private fun UpdatesContent(
     onCheckNow: () -> Unit,
     onToggleAuto: (Boolean) -> Unit,
     onCompleteInstall: () -> Unit,
+    onInstallUpdate: () -> Unit,
+    onResumeUpdate: () -> Unit,
     onPrimaryAction: (UpdateStatus.Available) -> Unit
 ) {
     SettingsDetailScaffold(
@@ -182,57 +159,59 @@ private fun UpdatesContent(
 
         val haptics = LocalHapticFeedback.current
 
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SettingsSectionHeader(stringResource(R.string.updates_section_auto_update))
-            SettingsGroupCard(index = 0, size = 1) {
-                val haptics = LocalHapticFeedback.current
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.update),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Column(
-                        modifier = Modifier.weight(1f)
+        if (installSource != InstallSource.F_DROID) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                SettingsSectionHeader(stringResource(R.string.updates_section_auto_update))
+                SettingsGroupCard(index = 0, size = 1) {
+                    val haptics = LocalHapticFeedback.current
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = stringResource(R.string.updates_toggle_auto_check),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.update),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
                         )
-                        Text(
-                            text = stringResource(R.string.updates_toggle_auto_check_desc),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.updates_toggle_auto_check),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.updates_toggle_auto_check_desc),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Switch(
+                            checked = autoCheckEnabled,
+                            onCheckedChange = { enabled ->
+                                onToggleAuto(enabled)
+                                haptics.performHapticFeedback(
+                                    if (enabled) HapticFeedbackType.ToggleOn else HapticFeedbackType.ToggleOff
+                                )
+                            },
+                            thumbContent = if (themePreferences.colorSource == ColorSource.DYNAMIC_COLOR) {
+                                {
+                                    Icon(
+                                        imageVector = ImageVector.vectorResource(R.drawable.update_filled),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(SwitchDefaults.IconSize),
+                                    )
+                                }
+                            } else {
+                                null
+                            }
                         )
                     }
-                    Switch(
-                        checked = autoCheckEnabled,
-                        onCheckedChange = { enabled ->
-                            onToggleAuto(enabled)
-                            haptics.performHapticFeedback(
-                                if (enabled) HapticFeedbackType.ToggleOn else HapticFeedbackType.ToggleOff
-                            )
-                        },
-                        thumbContent = if (themePreferences.colorSource == ColorSource.DYNAMIC_COLOR) {
-                            {
-                                Icon(
-                                    imageVector = ImageVector.vectorResource(R.drawable.update_filled),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(SwitchDefaults.IconSize),
-                                )
-                            }
-                        } else {
-                            null
-                        }
-                    )
                 }
             }
         }
@@ -244,11 +223,20 @@ private fun UpdatesContent(
                 lastCheckTime = lastCheckTime,
                 downloaded = downloaded,
                 onPrimaryAction = onPrimaryAction,
-                onCompleteInstall = onCompleteInstall
+                onCompleteInstall = onCompleteInstall,
+                onInstallUpdate = onInstallUpdate,
+                onResumeUpdate = onResumeUpdate
             )
 
             val checking = status is UpdateStatus.Checking
-            if (status !is UpdateStatus.Available) {
+            val updateInProgress = status is UpdateStatus.Downloading ||
+                status is UpdateStatus.Verifying ||
+                status is UpdateStatus.ReadyToInstall ||
+                status is UpdateStatus.PermissionRequired ||
+                status is UpdateStatus.Installing
+            if (installSource != InstallSource.F_DROID &&
+                status !is UpdateStatus.Available && !updateInProgress
+            ) {
                 Button(
                     onClick = {
                         onCheckNow()
@@ -289,10 +277,15 @@ private fun VersionInfo(
         null
     }
 
-    val sourceLabel = when (installSource) {
+    val channelLabel = when (installSource) {
         InstallSource.PLAY_STORE -> stringResource(R.string.install_source_google_play)
         InstallSource.F_DROID -> stringResource(R.string.install_source_f_droid)
         InstallSource.OTHER -> stringResource(R.string.install_source_manual)
+    }
+    val sourceLabel = if (BuildConfig.DEBUG && installSource != InstallSource.OTHER) {
+        "$channelLabel (debug)"
+    } else {
+        channelLabel
     }
 
     Surface(
@@ -350,8 +343,12 @@ private fun UpdateStatusCard(
     lastCheckTime: Long,
     downloaded: Boolean,
     onPrimaryAction: (UpdateStatus.Available) -> Unit,
-    onCompleteInstall: () -> Unit
+    onCompleteInstall: () -> Unit,
+    onInstallUpdate: () -> Unit,
+    onResumeUpdate: () -> Unit
 ) {
+    val haptics = LocalHapticFeedback.current
+
     SettingsGroupCard(index = 0, size = 1) {
         Column(
             modifier = Modifier
@@ -367,10 +364,44 @@ private fun UpdateStatusCard(
                     subtitle = null,
                     showSpinner = true
                 )
+                is UpdateStatus.Downloading -> StatusLine(
+                    icon = null,
+                    title = stringResource(R.string.updates_status_downloading),
+                    subtitle = status.progress?.let { progress ->
+                        stringResource(R.string.updates_status_downloading_progress, progress)
+                    },
+                    progress = status.progress?.div(100f),
+                    showSpinner = true
+                )
+                UpdateStatus.Verifying -> StatusLine(
+                    icon = null,
+                    title = stringResource(R.string.updates_status_verifying),
+                    subtitle = stringResource(R.string.updates_status_verifying_desc),
+                    showSpinner = true
+                )
+                is UpdateStatus.ReadyToInstall -> StatusLine(
+                    icon = R.drawable.check_filled,
+                    title = stringResource(R.string.updates_status_ready_title),
+                    subtitle = stringResource(
+                        R.string.updates_status_ready_version,
+                        status.available.versionName
+                    )
+                )
+                is UpdateStatus.PermissionRequired -> StatusLine(
+                    icon = R.drawable.info_filled,
+                    title = stringResource(R.string.updates_status_permission_title),
+                    subtitle = stringResource(R.string.updates_status_install_permission_required)
+                )
+                UpdateStatus.Installing -> StatusLine(
+                    icon = null,
+                    title = stringResource(R.string.updates_status_installing),
+                    subtitle = stringResource(R.string.updates_status_installing_desc),
+                    showSpinner = true
+                )
                 is UpdateStatus.Failed -> StatusLine(
                     icon = R.drawable.cancel_filled,
-                    title = stringResource(R.string.updates_status_failed),
-                    subtitle = status.message
+                    title = stringResource(R.string.updates_status_failed_title),
+                    subtitle = stringResource(status.error.messageRes())
                 )
                 UpdateStatus.Unsupported -> StatusLine(
                     icon = R.drawable.info_filled,
@@ -390,8 +421,47 @@ private fun UpdateStatusCard(
             }
 
             if (downloaded) {
-                Button(onClick = onCompleteInstall, modifier = Modifier.fillMaxWidth()) {
+                Button(
+                    onClick = {
+                        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                        onCompleteInstall()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text(stringResource(R.string.updates_button_restart_install))
+                }
+            }
+            if (status is UpdateStatus.ReadyToInstall) {
+                Button(
+                    onClick = {
+                        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                        onInstallUpdate()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.update_button_install))
+                }
+            }
+            if (status is UpdateStatus.PermissionRequired) {
+                Button(
+                    onClick = {
+                        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                        onInstallUpdate()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.update_button_allow_install))
+                }
+            }
+            if (status is UpdateStatus.Installing) {
+                Button(
+                    onClick = {
+                        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                        onResumeUpdate()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.updates_button_continue_install))
                 }
             }
         }
@@ -403,7 +473,7 @@ private fun AvailableContent(
     status: UpdateStatus.Available,
     onPrimaryAction: (UpdateStatus.Available) -> Unit
 ) {
-    val isPlay = status.playUpdateInfo != null
+    val isPlay = status.mechanism == UpdateMechanism.PLAY_IN_APP
     val haptics = LocalHapticFeedback.current
 
     Column (
@@ -445,7 +515,8 @@ private fun StatusLine(
     icon: Int?,
     title: String,
     subtitle: String?,
-    showSpinner: Boolean = false
+    showSpinner: Boolean = false,
+    progress: Float? = null
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -453,7 +524,14 @@ private fun StatusLine(
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         if (showSpinner) {
-            CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 3.dp)
+            if (progress != null) {
+                CircularWavyProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier.size(24.dp)
+                )
+            } else {
+                CircularWavyProgressIndicator(modifier = Modifier.size(24.dp))
+            }
         } else if (icon != null) {
             Icon(
                 imageVector = ImageVector.vectorResource(icon),
@@ -486,14 +564,6 @@ private fun lastCheckedText(time: Long): String {
     return stringResource(R.string.updates_last_checked, relative.toString())
 }
 
-private fun openUrl(context: Context, url: String) {
-    try {
-        context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
-    } catch (_: ActivityNotFoundException) {
-        Toast.makeText(context, context.getString(R.string.toast_no_app_to_open_link), Toast.LENGTH_SHORT).show()
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun UpdatesAvailablePreview() {
@@ -503,6 +573,7 @@ private fun UpdatesAvailablePreview() {
             installSource = InstallSource.OTHER,
             status = UpdateStatus.Available(
                 versionName = "1.0.7",
+                mechanism = UpdateMechanism.GITHUB_APK,
                 downloadUrl = "https://example.com/app.apk"
             ),
             autoCheckEnabled = true,
@@ -512,6 +583,8 @@ private fun UpdatesAvailablePreview() {
             onCheckNow = {},
             onToggleAuto = {},
             onCompleteInstall = {},
+            onInstallUpdate = {},
+            onResumeUpdate = {},
             onPrimaryAction = {}
         )
     }
@@ -532,6 +605,8 @@ private fun UpdatesUpToDatePreview() {
             onCheckNow = {},
             onToggleAuto = {},
             onCompleteInstall = {},
+            onInstallUpdate = {},
+            onResumeUpdate = {},
             onPrimaryAction = {}
         )
     }

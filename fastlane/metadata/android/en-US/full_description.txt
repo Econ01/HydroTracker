@@ -25,7 +25,7 @@ Privacy Focused
 - All data stored locally on your device
 - No cloud sync or data collection
 - No usage tracking or analytics
-- Works completely offline
+- Core hydration tracking works completely offline
 
 Customization Options
 - Flexible container presets for instant logging

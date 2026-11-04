@@ -31,7 +31,7 @@ data class UserProfile(
     val customReminderInterval: Int = 60,
     val volumeUnit: VolumeUnit = VolumeUnit.MILLILITRES, // Display unit for hydration amounts
     val funFactsEnabled: Boolean = false, // Opt-in daily hydration fact notifications
-    val notificationsEnabled: Boolean = true // Master toggle for hydration reminder notifications
+    val notificationsEnabled: Boolean = false // Opt-in master toggle for hydration reminder notifications
 )
 
 @Serializable

@@ -660,8 +660,8 @@
     <string name="updates_section_status">状态</string>
     <string name="updates_status_checking">正在检查更新……</string>
     <string name="updates_status_downloading">正在下载更新……</string>
-    <string name="updates_status_progress">%1$d%%</string>
     <string name="updates_status_downloading_progress">进度 • %1$d%%</string>
+    <string name="updates_status_progress">%1$d%%</string>
     <string name="updates_status_installing">正在安装更新……</string>
     <string name="updates_status_installing_desc">请在 Android 系统对话框中确认安装。</string>
     <string name="updates_status_verifying">正在验证已下载的更新</string>

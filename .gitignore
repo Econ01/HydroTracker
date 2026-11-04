@@ -19,8 +19,9 @@ bin/
 gen/
 out/
 
-# Gradle files
+# Gradle and Kotlin build caches
 .gradle/
+.kotlin/
 build/
 
 # Local configuration file (sdk path, etc)
