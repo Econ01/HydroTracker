@@ -1,11 +1,11 @@
 {
   "languages": {
     "de-DE": {
-      "translated": 43,
-      "approved": 15
+      "translated": 47,
+      "approved": 14
     },
     "es-ES": {
-      "translated": 100,
+      "translated": 99,
       "approved": 0
     },
     "fr-FR": {
@@ -13,7 +13,7 @@
       "approved": 0
     },
     "pt-PT": {
-      "translated": 0,
+      "translated": 8,
       "approved": 0
     },
     "ru-RU": {
@@ -21,8 +21,8 @@
       "approved": 0
     },
     "tr-TR": {
-      "translated": 24,
-      "approved": 24
+      "translated": 30,
+      "approved": 22
     },
     "zh-CN": {
       "translated": 97,

@@ -40,6 +40,43 @@
       "approvedWords": 0
     },
     {
+      "id": 17742837,
+      "name": "Cem Çakmak (Econ01)",
+      "username": "Econ01",
+      "languages": [
+        {
+          "id": "de",
+          "name": "German"
+        },
+        {
+          "id": "es-ES",
+          "name": "Spanish"
+        },
+        {
+          "id": "fr",
+          "name": "French"
+        },
+        {
+          "id": "pt-PT",
+          "name": "Portuguese"
+        },
+        {
+          "id": "ru",
+          "name": "Russian"
+        },
+        {
+          "id": "tr",
+          "name": "Turkish"
+        },
+        {
+          "id": "zh-CN",
+          "name": "Chinese Simplified"
+        }
+      ],
+      "translatedWords": 2508,
+      "approvedWords": 732
+    },
+    {
       "id": 17954795,
       "name": "Camilo Mejia (Kami88)",
       "username": "Kami88",
@@ -77,27 +114,6 @@
       ],
       "translatedWords": 726,
       "approvedWords": 0
-    },
-    {
-      "id": 17742837,
-      "name": "Cem Çakmak (Econ01)",
-      "username": "Econ01",
-      "languages": [
-        {
-          "id": "fr",
-          "name": "French"
-        },
-        {
-          "id": "tr",
-          "name": "Turkish"
-        },
-        {
-          "id": "zh-CN",
-          "name": "Chinese Simplified"
-        }
-      ],
-      "translatedWords": 674,
-      "approvedWords": 732
     },
     {
       "id": 17949133,
