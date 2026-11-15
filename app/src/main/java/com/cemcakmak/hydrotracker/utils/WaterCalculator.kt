@@ -105,7 +105,7 @@ object WaterCalculator {
 
         Log.d("Awake Hours", "Awake hours: $awakeHours")
 
-        // Glass-based reminder count: one reminder per ~300ml glass
+        // Glass-based reminder count: one reminder per ~300mL glass
         val targetReminders = (dailyGoal / 300.0).roundToInt().coerceAtLeast(1)
 
         val intervalMinutes = ((awakeHours * 60) / targetReminders).toInt()
@@ -122,7 +122,7 @@ object WaterCalculator {
      * @param remainingAwakeMinutes Minutes left until sleep time.
      * @param reminderIntervalMode Auto or Custom mode.
      * @param customReminderInterval User-defined interval in minutes (used only in Custom mode).
-     * @param averageDrinkSizeMl Estimated drink size for interval calculation (default 300 ml).
+     * @param averageDrinkSizeMl Estimated drink size for interval calculation (default 300 mL).
      * @return Interval in minutes.
      */
     fun calculateDynamicReminderInterval(
@@ -184,7 +184,7 @@ object WaterCalculator {
      * @param context Context for resolving unit labels.
      * @param amountMl Amount in milliliters.
      * @param volumeUnit The user's preferred display unit.
-     * @return Formatted string (e.g., "750 ml" or "25.4 fl oz").
+     * @return Formatted string (e.g., "750 mL" or "25.4 fl oz").
      */
     fun formatWaterAmount(context: Context, amountMl: Double, volumeUnit: VolumeUnit): String {
         return VolumeUnitConverter.format(context, amountMl, volumeUnit)

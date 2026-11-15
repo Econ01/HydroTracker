@@ -59,7 +59,7 @@
          ============================================================================ -->
     <string name="widget_large_label">HydroTracker</string>
     <string name="widget_large_description">Adaptive hydration progress and quick-add actions</string>
-    <string name="widget_quick_add_label">HydroTracker Quick Add</string>
+    <string name="widget_quick_add_label">HydroTracker Quick-Add</string>
     <string name="widget_quick_add_description">Resizable buttons for adding water with one tap</string>
     <string name="widget_of_goal_format">%2$s 中的 %1$s</string>
     <string name="widget_goal_reached">达成目标！</string>
@@ -407,7 +407,7 @@
     <!-- custom: %1$s=cadence phrase, %2$s=wake time, %3$s=sleep time -->
     <string name="reminder_preview_custom">你将在 %2$s 至 %3$s 期间，%1$s 收到提醒。</string>
     <!-- ============================================================================
-         Settings — Quick Add customization
+         Settings — Quick-Add customization
          ============================================================================ -->
     <string name="quickadd_containers_header">容器预设</string>
     <string name="quickadd_containers_desc">在主屏上快速选择容器。点击以编辑，拖动即可重新排序。</string>
@@ -947,7 +947,7 @@
     <string name="notification_fun_fact_title">你知道吗？</string>
     <!-- %1$d = remaining milliliters -->
     <string name="notification_minimal_remaining">剩余 %1$s</string>
-    <!-- %1$s = formatted amount with unit, e.g. "500 ml" -->
+    <!-- %1$s = formatted amount with unit, e.g. "500 mL" -->
     <string name="notification_action_add">添加 %1$s</string>
     <string name="notification_action_pause_today">今天不再提醒</string>
     <string name="notification_quick_add_preset_name">快速添加</string>

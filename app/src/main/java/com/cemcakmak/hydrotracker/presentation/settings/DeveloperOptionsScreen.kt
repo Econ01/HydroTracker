@@ -332,7 +332,7 @@ fun DeveloperOptionsScreen(
                                             note = "Health Connect Debug Test Entry"
                                         )
                                         val message = if (result.isSuccess) {
-                                            "Added and synced 250 ml test entry"
+                                            "Added and synced 250 mL test entry"
                                         } else {
                                             "Test failed: ${result.exceptionOrNull()?.message}"
                                         }

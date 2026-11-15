@@ -56,8 +56,8 @@
 
 ### Home Screen Widgets
 - **Adaptive Hydration Widget:** Progress ring for 1x1, linear progress for short sizes, and ring plus quick-add cards for larger sizes
-- **Quick Add Widget:** One to three resizable quick-action buttons using your pinned or most-used combinations
-- Dynamic theming, transparent/pure-colour backgrounds, and real-time updates shared by both widgets
+- **Quick-Add Widget:** One to three resizable quick-action buttons using your pinned or most-used combinations
+- Dynamic theming, transparent/pure-color backgrounds, and real-time updates shared by both widgets
 
 ### Smart Notifications
 - **Context-Aware Reminders:** Intelligent notifications that respect your sleep schedule

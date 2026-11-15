@@ -111,7 +111,7 @@ In the app, open **Settings → Developer Options → Update testing**. Under **
 
 All installation scenarios first require the release check to show the generated update version as available. Start the update through the **normal Home update modal** (or **Download update** on the Updates screen), which then remains responsible for download progress, verification, installation and retry. Repeated taps on the normal action verify that duplicate starts cannot start concurrent installers.
 
-| Scenario | Feed behaviour | Expected app result |
+| Scenario | Feed behavior | Expected app result |
 | --- | --- | --- |
 | `success` | Tag and exact asset name derived from the generated update version; actual byte size and `sha256:<actual digest>`; valid newer APK. | Download reaches 100%, size/digest and package checks pass, and Android shows the system installation confirmation. Confirming installs the synthetic update; cancelling does not. |
 | `up_to_date` | Tag derived from the installed baseline version. | **You're on the latest version**; no update download is offered. |

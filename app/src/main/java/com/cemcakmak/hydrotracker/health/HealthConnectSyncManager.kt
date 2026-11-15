@@ -30,7 +30,7 @@ object HealthConnectSyncManager {
      * Sync a water intake entry to Health Connect if conditions are met
      */
     fun syncWaterIntakeToHealthConnect(context: Context, userRepository: UserRepository, waterIntakeRepository: WaterIntakeRepository, entry: WaterIntakeEntry) {
-        Log.d(TAG, "🔄 Sync request received for entry: ${entry.amount}ml at ${entry.timestamp}")
+        Log.d(TAG, "🔄 Sync request received for entry: ${entry.amount}mL at ${entry.timestamp}")
 
         CoroutineScope(Dispatchers.IO).launch {
             _isSyncing.value = true
@@ -68,7 +68,7 @@ object HealthConnectSyncManager {
                 Log.d(TAG, "✅ Health Connect permissions granted")
 
                 // Perform the sync
-                Log.i(TAG, "🚀 Starting Health Connect sync for ${entry.amount}ml")
+                Log.i(TAG, "🚀 Starting Health Connect sync for ${entry.amount}mL")
                 val result = HealthConnectManager.writeHydrationRecord(context,entry)
 
                 if (result.isSuccess) {
@@ -85,12 +85,12 @@ object HealthConnectSyncManager {
                 } else {
                     val error = result.exceptionOrNull()
                     Log.e(TAG, "❌ Health Connect sync failed", error)
-                    Log.e(TAG, "Failed entry: amount=${entry.amount}ml, timestamp=${entry.timestamp}")
+                    Log.e(TAG, "Failed entry: amount=${entry.amount}mL, timestamp=${entry.timestamp}")
                 }
 
             } catch (e: Exception) {
                 Log.e(TAG, "💥 Unexpected error during Health Connect sync", e)
-                Log.e(TAG, "Entry details: amount=${entry.amount}ml, date=${entry.date}")
+                Log.e(TAG, "Entry details: amount=${entry.amount}mL, date=${entry.date}")
             } finally {
                 _isSyncing.value = false
                 Log.d(TAG, "🔄 Setting isSyncing = false for regular sync")
@@ -167,13 +167,13 @@ object HealthConnectSyncManager {
                         val isDuplicate = checkForDuplicate(waterIntakeRepository, waterIntakeEntry)
 
                         if (isDuplicate) {
-                            Log.d(TAG, "⚠️ Duplicate detected, skipping: ${waterIntakeEntry.amount}ml at ${waterIntakeEntry.timestamp}")
+                            Log.d(TAG, "⚠️ Duplicate detected, skipping: ${waterIntakeEntry.amount}mL at ${waterIntakeEntry.timestamp}")
                         } else {
                             // Add to database
                             val result = addImportedWaterEntry(waterIntakeRepository, waterIntakeEntry)
                             if (result.isSuccess) {
                                 importedCount++
-                                Log.d(TAG, "📥 Imported: ${waterIntakeEntry.amount}ml from ${waterIntakeEntry.note}")
+                                Log.d(TAG, "📥 Imported: ${waterIntakeEntry.amount}mL from ${waterIntakeEntry.note}")
                             } else {
                                 errorCount++
                                 Log.e(TAG, "❌ Failed to import: ${result.exceptionOrNull()?.message}")
@@ -333,13 +333,13 @@ object HealthConnectSyncManager {
                         val isDuplicate = checkForDuplicate(waterIntakeRepository, waterIntakeEntry)
 
                         if (isDuplicate) {
-                            Log.d(TAG, "⚠️ Duplicate detected, skipping: ${waterIntakeEntry.amount}ml at ${waterIntakeEntry.timestamp}")
+                            Log.d(TAG, "⚠️ Duplicate detected, skipping: ${waterIntakeEntry.amount}mL at ${waterIntakeEntry.timestamp}")
                             skippedCount++
                         } else {
                             val addResult = addImportedWaterEntry(waterIntakeRepository, waterIntakeEntry)
                             if (addResult.isSuccess) {
                                 importedCount++
-                                Log.d(TAG, "📥 Restored: ${waterIntakeEntry.amount}ml at ${waterIntakeEntry.timestamp}")
+                                Log.d(TAG, "📥 Restored: ${waterIntakeEntry.amount}mL at ${waterIntakeEntry.timestamp}")
                             } else {
                                 Log.e(TAG, "❌ Failed to restore entry: ${addResult.exceptionOrNull()?.message}")
                             }
@@ -371,7 +371,7 @@ object HealthConnectSyncManager {
      * This properly handles Health Connect updates by deleting the old record and adding a new one
      */
     fun syncUpdatedWaterIntakeToHealthConnect(context: Context, userRepository: UserRepository, waterIntakeRepository: WaterIntakeRepository, oldEntry: WaterIntakeEntry, updatedEntry: WaterIntakeEntry) {
-        Log.d(TAG, "🔄 Update sync request received for entry: ${updatedEntry.amount}ml (ID: ${updatedEntry.id})")
+        Log.d(TAG, "🔄 Update sync request received for entry: ${updatedEntry.amount}mL (ID: ${updatedEntry.id})")
 
         CoroutineScope(Dispatchers.IO).launch {
             _isSyncing.value = true
@@ -445,7 +445,7 @@ object HealthConnectSyncManager {
      * Uses the proper Health Connect deletion API
      */
     fun handleWaterIntakeDelete(context: Context, userRepository: UserRepository, deletedEntry: WaterIntakeEntry) {
-        Log.d(TAG, "🗑️ Delete notification received for entry: ${deletedEntry.amount}ml (ID: ${deletedEntry.id})")
+        Log.d(TAG, "🗑️ Delete notification received for entry: ${deletedEntry.amount}mL (ID: ${deletedEntry.id})")
         Log.d(TAG, "🔍 Entry details: note='${deletedEntry.note}', containerType='${deletedEntry.containerType}'")
         Log.d(TAG, "🆔 Health Connect Record ID: '${deletedEntry.healthConnectRecordId}'")
 
@@ -489,7 +489,7 @@ object HealthConnectSyncManager {
                 }
 
                 Log.i(TAG, "🗑️ Deleting entry from Health Connect: $healthConnectRecordId")
-                Log.d(TAG, "🔍 Entry details: ${deletedEntry.amount}ml from ${deletedEntry.note}")
+                Log.d(TAG, "🔍 Entry details: ${deletedEntry.amount}mL from ${deletedEntry.note}")
                 Log.d(TAG, "🏷️ Record ID type: ${if (healthConnectRecordId.startsWith("hydrotracker_")) "Our record" else "External record"}")
                 val result = HealthConnectManager.deleteHydrationRecord(context,healthConnectRecordId)
 
@@ -527,7 +527,7 @@ object HealthConnectSyncManager {
             // Get all entries for the same user-day (including hidden ones to prevent re-import)
             val existingEntries = repository.getAllEntriesForDate(entryDate)
 
-            Log.d(TAG, "🔍 Duplicate check for ${newEntry.amount}ml at ${newEntry.timestamp} (date=$entryDate): found ${existingEntries.size} existing entries on same user-day")
+            Log.d(TAG, "🔍 Duplicate check for ${newEntry.amount}mL at ${newEntry.timestamp} (date=$entryDate): found ${existingEntries.size} existing entries on same user-day")
 
             // Fast-path: exact healthConnectRecordId match
             if (newEntry.healthConnectRecordId != null) {
@@ -540,7 +540,7 @@ object HealthConnectSyncManager {
 
             // Check for duplicates within a 5-minute window with similar effective hydration amounts
             val timeWindow = 5 * 60 * 1000L // 5 minutes in milliseconds
-            val amountTolerance = 10.0 // ±10ml
+            val amountTolerance = 10.0 // ±10mL
 
             val isDuplicate = existingEntries.any { existing ->
                 // Compare effective hydration amounts, not raw amounts.
@@ -554,10 +554,10 @@ object HealthConnectSyncManager {
                 val isTimeMatch = timeDiff <= timeWindow
                 val isAmountMatch = amountDiff <= amountTolerance
 
-                Log.d(TAG, "   vs existing ${existing.amount}ml (effective=${existingEffectiveAmount}) at ${existing.timestamp}: timeDiff=${timeDiff}ms, amountDiff=${amountDiff}ml, timeMatch=$isTimeMatch, amountMatch=$isAmountMatch")
+                Log.d(TAG, "   vs existing ${existing.amount}mL (effective=${existingEffectiveAmount}) at ${existing.timestamp}: timeDiff=${timeDiff}ms, amountDiff=${amountDiff}ml, timeMatch=$isTimeMatch, amountMatch=$isAmountMatch")
 
                 if (isTimeMatch && isAmountMatch) {
-                    Log.d(TAG, "🔍 Potential duplicate found: existing ${existing.amount}ml (effective=${existingEffectiveAmount}) at ${existing.timestamp}, new ${newEntry.amount}ml at ${newEntry.timestamp}")
+                    Log.d(TAG, "🔍 Potential duplicate found: existing ${existing.amount}mL (effective=${existingEffectiveAmount}) at ${existing.timestamp}, new ${newEntry.amount}mL at ${newEntry.timestamp}")
                     true
                 } else {
                     false
@@ -565,9 +565,9 @@ object HealthConnectSyncManager {
             }
 
             if (isDuplicate) {
-                Log.i(TAG, "⚠️ Duplicate entry detected and skipped: ${newEntry.amount}ml at ${newEntry.timestamp} (date=$entryDate)")
+                Log.i(TAG, "⚠️ Duplicate entry detected and skipped: ${newEntry.amount}mL at ${newEntry.timestamp} (date=$entryDate)")
             } else {
-                Log.d(TAG, "✅ No duplicate found for ${newEntry.amount}ml at ${newEntry.timestamp} (date=$entryDate)")
+                Log.d(TAG, "✅ No duplicate found for ${newEntry.amount}mL at ${newEntry.timestamp} (date=$entryDate)")
             }
 
             isDuplicate
@@ -583,7 +583,7 @@ object HealthConnectSyncManager {
      */
     private suspend fun addImportedWaterEntry(repository: WaterIntakeRepository, entry: WaterIntakeEntry): Result<Long> {
         return try {
-            Log.d(TAG, "💾 Adding imported entry to database: ${entry.amount}ml from ${entry.note}")
+            Log.d(TAG, "💾 Adding imported entry to database: ${entry.amount}mL from ${entry.note}")
 
             // Use the special import method that doesn't trigger Health Connect sync
             val entryId = repository.addImportedWaterEntry(entry)
@@ -602,7 +602,7 @@ object HealthConnectSyncManager {
      */
     private suspend fun findHealthConnectRecordId(context: Context, entry: WaterIntakeEntry): String? {
         return try {
-            Log.d(TAG, "🔍 Searching for Health Connect record matching: ${entry.amount}ml at ${entry.timestamp}")
+            Log.d(TAG, "🔍 Searching for Health Connect record matching: ${entry.amount}mL at ${entry.timestamp}")
 
             val entryTime = java.time.Instant.ofEpochMilli(entry.timestamp)
             val startTime = entryTime.minusSeconds(150)
@@ -633,7 +633,7 @@ object HealthConnectSyncManager {
                 val volumeMatch = kotlin.math.abs(recordVolume - entry.amount) <= 1.0
                 val timeMatch = timeDiff <= 300_000
 
-                Log.d(TAG, "🔍 HydroTracker record check: ${recordVolume}ml at $recordTime, volume match: $volumeMatch, time match: $timeMatch")
+                Log.d(TAG, "🔍 HydroTracker record check: ${recordVolume}mL at $recordTime, volume match: $volumeMatch, time match: $timeMatch")
 
                 volumeMatch && timeMatch
             }

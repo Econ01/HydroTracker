@@ -107,12 +107,12 @@ Added
   4. DM Sans
   5. JetBrains Mono
 - Auto-hiding navigation bar and FAB on scroll
-- Extended colour palette with success and warning semantic colours
+- Extended color palette with success and warning semantic colors
 - Haptic feedback toggle
 - Optional subtle borders around cards in AMOLED mode
 - Font warning for Xiaomi group devices (HyperOS/MIUI) where custom fonts don't work as intended
-- Beverage Colours toggle under Appearance ▸ Home screen (default off)
-- When enabled, the home carousel, daily entry list, beverage selectors and custom entry dialogue take on each beverage's colour
+- Beverage Colors toggle under Appearance ▸ Home screen (default off)
+- When enabled, the home carousel, daily entry list, beverage selectors and custom entry dialogue take on each beverage's color
 #### Display & Locale
 - Multi-language and localization support
 - Multiple date format options:
@@ -126,7 +126,7 @@ Added
   2. British Imperial System
   3. US Customary System:
      - US fluid ounces
-#### Quick Add Customization
+#### Quick-Add Customization
 - Custom beverage type creation and management
 - Custom container icons
 #### Notifications
@@ -167,9 +167,9 @@ Added
 ### Widget
 - Complete rebuild of the home-screen widget using Jetpack Glance
 - Large widget now shows a progress ring and up to three quick-add cards
-- Material You dynamic colours on Android 12+ with a fallback HydroTracker water-themed palette
+- Material You dynamic colors on Android 12+ with a fallback HydroTracker water-themed palette
 - Widget refreshes automatically whenever you add, edit or delete an entry
-- New Widget settings under Appearance for choosing dynamic colours, transparent background, and pure black or white surfaces
+- New Widget settings under Appearance for choosing dynamic colors, transparent background, and pure black or white surfaces
 - Customizable quick-add buttons: pin your own container and beverage combos or let the widget pick your most-used ones
 - Quick-add cards automatically suggest your most common beverage and container combinations
 - Generated picker previews on Android 15; static preview fallback on older devices
@@ -185,7 +185,7 @@ Added
 ### Statistics
 - New Statistics tab with all-time insights:
   - Overview: current streak, daily average, total intake, success rate and days tracked
-  - Beverage breakdown doughnut chart with dedicated colours for each beverage type
+  - Beverage breakdown doughnut chart with dedicated colors for each beverage type
   - Container usage card showing your most-used containers
 
 Changed
@@ -249,13 +249,13 @@ Added
 
 [1.0.1]
 Added
-• Add support for Medium and High Colour Contrast added with Android 16.1
+• Add support for Medium and High Color Contrast added with Android 16.1
 • Add ability to change entry times
 Updated
 • Update Sources
 • Update Privacy Policy
 Fixed
-• Fix dynamic colour problems
+• Fix dynamic color problems
 
 [1.0.0]
 Added
@@ -297,7 +297,7 @@ Added
 • Bouncy animations to switches
 • New pure black mode
 Fixed
-• Colours of the donation buttons are applied correctly now
+• Colors of the donation buttons are applied correctly now
 • Reduce side padding on settings page
 
 [0.9.1]

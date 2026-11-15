@@ -141,7 +141,7 @@ object HealthConnectManager {
      */
     suspend fun writeHydrationRecord(context: Context, entry: WaterIntakeEntry): Result<String> {
         return try {
-            Log.d(TAG, "Starting Health Connect write for entry: ${entry.amount}ml at ${entry.timestamp}")
+            Log.d(TAG, "Starting Health Connect write for entry: ${entry.amount}mL at ${entry.timestamp}")
 
             if (!hasPermissions(context)) {
                 Log.w(TAG, "Cannot write to Health Connect: Missing permissions")
@@ -158,7 +158,7 @@ object HealthConnectManager {
 
             // Create volume using effective hydration amount (considers beverage type multiplier)
             val effectiveAmount = entry.getEffectiveHydrationAmount()
-            Log.d(TAG, "Using effective volume: ${effectiveAmount}ml (raw: ${entry.amount}ml, beverage: ${entry.getBeverageType().displayName}, multiplier: ${entry.getBeverageType().hydrationMultiplier})")
+            Log.d(TAG, "Using effective volume: ${effectiveAmount}mL (raw: ${entry.amount}mL, beverage: ${entry.getBeverageType().displayName}, multiplier: ${entry.getBeverageType().hydrationMultiplier})")
             Log.d(TAG, "Type check - effectiveAmount: $effectiveAmount (${effectiveAmount::class.simpleName}), volumeInMilliliters: $effectiveAmount (${effectiveAmount::class.simpleName})")
 
             // Create unique ID for tracking this record
@@ -177,8 +177,8 @@ object HealthConnectManager {
                 )
             )
 
-            Log.d(TAG, "Created HydrationRecord: startTime=$startTime, endTime=$endTime, volume=${effectiveAmount}ml")
-            Log.d(TAG, "Volume object created: ${Volume.milliliters(effectiveAmount)} (${Volume.milliliters(effectiveAmount).inMilliliters}ml)")
+            Log.d(TAG, "Created HydrationRecord: startTime=$startTime, endTime=$endTime, volume=${effectiveAmount}mL")
+            Log.d(TAG, "Volume object created: ${Volume.milliliters(effectiveAmount)} (${Volume.milliliters(effectiveAmount).inMilliliters}mL)")
 
             // Write to Health Connect
             Log.d(TAG, "Writing HydrationRecord to Health Connect...")
@@ -188,11 +188,11 @@ object HealthConnectManager {
             // Return the custom ID we set in metadata for tracking
             Log.d(TAG, "Health Connect record ID: $uniqueId")
 
-            Log.i(TAG, "✅ Successfully wrote hydration record to Health Connect: ${effectiveAmount}ml effective (${entry.amount}ml ${entry.getBeverageType().displayName})")
+            Log.i(TAG, "✅ Successfully wrote hydration record to Health Connect: ${effectiveAmount}mL effective (${entry.amount}mL ${entry.getBeverageType().displayName})")
             Result.success(uniqueId)
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error writing hydration record to Health Connect", e)
-            Log.e(TAG, "Entry details: amount=${entry.amount}ml, timestamp=${entry.timestamp}, date=${entry.date}")
+            Log.e(TAG, "Entry details: amount=${entry.amount}mL, timestamp=${entry.timestamp}, date=${entry.date}")
             Result.failure(e)
         }
     }
@@ -282,7 +282,7 @@ object HealthConnectManager {
 
             // Log details of each record for debugging
             allRecords.forEach { record ->
-                Log.d(TAG, "📥 Record: ${record.volume.inMilliliters}ml at ${record.startTime} (source: ${record.metadata.dataOrigin})")
+                Log.d(TAG, "📥 Record: ${record.volume.inMilliliters}mL at ${record.startTime} (source: ${record.metadata.dataOrigin})")
             }
 
             Result.success(allRecords)
@@ -365,7 +365,7 @@ object HealthConnectManager {
                 if (isFromHydroTracker) {
                     Log.d(TAG, "🚫 Excluding HydroTracker record: clientID=$clientRecordId, ID=$recordId, package=$packageName")
                 } else {
-                    Log.d(TAG, "✅ Including external record: clientID=$clientRecordId, ID=$recordId, package=$packageName, amount=${record.volume.inLiters * 1000}ml")
+                    Log.d(TAG, "✅ Including external record: clientID=$clientRecordId, ID=$recordId, package=$packageName, amount=${record.volume.inLiters * 1000}mL")
                 }
 
                 !isFromHydroTracker
@@ -485,7 +485,7 @@ object HealthConnectManager {
                 val isFromHydroTracker = isFromHydroTrackerByClientId || isFromHydroTrackerById || isFromHydroTrackerByPackage
 
                 if (isFromHydroTracker) {
-                    Log.d(TAG, "✅ Including HydroTracker record: clientID=$clientRecordId, ID=$recordId, package=$packageName, amount=${record.volume.inMilliliters}ml")
+                    Log.d(TAG, "✅ Including HydroTracker record: clientID=$clientRecordId, ID=$recordId, package=$packageName, amount=${record.volume.inMilliliters}mL")
                 }
 
                 isFromHydroTracker

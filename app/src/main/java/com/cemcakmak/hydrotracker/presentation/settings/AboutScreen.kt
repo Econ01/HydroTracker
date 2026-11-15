@@ -321,23 +321,27 @@ private fun VersionHero(themePreferences: ThemePreferences) {
                 horizontalArrangement = Arrangement.spacedBy(space = 12.dp)
             ) {
                 Surface(
+                    modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(30.dp),
                     color = MaterialTheme.colorScheme.tertiary
                 ) {
                     Text(
-                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
-                        text = stringResource(R.string.label_version, BuildConfig.VERSION_NAME),
+                        modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
+                        text = stringResource(R.string.label_version, BuildConfig.VERSION_NAME)
+                            .replace(BuildConfig.VERSION_NAME, "\n" + BuildConfig.VERSION_NAME),
                         style = MaterialTheme.typography.bodyMediumEmphasized,
                     )
                 }
 
                 Surface(
+                    modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(30.dp),
                     color = MaterialTheme.colorScheme.secondary
                 ) {
                     Text(
-                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
-                        text = stringResource(R.string.label_build_number, BuildConfig.VERSION_CODE),
+                        modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
+                        text = stringResource(R.string.label_build_number, BuildConfig.VERSION_CODE)
+                            .replace(BuildConfig.VERSION_CODE.toString(), "\n" + BuildConfig.VERSION_CODE),
                         style = MaterialTheme.typography.bodyMediumEmphasized,
                     )
                 }

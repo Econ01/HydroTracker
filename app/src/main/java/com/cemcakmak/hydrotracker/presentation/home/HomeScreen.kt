@@ -643,6 +643,7 @@ fun HomeScreen(
                     userProfile = userProfile,
                     themePreferences = themePreferences,
                     tonalElevation = 0.dp,
+                    modifier = Modifier.padding(bottom = 16.dp),
                     onEdit = { entry ->
                         entryToEdit = entry
                         showEditDialog = true

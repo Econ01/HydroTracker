@@ -341,7 +341,7 @@ private fun DarkModeSection(
                     modifier = Modifier.weight(1f)
                 ) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Crossfade(
@@ -356,7 +356,7 @@ private fun DarkModeSection(
                                     DarkModePreference.DARK -> if (selected) ImageVector.vectorResource(R.drawable.dark_mode_filled) else ImageVector.vectorResource(R.drawable.dark_mode)
                                 },
                                 contentDescription = null,
-                                modifier = Modifier.size(18.dp)
+                                modifier = Modifier.size(16.dp)
                             )
                         }
                         Text(
@@ -365,7 +365,9 @@ private fun DarkModeSection(
                                 DarkModePreference.LIGHT -> stringResource(R.string.appearance_theme_light)
                                 DarkModePreference.DARK -> stringResource(R.string.appearance_theme_dark)
                             },
-                            style = MaterialTheme.typography.labelLarge
+                            style = MaterialTheme.typography.labelLarge,
+                            maxLines = 1,
+                            softWrap = false
                         )
                     }
                 }

@@ -168,9 +168,9 @@ HydroTracker does not use any third-party analytics, advertising, or tracking se
 
 If you have any questions about this Privacy Policy, please contact us at: cemcakmak.contact@gmail.com
 
-## Open Source
+## Open-source
 
-HydroTracker is open source software. You can review our code and data handling practices at: https://github.com/Econ01/HydroTracker
+HydroTracker is open-source software. You can review our code and data handling practices at: https://github.com/Econ01/HydroTracker
 
 
 This Privacy Policy applies only to HydroTracker and not to any third-party websites, services, or applications that may be linked from our App. When using Health Connect, you should also review Google's privacy policies regarding Health Connect data.

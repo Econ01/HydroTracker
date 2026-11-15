@@ -101,7 +101,10 @@ fun DailyEntriesSection(
     onDelete: (WaterIntakeEntry) -> Unit,
     title: String = stringResource(R.string.home_section_recent_entries)
 ) {
-    if (entries.isEmpty()) return
+    if (entries.isEmpty()) {
+        Box(modifier = modifier)
+        return
+    }
 
     val haptics = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
@@ -140,7 +143,7 @@ fun DailyEntriesSection(
     }
 
     Column(
-        modifier = Modifier.padding(horizontal = 16.dp)
+        modifier = modifier.padding(horizontal = 16.dp)
     ) {
         Text(
             modifier = Modifier.padding(vertical = 16.dp),

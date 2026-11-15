@@ -31,7 +31,7 @@ class QuickAddAction : ActionCallback {
         val amount = parameters[KEY_AMOUNT] ?: return
         val container = parameters[KEY_CONTAINER] ?: "Glass"
         val beverage = parameters[KEY_BEVERAGE] ?: BeverageType.WATER.name
-        Log.d(TAG, "💧 Widget quick-add: ${amount}ml ($container, $beverage)")
+        Log.d(TAG, "💧 Widget quick-add: ${amount}mL ($container, $beverage)")
         try {
             val userRepository = UserRepository(context)
             val waterRepository = DatabaseInitializer.getWaterIntakeRepository(context, userRepository)
