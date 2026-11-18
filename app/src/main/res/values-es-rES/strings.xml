@@ -413,7 +413,7 @@
     <!-- custom: %1$s=cadence phrase, %2$s=wake time, %3$s=sleep time -->
     <string name="reminder_preview_custom">Recibirás un recordatorio %1$s entre %2$s y %3$s.</string>
     <!-- ============================================================================
-         Settings — Quick-Add customization
+         Settings — Quick Add customization
          ============================================================================ -->
     <string name="quickadd_containers_header">Contenedores predefinidos</string>
     <string name="quickadd_containers_desc">Contenedores de selección rápida en la pantalla de inicio. Toca para editar, arrastrar o reordenar.</string>
