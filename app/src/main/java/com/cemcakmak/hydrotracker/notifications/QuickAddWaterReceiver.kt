@@ -48,7 +48,7 @@ class QuickAddWaterReceiver : BroadcastReceiver() {
                     userRepository = userRepository
                 )
 
-                // Create a preset for quick-add
+                // Create a preset for quick add
                 val quickAddPreset = ContainerPreset(
                     name = containerName,
                     volume = amount,
@@ -89,7 +89,7 @@ class QuickAddWaterReceiver : BroadcastReceiver() {
                 }
 
             } catch (e: Exception) {
-                println("Error in quick-add water: ${e.message}")
+                println("Error in quick add water: ${e.message}")
             }
         }
     }
