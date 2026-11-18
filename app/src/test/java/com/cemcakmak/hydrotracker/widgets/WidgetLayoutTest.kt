@@ -53,14 +53,14 @@ class WidgetLayoutTest {
     }
 
     @Test
-    fun `quick-add shows one action only in one-cell bounds`() {
+    fun `quick add shows one action only in one-cell bounds`() {
         assertQuickAdd(57, 102, QuickAddWidgetLayout.SINGLE)
         assertQuickAdd(127, 51, QuickAddWidgetLayout.SINGLE)
         assertQuickAdd(40, 40, QuickAddWidgetLayout.SINGLE)
     }
 
     @Test
-    fun `quick-add shows two actions in short two-cell and tall narrow bounds`() {
+    fun `quick add shows two actions in short two-cell and tall narrow bounds`() {
         assertQuickAdd(130, 102, QuickAddWidgetLayout.TWO)
         assertQuickAdd(269, 51, QuickAddWidgetLayout.TWO)
         assertQuickAdd(110, 40, QuickAddWidgetLayout.TWO)
@@ -71,7 +71,7 @@ class WidgetLayoutTest {
     }
 
     @Test
-    fun `quick-add shows three actions when space permits`() {
+    fun `quick add shows three actions when space permits`() {
         assertQuickAdd(276, 102, QuickAddWidgetLayout.THREE)
         assertQuickAdd(292, 107, QuickAddWidgetLayout.THREE)
         assertQuickAdd(412, 51, QuickAddWidgetLayout.THREE)
