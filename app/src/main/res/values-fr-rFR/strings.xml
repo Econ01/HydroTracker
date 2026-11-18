@@ -59,7 +59,7 @@
          ============================================================================ -->
     <string name="widget_large_label">HydroTracker</string>
     <string name="widget_large_description">Adaptive hydration progress and quick-add actions</string>
-    <string name="widget_quick_add_label">HydroTracker Quick-Add</string>
+    <string name="widget_quick_add_label">HydroTracker Quick Add</string>
     <string name="widget_quick_add_description">Resizable buttons for adding water with one tap</string>
     <string name="widget_of_goal_format">%1$s sur %2$s</string>
     <string name="widget_goal_reached">Objectif atteint !</string>
@@ -413,7 +413,7 @@
     <!-- custom: %1$s=cadence phrase, %2$s=wake time, %3$s=sleep time -->
     <string name="reminder_preview_custom">Tu recevras un rappel %1$s entre %2$s et %3$s.</string>
     <!-- ============================================================================
-         Settings — Quick-Add customization
+         Settings — Quick Add customization
          ============================================================================ -->
     <string name="quickadd_containers_header">Préréglages du contenant</string>
     <string name="quickadd_containers_desc">Sélection rapide de contenants sur l\'écran d\'accueil. Appuie pour modifier, glisse pour réordonner.</string>
@@ -636,7 +636,7 @@
     <string name="about_license">Licence</string>
     <string name="about_license_desc">Licence open-source d\'HydroTracker</string>
     <string name="about_third_party_licenses">Licences tierces</string>
-    <string name="about_third_party_licenses_desc">Bibliothèques open-source dont nous dépendons</string>
+    <string name="about_third_party_licenses_desc">Bibliothèques open source dont nous dépendons</string>
     <string name="toast_no_app_to_open_link">Aucune application n\'a été trouvée pour ouvrir ce lien</string>
     <!-- ============================================================================
          Support Development
