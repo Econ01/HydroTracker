@@ -67,7 +67,7 @@
          ============================================================================ -->
     <string name="widget_large_label">HydroTracker</string>
     <string name="widget_large_description">Adaptive hydration progress and quick-add actions</string>
-    <string name="widget_quick_add_label">HydroTracker Quick-Add</string>
+    <string name="widget_quick_add_label">HydroTracker Quick Add</string>
     <string name="widget_quick_add_description">Resizable buttons for adding water with one tap</string>
     <string name="widget_of_goal_format">%1$s of %2$s</string>
     <string name="widget_goal_reached">Goal reached!</string>
@@ -243,8 +243,8 @@
     <string name="beverage_add">Add Beverage</string>
     <string name="beverage_edit_title">Edit Beverage</string>
     <string name="beverage_delete_title">Delete Beverage?</string>
-    <string name="beverage_show_in_quick_add">Show in Quick-Add</string>
-    <string name="beverage_hide_from_quick_add">Hide from Quick-Add</string>
+    <string name="beverage_show_in_quick_add">Show in Quick Add</string>
+    <string name="beverage_hide_from_quick_add">Hide from Quick Add</string>
     <!-- Preset effectiveness line, e.g. "150% hydration effectiveness"; %1$s = per cent value including the % sign -->
     <string name="beverage_hydration_effectiveness">%1$s hydration effectiveness</string>
     <string name="beverage_name_label">Beverage Name</string>
@@ -288,13 +288,13 @@
          ============================================================================ -->
     <string name="screen_appearance_title">Appearance</string>
     <string name="screen_hydration_title">Hydration &amp; Health</string>
-    <string name="screen_quickadd_title">Quick-Add Customization</string>
+    <string name="screen_quickadd_title">Quick Add Customization</string>
     <string name="screen_notifications_title">Notifications</string>
     <string name="screen_support_title">Support Development</string>
     <string name="screen_about_title">About</string>
     <string name="screen_developer_title">Developer Options</string>
     <string name="settings_about_update_available">About - Update Available</string>
-    <string name="settings_appearance_desc">Theme, colors and AMOLED mode</string>
+    <string name="settings_appearance_desc">Theme, colours and AMOLED mode</string>
     <string name="settings_display_desc">Week start day and locale</string>
     <string name="settings_hydration_desc">Water goal calculation and Health Connect</string>
     <string name="settings_quickadd_desc">Container presets and beverage types</string>
@@ -329,8 +329,8 @@
     <string name="appearance_number_animation_title">Rolling Number Animation</string>
     <string name="appearance_number_animation_desc">Switch off for a lighter count-up animation</string>
     <string name="appearance_edge_effect_title">Edge Effect</string>
-    <string name="appearance_beverage_colors_title">Beverage Colors</string>
-    <string name="appearance_beverage_colors_desc">Tint home-screen cards and entries with each beverage’s color</string>
+    <string name="appearance_beverage_colors_title">Beverage Colours</string>
+    <string name="appearance_beverage_colors_desc">Tint home-screen cards and entries with each beverage’s colour</string>
     <!-- Sample data shown in the theme preview card -->
     <string name="appearance_preview_amount">1,250 / 2,500 mL</string>
     <string name="appearance_preview_entries">Entries</string>
@@ -342,10 +342,10 @@
          ============================================================================ -->
     <string name="appearance_widget_section_title">Widgets</string>
     <string name="appearance_widget_title">Widget Settings</string>
-    <string name="appearance_widget_desc">Change appearance and behavior</string>
-    <string name="widget_settings_colours_header">Colors</string>
-    <string name="widget_settings_dynamic_title">Dynamic colors</string>
-    <string name="widget_settings_dynamic_desc">Colors from your wallpaper</string>
+    <string name="appearance_widget_desc">Change appearance and behaviour</string>
+    <string name="widget_settings_colours_header">Colours</string>
+    <string name="widget_settings_dynamic_title">Dynamic colours</string>
+    <string name="widget_settings_dynamic_desc">Colours from your wallpaper</string>
     <string name="widget_settings_background_header">Background</string>
     <string name="widget_settings_transparent_title">Transparent background</string>
     <string name="widget_settings_transparent_desc">Make the background surface transparent</string>
@@ -444,13 +444,13 @@
     <string name="reminder_preview_custom">You\'ll receive a reminder %1$s between %2$s and %3$s.</string>
 
     <!-- ============================================================================
-         Settings — Quick-Add customization
+         Settings — Quick Add customization
          ============================================================================ -->
     <string name="quickadd_containers_header">Container presets</string>
     <string name="quickadd_containers_desc">Quick-select containers on the home screen. Tap to edit, drag to reorder.</string>
     <string name="quickadd_edit_containers">Edit container presets</string>
     <string name="quickadd_beverages_header">Beverage types</string>
-    <string name="quickadd_beverages_desc">Beverages offered in quick-add. Drag to reorder, drag into Hidden to hide.</string>
+    <string name="quickadd_beverages_desc">Beverages offered in quick add. Drag to reorder, drag into Hidden to hide.</string>
     <string name="quickadd_edit_beverages">Edit beverage presets</string>
 
     <!-- Container presets list/editor -->
@@ -467,7 +467,7 @@
 
     <!-- Beverage types list/editor -->
     <string name="screen_beverage_types_title">Beverage Types</string>
-    <string name="beverage_types_helper">Beverages offered in quick-add. Tap to edit, drag to reorder.</string>
+    <string name="beverage_types_helper">Beverages offered in quick add. Tap to edit, drag to reorder.</string>
     <!-- e.g. "150% hydration"; %1$s = per cent value including the % sign -->
     <string name="beverage_hydration_short">%1$s hydration</string>
     <string name="beverage_reset_title">Reset Beverages?</string>
@@ -572,7 +572,7 @@
     <string name="dark_mode_light">Light Mode</string>
     <string name="dark_mode_dark">Dark Mode</string>
 
-    <!-- Color source -->
+    <!-- Colour source -->
     <string name="color_source_hydro">HydroTracker Blue</string>
     <string name="color_source_dynamic">Dynamic Colors</string>
     <string name="color_source_dynamic_desc">Colors from your wallpaper</string>
@@ -682,7 +682,7 @@
     <!-- ============================================================================
          About
          ============================================================================ -->
-    <string name="app_tagline">Open-source water intake tracker.</string>
+    <string name="app_tagline">Open source water intake tracker.</string>
     <string name="label_version">Version: %1$s</string>
     <string name="label_build_number">Build Number: %1$d</string>
     <string name="about_section_contributors">Contributors</string>
@@ -1076,7 +1076,7 @@
     <!-- %1$s = formatted amount with unit, e.g. "500 mL" -->
     <string name="notification_action_add">Add %1$s</string>
     <string name="notification_action_pause_today">Pause for today</string>
-    <string name="notification_quick_add_preset_name">Quick-Add</string>
+    <string name="notification_quick_add_preset_name">Quick Add</string>
     <string name="notification_quick_add_note">Added from notification</string>
     <string name="notification_paused_confirmation">Reminders paused until tomorrow</string>
 
