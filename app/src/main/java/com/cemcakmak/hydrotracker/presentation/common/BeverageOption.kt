@@ -64,7 +64,7 @@ fun CustomBeverageEntity.toOption(): BeverageOption {
 }
 
 /**
- * The beverages offered in quick-add: WATER first, then the visible presets + custom beverages
+ * The beverages offered in quick add: WATER first, then the visible presets + custom beverages
  * in [BeveragePreferences.orderedVisible] order.
  */
 fun buildActiveBeverages(
