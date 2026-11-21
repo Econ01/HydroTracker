@@ -77,13 +77,13 @@ object ContainerIconMapper {
     /**
      * Volume thresholds for icon selection (upper bounds)
      * Maps volume ranges to icons based on the plan:
-     * - ≤125ml → local_café
-     * - 126-162ml → glass_cup
-     * - 163-187ml → water_loss
-     * - 188-250ml → water_medium
-     * - 251-400ml → water_full
-     * - 401-750ml → water_bottle
-     * - >750ml → water_bottle_large
+     * - ≤125mL → local_café
+     * - 126-162mL → glass_cup
+     * - 163-187mL → water_loss
+     * - 188-250mL → water_medium
+     * - 251-400mL → water_full
+     * - 401-750mL → water_bottle
+     * - >750mL → water_bottle_large
      */
     private val volumeThresholds = listOf(
         125.0 to 0,   // local_cafe

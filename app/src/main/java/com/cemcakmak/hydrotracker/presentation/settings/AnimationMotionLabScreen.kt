@@ -110,7 +110,7 @@ fun AnimationMotionLabScreen(
                     ) {
                         RollingNumberText(
                             targetValue = rollingValue,
-                            formatValue = { value -> "${value.toInt()} of 2000 ml" },
+                            formatValue = { value -> "${value.toInt()} of 2000 mL" },
                             style = MaterialTheme.typography.displaySmallEmphasized,
                             direction = rollingDirection,
                             effects = rollingEffects,

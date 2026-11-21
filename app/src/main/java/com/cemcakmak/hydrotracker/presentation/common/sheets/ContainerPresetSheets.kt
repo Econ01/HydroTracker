@@ -663,7 +663,7 @@ fun AddContainerPresetBottomSheet(
     onDismiss: () -> Unit,
     onAdd: (name: String, volume: Double, iconType: String, iconName: String) -> Unit
 ) {
-    val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState
