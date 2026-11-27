@@ -947,7 +947,7 @@
     <string name="notification_fun_fact_title">你知道吗？</string>
     <!-- %1$d = remaining milliliters -->
     <string name="notification_minimal_remaining">剩余 %1$s</string>
-    <!-- %1$s = formatted amount with unit, e.g. "500 ml" -->
+    <!-- %1$s = formatted amount with unit, e.g. "500 mL" -->
     <string name="notification_action_add">添加 %1$s</string>
     <string name="notification_action_pause_today">今天不再提醒</string>
     <string name="notification_quick_add_preset_name">快速添加</string>

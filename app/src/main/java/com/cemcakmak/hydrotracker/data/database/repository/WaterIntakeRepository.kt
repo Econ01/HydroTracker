@@ -198,7 +198,7 @@ class WaterIntakeRepository(
         date: String? = null
     ): Result<Long> = withContext(Dispatchers.IO) {
         try {
-            Log.d(TAG, "📝 Adding water intake: ${amount}ml (${containerPreset.name})")
+            Log.d(TAG, "📝 Adding water intake: ${amount}mL (${containerPreset.name})")
 
             val userDayString = date ?: getTodayUserDayString()
             val entry = WaterIntakeEntry(
@@ -228,7 +228,7 @@ class WaterIntakeRepository(
             val entryWithId = entry.copy(id = entryId)
             healthConnectSyncManager.syncWaterIntakeToHealthConnect(context, userRepository, this@WaterIntakeRepository, entryWithId)
 
-            Log.i(TAG, "✅ Water intake added successfully: ${amount}ml (ID: $entryId)")
+            Log.i(TAG, "✅ Water intake added successfully: ${amount}mL (ID: $entryId)")
             Result.success(entryId)
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error adding water intake", e)
@@ -239,7 +239,7 @@ class WaterIntakeRepository(
     suspend fun deleteWaterIntake(entry: WaterIntakeEntry): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             if (!entry.isSyncableToHealthConnect()) {
-                Log.d(TAG, "👁️ Hiding external entry: ${entry.amount}ml (ID: ${entry.id}) from ${entry.containerType}")
+                Log.d(TAG, "👁️ Hiding external entry: ${entry.amount}mL (ID: ${entry.id}) from ${entry.containerType}")
 
                 // External imports are read-only snapshots; hide them locally
                 waterIntakeDao.hideEntry(entry.id)
@@ -249,10 +249,10 @@ class WaterIntakeRepository(
                 Log.d(TAG, "🔄 Updating widgets...")
                 HydroWidgetUpdater.updateAll(context)
 
-                Log.i(TAG, "👁️ External entry hidden successfully: ${entry.amount}ml")
+                Log.i(TAG, "👁️ External entry hidden successfully: ${entry.amount}mL")
                 Result.success(Unit)
             } else {
-                Log.d(TAG, "🗑️ Deleting water intake: ${entry.amount}ml (ID: ${entry.id})")
+                Log.d(TAG, "🗑️ Deleting water intake: ${entry.amount}mL (ID: ${entry.id})")
 
                 // Delete our own entries normally
                 waterIntakeDao.deleteEntry(entry)
@@ -266,7 +266,7 @@ class WaterIntakeRepository(
                 Log.d(TAG, "🏥 Deleting entry from Health Connect...")
                 healthConnectSyncManager.handleWaterIntakeDelete(context, userRepository, entry)
 
-                Log.i(TAG, "✅ Water intake deleted successfully: ${entry.amount}ml")
+                Log.i(TAG, "✅ Water intake deleted successfully: ${entry.amount}mL")
                 Result.success(Unit)
             }
         } catch (e: Exception) {
@@ -277,7 +277,7 @@ class WaterIntakeRepository(
 
     suspend fun unhideWaterIntake(entry: WaterIntakeEntry): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            Log.d(TAG, "👁️ Unhiding water intake: ${entry.amount}ml (ID: ${entry.id})")
+            Log.d(TAG, "👁️ Unhiding water intake: ${entry.amount}mL (ID: ${entry.id})")
 
             waterIntakeDao.unhideEntry(entry.id)
             updateDailySummaryForDate(entry.date)
@@ -286,7 +286,7 @@ class WaterIntakeRepository(
             Log.d(TAG, "🔄 Updating widgets...")
             HydroWidgetUpdater.updateAll(context)
 
-            Log.i(TAG, "👁️ Water intake unhidden successfully: ${entry.amount}ml")
+            Log.i(TAG, "👁️ Water intake unhidden successfully: ${entry.amount}mL")
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error unhiding water intake", e)
@@ -328,7 +328,7 @@ class WaterIntakeRepository(
 
     suspend fun updateWaterIntake(oldEntry: WaterIntakeEntry, newEntry: WaterIntakeEntry): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            Log.d(TAG, "✏️ Updating water intake: ${newEntry.amount}ml (ID: ${newEntry.id})")
+            Log.d(TAG, "✏️ Updating water intake: ${newEntry.amount}mL (ID: ${newEntry.id})")
             waterIntakeDao.updateEntry(newEntry)
             updateDailySummaryForDate(newEntry.date)
 
@@ -340,7 +340,7 @@ class WaterIntakeRepository(
             Log.d(TAG, "🏥 Re-syncing updated entry to Health Connect...")
             healthConnectSyncManager.syncUpdatedWaterIntakeToHealthConnect(context, userRepository, this@WaterIntakeRepository, oldEntry, newEntry)
 
-            Log.i(TAG, "✅ Water intake updated successfully: ${newEntry.amount}ml")
+            Log.i(TAG, "✅ Water intake updated successfully: ${newEntry.amount}mL")
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error updating water intake", e)
@@ -459,7 +459,7 @@ class WaterIntakeRepository(
      * Used for importing external data to avoid circular syncing
      */
     suspend fun addImportedWaterEntry(entry: WaterIntakeEntry): Long = withContext(Dispatchers.IO) {
-        Log.d(TAG, "📥 Adding imported water entry: ${entry.amount}ml from ${entry.note}")
+        Log.d(TAG, "📥 Adding imported water entry: ${entry.amount}mL from ${entry.note}")
 
         val entryId = waterIntakeDao.insertEntry(entry)
         updateDailySummaryForDate(entry.date)
@@ -789,7 +789,7 @@ class WaterIntakeRepository(
                         maxOf(100.0, minOf(amount, remainingTarget))
                     } else {
                         minOf(amount, remainingTarget / (entriesPerDay - entryIndex))
-                    }.coerceAtLeast(50.0) // Minimum 50ml per entry
+                    }.coerceAtLeast(50.0) // Minimum 50mL per entry
 
                     totalDailyIntake += finalAmount
                     if (finalAmount > largestIntake) {

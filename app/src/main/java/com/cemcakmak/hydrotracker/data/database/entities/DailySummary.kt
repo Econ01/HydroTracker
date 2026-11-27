@@ -52,7 +52,7 @@ data class DailySummary(
     fun getFormattedTotal(): String {
         return when {
             totalIntake >= 1000 -> "${String.format("%.1f", totalIntake / 1000)} L"
-            else -> "${totalIntake.toInt()} ml"
+            else -> "${totalIntake.toInt()} mL"
         }
     }
 

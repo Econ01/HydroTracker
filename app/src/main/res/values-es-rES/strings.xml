@@ -38,7 +38,7 @@
          Unit suffixes are kept separate from numbers so the value can be formatted
          locale-aware (NumberFormat) and the unit swapped independently.
          ============================================================================ -->
-    <string name="unit_milliliters_format">%1$s ml</string>
+    <string name="unit_milliliters_format">%1$s mL</string>
     <!-- Percentage with sign appended in code; %1$s = value including the % sign, e.g. "85%" -->
     <string name="percent_format">%1$s</string>
     <!-- Character counter, e.g. "12/15 characters"; %1$d = current length, %2$d = max -->
@@ -119,7 +119,7 @@
     <string name="date_format_year_month_day">2026-06-16</string>
     <!-- Volume unit options -->
     <string name="unit_millilitres">Métrica</string>
-    <string name="unit_ml_short">ml</string>
+    <string name="unit_ml_short">mL</string>
     <string name="unit_us_fl_oz">Onzas líquidas (EEUU)</string>
     <string name="unit_us_fl_oz_short">fl oz</string>
     <string name="unit_imperial_fl_oz">Onzas líquidas (Sistema imperial)</string>
@@ -305,7 +305,7 @@
     <string name="appearance_beverage_colors_title">Colores de Bebida</string>
     <string name="appearance_beverage_colors_desc">Pintar las tarjetas y entradas de la pantalla principal con cada color de cada bebida</string>
     <!-- Sample data shown in the theme preview card -->
-    <string name="appearance_preview_amount">1,250 / 2,500 ml</string>
+    <string name="appearance_preview_amount">1,250 / 2,500 mL</string>
     <string name="appearance_preview_entries">Registros</string>
     <string name="appearance_preview_first">Primero</string>
     <string name="appearance_preview_latest">Último</string>
@@ -958,7 +958,7 @@
     <string name="notification_fun_fact_title">¿Sabías que...</string>
     <!-- %1$d = remaining milliliters -->
     <string name="notification_minimal_remaining">%1$s restante/s</string>
-    <!-- %1$s = formatted amount with unit, e.g. "500 ml" -->
+    <!-- %1$s = formatted amount with unit, e.g. "500 mL" -->
     <string name="notification_action_add">Añadir %1$s</string>
     <string name="notification_action_pause_today">Pausar por hoy</string>
     <string name="notification_quick_add_preset_name">Agregar Rápido</string>

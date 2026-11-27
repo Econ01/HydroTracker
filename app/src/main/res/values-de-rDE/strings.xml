@@ -38,7 +38,7 @@
          Unit suffixes are kept separate from numbers so the value can be formatted
          locale-aware (NumberFormat) and the unit swapped independently.
          ============================================================================ -->
-    <string name="unit_milliliters_format">%1$s ml</string>
+    <string name="unit_milliliters_format">%1$s mL</string>
     <!-- Percentage with sign appended in code; %1$s = value including the % sign, e.g. "85%" -->
     <string name="percent_format">%1$s</string>
     <!-- Character counter, e.g. "12/15 characters"; %1$d = current length, %2$d = max -->
@@ -955,7 +955,7 @@
     <string name="notification_fun_fact_title">Schon gewusst?</string>
     <!-- %1$d = remaining milliliters -->
     <string name="notification_minimal_remaining">%1$s Verbleibend</string>
-    <!-- %1$s = formatted amount with unit, e.g. "500 ml" -->
+    <!-- %1$s = formatted amount with unit, e.g. "500 mL" -->
     <string name="notification_action_add">Füge hinzu %1$s</string>
     <string name="notification_action_pause_today">Für heute pausieren</string>
     <string name="notification_quick_add_preset_name">Schnell hinzufügen</string>

@@ -327,7 +327,7 @@ private const val CLASSIC_HAPTIC_MIN_STEP = 1e-3f
  * [Animatable.snapTo] instead of counting up, and only later changes animate.
  *
  * While an animation is running, a haptic tick fires each time the value crosses one whole display
- * unit of the formatted text (every 1 L for "2.5 L", every 1 ml for "2500 ml"), so ticks always
+ * unit of the formatted text (every 1 L for "2.5 L", every 1 mL for "2500 mL"), so ticks always
  * line up with the unit digit on screen. If the display unit cannot be derived from the
  * formatted text, a fallback step of `|target| / [CLASSIC_HAPTIC_FALLBACK_TICKS]` is used.
  * Ticks only fire while an animation is running, so instant reveals and statically composed
@@ -842,7 +842,7 @@ private fun RollingNumberAutoPreview() {
             )
             RollingNumberText(
                 targetValue = target,
-                formatValue = { value -> "${value.toInt()} of 2000 ml" },
+                formatValue = { value -> "${value.toInt()} of 2000 mL" },
                 style = MaterialTheme.typography.displayMediumEmphasized,
                 hapticsEnabled = false
             )
@@ -866,7 +866,7 @@ private fun RollingNumberInteractivePreview() {
             )
             RollingNumberText(
                 targetValue = target,
-                formatValue = { value -> "${value.toInt()} of 2000 ml" },
+                formatValue = { value -> "${value.toInt()} of 2000 mL" },
                 style = MaterialTheme.typography.headlineMediumEmphasized,
                 hapticsEnabled = false
             )
@@ -876,7 +876,7 @@ private fun RollingNumberInteractivePreview() {
             )
             RollingNumberText(
                 targetValue = target,
-                formatValue = { value -> "${value.toInt()} of 2000 ml" },
+                formatValue = { value -> "${value.toInt()} of 2000 mL" },
                 style = MaterialTheme.typography.headlineMediumEmphasized,
                 hapticsEnabled = false,
                 effects = RollingEffects.Subtle
